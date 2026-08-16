@@ -76,5 +76,7 @@ export function getGlyphAtlas(): GlyphAtlas {
   metrics.needsUpdate = true;
 
   cached = { atlas, metrics };
+  // debug/testing handle
+  (window as unknown as Record<string, unknown>).__atlasCanvas = canvas;
   return cached;
 }

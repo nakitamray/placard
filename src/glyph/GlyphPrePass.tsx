@@ -119,6 +119,13 @@ export function GlyphPrePass({
     gl.clear();
     gl.render(scene, camera);
     gl.setRenderTarget(prev);
+
+    // testing handle: confirms the pre-pass is live without touching the GPU
+    (window as unknown as Record<string, unknown>).__prepass = {
+      count: artwork.glyphs.count,
+      corpusLen: artwork.corpusLen,
+      charOffset: u.uCharOffset.value,
+    };
   }, -1); // negative priority = before the default render (spec §7.3)
 
   return null;

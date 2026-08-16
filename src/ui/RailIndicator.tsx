@@ -9,7 +9,14 @@ export function RailIndicator() {
 
   if (phase !== 'gallery' || !artworks.length) return null;
 
-  const surname = (artist: string) => artist.split(' ').slice(-1)[0].toUpperCase();
+  // keep nobiliary particles with the surname: "Vincent van Gogh" → VAN GOGH
+  const surname = (artist: string) => {
+    const words = artist.split(' ');
+    const particles = new Set(['van', 'de', 'du', 'da', 'della', 'la', 'le']);
+    let start = words.length - 1;
+    while (start > 0 && particles.has(words[start - 1].toLowerCase())) start--;
+    return words.slice(start).join(' ').toUpperCase();
+  };
 
   return (
     <nav className="rail" aria-label="Artworks">
