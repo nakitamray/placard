@@ -1,0 +1,40 @@
+{
+  "name": "placard",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Placard — Where History Paints the Masterpiece. A web-based digital art exhibition where famous paintings are reconstructed out of moving text drawn from their own history.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "build:assets": "tsx scripts/build-all.ts",
+    "build:glyphs": "tsx scripts/build-glyphs.ts",
+    "build:corpus": "tsx scripts/build-corpus.ts",
+    "build:images": "tsx scripts/build-images.ts"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.114.0",
+    "@react-three/fiber": "^8.17.10",
+    "gsap": "^3.12.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.169.0",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.169.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "playwright": "1.56.1",
+    "sharp": "^0.33.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

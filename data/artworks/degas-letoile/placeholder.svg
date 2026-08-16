@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1151" height="1600" viewBox="0 0 1151 1600">
+  <defs>
+    <linearGradient id="stage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a2e22"/>
+      <stop offset="0.45" stop-color="#6b5232"/>
+      <stop offset="1" stop-color="#9a7742"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.62" r="0.55">
+      <stop offset="0" stop-color="#e8c87a" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#e8c87a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="tutu" cx="0.5" cy="0.45" r="0.6">
+      <stop offset="0" stop-color="#fdfaf2"/>
+      <stop offset="0.7" stop-color="#f3ecd8"/>
+      <stop offset="1" stop-color="#e3d6b8"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1151" height="1600" fill="url(#stage)"/>
+
+  <!-- scenery flats, upper left wings -->
+  <g>
+    <rect x="0" y="0" width="360" height="640" fill="#2c2417"/>
+    <rect x="60" y="0" width="14" height="640" fill="#463823"/>
+    <rect x="180" y="0" width="14" height="600" fill="#463823"/>
+    <path d="M0,0 L360,0 L360,120 Q180,180 0,140 Z" fill="#243020"/>
+    <path d="M40,120 Q140,240 90,420 Q60,520 80,640 L0,640 L0,140 Z" fill="#324028"/>
+  </g>
+
+  <!-- corps legs in the wings -->
+  <g fill="#d8c9a8" opacity="0.85">
+    <path d="M120,540 l14,-120 l16,2 l-8,120 Z"/>
+    <path d="M170,548 l10,-116 l16,2 l-6,116 Z"/>
+    <path d="M240,536 l16,-110 l15,3 l-10,110 Z"/>
+  </g>
+  <g fill="#c9b68e" opacity="0.7">
+    <ellipse cx="150" cy="420" rx="70" ry="30"/>
+    <ellipse cx="255" cy="415" rx="55" ry="26"/>
+  </g>
+
+  <!-- the abonné, black evening dress -->
+  <path d="M300,120 L300,600 L420,600 L424,240 Q412,160 380,120 Z" fill="#171310"/>
+
+  <!-- pool of light around the dancer -->
+  <ellipse cx="600" cy="960" rx="560" ry="520" fill="url(#glow)"/>
+
+  <!-- the star -->
+  <g>
+    <!-- extended back leg -->
+    <path d="M600,1120 Q700,1230 820,1300 L836,1272 Q730,1200 640,1096 Z" fill="#e9cba6"/>
+    <!-- supporting leg -->
+    <path d="M568,1120 L556,1330 L588,1334 L604,1124 Z" fill="#eed0aa"/>
+    <path d="M548,1330 l44,4 l-6,34 l-40,-6 Z" fill="#d8a8a0"/>
+    <!-- tutu -->
+    <ellipse cx="590" cy="1040" rx="230" ry="120" fill="url(#tutu)"/>
+    <ellipse cx="590" cy="1030" rx="150" ry="80" fill="#f8f3e4"/>
+    <!-- flowers on the tutu -->
+    <circle cx="470" cy="1030" r="16" fill="#c96a5a"/>
+    <circle cx="700" cy="1055" r="14" fill="#c96a5a"/>
+    <circle cx="590" cy="1105" r="13" fill="#8a9a5a"/>
+    <!-- bodice -->
+    <path d="M540,930 Q545,860 570,830 L620,830 Q648,864 650,930 Q620,960 540,930 Z" fill="#f2ead6"/>
+    <!-- arms open -->
+    <path d="M545,880 Q460,850 400,870 Q380,878 372,896 L392,912 Q450,884 548,916 Z" fill="#eed0aa"/>
+    <path d="M645,880 Q740,830 800,846 Q820,852 828,870 L810,888 Q750,862 650,912 Z" fill="#eed0aa"/>
+    <!-- head thrown back -->
+    <circle cx="596" cy="790" r="42" fill="#eecfa8"/>
+    <path d="M560,770 Q590,730 640,758 Q650,790 640,806 Q615,780 560,788 Z" fill="#4a3520"/>
+    <circle cx="640" cy="762" r="10" fill="#c96a5a"/>
+    <!-- choker -->
+    <rect x="576" y="826" width="42" height="8" fill="#2c2417"/>
+  </g>
+
+  <!-- foreground stage rake, empty -->
+  <path d="M0,1400 Q575,1330 1151,1400 L1151,1600 L0,1600 Z" fill="#a8813f" opacity="0.55"/>
+</svg>

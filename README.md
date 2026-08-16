@@ -1,0 +1,100 @@
+# Placard
+
+*Where History Paints the Masterpiece*
+
+A web-based digital art exhibition. Famous paintings are reconstructed entirely
+out of moving text drawn from the artwork's own history. On interaction the
+typographic layer dissolves and the painting is revealed under gallery
+lighting, alongside a museum wall placard.
+
+Navigation is spatial: **Landing → 3D corridor → floor map → horizontal
+gallery roll → individual artwork.**
+
+Built from the Placard developer specification (v1.0). Requires WebGL2.
+
+## Quick start
+
+```bash
+pnpm install
+pnpm build:assets   # regenerates public/ from data/ (images, corpora, glyphs)
+pnpm dev            # or: pnpm build && pnpm preview
+```
+
+Node ≥ 20. `pnpm approve-builds` may be needed once so `sharp` can install its
+prebuilt binaries.
+
+## ⚠️ Placeholder artwork images
+
+This repository was assembled in an environment with **no access to Wikimedia
+Commons**, so the five paintings currently ship as *procedurally generated
+painterly placeholders* (rendered from `data/artworks/{id}/placeholder.svg`).
+All the metadata, placard text, corpora and the entire pipeline are real.
+
+**To use the authentic public-domain scans** (all five works are PD-Art):
+
+1. Download each painting from Wikimedia Commons (≥2000px long edge).
+2. Save it as `data/artworks/{id}/source.jpg` for each of:
+   `whistler-mother`, `vangogh-starry-night-rhone`, `seurat-le-cirque`,
+   `monet-coquelicots`, `degas-letoile`.
+3. Run `pnpm build:assets`.
+
+The build prefers `source.jpg` automatically; nothing else changes. Check
+`data/artworks/{id}/preview.png` after building — it is the fastest iteration
+loop for tuning `config.json` (variance threshold, cell sizes, palette).
+
+## How it works
+
+- **Build time** (`scripts/`): each painting is analysed once by a quadtree
+  variance subdivision — small glyphs across faces and detail, large glyphs
+  across sky and flat fields — and emitted as a compact binary
+  (`glyphs.bin`, format documented in `shared/glyphFormat.ts`). The artwork's
+  corpus (letters, treatises, curatorial notes — tagged per source for
+  licensing) is cleaned, stripped of whitespace and encoded as charset
+  indices (`corpus.bin`).
+- **Runtime** (`src/glyph/`): one instanced draw call renders every glyph.
+  All per-glyph attributes upload once; animation is uniform-driven — the
+  *character occupying each slot advances through the corpus over time* while
+  positions and colours stay fixed, so the painting holds still while its
+  history scrolls through it. The mesh renders into a reused render target
+  sampled by the active artwork plane; only the nearest artwork is live.
+- **Scenes** (`src/scenes/`): a procedural 12-bay corridor (Louis XVI-ish
+  boiserie register, reflective floor, warm 3000K lamps, terminal apse — kept
+  deliberately light and warm per the spec's brightness guardrail) and a
+  horizontal gallery rail with magnetic snap, spotlight reveal and a
+  projected DOM placard.
+
+## Deviations from the spec (and why)
+
+| Spec | This build | Why |
+|---|---|---|
+| MSDF atlas via `msdf-bmfont-xml` at build time | Charset drawn once into a canvas atlas at runtime, mipmapped | No font-tooling/native deps; identical runtime cost (one upload, ever); at 4–24px the difference is invisible. The metrics-texture contract is unchanged, so swapping in a real MSDF atlas later only touches `glyphAtlas.ts` + the fragment shader |
+| Poly Haven HDRI + PBR textures | `RoomEnvironment` procedural env + flat materials in the spec's palette | No network access to Poly Haven; the palette values and lighting rig are the spec's |
+| Lenis scroll | Small hand-rolled damped scroll | One less dependency; same damping maths as §10B.2 |
+| `@react-three/postprocessing` bloom | Omitted for v1 | Keeps the frame budget honest under software rendering; the gilt reads via env reflections |
+| T1 clip-path aperture | Push-through scale/fade layers | A true "hole" clip (landing visible *outside* an expanding window) isn't expressible with a single `clip-path: inset()`; the layered push-through reads correctly and stays cheap |
+| CC0 sculpture scans | Abstracted procedural marble forms | Scan the World / Smithsonian unreachable from the build environment |
+
+Everything else — the binary format, corpus reading order, staggered dissolve,
+reveal choreography ("add light to the artwork, don't darken the room"),
+two-tier placard with dual provenance treatment, device tiering with
+`glyphs-lo.bin`, reduced-motion paths, keyboard navigation, the credits page —
+follows the spec.
+
+## Credits & references
+
+The in-app **Credits** panel (landing page → "Credits & sources") lists every
+corpus source with licence and attribution, image provenance, and the
+projects that informed this build:
+
+- [chenglou/pretext](https://github.com/chenglou/pretext) — interactive-text experiments
+- [WICG/view-transitions](https://github.com/WICG/view-transitions) — transition choreography patterns
+- [saadeghi/daisyui](https://github.com/saadeghi/daisyui) — UI component/token conventions
+- [GitHub transitions topic](https://github.com/topics/transitions?o=desc&s=stars) — survey of transition libraries
+- three.js, @react-three/fiber, drei, GSAP, Zustand, Vite, sharp
+
+## Adding an artwork
+
+1. Create `data/artworks/{id}/` with `placard.json`, `sources.json`,
+   `config.json`, corpus text files, and `source.jpg` (or a `placeholder.svg`).
+2. Add the id to `data/artworks/order.json`.
+3. `pnpm build:assets`.

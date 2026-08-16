@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+data/.cache/
+data/artworks/*/source.generated.png
+data/artworks/*/preview.png.small.png
+smoke.tmp.mjs

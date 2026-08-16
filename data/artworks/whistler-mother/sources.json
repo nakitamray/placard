@@ -1,0 +1,24 @@
+{
+  "segments": [
+    { "sourceId": "placard-note", "weight": 0.6 },
+    { "sourceId": "whistler-gentle-art", "weight": 0.4 }
+  ],
+  "sources": [
+    {
+      "id": "placard-note",
+      "file": "corpus/placard-note.txt",
+      "title": "Curatorial note written for Placard",
+      "url": "",
+      "license": "CC0",
+      "attribution": "Placard"
+    },
+    {
+      "id": "whistler-gentle-art",
+      "file": "corpus/gentle-art.txt",
+      "title": "The Gentle Art of Making Enemies (1890), excerpts",
+      "url": "https://www.gutenberg.org/ebooks/24650",
+      "license": "PD",
+      "attribution": "James McNeill Whistler"
+    }
+  ]
+}

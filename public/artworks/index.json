@@ -1,0 +1,32 @@
+[
+  {
+    "id": "whistler-mother",
+    "artist": "James McNeill Whistler",
+    "title": "Arrangement in Grey and Black No. 1",
+    "aspect": 1.124859392575928
+  },
+  {
+    "id": "vangogh-starry-night-rhone",
+    "artist": "Vincent van Gogh",
+    "title": "Starry Night Over the Rhône",
+    "aspect": 1.2690355329949239
+  },
+  {
+    "id": "seurat-le-cirque",
+    "artist": "Georges Seurat",
+    "title": "The Circus",
+    "aspect": 0.822
+  },
+  {
+    "id": "monet-coquelicots",
+    "artist": "Claude Monet",
+    "title": "Poppies",
+    "aspect": 1.299545159194282
+  },
+  {
+    "id": "degas-letoile",
+    "artist": "Edgar Degas",
+    "title": "The Star",
+    "aspect": 0.7195
+  }
+]

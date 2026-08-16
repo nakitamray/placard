@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1231" viewBox="0 0 1600 1231">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9c4dd"/>
+      <stop offset="0.7" stop-color="#cdd9e2"/>
+      <stop offset="1" stop-color="#dde3e2"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9aa96a"/>
+      <stop offset="0.5" stop-color="#8ba05e"/>
+      <stop offset="1" stop-color="#7d9455"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="560" fill="url(#sky)"/>
+  <!-- clouds -->
+  <g fill="#e9edec" opacity="0.85">
+    <ellipse cx="380" cy="140" rx="240" ry="60"/>
+    <ellipse cx="900" cy="90" rx="300" ry="55"/>
+    <ellipse cx="1350" cy="200" rx="220" ry="50"/>
+    <ellipse cx="620" cy="260" rx="200" ry="42"/>
+  </g>
+
+  <!-- tree line -->
+  <path d="M0,540 Q120,470 260,505 Q400,455 560,500 Q700,465 840,505 Q1000,460 1160,502 Q1320,468 1460,505 Q1540,485 1600,500 L1600,575 L0,575 Z" fill="#5c7247"/>
+  <!-- house -->
+  <rect x="1050" y="470" width="120" height="70" fill="#c9b8a2"/>
+  <path d="M1040,470 L1110,425 L1180,470 Z" fill="#8a6a52"/>
+
+  <!-- field -->
+  <rect y="560" width="1600" height="671" fill="url(#field)"/>
+  <!-- hazy band at the crest -->
+  <rect y="560" width="1600" height="60" fill="#a7b378" opacity="0.7"/>
+
+  <!-- poppy drift, left half, growing toward foreground -->
+  <g fill="#c0392b">
+    <circle cx="120" cy="640" r="9"/><circle cx="220" cy="655" r="8"/><circle cx="320" cy="640" r="9"/>
+    <circle cx="430" cy="660" r="8"/><circle cx="60" cy="690" r="10"/><circle cx="180" cy="700" r="11"/>
+    <circle cx="300" cy="690" r="10"/><circle cx="420" cy="705" r="10"/><circle cx="540" cy="695" r="9"/>
+    <circle cx="100" cy="760" r="13"/><circle cx="240" cy="775" r="12"/><circle cx="380" cy="760" r="13"/>
+    <circle cx="520" cy="778" r="12"/><circle cx="640" cy="765" r="11"/>
+    <circle cx="60" cy="840" r="16"/><circle cx="200" cy="855" r="15"/><circle cx="350" cy="840" r="16"/>
+    <circle cx="500" cy="860" r="15"/><circle cx="650" cy="845" r="14"/><circle cx="770" cy="862" r="12"/>
+    <circle cx="120" cy="940" r="20"/><circle cx="290" cy="955" r="19"/><circle cx="460" cy="938" r="20"/>
+    <circle cx="620" cy="958" r="18"/><circle cx="780" cy="942" r="16"/>
+    <circle cx="80" cy="1050" r="26"/><circle cx="270" cy="1070" r="24"/><circle cx="470" cy="1050" r="26"/>
+    <circle cx="660" cy="1072" r="23"/><circle cx="840" cy="1055" r="20"/>
+    <circle cx="160" cy="1160" r="32"/><circle cx="380" cy="1175" r="30"/><circle cx="600" cy="1158" r="31"/>
+    <circle cx="810" cy="1178" r="27"/>
+  </g>
+  <g fill="#d35d4a" opacity="0.85">
+    <circle cx="170" cy="620" r="6"/><circle cx="370" cy="628" r="6"/><circle cx="500" cy="640" r="6"/>
+    <circle cx="140" cy="800" r="10"/><circle cx="430" cy="812" r="10"/><circle cx="590" cy="800" r="9"/>
+    <circle cx="220" cy="1000" r="15"/><circle cx="540" cy="1005" r="15"/><circle cx="720" cy="1000" r="13"/>
+    <circle cx="300" cy="1120" r="20"/><circle cx="700" cy="1120" r="19"/><circle cx="920" cy="1130" r="16"/>
+  </g>
+
+  <!-- crest pair: woman with parasol + child -->
+  <g>
+    <ellipse cx="1218" cy="588" rx="30" ry="10" fill="#6f854f"/>
+    <path d="M1200,510 q6,-26 18,-26 q12,0 18,26 l6,68 l-46,0 Z" fill="#4f5a6e"/>
+    <circle cx="1218" cy="474" r="12" fill="#d8b894"/>
+    <path d="M1188,462 a30,14 0 0 1 60,0 Z" fill="#e8e2d2"/>
+    <line x1="1218" y1="462" x2="1218" y2="448" stroke="#8a7a5e" stroke-width="3"/>
+    <path d="M1252,540 q4,-18 11,-18 q7,0 11,18 l4,40 l-30,0 Z" fill="#7a8496"/>
+    <circle cx="1263" cy="512" r="9" fill="#d8b894"/>
+  </g>
+
+  <!-- foreground pair -->
+  <g>
+    <path d="M990,960 q10,-50 26,-50 q16,0 26,50 l10,150 l-72,0 Z" fill="#3e4a60"/>
+    <circle cx="1016" cy="880" r="22" fill="#d8b894"/>
+    <path d="M980,862 a38,17 0 0 1 74,0 Z" fill="#e8e2d2"/>
+    <line x1="1042" y1="872" x2="1076" y2="830" stroke="#8a7a5e" stroke-width="5"/>
+    <ellipse cx="1084" cy="822" rx="16" ry="30" fill="#dcd4c0"/>
+    <path d="M880,1030 q8,-36 20,-36 q12,0 20,36 l8,96 l-56,0 Z" fill="#6e7488"/>
+    <circle cx="900" cy="968" r="16" fill="#d8b894"/>
+    <path d="M876,956 a26,12 0 0 1 50,0 Z" fill="#caa84e"/>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+{
+  "workingWidth": 1400,
+  "minCell": 6,
+  "maxCell": 24,
+  "varianceThreshold": 0.006,
+  "fontScale": 1.15,
+  "paletteSize": 64,
+  "saturationBoost": 1.15,
+  "contrastBoost": 1.0
+}

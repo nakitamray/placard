@@ -1,0 +1,30 @@
+{
+  "id": "whistler-mother",
+  "artist": "James McNeill Whistler",
+  "artistDates": "1834–1903",
+  "title": "Arrangement in Grey and Black No. 1",
+  "titleOriginal": "Portrait of the Artist's Mother",
+  "year": "1871",
+  "medium": "Oil on canvas",
+  "dimensions": "144.3 × 162.4 cm",
+  "housedAt": {
+    "institution": "Musée d'Orsay",
+    "city": "Paris",
+    "room": "Level 5",
+    "accession": "RF 699",
+    "creditLine": "Acquired by the French state, 1891"
+  },
+  "labelText": "Whistler insisted the picture be understood first as a painting: an arrangement of tone before it is a portrait of Anna McNeill Whistler. Painted in London in 1871, it sets the seated figure in strict profile against a wall of measured greys, the black of her dress relieved only by the lace of cap and cuffs. The composition is ruled by rectangles — curtain, framed print, dado — balanced with an austerity Whistler admired in Japanese prints. Purchased by the French state in 1891, it was the first painting by an American artist to enter the national collection.",
+  "extendedNote": "When Whistler exhibited this canvas at the Royal Academy in 1872, its title scandalised critics who expected sentiment from a picture of a mother. 'To me it is interesting as a picture of my mother,' he conceded, 'but what can or ought the public to care about the identity of the portrait?' The remark is the whole of his aesthetic creed. Whistler belonged to no school and courted none; he had left America for Paris in 1855, settled in London, and spent his career arguing — in paint, in pamphlets, and once in court — that painting should aspire to the condition of music. His titles borrowed its vocabulary: arrangements, harmonies, nocturnes.\n\nThe picture itself was partly an accident. A model failed to appear, and his mother, then living with him in Chelsea, took her place. Standing tired her; she sat. The pose that resulted — profile, hands folded over a white handkerchief, feet on a low stool — has the gravity of a coin or a memorial relief. Every interval is calculated: the curtain with its scattered flecks at the left edge, the framed etching of the Thames placed high against the grey wall, the long dark skirt anchoring the lower half. The palette is close to monochrome, yet within the greys and blacks there are warm and cool notes laid with extraordinary delicacy — the paint thin, almost stained into the canvas.\n\nThe painting's later fame would have amused its maker. Sold to the French state in 1891 through the efforts of his friends Stéphane Mallarmé and Théodore Duret, it entered the Luxembourg and later the Louvre before coming to the Musée d'Orsay. In America, where it toured in the 1930s, it became an icon of motherhood — the very sentimental reading Whistler had built the title to refuse. The picture has survived both readings. What remains on the wall is what he intended: an arrangement in grey and black, perfectly weighed.",
+  "textProvenance": {
+    "type": "placard_original",
+    "attribution": "Curatorial note written for Placard; facts verified against Musée d'Orsay collection records",
+    "url": "https://www.musee-orsay.fr/en/artworks/arrangement-en-gris-et-noir-no-1-968"
+  },
+  "image": {
+    "file": "full.jpg",
+    "source": "Wikimedia Commons (PD-Art) — placeholder rendering shipped until the scan is dropped into data/artworks/whistler-mother/source.jpg",
+    "license": "PD-Art",
+    "photoCredit": ""
+  }
+}

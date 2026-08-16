@@ -1,0 +1,63 @@
+{
+  "id": "seurat-le-cirque",
+  "artist": "Georges Seurat",
+  "artistDates": "1859–1891",
+  "title": "The Circus",
+  "titleOriginal": "Le Cirque",
+  "year": "1891",
+  "medium": "Oil on canvas",
+  "dimensions": "185.5 × 152.5 cm",
+  "housedAt": {
+    "institution": "Musée d'Orsay",
+    "city": "Paris",
+    "room": "Level 5",
+    "accession": "RF 2511",
+    "creditLine": "Bequest of John Quinn, 1924"
+  },
+  "labelText": "A bareback rider balances on one foot as her white horse canters the ring of the Cirque Fernando in Montmartre; a clown's back closes the foreground, an acrobat tumbles in mid-air, and the audience sits in tiers graded by the price of the seats. Seurat built the whole spectacle from his dots of pure colour — orange and yellow against blue — and from lines chosen by theory: upward curves for gaiety. The picture was unfinished when he exhibited it in March 1891, and unfinished it remained; he died that month, at thirty-one.",
+  "extendedNote": "Le Cirque is Seurat's last painting, and it is a demonstration piece. By 1891 he had pushed his method — colour divided into small separate touches, mixed by the eye rather than the brush — into a complete system that claimed to govern emotion as well as light. Lines rising from the horizontal signified happiness; warm colours, orange above all, carried gaiety. The circus, all upward curves and orange-gold air, was the perfect subject for a theory of joy.\n\nEverything in the picture performs. The rider stands on her cantering horse; the acrobat behind is frozen at the top of his tumble; the ringmaster's whip draws one long arabesque through the composition. In the foreground, seen from behind, a clown in red holds back a curtain — we watch the show over his shoulder, placed by Seurat in the cheap standing room. Behind the performers the audience rises in strict horizontal tiers, the spectators drawn with a caricaturist's economy: top hats in the expensive rows near the ring, caps and leaning elbows in the gallery. The frontier between spectacle and spectator — curved line against straight — is the painting's real subject.\n\nSeurat showed the canvas, its dotted surface still open and unfinished in places, at the Salon des Indépendants in March 1891. Days later he was dead of an infection at thirty-one, and the painting returned to his studio wall. Its later history is its own small drama of devotion: the American collector John Quinn, urged by the painter's friends, bought it on the understanding that it would go to France, and at his death in 1924 it entered the Louvre — the first Seurat in the national collection, now at the Musée d'Orsay. The dots have never closed; the joy machine runs unfinished forever.",
+  "textProvenance": {
+    "type": "placard_original",
+    "attribution": "Curatorial note written for Placard; facts verified against Musée d'Orsay collection records",
+    "url": "https://www.musee-orsay.fr/en/artworks/cirque-343"
+  },
+  "image": {
+    "file": "full.jpg",
+    "source": "Wikimedia Commons (PD-Art) — placeholder rendering shipped until the scan is dropped into data/artworks/seurat-le-cirque/source.jpg",
+    "license": "PD-Art",
+    "photoCredit": ""
+  },
+  "corpus": {
+    "length": 1665,
+    "segments": [
+      {
+        "sourceId": "placard-note",
+        "offset": 0,
+        "length": 872
+      },
+      {
+        "sourceId": "signac-neo",
+        "offset": 872,
+        "length": 793
+      }
+    ],
+    "sources": [
+      {
+        "id": "placard-note",
+        "title": "Curatorial note written for Placard",
+        "url": "",
+        "license": "CC0",
+        "attribution": "Placard"
+      },
+      {
+        "id": "signac-neo",
+        "title": "On divisionism — after the neo-impressionist doctrine (paraphrase, written for Placard)",
+        "url": "",
+        "license": "CC0",
+        "attribution": "Placard"
+      }
+    ]
+  },
+  "imageWidth": 1644,
+  "imageHeight": 2000
+}

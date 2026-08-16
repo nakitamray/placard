@@ -1,0 +1,30 @@
+{
+  "id": "degas-letoile",
+  "artist": "Edgar Degas",
+  "artistDates": "1834–1917",
+  "title": "The Star",
+  "titleOriginal": "L'Étoile, or Danseuse sur scène",
+  "year": "c. 1876",
+  "medium": "Pastel over monotype on paper",
+  "dimensions": "58.4 × 42 cm",
+  "housedAt": {
+    "institution": "Musée d'Orsay",
+    "city": "Paris",
+    "room": "Level 5",
+    "accession": "RF 12258",
+    "creditLine": "Bequest of Gustave Caillebotte, 1894"
+  },
+  "labelText": "Seen from a box above the stage, the star takes her bow alone in the gaslight, head thrown back, arms open, her tutu a burst of white and flower-colour against the empty rake of the floor. In the wings — where Degas always looked — wait the shadowed legs of the corps de ballet and a man in evening black, one of the subscribers whose backstage privileges everyone at the Opéra understood. Pastel worked over a monotype base gives the light its powdery flare. It came to the state in 1894 with the bequest of the painter Gustave Caillebotte.",
+  "extendedNote": "Degas called himself a realist and detested the word 'impressionist,' yet the ballet pictures that made him famous are studies of exactly what the impressionists loved: artificial light, arrested movement, the odd truthful angle. He drew the Opéra's dancers for forty years — at the barre, at rest, scratching their backs, yawning, and only occasionally, as here, in glory.\n\nThe viewpoint is the picture's first invention. We look down from a box, so the stage floor tips up behind the dancer like a wall of amber light, and she floats against it with nothing else in focus. She is caught at the instant of the révérence, the bow taken alone after a solo: chin lifted, throat bare, eyes closed, one shoulder dipped. The gaslight of the footlights strikes her from below — the lighting that makes theatrical faces strange — and burns the front of her tutu to a white flare.\n\nThe second invention waits in the wings. Behind the flats stand the others: dancers' legs beneath drooping skirts, and a man in black evening dress, faceless, hands in pockets. He is an abonné — a season subscriber of the Paris Opéra, one of the wealthy men whose subscriptions bought entry to the foyer de la danse and to the company of the dancers, most of them working-class girls whose careers such men could make. Degas states the fact without comment, in the corner, the way facts stood in the ballet's actual world.\n\nThe sheet is pastel over monotype — Degas inked a metal plate, printed it, then worked colour over the ghostly print, a hybrid technique he made his own in these years. It belonged to his friend and fellow painter Gustave Caillebotte, whose bequest of 1894 forced the French state, amid real controversy, to hang the impressionists at last. It hangs now at the Musée d'Orsay.",
+  "textProvenance": {
+    "type": "placard_original",
+    "attribution": "Curatorial note written for Placard; facts verified against Musée d'Orsay collection records",
+    "url": "https://www.musee-orsay.fr/en/artworks/letoile-79975"
+  },
+  "image": {
+    "file": "full.jpg",
+    "source": "Wikimedia Commons (PD-Art) — placeholder rendering shipped until the scan is dropped into data/artworks/degas-letoile/source.jpg",
+    "license": "PD-Art",
+    "photoCredit": ""
+  }
+}

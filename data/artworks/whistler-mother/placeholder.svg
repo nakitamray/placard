@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1422" viewBox="0 0 1600 1422">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6f6d68"/>
+      <stop offset="0.55" stop-color="#63615c"/>
+      <stop offset="1" stop-color="#57554f"/>
+    </linearGradient>
+    <linearGradient id="dado" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3f3d38"/>
+      <stop offset="1" stop-color="#34322d"/>
+    </linearGradient>
+    <linearGradient id="curtain" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2c2a27"/>
+      <stop offset="1" stop-color="#3a3833"/>
+    </linearGradient>
+    <radialGradient id="face" cx="0.4" cy="0.4" r="0.8">
+      <stop offset="0" stop-color="#cbb49a"/>
+      <stop offset="1" stop-color="#a8927b"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="1422" fill="url(#wall)"/>
+  <!-- dado -->
+  <rect y="1080" width="1600" height="342" fill="url(#dado)"/>
+  <rect y="1068" width="1600" height="14" fill="#7a7872"/>
+
+  <!-- curtain, flecked -->
+  <rect width="360" height="1422" fill="url(#curtain)"/>
+  <g fill="#8d8a80" opacity="0.55">
+    <circle cx="60" cy="140" r="6"/><circle cx="150" cy="260" r="5"/><circle cx="240" cy="180" r="4"/>
+    <circle cx="90" cy="420" r="5"/><circle cx="200" cy="520" r="6"/><circle cx="300" cy="380" r="4"/>
+    <circle cx="70" cy="700" r="5"/><circle cx="180" cy="800" r="4"/><circle cx="280" cy="660" r="6"/>
+    <circle cx="120" cy="980" r="5"/><circle cx="250" cy="1080" r="4"/><circle cx="80" cy="1220" r="6"/>
+    <circle cx="220" cy="1300" r="5"/><circle cx="320" cy="1180" r="4"/>
+  </g>
+
+  <!-- framed etching on wall -->
+  <rect x="430" y="120" width="330" height="250" fill="#2f2d29"/>
+  <rect x="444" y="134" width="302" height="222" fill="#b9b3a4"/>
+  <rect x="460" y="150" width="270" height="190" fill="#9d9684"/>
+  <path d="M460,300 Q560,260 660,290 T730,280 L730,340 L460,340 Z" fill="#807a6a"/>
+
+  <!-- floor hint -->
+  <rect y="1330" width="1600" height="92" fill="#4a4741"/>
+
+  <!-- footstool -->
+  <rect x="620" y="1290" width="260" height="60" rx="10" fill="#232120"/>
+
+  <!-- seated figure in profile, facing left -->
+  <g>
+    <!-- skirt mass -->
+    <path d="M700,1330 C660,1150 700,980 810,900 L1120,900 C1230,960 1290,1120 1300,1330 Z" fill="#141312"/>
+    <!-- torso -->
+    <path d="M810,910 C800,780 830,640 900,590 L1010,590 C1070,650 1090,780 1090,910 Z" fill="#191817"/>
+    <!-- profile head -->
+    <path d="M878,470 C878,410 918,368 968,368 C1020,368 1050,410 1050,470 C1050,520 1020,552 968,556 C918,556 878,522 878,470 Z" fill="url(#face)"/>
+    <!-- lace cap -->
+    <path d="M900,380 C920,340 1010,336 1040,380 C1058,410 1056,450 1048,470 C1052,420 1030,392 968,388 C930,388 908,404 898,440 Z" fill="#e8e2d6"/>
+    <path d="M1040,430 C1064,470 1062,540 1044,590 L1010,590 C1026,540 1030,480 1022,440 Z" fill="#ddd6c8"/>
+    <!-- hands + handkerchief -->
+    <ellipse cx="905" cy="920" rx="70" ry="42" fill="#e3ddd0"/>
+    <ellipse cx="905" cy="905" rx="46" ry="26" fill="#c7b49b"/>
+  </g>
+
+  <!-- chair back -->
+  <rect x="1120" y="560" width="60" height="700" fill="#100f0e"/>
+</svg>

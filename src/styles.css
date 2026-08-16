@@ -1,0 +1,306 @@
+/* ─── Placard UI system — spec §10C ───────────────────────────────────────
+   The interface is the quiet frame around a loud idea. */
+
+:root {
+  /* colour — derived from the corridor palette, not chosen separately */
+  --bone: #f2ebdf;
+  --stone: #e8dfd0;
+  --limestone: #d8cdba;
+  --taupe: #b9a88f;
+  --umber: #6e5b4a;
+  --ink: #241f1a;
+  --gilt: #c9a227;
+
+  /* spacing — 4px base */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+  --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px;
+
+  /* radius — museums have sharp corners */
+  --r-none: 0;
+  --r-sm: 2px;
+
+  /* motion */
+  --d-fast: 200ms; --d-base: 400ms; --d-slow: 600ms; --d-grand: 900ms;
+  --e-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --e-both: cubic-bezier(0.65, 0, 0.35, 1);
+
+  font-family: 'EB Garamond', 'Iowan Old Style', 'Palatino Linotype', Palatino,
+    Georgia, serif;
+  font-feature-settings: 'onum' 1; /* old-style figures everywhere */
+  color: var(--ink);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body { margin: 0; overflow: hidden; background: var(--ink); }
+
+.no-native-cursor, .no-native-cursor * { cursor: none !important; }
+
+/* ─── type scale — spec §10C.2 ─── */
+.caption { font-size: 11px; line-height: 16px; letter-spacing: 0.09em; text-transform: uppercase; }
+.meta    { font-size: 13px; line-height: 20px; letter-spacing: 0.02em; font-variant-caps: small-caps; text-transform: none; }
+.body    { font-size: 16px; line-height: 26px; letter-spacing: 0; text-transform: none; }
+.title   { font-size: 21px; line-height: 28px; font-style: italic; font-weight: 500; }
+.display { font-size: 34px; line-height: 40px; letter-spacing: -0.01em; font-weight: 500; }
+.hero    { font-size: 54px; line-height: 58px; letter-spacing: -0.02em; font-weight: 500; }
+@media (max-width: 720px) { .hero { font-size: 38px; line-height: 42px; } }
+
+.hairline { border: 0; border-top: 1px solid var(--limestone); margin: var(--s4) 0; }
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--gilt); /* never outline: none — spec §10C.10 */
+  outline-offset: 3px;
+}
+button:active { transform: translateY(1px); }
+
+/* ─── canvas ─── */
+.canvas-wrap {
+  position: fixed;
+  inset: 0;
+  transition: filter var(--d-slow) var(--e-both), transform var(--d-slow) var(--e-both);
+}
+.canvas-wrap.is-blurred {
+  filter: blur(14px) saturate(0.92);
+  transform: scale(1.02); /* map backdrop breathes 1.00 → 1.02 (spec §10B.3) */
+}
+
+/* ─── loading — spec §10C.8 ─── */
+.loading { position: fixed; inset: 0; background: var(--ink); z-index: 60; }
+.loading-word {
+  position: absolute; bottom: 28px; left: 0; right: 0;
+  text-align: center; color: var(--bone); letter-spacing: 0.35em;
+}
+.loading-rule {
+  position: absolute; bottom: 16px; left: 0; right: 0;
+  height: 1px; background: var(--gilt);
+  transform-origin: left center;
+  transition: transform var(--d-base) var(--e-out);
+}
+
+.webgl-missing {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  background: var(--bone); color: var(--ink); padding: var(--s6); text-align: center;
+}
+
+/* ─── landing — spec §10C.3 ─── */
+.landing { position: fixed; inset: 0; z-index: 40; background: var(--ink); overflow: hidden; }
+.landing-bg { position: absolute; inset: -32px; }
+.landing-img {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+}
+.landing-img.is-active { opacity: 1; animation: kenburns linear forwards; }
+@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .landing-img.is-active { animation: none; } }
+.landing-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(36,31,26,0.30) 0%, rgba(36,31,26,0.75) 100%);
+}
+.landing-content {
+  position: absolute; top: 50%; left: 12vw; transform: translateY(-50%);
+  width: 480px; max-width: 88vw; color: var(--bone);
+}
+.landing-mark { color: var(--gilt); letter-spacing: 0.35em; margin: 0 0 var(--s5); }
+.landing-content .hero { margin: 0 0 var(--s5); }
+.landing-content .hairline { border-color: rgba(216, 205, 186, 0.4); width: 220px; margin-left: 0; }
+.landing-choose { color: var(--stone); opacity: 0.85; margin: var(--s5) 0 var(--s3); }
+.gallery-list { list-style: none; margin: 0; padding: 0; }
+.gallery-list li { border-bottom: 1px solid rgba(216, 205, 186, 0.28); }
+.gallery-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  width: 100%; height: 64px; align-items: center;
+  position: relative; text-align: left; color: var(--bone);
+}
+.gallery-row .gallery-name { font-size: 21px; transition: transform var(--d-fast) var(--e-out); }
+.gallery-row::after {
+  content: ''; position: absolute; left: 0; bottom: -1px; height: 1px; width: 100%;
+  background: var(--gilt); transform: scaleX(0); transform-origin: left center;
+  transition: transform var(--d-fast) var(--e-out);
+}
+.gallery-row:hover::after, .gallery-row.is-chosen::after { transform: scaleX(1); }
+.gallery-row:hover .gallery-name { transform: translateX(4px); }
+.gallery-row.is-disabled { color: var(--taupe); cursor: not-allowed; }
+.gallery-city { color: var(--taupe); }
+.credits-link { margin-top: var(--s6); color: var(--taupe); }
+.credits-link:hover { color: var(--gilt); }
+
+.skip-link {
+  position: absolute; top: -48px; left: var(--s4); z-index: 70;
+  background: var(--bone); color: var(--ink); padding: var(--s2) var(--s4);
+  transition: top var(--d-fast);
+}
+.skip-link:focus { top: var(--s4); }
+
+/* ─── map overlay — spec §10C.4 ─── */
+.map-overlay {
+  position: fixed; inset: 0; z-index: 30;
+  background: rgba(242, 235, 223, 0.82); /* bone scrim */
+  display: flex; flex-direction: column; align-items: center;
+  animation: map-in var(--d-base) var(--e-out);
+  color: var(--ink);
+}
+@keyframes map-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+.map-header {
+  width: 100%; display: flex; justify-content: space-between;
+  padding: var(--s5) var(--s6); color: var(--umber);
+}
+.map-back:hover { color: var(--gilt); }
+.map-title { margin: var(--s6) 0 var(--s7); }
+.map-plan { width: min(720px, 92vw); }
+.map-svg { width: 100%; height: auto; overflow: visible; }
+.map-room {
+  fill: var(--stone); stroke: var(--limestone); stroke-width: 1;
+  transition: fill var(--d-fast), stroke var(--d-fast);
+}
+.map-room.is-active { cursor: pointer; }
+.map-room.is-active:hover, .map-room.is-active:focus-visible { fill: var(--bone); stroke: var(--gilt); }
+.map-room.is-inactive { fill: #e4e0d8; stroke-dasharray: 4 3; cursor: not-allowed; }
+.map-label {
+  fill: var(--umber); text-anchor: middle; dominant-baseline: middle;
+  font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase;
+  pointer-events: none;
+}
+g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
+.map-label.is-inactive { fill: var(--taupe); }
+.map-footnote { margin-top: var(--s7); color: var(--taupe); }
+.map-footnote-sub { margin-top: var(--s2); color: var(--taupe); opacity: 0.8; }
+
+/* ─── placard — spec §10C.5 ─── */
+.placard {
+  position: fixed; top: 0; left: 0; z-index: 25;
+  width: 380px; background: var(--bone);
+  border: 1px solid var(--limestone);
+  box-shadow: 0 24px 60px rgba(36, 31, 26, 0.18);
+  border-radius: 0;
+  opacity: 0; visibility: hidden;
+  translate: 24px 0;
+  transition: opacity var(--d-slow) var(--e-out), translate var(--d-slow) var(--e-out),
+    visibility 0s linear var(--d-slow);
+}
+.placard.is-visible {
+  opacity: 1; visibility: visible; translate: 0 0;
+  transition-delay: 400ms, 400ms, 0s; /* placard slides in late (spec §10.6) */
+}
+.placard-scroll { max-height: 70vh; overflow-y: auto; padding: var(--s6); scrollbar-width: thin; }
+.placard p { margin: 0; }
+.placard-artist { letter-spacing: 0.08em; }
+.placard-dates { color: var(--taupe); margin-bottom: var(--s4) !important; }
+.placard-title { margin: 0; }
+.placard .caption { color: var(--umber); }
+.placard-medium { margin-top: var(--s4) !important; }
+.placard-housing { font-weight: 500; }
+.placard-room { color: var(--taupe) !important; }
+.placard-label { margin-top: var(--s2) !important; }
+.placard-more { color: var(--gilt) !important; margin-top: var(--s4); display: inline-flex; gap: 6px; }
+.placard-more .chev { display: inline-block; transition: rotate var(--d-base) var(--e-both); }
+.placard.is-expanded .placard-more .chev { rotate: 180deg; }
+.placard-note p { margin-top: var(--s4) !important; }
+.placard-provenance { font-style: italic; color: var(--taupe) !important; margin-top: var(--s5) !important; }
+
+@media (pointer: coarse), (max-width: 720px) {
+  /* bottom sheet (spec §10C.5 mobile) */
+  .placard {
+    top: auto; bottom: 0; left: 0; right: 0; width: 100%;
+    translate: 0 40px; max-height: 55vh;
+  }
+  .placard.is-expanded { max-height: 90vh; }
+  .placard.is-visible { translate: 0 0; }
+  .placard-scroll { max-height: inherit; }
+  .placard::before {
+    content: ''; display: block; width: 36px; height: 3px; margin: 8px auto 0;
+    background: var(--limestone); border-radius: 2px;
+  }
+}
+
+/* ─── rail indicator — spec §10C.6 ─── */
+.rail {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  z-index: 20; text-align: center;
+}
+.rail-ticks { display: flex; gap: 24px; align-items: center; justify-content: center; }
+.rail-tick {
+  width: 16px; height: 1px; background: var(--limestone); padding: 8px 0;
+  background-clip: content-box;
+  transition: width 300ms var(--e-out), background-color 300ms;
+}
+.rail-tick.is-active { width: 24px; height: 2px; background-color: var(--gilt); background-clip: content-box; }
+.rail-label { color: var(--umber); margin: 2px 0 0; }
+
+.gallery-back {
+  position: fixed; top: var(--s5); left: var(--s6); z-index: 20; color: var(--umber);
+}
+.gallery-back:hover { color: var(--gilt); }
+
+/* ─── reveal vignette — spec §10.6: 18% opacity, generous radius ─── */
+.reveal-vignette {
+  position: fixed; inset: 0; z-index: 15; pointer-events: none;
+  background: radial-gradient(ellipse 130% 130% at center, transparent 55%, rgba(36, 31, 26, 0.18) 100%);
+  opacity: 0; transition: opacity 700ms var(--e-both) 200ms;
+}
+.reveal-vignette.is-on { opacity: 1; }
+
+/* ─── warp flash ─── */
+.flash {
+  position: fixed; inset: 0; z-index: 50; pointer-events: none;
+  background: #fff8ea; opacity: 0;
+}
+
+/* ─── credits ─── */
+.credits {
+  position: fixed; inset: 0; z-index: 55; background: rgba(36, 31, 26, 0.35);
+  display: grid; place-items: center; padding: var(--s6);
+}
+.credits-inner {
+  background: var(--bone); border: 1px solid var(--limestone);
+  box-shadow: 0 24px 60px rgba(36, 31, 26, 0.25);
+  max-width: 640px; width: 100%; max-height: 84vh; overflow-y: auto;
+  padding: var(--s7);
+}
+.credits-header { display: flex; justify-content: space-between; align-items: baseline; }
+.credits-close { color: var(--umber); }
+.credits-close:hover { color: var(--gilt); }
+.credits-section { color: var(--umber); margin: var(--s6) 0 var(--s2); letter-spacing: 0.06em; }
+.credits-note { color: var(--ink); margin: 0 0 var(--s4); }
+.credits-artwork { margin-bottom: var(--s4); }
+.credits-title { margin: 0; }
+.credits-inner ul { margin: var(--s2) 0; padding-left: var(--s4); }
+.credits-source { color: var(--umber); text-transform: none; letter-spacing: 0.02em; margin: var(--s1) 0; }
+.credits-source a { color: var(--umber); text-decoration-color: var(--gilt); }
+.credits-source a:hover { color: var(--gilt); }
+.credits-imgsrc { color: var(--taupe); text-transform: none; letter-spacing: 0.02em; }
+
+/* ─── cursor — spec §10C.7 ─── */
+.cursor-ring {
+  position: fixed; top: 0; left: 0; z-index: 80; pointer-events: none;
+  width: 18px; height: 18px; margin: -9px 0 0 -9px;
+  border: 1px solid rgba(36, 31, 26, 0.4); border-radius: 50%;
+  display: grid; place-items: center;
+  transition: width var(--d-fast), height var(--d-fast), margin var(--d-fast),
+    background-color var(--d-fast);
+}
+.cursor-ring.is-interactive {
+  width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  background: rgba(36, 31, 26, 0.06);
+}
+.cursor-ring.is-contracted { width: 10px; height: 10px; margin: -5px 0 0 -5px; background: var(--ink); }
+.cursor-label { position: absolute; top: 22px; color: var(--ink); white-space: nowrap; }
+
+/* ─── screen-reader proxies ─── */
+.sr-proxies { position: fixed; left: -9999px; top: 0; }
+.sr-proxies button { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas-wrap, .placard, .map-overlay, .reveal-vignette { transition-duration: 1ms !important; }
+  .map-overlay { animation: none; }
+}

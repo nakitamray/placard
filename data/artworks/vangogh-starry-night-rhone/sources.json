@@ -1,0 +1,24 @@
+{
+  "segments": [
+    { "sourceId": "vg-letters", "weight": 0.55 },
+    { "sourceId": "placard-note", "weight": 0.45 }
+  ],
+  "sources": [
+    {
+      "id": "vg-letters",
+      "file": "corpus/letters.txt",
+      "title": "Letters to Theo van Gogh and Émile Bernard, Arles 1888 (translated excerpts)",
+      "url": "https://vangoghletters.org/",
+      "license": "PD",
+      "attribution": "Vincent van Gogh"
+    },
+    {
+      "id": "placard-note",
+      "file": "corpus/placard-note.txt",
+      "title": "Curatorial note written for Placard",
+      "url": "",
+      "license": "CC0",
+      "attribution": "Placard"
+    }
+  ]
+}

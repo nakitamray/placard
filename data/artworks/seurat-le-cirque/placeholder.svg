@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1315" height="1600" viewBox="0 0 1315 1600">
+  <defs>
+    <linearGradient id="hall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8d9a8"/>
+      <stop offset="1" stop-color="#e2c98e"/>
+    </linearGradient>
+    <radialGradient id="ring" cx="0.5" cy="0.45" r="0.75">
+      <stop offset="0" stop-color="#f2e3b4"/>
+      <stop offset="1" stop-color="#e8cf92"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1315" height="1600" fill="url(#hall)"/>
+
+  <!-- tiered audience -->
+  <g>
+    <rect y="60" width="1315" height="90" fill="#d9b878"/>
+    <rect y="150" width="1315" height="90" fill="#dfc084"/>
+    <rect y="240" width="1315" height="90" fill="#d9b878"/>
+    <rect y="330" width="1315" height="90" fill="#dfc084"/>
+    <rect y="420" width="1315" height="80" fill="#d9b878"/>
+  </g>
+  <!-- spectators -->
+  <g fill="#4a5a8a">
+    <circle cx="90" cy="100" r="20"/><circle cx="210" cy="104" r="20"/><circle cx="330" cy="98" r="20"/>
+    <circle cx="450" cy="102" r="20"/><circle cx="570" cy="100" r="20"/><circle cx="690" cy="104" r="20"/>
+    <circle cx="810" cy="98" r="20"/><circle cx="930" cy="102" r="20"/><circle cx="1050" cy="100" r="20"/>
+    <circle cx="1170" cy="104" r="20"/><circle cx="150" cy="192" r="20"/><circle cx="270" cy="188" r="20"/>
+    <circle cx="390" cy="194" r="20"/><circle cx="510" cy="190" r="20"/><circle cx="630" cy="192" r="20"/>
+    <circle cx="750" cy="188" r="20"/><circle cx="870" cy="194" r="20"/><circle cx="990" cy="190" r="20"/>
+    <circle cx="1110" cy="192" r="20"/><circle cx="1230" cy="188" r="20"/>
+    <circle cx="90" cy="282" r="20"/><circle cx="210" cy="278" r="20"/><circle cx="330" cy="284" r="20"/>
+    <circle cx="450" cy="280" r="20"/><circle cx="570" cy="282" r="20"/><circle cx="690" cy="278" r="20"/>
+    <circle cx="810" cy="284" r="20"/><circle cx="930" cy="280" r="20"/><circle cx="1050" cy="282" r="20"/>
+    <circle cx="1170" cy="278" r="20"/><circle cx="150" cy="372" r="20"/><circle cx="270" cy="376" r="20"/>
+    <circle cx="390" cy="370" r="20"/><circle cx="510" cy="374" r="20"/><circle cx="630" cy="372" r="20"/>
+    <circle cx="750" cy="376" r="20"/><circle cx="870" cy="370" r="20"/><circle cx="990" cy="374" r="20"/>
+    <circle cx="1110" cy="372" r="20"/><circle cx="1230" cy="376" r="20"/>
+  </g>
+  <!-- top hats front row -->
+  <g fill="#2c2c3c">
+    <rect x="70" y="440" width="44" height="36"/><rect x="240" y="444" width="44" height="36"/>
+    <rect x="420" y="440" width="44" height="36"/><rect x="600" y="444" width="44" height="36"/>
+    <rect x="1060" y="440" width="44" height="36"/><rect x="1220" y="444" width="44" height="36"/>
+  </g>
+
+  <!-- ring barrier -->
+  <path d="M0,560 Q660,470 1315,560 L1315,620 Q660,530 0,620 Z" fill="#c04a30"/>
+
+  <!-- ring floor -->
+  <rect y="600" width="1315" height="1000" fill="url(#ring)"/>
+
+  <!-- ringmaster's whip arabesque -->
+  <path d="M1120,1380 Q900,1000 620,880 Q420,800 380,650" stroke="#b8562e" stroke-width="12" fill="none"/>
+
+  <!-- white horse cantering -->
+  <g>
+    <path d="M420,900 C400,830 470,780 570,780 C680,780 760,810 800,860 C830,900 830,950 790,970 C740,995 640,990 560,975 C480,960 435,945 420,900 Z" fill="#f5f1e4"/>
+    <!-- neck+head -->
+    <path d="M770,830 C820,780 870,750 905,755 C925,760 930,785 915,805 C890,835 850,870 815,885 Z" fill="#f0ebdb"/>
+    <!-- legs extended -->
+    <path d="M470,960 L400,1090 L426,1098 L500,975 Z" fill="#ece6d4"/>
+    <path d="M700,975 L760,1100 L785,1090 L740,968 Z" fill="#ece6d4"/>
+    <path d="M540,970 L520,1080 L545,1085 L570,978 Z" fill="#e4ddc8"/>
+    <!-- tail -->
+    <path d="M425,865 Q360,880 340,940 Q368,942 400,915 Q420,895 438,890 Z" fill="#e9e2cf"/>
+  </g>
+
+  <!-- bareback rider -->
+  <g>
+    <path d="M600,640 C596,600 620,570 650,570 C682,570 700,600 696,640 L680,700 L620,700 Z" fill="#f2c94c"/>
+    <circle cx="648" cy="548" r="26" fill="#e8b48a"/>
+    <path d="M560,660 Q600,640 616,652 L600,690 Q570,690 560,660 Z" fill="#f2c94c"/>
+    <path d="M696,640 Q740,620 760,632 L744,668 Q712,668 700,660 Z" fill="#f2c94c"/>
+    <!-- flaring skirt -->
+    <path d="M596,700 Q560,760 588,790 Q650,810 712,788 Q736,754 700,700 Z" fill="#f7dc6f"/>
+    <!-- standing leg on horse -->
+    <path d="M640,790 L632,838 L660,842 L668,792 Z" fill="#e8b48a"/>
+  </g>
+
+  <!-- tumbling acrobat -->
+  <g fill="#d9772e">
+    <path d="M950,540 C980,520 1010,530 1018,556 C1026,584 1005,608 975,606 C948,604 935,565 950,540 Z"/>
+    <path d="M1010,560 L1070,520 L1082,542 L1026,584 Z"/>
+    <path d="M955,600 L920,650 L942,664 L980,614 Z"/>
+    <circle cx="940" cy="530" r="18" fill="#e8b48a"/>
+  </g>
+
+  <!-- foreground clown, back to us -->
+  <g>
+    <path d="M80,1600 L80,1240 C80,1140 150,1080 250,1080 C350,1080 420,1150 420,1250 L420,1600 Z" fill="#c0392b"/>
+    <circle cx="250" cy="1040" r="70" fill="#e8b48a"/>
+    <path d="M190,1010 Q250,940 315,1008 Q290,970 250,968 Q212,970 190,1010 Z" fill="#8a2f22"/>
+    <!-- ruff -->
+    <ellipse cx="250" cy="1105" rx="120" ry="36" fill="#e9e2cf"/>
+    <!-- arm holding curtain -->
+    <path d="M395,1200 Q480,1150 520,1060 L488,1040 Q440,1130 372,1168 Z" fill="#c0392b"/>
+  </g>
+  <!-- curtain edge -->
+  <path d="M505,1060 Q530,1300 505,1600 L610,1600 Q640,1300 600,1040 Z" fill="#a93226"/>
+</svg>
