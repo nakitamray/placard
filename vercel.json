@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm build",
+  "buildCommand": "pnpm build:assets && pnpm build",
   "outputDirectory": "dist",
   "framework": "vite",
   "headers": [
