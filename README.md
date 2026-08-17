@@ -21,9 +21,13 @@ Requires WebGL2.
 
 ```bash
 pnpm install
+pnpm fetch:images   # pulls the real paintings from Wikimedia Commons
 pnpm build:assets   # regenerates public/ from data/ (images, corpora, glyphs)
 pnpm dev            # or: pnpm build && pnpm preview
 ```
+
+`fetch:images` is optional — skip it and the exhibition runs on procedural
+stand-ins. See **Artwork images** below.
 
 Node ≥ 20. `pnpm approve-builds` may be needed once so `sharp` can install its
 prebuilt binaries. `public/artworks`, `public/landing` and `public/museums` are
@@ -48,33 +52,65 @@ it is the British Museum's own painted holdings, which are prints, frescoes,
 scrolls and painted papyri rather than gallery canvases. `corridorNote` in
 `data/museums/british-museum.json` records this.
 
-## ⚠️ Artwork images
+## Artwork images
 
-This repository was assembled in an environment with **no network access to
-Wikimedia Commons**, so 48 of the 50 works currently ship as *procedurally
-generated painterly stand-ins* rather than authentic scans. Two works —
-*Starry Night Over the Rhône* and *Whistler's Mother* — have real
-public-domain scans and show what the exhibition looks like when it is fed
-real material.
+Two works ship with real public-domain scans; the other 48 render *procedurally
+generated painterly stand-ins* until you fetch them. **One command fetches the
+rest from Wikimedia Commons:**
 
-All the metadata, placard text, corpora, floor plans, architecture and the
-entire pipeline are real. The stand-ins are deterministic renderings from each
-work's `placeholder` spec — an archetype (portrait, nocturne, fresco, register,
-wave…) plus the painting's actual palette — and they are built to have the
-right tonal structure in the right places, because that is all the glyph
-pipeline reads.
+```bash
+pnpm fetch:images --dry    # resolve everything, download nothing — read this first
+pnpm fetch:images          # fetch every work that has no scan yet
+pnpm build:assets          # rebuild the exhibition around the real paintings
+```
 
-### Adding an authentic scan
+`fetch:images` resolves each work on Commons, downloads a ~2600px render, and
+writes `data/artworks/{id}/source.jpg` plus an `image-credit.json` recording
+the exact Commons file, its stated licence and its author. `build:assets`
+prefers `source.jpg` automatically and publishes that credit onto the work's
+placard, so the Credits panel says which reproduction is on the wall and under
+what terms.
 
-1. Download the painting from Wikimedia Commons (≥ 2000px long edge).
-2. Save it as `data/artworks/{id}/source.jpg` — create the folder if needed.
-   The ids are the `id` fields in `data/collections/*.json`.
-3. `pnpm build:assets`.
+| Flag | |
+|---|---|
+| `--dry` | resolve and print the table, download nothing |
+| `--force` | re-fetch works that already have a scan |
+| `--museum louvre` | one museum only |
+| `--only id1,id2` | named works only |
 
-The build prefers `source.jpg` automatically and reports how many works are
-still on stand-ins. Nothing else changes. `data/.cache/previews/{id}.png` shows
-the glyph field for a work and is the fastest loop for tuning
-`data/artworks/{id}/config.json`.
+**Run `--dry` first and read the table.** Search can return the wrong picture,
+and a wrong painting hung under the right label is worse than no painting at
+all. Every run also writes `data/.cache/fetch-report.json` with the file, size,
+licence and Commons URL it chose for each work.
+
+To correct one, open it on Commons and pin the exact file in
+`data/image-sources.json`:
+
+```json
+"manet-olympia": { "commonsFile": "File:Edouard Manet - Olympia - Google Art Project 3.jpg" }
+```
+
+then `pnpm fetch:images --force --only manet-olympia`. A pinned file is used as
+given and skips search entirely.
+
+A few entries need judgement rather than search: the Fayum portrait and John
+White's album are whole classes of object rather than one work, the Admonitions
+Scroll and the Codex Zouche-Nuttall are long enough that you want a specific
+section, and several Van Gogh and Monet subjects exist in many versions.
+`data/image-sources.json` flags each of these with a `note`.
+
+Everything listed is old enough to be in the public domain; reproductions are
+PD-Art in the US and most of Europe. The fetcher records whatever licence
+Commons states per file rather than assuming.
+
+### Doing it by hand instead
+
+Save a scan as `data/artworks/{id}/source.jpg` (ids are the `id` fields in
+`data/collections/*.json`) and run `pnpm build:assets`. The build reports how
+many works are still on stand-ins.
+
+`data/.cache/previews/{id}.png` shows the glyph field for a work and is the
+fastest loop for tuning `data/artworks/{id}/config.json`.
 
 ## Moving through the exhibition
 

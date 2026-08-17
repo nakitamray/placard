@@ -1,10 +1,10 @@
-# Applying `placard-iteration-4.bundle`
+# Applying `placard-iteration-5.bundle`
 
 A git bundle is a single file containing real git history. You pull from it
 exactly as you would from a remote, so nothing is overwritten without you
 asking and every commit keeps its authorship.
 
-**This bundle contains three commits**, on the branch
+**This bundle contains four commits**, on the branch
 `claude/project-iteration-one-ui-1fzn9d`, on top of the commit your repository
 is already on (`37a67ad`). It carries the complete history, so it works against
 an existing clone *or* on a machine with no clone at all.
@@ -20,34 +20,34 @@ From inside your `placard` checkout:
 git log --oneline -1
 
 # 2. pull the branch out of the bundle
-git fetch /full/path/to/placard-iteration-4.bundle \
-  claude/project-iteration-one-ui-1fzn9d:iteration-4
+git fetch /full/path/to/placard-iteration-5.bundle \
+  claude/project-iteration-one-ui-1fzn9d:iteration-5
 
 # 3. look before you leap
-git log --oneline iteration-4
-git diff --stat HEAD iteration-4
+git log --oneline iteration-5
+git diff --stat HEAD iteration-5
 ```
 
-That leaves a new local branch called `iteration-4` and changes nothing else.
+That leaves a new local branch called `iteration-5` and changes nothing else.
 When you are happy with it:
 
 ```bash
-git checkout iteration-4
+git checkout iteration-5
 ```
 
-To put it on your own branch name instead, replace `iteration-4` in step 2 with
+To put it on your own branch name instead, replace `iteration-5` in step 2 with
 whatever you want to call it.
 
 **To push it to GitHub yourself** (this session was not permitted to push):
 
 ```bash
-git push -u origin iteration-4
+git push -u origin iteration-5
 ```
 
 ## Option B — fresh machine, no clone
 
 ```bash
-git clone placard-iteration-4.bundle placard
+git clone placard-iteration-5.bundle placard
 cd placard
 git checkout claude/project-iteration-one-ui-1fzn9d
 ```
@@ -64,9 +64,17 @@ git remote set-url origin https://github.com/nakitamray/placard
 
 ```bash
 pnpm install
-pnpm build:assets     # a few minutes — 50 works, each analysed twice
+pnpm fetch:images --dry   # see which painting it found for each work
+pnpm fetch:images         # download them all from Wikimedia Commons
+pnpm build:assets         # a few minutes — 50 works, each analysed twice
 pnpm dev
 ```
+
+`pnpm fetch:images` is the one that saves you the manual work: it pulls all 48
+missing paintings from Wikimedia Commons and records the licence and author for
+each. Run `--dry` first and read the table — search occasionally picks the
+wrong picture, and anything wrong can be pinned by exact file name in
+`data/image-sources.json`. Full detail in the README under **Artwork images**.
 
 `pnpm build:assets` is **required**, not optional. It regenerates
 `public/artworks`, `public/landing` and `public/museums` from `data/`, and none
@@ -150,19 +158,15 @@ the Musée d'Orsay and the Met — replacing the single gallery of five.
 Full detail, including the authoring format and the five style records, is in
 `README.md`.
 
-## One thing to know before you show it
+### 4 — Fetching the paintings automatically
 
-48 of the 50 works are **procedurally generated stand-ins**, not authentic
-scans. The environment this was built in had no network access to Wikimedia
-Commons. Two works — *Starry Night Over the Rhône* and *Whistler's Mother* —
-have real scans and show what it looks like with real material.
+`pnpm fetch:images` pulls all 48 missing paintings from Wikimedia Commons, so
+you never have to find and import them by hand. It writes each scan to
+`data/artworks/{id}/source.jpg` and records the exact Commons file, licence and
+author alongside it, which `build:assets` then publishes onto the placard.
 
-Dropping in a real painting is one step:
-
-1. Save the scan as `data/artworks/{id}/source.jpg` (create the folder; the ids
-   are the `id` fields in `data/collections/*.json`).
-2. `pnpm build:assets`.
-
-The build prefers `source.jpg` automatically and prints how many works are
-still on stand-ins. Nothing else changes — the same pipeline, the same
-corridors, the same placards.
+**This could not be run or verified from the environment it was written in** —
+Wikimedia is blocked there by network policy, so the first real run will be on
+your machine. Everything up to the network call is tested, including the
+candidate scoring; the network path is not. Run `--dry` first, read the table,
+and pin anything wrong by exact file name in `data/image-sources.json`.

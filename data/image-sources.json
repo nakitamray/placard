@@ -1,0 +1,184 @@
+{
+  "_readme": [
+    "Where `pnpm fetch:images` looks for each work on Wikimedia Commons.",
+    "",
+    "  search       the query sent to the Commons search API (namespace 6, files)",
+    "  commonsFile  an exact file, e.g. 'File:Mona Lisa.jpg' — used as given,",
+    "               skipping search entirely. Add one to pin anything search",
+    "               gets wrong, then re-run with --force --only <id>.",
+    "  note         why a work is awkward, where it is awkward",
+    "",
+    "Run `pnpm fetch:images --dry` first and read the table it prints: search",
+    "can return the wrong picture, and a wrong painting under the right label",
+    "is worse than no painting at all.",
+    "",
+    "Everything listed here is a work whose original is old enough to be in the",
+    "public domain. Reproductions of them are PD-Art in the US and in most of",
+    "Europe; the fetcher records the licence Commons states for each file in",
+    "data/artworks/{id}/image-credit.json, and the Credits panel shows it."
+  ],
+
+  "leonardo-mona-lisa": {
+    "commonsFile": "File:Mona Lisa, by Leonardo da Vinci, from C2RMF retouched.jpg",
+    "search": "Mona Lisa Leonardo da Vinci Louvre"
+  },
+  "delacroix-liberty": {
+    "search": "Delacroix La Liberté guidant le peuple 1830"
+  },
+  "david-coronation-napoleon": {
+    "search": "Jacques-Louis David Coronation of Napoleon Sacre"
+  },
+  "gericault-raft-medusa": {
+    "search": "Théodore Géricault Radeau de la Méduse Raft of the Medusa"
+  },
+  "veronese-wedding-cana": {
+    "search": "Paolo Veronese Wedding at Cana Nozze di Cana Louvre"
+  },
+  "david-oath-horatii": {
+    "search": "Jacques-Louis David Oath of the Horatii Serment des Horaces"
+  },
+  "vermeer-lacemaker": {
+    "search": "Johannes Vermeer The Lacemaker Louvre"
+  },
+  "ingres-grande-odalisque": {
+    "search": "Ingres Grande Odalisque 1814 Louvre"
+  },
+  "delacroix-death-sardanapalus": {
+    "search": "Delacroix Death of Sardanapalus Mort de Sardanapale"
+  },
+  "leonardo-st-john-baptist": {
+    "search": "Leonardo da Vinci Saint John the Baptist Louvre painting"
+  },
+
+  "hokusai-great-wave": {
+    "search": "Hokusai Great Wave off Kanagawa woodblock print"
+  },
+  "nebamun-marshes": {
+    "search": "Nebamun hunting in the marshes tomb fresco British Museum",
+    "note": "Search may return the whole tomb-chapel group; pin the marsh-hunting fragment."
+  },
+  "gu-kaizhi-admonitions": {
+    "search": "Admonitions Scroll Gu Kaizhi British Museum",
+    "note": "A handscroll: pick a section, not the full 3.4m strip, or it hangs as a sliver."
+  },
+  "fayum-mummy-portraits": {
+    "search": "Fayum mummy portrait young man encaustic Roman Egypt",
+    "note": "Generic subject — search will pick some Fayum portrait, not a specific one. Pin the one you want."
+  },
+  "geese-of-meidum": {
+    "search": "Meidum geese painting Itet tomb",
+    "note": "Original panel is in Cairo; the British Museum holds facsimiles. See the placard."
+  },
+  "white-portrait-lady": {
+    "search": "John White watercolour drawing British Museum 1585",
+    "note": "White's album is many sheets; search cannot know which. Pin one."
+  },
+  "schouman-birds": {
+    "search": "Aert Schouman bird watercolour drawing"
+  },
+  "book-of-the-dead-ani": {
+    "search": "Papyrus of Ani Book of the Dead weighing of the heart"
+  },
+  "dunhuang-cave-17": {
+    "search": "Dunhuang silk painting banner Stein collection bodhisattva"
+  },
+  "aztec-codices": {
+    "search": "Codex Zouche-Nuttall page Mixtec"
+  },
+
+  "michelangelo-creation-adam": {
+    "search": "Michelangelo Creation of Adam Sistine Chapel"
+  },
+  "michelangelo-last-judgment": {
+    "search": "Michelangelo Last Judgment Sistine Chapel fresco"
+  },
+  "raphael-school-athens": {
+    "search": "Raphael School of Athens Scuola di Atene Stanza"
+  },
+  "raphael-transfiguration": {
+    "search": "Raphael Transfiguration 1520 Vatican Pinacoteca"
+  },
+  "caravaggio-entombment": {
+    "search": "Caravaggio Entombment of Christ Deposizione Vatican"
+  },
+  "leonardo-st-jerome": {
+    "search": "Leonardo da Vinci Saint Jerome in the Wilderness unfinished"
+  },
+  "raphael-deliverance-peter": {
+    "search": "Raphael Liberation of Saint Peter Stanza di Eliodoro"
+  },
+  "giotto-stefaneschi-triptych": {
+    "search": "Giotto Stefaneschi Triptych Vatican"
+  },
+  "raphael-madonna-foligno": {
+    "search": "Raphael Madonna of Foligno"
+  },
+  "raphael-coronation-virgin": {
+    "search": "Raphael Coronation of the Virgin Oddi altarpiece"
+  },
+
+  "vangogh-starry-night-rhone": {
+    "search": "Van Gogh Starry Night Over the Rhone 1888"
+  },
+  "renoir-moulin-galette": {
+    "search": "Renoir Bal du moulin de la Galette 1876 Orsay"
+  },
+  "manet-olympia": {
+    "search": "Édouard Manet Olympia 1863 Orsay"
+  },
+  "manet-dejeuner-sur-lherbe": {
+    "search": "Manet Le Déjeuner sur l'herbe 1863"
+  },
+  "millet-gleaners": {
+    "search": "Jean-François Millet The Gleaners Des glaneuses 1857"
+  },
+  "cezanne-apples-oranges": {
+    "search": "Paul Cézanne Apples and Oranges Pommes et oranges"
+  },
+  "vangogh-self-portrait": {
+    "search": "Van Gogh self portrait 1889 Orsay",
+    "note": "Van Gogh painted ~35 self-portraits; pin the Orsay 1889 one if search wanders."
+  },
+  "cezanne-card-players": {
+    "search": "Cézanne The Card Players Joueurs de cartes Orsay"
+  },
+  "whistler-mother": {
+    "search": "Whistler Arrangement in Grey and Black Portrait of the Artist's Mother"
+  },
+  "caillebotte-floor-scrapers": {
+    "search": "Caillebotte Les raboteurs de parquet Floor Scrapers 1875"
+  },
+
+  "leutze-washington-delaware": {
+    "search": "Emanuel Leutze Washington Crossing the Delaware 1851"
+  },
+  "david-death-socrates": {
+    "search": "Jacques-Louis David The Death of Socrates 1787"
+  },
+  "monet-water-lilies-bridge": {
+    "search": "Monet Bridge over a Pond of Water Lilies 1899",
+    "note": "Monet painted the bridge many times; pin the Met's 1899 canvas if needed."
+  },
+  "sargent-madame-x": {
+    "search": "John Singer Sargent Madame X Madame Pierre Gautreau"
+  },
+  "el-greco-view-toledo": {
+    "search": "El Greco View of Toledo Vista de Toledo"
+  },
+  "rembrandt-aristotle-homer": {
+    "search": "Rembrandt Aristotle with a Bust of Homer 1653"
+  },
+  "vermeer-water-pitcher": {
+    "search": "Vermeer Young Woman with a Water Pitcher"
+  },
+  "vangogh-straw-hat": {
+    "search": "Van Gogh Self-Portrait with a Straw Hat 1887",
+    "note": "Several versions exist; the Met's is the one on this placard."
+  },
+  "degas-dance-class": {
+    "search": "Edgar Degas The Dance Class 1874"
+  },
+  "velazquez-juan-de-pareja": {
+    "search": "Velázquez Portrait of Juan de Pareja 1650"
+  }
+}
