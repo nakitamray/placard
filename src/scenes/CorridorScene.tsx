@@ -35,6 +35,7 @@ import { Ceiling } from './corridor/Ceiling';
 import { Floor, Walls } from './corridor/Surfaces';
 import { Fixtures } from './corridor/Fixtures';
 import { bayZ, dimsFor, hangHeight, type Dims } from './corridor/dims';
+import { Atmosphere } from './corridor/Atmosphere';
 import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
 
 function useArtworkTextures(artworks: ArtworkIndexEntry[]) {
@@ -56,6 +57,7 @@ function useArtworkTextures(artworks: ArtworkIndexEntry[]) {
  */
 function HungWork({
   artwork,
+  index,
   texture,
   museum,
   width,
@@ -63,13 +65,65 @@ function HungWork({
   showPanel = true,
 }: {
   artwork: ArtworkIndexEntry;
+  /** position in the museum's running order — what clicking this opens */
+  index: number;
   texture: THREE.Texture;
   museum: MuseumData;
   width: number;
   height: number;
   showPanel?: boolean;
 }) {
+  const canvasMat = useRef<THREE.MeshStandardMaterial>(null);
+  const group = useRef<THREE.Group>(null);
   const reach = frameReach(museum.style.frame) * height;
+
+  /**
+   * A painting you can see should be a painting you can open. Walking to the
+   * far wall and going through the floor plan to reach a canvas already in
+   * front of you is friction with nothing on the other side of it, so the
+   * corridor lights a work under the cursor and lets you step into its room.
+   */
+  const lift = (on: boolean) => {
+    document.body.style.cursor = on ? 'pointer' : '';
+    if (canvasMat.current) {
+      gsap.to(canvasMat.current, {
+        emissiveIntensity: on ? 0.46 : 0.14,
+        duration: 0.45,
+        ease: 'power2.out',
+      });
+    }
+    if (group.current) {
+      gsap.to(group.current.scale, {
+        x: on ? 1.035 : 1,
+        y: on ? 1.035 : 1,
+        z: 1,
+        duration: 0.5,
+        ease: 'power3.out',
+      });
+    }
+  };
+
+  const enter = () => {
+    lift(true);
+    useStore.getState().setHoveredWork({
+      index,
+      artist: artwork.artist,
+      title: artwork.title,
+    });
+  };
+  const leave = () => {
+    lift(false);
+    const s = useStore.getState();
+    if (s.hoveredWork?.index === index) s.setHoveredWork(null);
+  };
+  const open = () => {
+    const s = useStore.getState();
+    if (s.phase !== 'corridor') return;
+    document.body.style.cursor = '';
+    s.setHoveredWork(null);
+    s.setIndex(index);
+    s.setPhase('warp');
+  };
   // The painter's ground, pulled most of the way toward the wall tone. At full
   // strength it reads as a coloured rectangle stuck on the wall, which no
   // gallery has; at this strength it is a tonal shift you notice only once you
@@ -80,7 +134,7 @@ function HungWork({
   }, [artwork.accent, museum.style.palette.wall]);
 
   return (
-    <group>
+    <group ref={group}>
       {showPanel && (
         <mesh position={[0, 0, -0.02]} receiveShadow>
           <planeGeometry args={[width + reach * 2 + 0.42, height + reach * 2 + 0.42]} />
@@ -94,9 +148,21 @@ function HungWork({
         gilt={museum.style.palette.gilt}
         dark={museum.style.palette.wallDeep}
       />
-      <mesh position={[0, 0, 0.028]}>
+      <mesh
+        position={[0, 0, 0.028]}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          enter();
+        }}
+        onPointerOut={leave}
+        onClick={(e) => {
+          e.stopPropagation();
+          open();
+        }}
+      >
         <planeGeometry args={[width, height]} />
         <meshStandardMaterial
+          ref={canvasMat}
           map={texture}
           roughness={0.88}
           emissiveMap={texture}
@@ -142,6 +208,7 @@ function Bays({ museum, d }: { museum: MuseumData; d: Dims }) {
           <group position={[0, centre, 0.05]}>
             <HungWork
               artwork={artworks[i]}
+              index={i}
               texture={textures[i]}
               museum={museum}
               width={main.width}
@@ -166,6 +233,7 @@ function Bays({ museum, d }: { museum: MuseumData; d: Dims }) {
                 >
                   <HungWork
                     artwork={artworks[j]}
+                    index={j}
                     texture={textures[j]}
                     museum={museum}
                     width={small.width}
@@ -205,8 +273,9 @@ function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
         <planeGeometry args={[d.halfWidth * 2.1, d.vaultHeight + 1]} />
         {museum.style.fixtures.glazedEnd ? (
           // a window, not a wall: the light at the end of the corridor is
-          // outside, which is what makes a covered court read as a courtyard
-          <meshBasicMaterial color={p.sky} toneMapped={false} />
+          // outside, which is what makes a covered court read as a courtyard.
+          // Tone-mapped, or an unclamped plane this size washes out the room.
+          <meshBasicMaterial color={p.sky} />
         ) : (
           <meshStandardMaterial color={p.wallDeep} roughness={0.86} />
         )}
@@ -228,7 +297,22 @@ function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
             gilt={p.gilt}
             dark={p.wallDeep}
           />
-          <mesh position={[0, 0, 0.028]}>
+          <mesh
+            position={[0, 0, 0.028]}
+            onPointerOver={(e) => {
+              e.stopPropagation();
+              document.body.style.cursor = 'pointer';
+            }}
+            onPointerOut={() => (document.body.style.cursor = '')}
+            onClick={(e) => {
+              e.stopPropagation();
+              const st = useStore.getState();
+              if (st.phase !== 'corridor') return;
+              document.body.style.cursor = '';
+              st.setIndex(artworks.indexOf(a));
+              st.setPhase('warp');
+            }}
+          >
             <planeGeometry args={[aw, h]} />
             <meshStandardMaterial
               map={textures[1] ?? textures[0]}
@@ -483,6 +567,7 @@ export function CorridorScene({ tier }: { tier: DeviceTier }) {
       <Ceiling style={museum.style} d={d} />
       <Bays museum={museum} d={d} />
       <Fixtures style={museum.style} d={d} />
+      <Atmosphere style={museum.style} d={d} quality={tier.name} />
       <Apse museum={museum} d={d} />
       <Lamps museum={museum} d={d} />
 

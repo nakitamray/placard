@@ -30,6 +30,9 @@ interface AppStore {
   hoveredRegion: ArtworkRegion | null;
   pulledRegion: ArtworkRegion | null;
 
+  /** the corridor canvas under the cursor, for the floating label */
+  hoveredWork: { index: number; artist: string; title: string } | null;
+
   /** every museum in the exhibition, for the landing page */
   museums: MuseumIndexEntry[];
   /** the one currently entered — carries its corridor style, plan and works */
@@ -43,6 +46,7 @@ interface AppStore {
   setDissolve: (d: number) => void;
   setPlacardExpanded: (e: boolean) => void;
   setCreditsOpen: (o: boolean) => void;
+  setHoveredWork: (w: { index: number; artist: string; title: string } | null) => void;
   setMuseums: (m: MuseumIndexEntry[]) => void;
   setMuseum: (m: MuseumData | null) => void;
   setMuseumLoading: (id: string | null) => void;
@@ -73,6 +77,7 @@ export const useStore = create<AppStore>()(
     hoveredRegion: null,
     pulledRegion: null,
 
+    hoveredWork: null,
     museums: [],
     museum: null,
     museumLoading: null,
@@ -88,6 +93,7 @@ export const useStore = create<AppStore>()(
       }
       set({
         phase: p,
+        ...(p !== 'corridor' ? { hoveredWork: null } : {}),
         ...(p === 'corridor' && from === 'map' ? { corridorT: 0.8 } : {}),
         ...(p === 'landing' ? { corridorT: 0, museum: null, index: 0 } : {}),
         ...(p !== 'gallery' ? { revealed: false, dissolve: 0, placardExpanded: false } : {}),
@@ -102,6 +108,7 @@ export const useStore = create<AppStore>()(
     setDissolve: (d) => set({ dissolve: d }),
     setPlacardExpanded: (e) => set({ placardExpanded: e }),
     setCreditsOpen: (o) => set({ creditsOpen: o }),
+    setHoveredWork: (hoveredWork) => set({ hoveredWork }),
     setMuseums: (museums) => set({ museums }),
     setMuseum: (museum) => {
       // Entering a museum always starts you at the mouth of its corridor.

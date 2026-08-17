@@ -39,7 +39,7 @@ glyph field twice.
 | **The British Museum** | crimson walls, pitched glass lantern on gilded archways, warm red and gold coving, polished light wood, tufted leather seating | heavy swept gilt with a fluted cove | single large work per bay |
 | **Vatican Museums** | frescoed vault in deeply carved gilded stucco, map panels between gilded pilasters, geometric marble inlay, crystal chandeliers, marble busts | architectural tabernacle — pilasters, entablature, pediment | alternating walls |
 | **Musée d'Orsay** | colossal arched steel-and-glass roof, carved stone terraces behind glass railings, the great gilded clock closing the nave | slim reeded gilt, the impressionist standard | single large work per bay |
-| **The Metropolitan Museum of Art** | sunlit court under a peaked glass skylight, pale stone one side and red brick with white arches the other, a glass wall closing the far end | broad flat-topped American gilt | alternating walls |
+| **The Metropolitan Museum of Art** | sunlit court under a peaked glass skylight; coursed red brick and white voussoired arches one side, marble ashlar the other, engaged columns, string courses and warm sconces, a glass wall closing the far end | broad flat-topped American gilt | alternating walls |
 
 A note on the second one: the reference photograph is **Room 32 at the National
 Gallery, London** — the Julia and Hans Rausing Room — not a British Museum
@@ -175,6 +175,17 @@ list its id in `data/museums/orsay.json`.
   of its surround rather than sinking to the bottom of it. Works too wide to
   hang at full height give up height rather than run into their neighbours
   (`src/scenes/fit.ts`).
+- **Atmosphere** (`src/scenes/corridor/Atmosphere.tsx`): shafts of light lean
+  out of the skylights along the museum's own key-light direction, breathing a
+  few percent so they read as weather rather than as decals, and a few hundred
+  instanced dust motes drift up through them. Both are additive and never
+  depth-write, so they lie over the room without occluding a painting. Motes
+  are dropped entirely on the low device tier.
+- **Opening a work from the corridor**: hovering a canvas lifts it, warms it
+  and raises a wall label under the cursor; clicking walks straight into that
+  painting's room. A painting you can see should be a painting you can open —
+  going to the far wall and through the floor plan to reach a canvas already
+  in front of you is friction with nothing on the other side of it.
 - **The artwork room**: each painting sits in a full moulded bay — fluted
   pilasters, entablature, cornice, dentils, a raised bolection panel, a coffer
   overhead — and the entire room, walls, joinery, fill light, fog and

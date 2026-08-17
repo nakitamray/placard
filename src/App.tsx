@@ -1,8 +1,8 @@
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { selectArtworks, useStore } from './state/store';
-import { attachPointer } from './state/motion';
+import { attachPointer, pointer } from './state/motion';
 import { detectTier, webgl2Supported } from './lib/deviceTier';
 import { CorridorScene } from './scenes/CorridorScene';
 import { GalleryScene } from './scenes/GalleryScene';
@@ -138,6 +138,7 @@ export default function App() {
             {museum?.name}
             <span className="corridor-sub"> · {museum?.subtitle}</span>
           </p>
+          <WorkLabel />
         </>
       )}
       {inGallery && (
@@ -167,6 +168,53 @@ function ExposureRig({ exposure }: { exposure: number }) {
     gl.toneMappingExposure = exposure;
   }, [gl, exposure]);
   return null;
+}
+
+/**
+ * The wall label that appears when the cursor is over a canvas in the
+ * corridor. It follows the pointer rather than the painting, so it never
+ * covers the work it is naming, and it says what clicking will do.
+ */
+function WorkLabel() {
+  const work = useStore((s) => s.hoveredWork);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!work) return;
+    let raf = 0;
+    const cur = { x: 0, y: 0 };
+    let first = true;
+    const tick = () => {
+      const el = ref.current;
+      if (el) {
+        const tx = pointer.x * (window.innerWidth / 2) + window.innerWidth / 2 + 22;
+        const ty = pointer.y * (window.innerHeight / 2) + window.innerHeight / 2 + 20;
+        if (first) {
+          cur.x = tx;
+          cur.y = ty;
+          first = false;
+        } else {
+          cur.x += (tx - cur.x) * 0.24;
+          cur.y += (ty - cur.y) * 0.24;
+        }
+        const w = el.offsetWidth;
+        const x = Math.min(cur.x, window.innerWidth - w - 20);
+        el.style.transform = `translate(${x}px, ${cur.y}px)`;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [work]);
+
+  if (!work) return null;
+  return (
+    <div className="work-label" ref={ref} aria-hidden>
+      <p className="work-label-artist caption">{work.artist}</p>
+      <p className="work-label-title">{work.title}</p>
+      <p className="work-label-cue caption">Click to enter this room</p>
+    </div>
+  );
 }
 
 function ArtworkProxies() {

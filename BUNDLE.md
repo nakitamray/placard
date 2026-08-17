@@ -1,10 +1,10 @@
-# Applying `placard-iteration-3.bundle`
+# Applying `placard-iteration-4.bundle`
 
 A git bundle is a single file containing real git history. You pull from it
 exactly as you would from a remote, so nothing is overwritten without you
 asking and every commit keeps its authorship.
 
-**This bundle contains two commits**, on the branch
+**This bundle contains three commits**, on the branch
 `claude/project-iteration-one-ui-1fzn9d`, on top of the commit your repository
 is already on (`37a67ad`). It carries the complete history, so it works against
 an existing clone *or* on a machine with no clone at all.
@@ -20,34 +20,34 @@ From inside your `placard` checkout:
 git log --oneline -1
 
 # 2. pull the branch out of the bundle
-git fetch /full/path/to/placard-iteration-3.bundle \
-  claude/project-iteration-one-ui-1fzn9d:iteration-3
+git fetch /full/path/to/placard-iteration-4.bundle \
+  claude/project-iteration-one-ui-1fzn9d:iteration-4
 
 # 3. look before you leap
-git log --oneline iteration-3
-git diff --stat HEAD iteration-3
+git log --oneline iteration-4
+git diff --stat HEAD iteration-4
 ```
 
-That leaves a new local branch called `iteration-3` and changes nothing else.
+That leaves a new local branch called `iteration-4` and changes nothing else.
 When you are happy with it:
 
 ```bash
-git checkout iteration-3
+git checkout iteration-4
 ```
 
-To put it on your own branch name instead, replace `iteration-3` in step 2 with
+To put it on your own branch name instead, replace `iteration-4` in step 2 with
 whatever you want to call it.
 
 **To push it to GitHub yourself** (this session was not permitted to push):
 
 ```bash
-git push -u origin iteration-3
+git push -u origin iteration-4
 ```
 
 ## Option B — fresh machine, no clone
 
 ```bash
-git clone placard-iteration-3.bundle placard
+git clone placard-iteration-4.bundle placard
 cd placard
 git checkout claude/project-iteration-one-ui-1fzn9d
 ```
@@ -133,6 +133,19 @@ the Musée d'Orsay and the Met — replacing the single gallery of five.
   position lives outside React, so the second museum you visited dropped you
   wherever you left the first.
 - Both pitched roofs were being built as valleys rather than gables.
+
+### 3 — The Met facades, atmosphere, and opening works from the corridor
+
+- **Both Met walls rebuilt as masonry**: coursed brick with staggered
+  perpends, marble ashlar, arches built from voussoirs around a keystone over
+  a recessed reveal, engaged columns with base/shaft/necking/capital, string
+  courses, an entablature with dentils, and warm sconces washing the brick
+  against the cool daylight. The stick-figure rings are gone.
+- **Air in every room**: shafts of light leaning out of the skylights, and
+  dust drifting up through them.
+- **Click a painting in the corridor to enter its room.** Hovering lifts and
+  warms the canvas and raises a wall label under the cursor.
+- **Softer scrims** behind the hints, museum name and back control.
 
 Full detail, including the authoring format and the five style records, is in
 `README.md`.

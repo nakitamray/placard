@@ -13,7 +13,10 @@ import type { Phase } from '../types';
 export const ALLOWED: Record<Phase, Phase[]> = {
   boot: ['landing'],
   landing: ['corridor'],
-  corridor: ['map', 'landing'],
+  // a painting in the corridor can be opened directly — you should not
+  // have to walk to the far wall and use the plan to reach a canvas you can
+  // already see
+  corridor: ['map', 'landing', 'warp'],
   map: ['corridor', 'warp'],
   warp: ['gallery'],
   gallery: ['map'],

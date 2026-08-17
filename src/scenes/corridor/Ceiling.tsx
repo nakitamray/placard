@@ -146,7 +146,7 @@ function PitchedGlass({ style, d }: Props) {
         >
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[slopeLen, runLength]} />
-            <meshBasicMaterial color={p.sky} toneMapped={false} side={THREE.DoubleSide} />
+            <meshBasicMaterial color={p.sky} side={THREE.DoubleSide} />
           </mesh>
         </group>
       ))}
@@ -375,7 +375,7 @@ function PeakedCourt({ style, d }: Props) {
               the note on the National Gallery lantern */}
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[slopeLen, runLength]} />
-            <meshBasicMaterial color={p.sky} toneMapped={false} side={THREE.DoubleSide} />
+            <meshBasicMaterial color={p.sky} side={THREE.DoubleSide} />
           </mesh>
         </group>
       ))}
@@ -388,7 +388,7 @@ function PeakedCourt({ style, d }: Props) {
           rotation={[Math.PI / 2, 0, 0]}
         >
           <planeGeometry args={[r - peakHalf, runLength]} />
-          <meshBasicMaterial color={p.ceiling} toneMapped={false} side={THREE.DoubleSide} />
+          <meshBasicMaterial color={p.ceiling} side={THREE.DoubleSide} />
         </mesh>
       ))}
 

@@ -337,22 +337,28 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
   align-items: center; gap: var(--s2) var(--s5);
   max-width: min(1000px, 94vw);
   padding: 9px var(--s5);
-  background: rgba(20, 17, 14, 0.52);
-  backdrop-filter: blur(7px);
-  -webkit-backdrop-filter: blur(7px);
-  border: 1px solid rgba(242, 235, 223, 0.14);
-  border-radius: 3px;
+  /* softened: a hard slab of near-black under the type read as a browser
+     chrome bar sitting on the picture. This is a veil — enough to hold the
+     letterforms, not enough to be a shape in its own right. */
+  background: rgba(28, 24, 20, 0.3);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(242, 235, 223, 0.09);
+  border-radius: 999px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.16);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
   color: var(--bone);
   font-size: 12px; letter-spacing: 0.1em; line-height: 16px;
   opacity: 1;
   transition: opacity 900ms var(--e-both), background-color 900ms var(--e-both);
   pointer-events: none;
 }
-.control-hints.is-settled { opacity: 0.78; background: rgba(20, 17, 14, 0.4); }
+.control-hints.is-settled { opacity: 0.8; background: rgba(28, 24, 20, 0.22); }
 .control-hints.is-on-light {
-  background: rgba(255, 253, 248, 0.82);
-  border-color: rgba(36, 31, 26, 0.16);
+  background: rgba(255, 253, 248, 0.55);
+  border-color: rgba(36, 31, 26, 0.1);
   color: var(--ink);
+  text-shadow: none;
 }
 .control-hint { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .control-hints kbd {
@@ -368,9 +374,10 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
 .corridor-title {
   position: fixed; top: var(--s5); right: var(--s6); z-index: 20; margin: 0;
   color: var(--bone); text-align: right; font-size: 12px; letter-spacing: 0.11em;
-  padding: 6px 12px; border-radius: 3px;
-  background: rgba(20, 17, 14, 0.42);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  padding: 6px 14px; border-radius: 999px;
+  background: rgba(28, 24, 20, 0.26);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
   pointer-events: none;
 }
 .corridor-sub { opacity: 0.72; }
@@ -378,11 +385,35 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
 /* the back control shares the treatment, so both corners read the same */
 .gallery-back {
   color: var(--bone); font-size: 12px; letter-spacing: 0.11em;
-  padding: 6px 12px; border-radius: 3px;
-  background: rgba(20, 17, 14, 0.42);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  padding: 6px 14px; border-radius: 999px;
+  background: rgba(28, 24, 20, 0.26);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  transition: background-color var(--d-fast), color var(--d-fast);
 }
-.gallery-back:hover { color: var(--gilt); background: rgba(20, 17, 14, 0.6); }
+.gallery-back:hover { color: var(--gilt); background: rgba(28, 24, 20, 0.42); }
+
+/* ─── the wall label that follows the cursor in the corridor ─── */
+.work-label {
+  position: fixed; top: 0; left: 0; z-index: 22; pointer-events: none;
+  max-width: 300px; padding: 10px 16px 11px;
+  background: rgba(28, 24, 20, 0.34);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(242, 235, 223, 0.1);
+  border-radius: 3px;
+  color: var(--bone);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  animation: label-in 260ms var(--e-out) both;
+}
+@keyframes label-in { from { opacity: 0; } to { opacity: 1; } }
+.work-label p { margin: 0; }
+.work-label-artist { color: var(--gilt); font-size: 10px; letter-spacing: 0.14em; }
+.work-label-title { font-size: 16px; font-style: italic; line-height: 21px; margin-top: 2px !important; }
+.work-label-cue {
+  font-size: 9.5px; letter-spacing: 0.13em; opacity: 0.62; margin-top: 6px !important;
+}
+@media (pointer: coarse) { .work-label { display: none; } }
 
 /* ─── Thread Pull ─── */
 .is-extracting, .is-extracting * { cursor: crosshair !important; }

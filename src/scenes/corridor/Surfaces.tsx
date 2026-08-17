@@ -10,6 +10,7 @@ import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import type { MuseumStyle } from '../../types';
 import { bayZ, type Dims } from './dims';
+import { CourtFacade } from './CourtFacade';
 
 interface Props {
   style: MuseumStyle;
@@ -202,65 +203,7 @@ export function Walls({ style, d }: Props) {
     </group>
   );
 
-  if (kind === 'court-facade') {
-    // The Met court's whole character is that the two walls disagree: smooth
-    // pale stone with lit panels on one side, red brick and white arches on
-    // the other, as though the roof were dropped between two buildings.
-    return (
-      <group>
-        {base(-1, p.wall)}
-        {base(1, p.wallDeep)}
-
-        {/* left: illuminated rectangular panels and arched doorways */}
-        {Array.from({ length: d.bays }, (_, b) => (
-          <group key={`L${b}`} position={[-d.halfWidth + 0.05, 0, bayZ(d, b)]}>
-            <mesh rotation={[0, Math.PI / 2, 0]} position={[0, d.wallHeight * 0.62, 0]}>
-              <planeGeometry args={[d.bayDepth * 0.5, d.wallHeight * 0.3]} />
-              <meshBasicMaterial color={p.molding} toneMapped={false} />
-            </mesh>
-            {b % 2 === 1 && (
-              <group>
-                <mesh rotation={[0, Math.PI / 2, 0]} position={[0, 1.2, 0]}>
-                  <planeGeometry args={[1.5, 2.4]} />
-                  <meshStandardMaterial color="#1A1A1E" roughness={0.9} />
-                </mesh>
-                <mesh rotation={[0, Math.PI / 2, 0]} position={[0, 2.4, 0]}>
-                  <circleGeometry args={[0.75, 20, 0, Math.PI]} />
-                  <meshStandardMaterial color="#1A1A1E" roughness={0.9} />
-                </mesh>
-              </group>
-            )}
-          </group>
-        ))}
-
-        {/* right: brick courses, white stone arches, circular medallions */}
-        <Instanced
-          count={d.bays * 3}
-          place={(i, m) => {
-            const b = Math.floor(i / 3);
-            const row = i % 3;
-            m.makeRotationY(-Math.PI / 2);
-            m.setPosition(d.halfWidth - 0.05, 1.5 + row * 1.7, bayZ(d, b));
-          }}
-        >
-          <planeGeometry args={[d.bayDepth * 0.9, 0.09]} />
-          <meshStandardMaterial color={p.molding} roughness={0.8} />
-        </Instanced>
-        {Array.from({ length: d.bays }, (_, b) => (
-          <group key={`R${b}`} position={[d.halfWidth - 0.06, 0, bayZ(d, b)]}>
-            <mesh rotation={[0, -Math.PI / 2, 0]} position={[0, 3.4, 0]}>
-              <ringGeometry args={[0.42, 0.58, 24]} />
-              <meshStandardMaterial color={p.molding} roughness={0.75} />
-            </mesh>
-            <mesh rotation={[0, -Math.PI / 2, 0]} position={[0, 1.9, 0]}>
-              <ringGeometry args={[1.0, 1.16, 24, 1, 0, Math.PI]} />
-              <meshStandardMaterial color={p.molding} roughness={0.75} />
-            </mesh>
-          </group>
-        ))}
-      </group>
-    );
-  }
+  if (kind === 'court-facade') return <CourtFacade style={style} d={d} />;
 
   if (kind === 'fresco-maps') {
     // Painted map panels between gilded pilasters, busts along the base.
