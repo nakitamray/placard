@@ -1,0 +1,222 @@
+[
+  {
+    "id": "leutze-washington-delaware",
+    "artist": "Emanuel Leutze",
+    "artistDates": "1816–1868",
+    "title": "Washington Crossing the Delaware",
+    "titleOriginal": "",
+    "year": "1851",
+    "medium": "Oil on canvas",
+    "dimensions": "378.5 × 647.7 cm",
+    "room": "The American Wing",
+    "accession": "97.34",
+    "creditLine": "Gift of John Stewart Kennedy, 1897",
+    "accentColor": "#3A4450",
+    "labelText": "Washington stands in the bow of an overloaded boat as it is forced through river ice before dawn on 26 December 1776, the flag held up behind him. Almost nothing in the picture is accurate — the ice, the boat, the flag, the light, the pose — and it is nonetheless the image through which the crossing is remembered. It was painted in Düsseldorf, by a German-American, using the Rhine as a model for the Delaware.",
+    "extendedNote": "Leutze's motive was European. He was working in Germany in the aftermath of the failed revolutions of 1848 and wanted to make a picture that would encourage liberal reformers there by showing what a revolution looked like when it succeeded. American students in Düsseldorf posed for the boat; the first version was damaged by studio fire and later destroyed in a bombing raid on Bremen in 1942. This is the second, painted immediately afterwards and shipped to New York, where fifty thousand people paid to see it.\n\nThe errors are famous and mostly deliberate. The crossing happened in darkness and sleet, not at dawn; the flag shown was not adopted until the following year; the boats were large flat-bottomed Durham craft, not the small skiff painted here; and no one who has ever been in a boat stands like that. Leutze wanted a pyramid with a man at its apex, and he sacrificed the facts to get it. What he did not sacrifice is the crew, which is pointedly mixed — a Black oarsman at the front, a Scot, a farmer, a rifleman in a hunting shirt, and two men at the stern struggling with the ice — an argument, in 1851, about who the republic belonged to.",
+    "placeholder": {
+      "aspect": 1.71,
+      "archetype": "figure-group",
+      "palette": ["#1A222E", "#354456", "#5E6E7E", "#98A2A4", "#E4DEC8", "#9E4632"],
+      "seed": 51
+    }
+  },
+  {
+    "id": "david-death-socrates",
+    "artist": "Jacques-Louis David",
+    "artistDates": "1748–1825",
+    "title": "The Death of Socrates",
+    "titleOriginal": "La Mort de Socrate",
+    "year": "1787",
+    "medium": "Oil on canvas",
+    "dimensions": "129.5 × 196.2 cm",
+    "room": "European Paintings",
+    "accession": "31.45",
+    "creditLine": "Catharine Lorillard Wolfe Collection, 1931",
+    "accentColor": "#4A4034",
+    "labelText": "Socrates, condemned by Athens, reaches for the cup of hemlock without looking at it, one finger raised, still in the middle of the argument. His students collapse around him; the man handing him the cup turns his face away. At the far end of the bed, alone and hunched, sits Plato — who was not present, and who is the reason we have the scene at all. Painted two years before the Revolution.",
+    "extendedNote": "David composed it with advice from classicists and read the Phaedo closely; the raised hand, the untouched cup and the continuing speech all come from Plato's account of a man who treated his own execution as the last session of a seminar. Contemporaries considered it the finest history painting of the century, and Thomas Jefferson saw it in Paris and admired it.\n\nThe staging is severe to the point of austerity. A vaulted cell, a stone bench, a bare floor, and a single hard light from the left that models the figures like sculpture and leaves the architecture flat. Everything is horizontal except Socrates and his arm. David places the emotional collapse — the weeping disciples, the averted jailer — around the edges, so that the centre of the canvas is occupied by pure reasoning, and the picture's argument is that composure is a moral act. Two years later the same painter would be designing the visual language of the French Revolution, and four years after that voting for the execution of the king. The anachronism at the foot of the bed is deliberate: Plato, shown as an old man, is remembering.",
+    "placeholder": {
+      "aspect": 1.515,
+      "archetype": "architectural",
+      "palette": ["#1E1A14", "#3E362A", "#6A5C48", "#A08E72", "#DCCCAE", "#9E3020"],
+      "seed": 52
+    }
+  },
+  {
+    "id": "monet-water-lilies-bridge",
+    "artist": "Claude Monet",
+    "artistDates": "1840–1926",
+    "title": "Bridge over a Pond of Water Lilies",
+    "titleOriginal": "Le Bassin aux nymphéas",
+    "year": "1899",
+    "medium": "Oil on canvas",
+    "dimensions": "92.7 × 73.7 cm",
+    "room": "European Paintings",
+    "accession": "29.100.113",
+    "creditLine": "H. O. Havemeyer Collection, 1929",
+    "accentColor": "#2E4438",
+    "labelText": "The Japanese footbridge in Monet's own garden at Giverny, with the lily pond beneath it. He had the water diverted from a nearby river to make the pond, planted it, and then spent the last twenty-seven years of his life painting it — a subject he had built himself in order to have something to look at. The bridge closes the top of the canvas so there is no sky and no horizon: the picture is all water, leaf and reflection.",
+    "extendedNote": "This belongs to a group of twelve views of the bridge made in 1899, all from nearly the same spot, differing in light and season. Monet had been working in series since the haystacks of 1890 — the same motif under changing conditions, painted from several canvases at once, swapping between them as the light moved — because what interested him was not the object but the envelope of atmosphere around it.\n\nWhat is radical here is the emptiness of the design. There is no framing device, no path in, no distance: the far bank is a wall of willow and the near edge is cropped, so the eye has nowhere to go except across the surface. The lilies sit on the water in horizontal drifts; the reflections of the trees run vertically through them; and the two systems cross in a grid that is entirely abstract if you stand close enough. Monet was in his late fifties, wealthy, famous, and about to spend his final decades enlarging exactly this problem until the canvases were two metres tall and wrapped around a room. The American collector Louisine Havemeyer, advised by Mary Cassatt, bought this one for New York within a few years of its painting.",
+    "placeholder": {
+      "aspect": 0.795,
+      "archetype": "landscape",
+      "palette": ["#16241C", "#2C4234", "#4E6E4E", "#88A078", "#DCE4C8", "#B888B0"],
+      "seed": 53
+    }
+  },
+  {
+    "id": "sargent-madame-x",
+    "artist": "John Singer Sargent",
+    "artistDates": "1856–1925",
+    "title": "Madame X",
+    "titleOriginal": "Portrait of Madame Pierre Gautreau",
+    "year": "1883–1884",
+    "medium": "Oil on canvas",
+    "dimensions": "208.6 × 109.9 cm",
+    "room": "European Paintings",
+    "accession": "16.53",
+    "creditLine": "Arthur Hoppock Hearn Fund, 1916",
+    "accentColor": "#2A2A2E",
+    "labelText": "Virginie Amélie Avegno Gautreau — American-born, married in Paris, famous for a beauty she maintained with lavender powder — stands in a black satin dress against a plain brown ground, one hand twisting the table behind her, her head turned sharply away. Sargent asked to paint her; she agreed; the result ended both their reputations in Paris for a while. He kept the canvas in his studio for over thirty years.",
+    "extendedNote": "The scandal at the Salon of 1884 is usually told as a story about a shoulder strap, and that is roughly right: in the first version the right strap had slipped off the shoulder, and the room read the whole picture through it. Sargent repainted the strap upright almost immediately. It made no difference. He left for London within a year.\n\nWhat the audience actually reacted to is harder to fix — probably the combination of a known woman, a pose of enormous self-possession, and skin painted the lilac-white she really did powder herself, against a dress reduced to a single black silhouette. The drawing is what carries it: one continuous contour from the neck down the arm to the hand on the table, and a profile so sharp it reads as a cut edge. Sargent thought it the best thing he had done. When he finally sold it to the Metropolitan in 1916 he asked that the sitter not be named, which is why it is called Madame X, and wrote that he supposed it was the best thing he had ever painted.",
+    "placeholder": {
+      "aspect": 0.527,
+      "archetype": "portrait",
+      "palette": ["#16151A", "#2E2C30", "#544C46", "#8E8076", "#E8DCD0", "#8A6A3A"],
+      "seed": 54
+    }
+  },
+  {
+    "id": "el-greco-view-toledo",
+    "artist": "El Greco",
+    "artistDates": "1541–1614",
+    "title": "View of Toledo",
+    "titleOriginal": "Vista de Toledo",
+    "year": "c. 1599–1600",
+    "medium": "Oil on canvas",
+    "dimensions": "121.3 × 108.6 cm",
+    "room": "European Paintings",
+    "accession": "29.100.6",
+    "creditLine": "H. O. Havemeyer Collection, 1929",
+    "accentColor": "#24303A",
+    "labelText": "One of only two landscapes El Greco painted, and unlike anything else made in Europe for two hundred years afterwards. Toledo is shown under a black-green storm with the light coming from nowhere identifiable, the hillside surging up in acid green, the Alcázar and the cathedral rearranged on the skyline for effect. It is a portrait of a city painted as a state of mind.",
+    "extendedNote": "El Greco was Cretan, trained in the Byzantine icon tradition, then Venetian under Titian's influence, and finally Spanish; he arrived in Toledo around 1577 and stayed for the rest of his life. The city was in decline — the court had gone to Madrid — and he became its great painter anyway.\n\nThe topography is unreliable on purpose. He moved the cathedral to the other side of the Alcázar because the composition wanted it there, and the sweep of hill and river is compressed far beyond what the site allows. The sky is what stops people: layered blue-black cloud with lightning-coloured breaks, painted in long unblended strokes, lit from within rather than from above. Nothing else in the sixteenth century looks like it, and for three hundred years the picture was regarded as evidence of eccentricity or bad eyesight. The nineteenth century's rediscovery of El Greco — by Cézanne's generation, and then by the Expressionists and Picasso — was largely a rediscovery of this canvas and of what happens when a painter decides that the emotional truth of a place outranks its appearance.",
+    "placeholder": {
+      "aspect": 0.895,
+      "archetype": "landscape",
+      "palette": ["#0E1620", "#20303E", "#3E5A5A", "#7A9080", "#D6DCC8", "#8A9A3A"],
+      "seed": 55
+    }
+  },
+  {
+    "id": "rembrandt-aristotle-homer",
+    "artist": "Rembrandt van Rijn",
+    "artistDates": "1606–1669",
+    "title": "Aristotle with a Bust of Homer",
+    "titleOriginal": "Aristoteles bij de buste van Homerus",
+    "year": "1653",
+    "medium": "Oil on canvas",
+    "dimensions": "143.5 × 136.5 cm",
+    "room": "European Paintings",
+    "accession": "61.198",
+    "creditLine": "Purchased with special funds and gifts, 1961",
+    "accentColor": "#2E2418",
+    "labelText": "A philosopher in a white sleeve rests his hand on the head of a blind poet who has been dead for two thousand years, and wears across his chest a gold chain with a medallion of Alexander, the pupil who made him rich. Three kinds of value are laid on top of one another — poetry, philosophy, patronage — and Aristotle's face, half in shadow, is not obviously grateful for any of them.",
+    "extendedNote": "The commission came from Antonio Ruffo, a Sicilian nobleman who ordered a philosopher from Amsterdam without specifying which one and paid many times the going Italian rate. Rembrandt was in financial trouble that would end three years later in insolvency, and the picture is, among other things, about the price of things.\n\nThe painting is a lesson in surface. The sleeve is built up in thick, dragged, buttery white; the chain is scratched into wet paint with the handle of the brush and glitters because it is physically raised off the canvas; the bust is cool, dry and smooth; the background is nearly nothing at all. Each material is given a different kind of paint, and the eye reads wealth, marble and cloth as touch before it reads them as objects. When the Metropolitan bought it at auction in 1961 for $2.3 million — then the highest price ever paid for a painting — the number was front-page news around the world, which is a rather exact continuation of what the picture is about.",
+    "placeholder": {
+      "aspect": 0.951,
+      "archetype": "portrait",
+      "palette": ["#140F0A", "#33261A", "#5C462C", "#8E7048", "#E4D2A6", "#C8A82E"],
+      "seed": 56
+    }
+  },
+  {
+    "id": "vermeer-water-pitcher",
+    "artist": "Johannes Vermeer",
+    "artistDates": "1632–1675",
+    "title": "Young Woman with a Water Pitcher",
+    "titleOriginal": "Jonge vrouw met waterkan",
+    "year": "c. 1662",
+    "medium": "Oil on canvas",
+    "dimensions": "45.7 × 40.6 cm",
+    "room": "European Paintings",
+    "accession": "89.15.21",
+    "creditLine": "Marquand Collection, 1889",
+    "accentColor": "#3A4450",
+    "labelText": "A woman in a starched white linen cap stands between a window she is opening and a silver-gilt basin she is holding. Nothing else happens. Light comes through the leaded panes, crosses the wall, catches the brass of the window frame and the rim of the pitcher, and lands on the white linen, which is the brightest thing in the room and also the most complicated. This was the first Vermeer to enter an American public collection.",
+    "extendedNote": "Only about thirty-five paintings by Vermeer are known. He worked slowly, in one house in Delft, mostly in one corner of one room, and died at forty-three leaving eleven children and large debts; his reputation vanished for nearly two centuries and was rebuilt from the 1860s onward.\n\nThe subject here is light on white, which sounds like nothing and is one of the hardest problems in painting. The cap and collar are described almost entirely by the colour of their shadows — pale blue where the light from the window reaches them, warm grey where the wall reflects back — so that white is never once painted as white. Vermeer's other habit is visible in the map on the wall and the table rug: he owned a small stock of props and reused them from picture to picture. Whether he used a camera obscura is a long argument; what is certain is that he saw and rendered the tiny disc-shaped highlights that an out-of-focus lens produces, on the pitcher's rim, and that no one else in Delft was painting them.",
+    "placeholder": {
+      "aspect": 0.888,
+      "archetype": "interior",
+      "palette": ["#1E2028", "#3C4450", "#6A7078", "#A6A292", "#F0EADC", "#B08A32"],
+      "seed": 57
+    }
+  },
+  {
+    "id": "vangogh-straw-hat",
+    "artist": "Vincent van Gogh",
+    "artistDates": "1853–1890",
+    "title": "Self-Portrait with a Straw Hat",
+    "titleOriginal": "Zelfportret met strohoed",
+    "year": "1887",
+    "medium": "Oil on canvas",
+    "dimensions": "40.6 × 31.8 cm",
+    "room": "European Paintings",
+    "accession": "67.187.70a",
+    "creditLine": "Bequest of Miss Adelaide Milton de Groot, 1967",
+    "accentColor": "#3A4A2E",
+    "labelText": "Painted in Paris, on the back of an earlier peasant study he decided not to keep — canvas was expensive and he was living off his brother. The whole head is built from short separate strokes of unmixed colour laid in radiating lines, blue against orange, green against red, so the face is assembled from the same touches as the background. Two years earlier he had been painting in brown. Paris did this.",
+    "extendedNote": "Van Gogh arrived in Paris in 1886 and stayed two years, living with Theo, meeting Pissarro, Signac, Bernard and Toulouse-Lautrec, and looking hard at both Impressionism and the Neo-Impressionist theory of divided colour. He could not afford models, so he painted himself — around thirty times in those two years, using his own face as a laboratory.\n\nThis is one of the experiments. The strokes are short, discrete and directional, radiating outward from the head like a halo of dashes, and the colour is set out in complementary pairs rather than mixed: the blue-green of the coat against the orange of the beard, red flecks in the shadow of the cheek against green in the light. It is Seurat's method used at speed and by hand rather than by system, and Van Gogh dropped the strict version of it almost immediately. What he kept was the discovery underneath — that colour laid down separately and left to combine in the eye stays far more intense than colour mixed on a palette — and he took it to Arles the following February.",
+    "placeholder": {
+      "aspect": 0.783,
+      "archetype": "portrait",
+      "palette": ["#1E2418", "#3A4A2A", "#5E7040", "#95A068", "#E8DCB0", "#C4642A"],
+      "seed": 58
+    }
+  },
+  {
+    "id": "degas-dance-class",
+    "artist": "Edgar Degas",
+    "artistDates": "1834–1917",
+    "title": "The Dance Class",
+    "titleOriginal": "La Classe de danse",
+    "year": "1874",
+    "medium": "Oil on canvas",
+    "dimensions": "83.5 × 77.2 cm",
+    "room": "European Paintings",
+    "accession": "87.15.75",
+    "creditLine": "Bequest of Mrs. Harry Payne Bingham, 1986",
+    "accentColor": "#6A5E4A",
+    "labelText": "A rehearsal room at the Paris Opéra, with the ballet master Jules Perrot leaning on his stick in the middle of the floor and the class waiting around him. Nobody is dancing. A girl scratches her back, another adjusts an earring, a mother reads a newspaper in the corner, and the floor tilts up and away so steeply that the room feels like it is being watched from a doorway you should not be standing in.",
+    "extendedNote": "Degas drew the Opéra's dancers for forty years and almost never at the moment of performance. He wanted the intervals — the waiting, the fatigue, the yawning, the small maintenance of the body — because those are the parts an audience never pays for.\n\nThe composition is borrowed from photography and from Japanese prints, both of which he studied: the abrupt cropping at the edges, the empty foreground, the high viewpoint, the figures cut by the frame. Nothing is centred. The eye enters at the bottom left, is led up the diagonal of the floorboards to Perrot, and then dispersed among a dozen small distractions, none of which is the subject and all of which are. Perrot was a real and once-famous dancer, painted from studies, standing in a room Degas reconstructed in his studio from memory and drawings. The girls were working children of the Paris poor, and the world that employed them was not a gentle one — a fact Degas records without comment, in the corner, the way he records everything.",
+    "placeholder": {
+      "aspect": 0.924,
+      "archetype": "interior",
+      "palette": ["#28221A", "#4E4432", "#7E7258", "#B2A88C", "#EFE8D2", "#9E5A4A"],
+      "seed": 59
+    }
+  },
+  {
+    "id": "velazquez-juan-de-pareja",
+    "artist": "Diego Velázquez",
+    "artistDates": "1599–1660",
+    "title": "Portrait of Juan de Pareja",
+    "titleOriginal": "Retrato de Juan de Pareja",
+    "year": "1650",
+    "medium": "Oil on canvas",
+    "dimensions": "81.3 × 69.9 cm",
+    "room": "European Paintings",
+    "accession": "1971.86",
+    "creditLine": "Purchased 1971, Fletcher and Rogers Funds and gifts",
+    "accentColor": "#3A322A",
+    "labelText": "Painted in Rome as a warm-up for the portrait of Pope Innocent X, and exhibited at the Pantheon in 1650, where it was said that everything else looked like painting and this alone looked like truth. The sitter was Velázquez's assistant, and — at the time this was painted — the man he legally owned. Pareja stands in a worn grey-brown cloak with a plain collar, entirely composed, and looks at the painter as an equal.",
+    "extendedNote": "Juan de Pareja was of Moorish descent, born in Antequera, and enslaved in the Velázquez household, where he ground pigments and prepared canvases. Spanish guild rules forbade an enslaved person from practising an art. Velázquez signed a deed of manumission in Rome in November 1650, months after this portrait, with freedom to take effect after four more years of service. Pareja then worked as a painter in his own right in Madrid for the rest of his life, and several of his pictures survive.\n\nThe portrait's technique is extraordinarily economical: the collar is a few strokes of lead white dragged over grey, the cloak is scumbled thinly enough that the weave shows through, and the face is fully modelled while the sleeve is barely described. Velázquez has given a servant the format, scale and bearing reserved for aristocrats, and the sitter meets the viewer's eye without deference. The Metropolitan bought it in 1971 for a then-record sum. It hangs across the corridor from work by Pareja himself, which is the only appropriate arrangement.",
+    "placeholder": {
+      "aspect": 0.86,
+      "archetype": "portrait",
+      "palette": ["#181410", "#342C24", "#5A4E42", "#8A7A68", "#DED2BE", "#6E5A3E"],
+      "seed": 60
+    }
+  }
+]

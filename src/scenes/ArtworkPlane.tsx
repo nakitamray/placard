@@ -99,24 +99,12 @@ export function ArtworkPlane({
     }
   });
 
-  // frame: procedural, dark walnut with a gilt inner lip (spec §10.4)
-  const frameDepth = 0.09;
-  const frameBorder = 0.11;
-
+  // The frame is no longer drawn here: the surrounding scene mounts an
+  // OrnateFrame around this position, so the plane is only ever the canvas.
   return (
     <group position={position}>
-      {/* frame */}
-      <mesh position={[0, 0, -0.005]} castShadow>
-        <boxGeometry args={[width + frameBorder * 2, height + frameBorder * 2, frameDepth]} />
-        <meshStandardMaterial color="#3a2c1e" roughness={0.5} metalness={0.15} />
-      </mesh>
-      <mesh position={[0, 0, 0.012]}>
-        <boxGeometry args={[width + 0.05, height + 0.05, frameDepth * 0.6]} />
-        <meshStandardMaterial color="#C9A227" roughness={0.28} metalness={0.9} />
-      </mesh>
-      {/* canvas */}
       <mesh
-        position={[0, 0, 0.045]}
+        position={[0, 0, 0]}
         onPointerEnter={onEnter}
         onPointerLeave={onLeave}
         onPointerMove={(e) => {

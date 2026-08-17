@@ -1,44 +1,230 @@
 /**
  * GalleryScene — spec §10.4 / §10.6 / M6.
  *
- * Horizontal roll: artwork planes along +x, spacing 8, camera x = damped
- * scroll with magnetic snap. Exactly one plane renders live glyphs (the
- * nearest); reveal is hover on desktop / tap on touch, Esc or scroll exits.
+ * The room you are in when you are looking at one painting.
+ *
+ * Two things carry the identity of the work here. The first is the
+ * architecture: every canvas sits inside a full moulded bay — fluted pilasters
+ * either side, an entablature and cornice above, a dado and skirting below,
+ * and a raised bolection panel behind the frame — rather than hanging on a
+ * bare plane. The second is colour: the entire room, walls, coffers, floor
+ * tint, fill light, fog and background, takes the painter's own accent, and
+ * eases from one to the next as you move along the rail. You can tell whose
+ * room you are standing in with your eyes half shut.
+ *
+ * Horizontal roll: artwork bays along +x, spacing 8, camera x = damped scroll
+ * with magnetic snap. Exactly one plane renders live glyphs (the nearest);
+ * reveal is hover on desktop / tap on touch, Esc or scroll exits.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { useStore } from '../state/store';
+import { selectArtworks, useStore } from '../state/store';
 import { gallery, pointer } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
 import { GlyphPrePass } from '../glyph/GlyphPrePass';
 import { loadArtwork, prefetchAround, type LoadedArtwork } from '../glyph/artworkLoader';
 import { ArtworkPlane } from './ArtworkPlane';
+import { OrnateFrame } from './OrnateFrame';
+import { frameReach } from './frames';
+import { fitWork } from './fit';
 import { startReveal, endReveal, revealAnim } from '../transitions/reveal';
-import { LAMP } from './Lighting';
 import { artworkProjector, regionAt } from '../threadpull/state';
-import type { DeviceTier } from '../types';
+import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
 
 const SPACING = 8;
-const CAM_Z = 3.4;
-/** shared painting height — the museum hanging line (spec §10A.2) */
-export const PLANE_H = 2.4;
-const PAL = {
-  field: '#C6BAA6',
-  highlight: '#DACFBA',
-  floorLight: '#BDB3A2',
-  vault: '#D2C8B6',
-};
+const CAM_Z = 5.6;
+/** the height a work is hung at unless it is too wide to allow it */
+export const PLANE_H = 2.2;
+/** widest a work may be drawn before its height gives way (spec: fit.ts) */
+const MAX_W = 5.4;
+/** height every canvas is centred on */
+export const HANG_Y = 2.05;
+const WALL_H = 6.2;
 
 /** screen-space projection of the active plane for the DOM placard (§10.7) */
 export const placardAnchor = { x: 0, y: 0, edge: 0, visible: false };
 
+/* ── the moulded bay around one painting ────────────────────────────────── */
+
+/** vertical flutes cut into a pilaster shaft */
+function Flutes({ height, width }: { height: number; width: number }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const COUNT = 4;
+  useEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const m = new THREE.Matrix4();
+    for (let i = 0; i < COUNT; i++) {
+      m.makeTranslation((i / (COUNT - 1) - 0.5) * width * 0.62, 0, width * 0.19);
+      mesh.setMatrixAt(i, m);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+  }, [height, width]);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, COUNT]}>
+      <boxGeometry args={[width * 0.09, height * 0.82, width * 0.1]} />
+      <meshStandardMaterial color="#00000022" roughness={0.9} transparent opacity={0.16} />
+    </instancedMesh>
+  );
+}
+
+/**
+ * The joinery around one work: pilasters, entablature, cornice, dado,
+ * skirting and a raised panel. Everything is tinted from the painter's accent,
+ * so the room is theirs and the mouldings still read as mouldings.
+ */
+function MouldedBay({
+  artwork,
+  museum,
+  width,
+  height,
+}: {
+  artwork: ArtworkIndexEntry;
+  museum: MuseumData;
+  width: number;
+  height: number;
+}) {
+  const accent = artwork.accent;
+  const p = museum.style.palette;
+
+  // Mouldings are the accent lightened — never neutral. Taken too far toward
+  // the museum's stone colour the joinery washes out to bone and the room
+  // stops belonging to the painter, which is the one thing it has to do.
+  const tint = useMemo(() => {
+    const base = new THREE.Color(accent);
+    const light = base.clone().lerp(new THREE.Color(p.molding), 0.36);
+    const deep = base.clone().lerp(new THREE.Color('#000000'), 0.28);
+    const mid = base.clone().lerp(new THREE.Color(p.molding), 0.14);
+    return {
+      light: `#${light.getHexString()}`,
+      deep: `#${deep.getHexString()}`,
+      mid: `#${mid.getHexString()}`,
+    };
+  }, [accent, p.molding]);
+
+  const reach = frameReach(museum.style.frame) * height;
+  const panelW = width + reach * 2 + 0.55;
+  const panelH = height + reach * 2 + 0.55;
+  const pilasterX = panelW / 2 + 0.42;
+  const pilasterH = 4.0;
+  const bayW = pilasterX * 2 + 0.84;
+
+  return (
+    <group>
+      {/* the field of the bay, in the painter's colour */}
+      <mesh position={[0, WALL_H / 2 - 0.4, -0.06]} receiveShadow>
+        <planeGeometry args={[SPACING, WALL_H]} />
+        <meshStandardMaterial color={accent} roughness={0.92} />
+      </mesh>
+
+      {/* raised bolection panel the painting sits in the middle of */}
+      <mesh position={[0, HANG_Y, -0.04]} receiveShadow>
+        <boxGeometry args={[panelW + 0.34, panelH + 0.34, 0.05]} />
+        <meshStandardMaterial color={tint.light} roughness={0.72} />
+      </mesh>
+      <mesh position={[0, HANG_Y, -0.014]} receiveShadow>
+        <boxGeometry args={[panelW, panelH, 0.04]} />
+        <meshStandardMaterial color={tint.deep} roughness={0.9} />
+      </mesh>
+
+      {/* pilasters flanking the work */}
+      {[-1, 1].map((s) => (
+        <group key={s} position={[s * pilasterX, 0, 0.02]}>
+          <mesh position={[0, pilasterH / 2, 0.1]} castShadow receiveShadow>
+            <boxGeometry args={[0.5, pilasterH, 0.2]} />
+            <meshStandardMaterial color={tint.light} roughness={0.7} />
+          </mesh>
+          <group position={[0, pilasterH / 2, 0.1]}>
+            <Flutes height={pilasterH} width={0.5} />
+          </group>
+          {/* capital and base */}
+          <mesh position={[0, pilasterH - 0.13, 0.14]} castShadow>
+            <boxGeometry args={[0.72, 0.26, 0.3]} />
+            <meshStandardMaterial color={tint.light} roughness={0.66} />
+          </mesh>
+          <mesh position={[0, 0.16, 0.14]} castShadow>
+            <boxGeometry args={[0.68, 0.32, 0.3]} />
+            <meshStandardMaterial color={tint.light} roughness={0.7} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* entablature and cornice spanning the bay */}
+      <mesh position={[0, pilasterH + 0.24, 0.16]} castShadow receiveShadow>
+        <boxGeometry args={[bayW, 0.44, 0.34]} />
+        <meshStandardMaterial color={tint.light} roughness={0.68} />
+      </mesh>
+      <mesh position={[0, pilasterH + 0.56, 0.26]} castShadow>
+        <boxGeometry args={[bayW + 0.3, 0.22, 0.52]} />
+        <meshStandardMaterial color={tint.light} roughness={0.64} />
+      </mesh>
+      {/* a run of dentils under the cornice — the detail that reads as carving */}
+      <Dentils width={bayW} y={pilasterH + 0.02} color={tint.light} />
+
+      {/* frieze panel above the entablature, in the deeper tone */}
+      <mesh position={[0, pilasterH + 1.15, -0.02]}>
+        <planeGeometry args={[bayW - 0.4, 0.9]} />
+        <meshStandardMaterial color={tint.deep} roughness={0.9} />
+      </mesh>
+
+      {/* skirting only — a dado rail at this scale runs straight across the
+          bottom of the canvas, so the wall below the panel stays plain */}
+      <mesh position={[0, 0.16, 0.02]}>
+        <planeGeometry args={[SPACING, 0.32]} />
+        <meshStandardMaterial color={tint.mid} roughness={0.88} />
+      </mesh>
+      <mesh position={[0, 0.1, 0.1]} castShadow receiveShadow>
+        <boxGeometry args={[SPACING, 0.2, 0.18]} />
+        <meshStandardMaterial color={tint.light} roughness={0.72} />
+      </mesh>
+
+      {/* coffer directly overhead, so the ceiling belongs to the bay too */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, WALL_H - 0.02, 2.0]}>
+        <planeGeometry args={[bayW, 3.6]} />
+        <meshStandardMaterial color={tint.deep} roughness={0.92} />
+      </mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, WALL_H - 0.12, 2.0]}>
+        <ringGeometry args={[1.2, 1.44, 24]} />
+        <meshStandardMaterial color={tint.light} roughness={0.7} />
+      </mesh>
+    </group>
+  );
+}
+
+function Dentils({ width, y, color }: { width: number; y: number; color: string }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const count = Math.max(6, Math.round(width / 0.26));
+  useEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const m = new THREE.Matrix4();
+    for (let i = 0; i < count; i++) {
+      m.makeTranslation((i / (count - 1) - 0.5) * (width - 0.2), y, 0.22);
+      mesh.setMatrixAt(i, m);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+  }, [count, width, y]);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, count]} castShadow>
+      <boxGeometry args={[0.12, 0.16, 0.16]} />
+      <meshStandardMaterial color={color} roughness={0.7} />
+    </instancedMesh>
+  );
+}
+
+/* ── the scene ──────────────────────────────────────────────────────────── */
+
 export function GalleryScene({ tier }: { tier: DeviceTier }) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
+  const scene = useThree((s) => s.scene);
   const size = useThree((s) => s.size);
-  const artworks = useStore((s) => s.artworks);
+  const museum = useStore((s) => s.museum);
+  const artworks = useStore(selectArtworks);
   const index = useStore((s) => s.index);
   const revealed = useStore((s) => s.revealed);
   const reducedMotion = useStore((s) => s.reducedMotion);
@@ -46,9 +232,11 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
 
   const [loaded, setLoaded] = useState<Map<number, LoadedArtwork>>(new Map());
   const spotRef = useRef<THREE.SpotLight>(null);
+  const fillRef = useRef<THREE.HemisphereLight>(null);
   const spotTarget = useRef<THREE.Object3D>(new THREE.Object3D());
   const look = useRef({ x: 0, y: 0 });
   const touch = useRef({ x: 0, active: false });
+  const roomTone = useRef(new THREE.Color('#3A3630'));
 
   // load current + warm zone (spec §7.5)
   useEffect(() => {
@@ -158,10 +346,10 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
     look.current.x += (px - look.current.x) * k;
     look.current.y += (py - look.current.y) * k;
 
-    camera.position.set(gallery.x + look.current.x * 0.1, 1.6 + look.current.y * -0.04, CAM_Z);
+    camera.position.set(gallery.x + look.current.x * 0.1, 1.86 + look.current.y * -0.05, CAM_Z);
     camera.rotation.set(
-      -look.current.y * (1.2 * Math.PI) / 180,
-      -look.current.x * (2.0 * Math.PI) / 180,
+      (-look.current.y * 1.2 * Math.PI) / 180,
+      (-look.current.x * 2.0 * Math.PI) / 180,
       0,
     );
     if (camera.fov !== 45) {
@@ -169,21 +357,36 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
       camera.updateProjectionMatrix();
     }
 
+    // the room takes the painter's colour, eased so moving along the rail is a
+    // slow wash from one artist's ground to the next rather than a cut
+    const nearest = artworks[Math.round(gallery.x / SPACING)] ?? artworks[index];
+    if (nearest) {
+      const target = new THREE.Color(nearest.accent);
+      roomTone.current.lerp(target, Math.min(1, delta * 2.4));
+      const bg = roomTone.current.clone().multiplyScalar(0.34);
+      if (state.scene.background instanceof THREE.Color) state.scene.background.copy(bg);
+      const fog = state.scene.fog as THREE.Fog | null;
+      if (fog) fog.color.copy(bg);
+      if (fillRef.current) {
+        fillRef.current.color.copy(roomTone.current).lerp(new THREE.Color('#FFF3E0'), 0.55);
+        fillRef.current.groundColor.copy(roomTone.current).multiplyScalar(0.7);
+      }
+    }
+
     // spotlight follows + intensifies on reveal (spec §10.6)
     if (spotRef.current) {
-      spotRef.current.position.set(index * SPACING, 4.6, 1.9);
-      spotTarget.current.position.set(index * SPACING, 1.6, 0);
+      spotRef.current.position.set(index * SPACING, 4.6, 2.4);
+      spotTarget.current.position.set(index * SPACING, HANG_Y, 0);
       spotTarget.current.updateMatrixWorld();
-      spotRef.current.intensity = revealAnim.spot * 4;
+      spotRef.current.intensity = revealAnim.spot * 3.4;
     }
-    state.scene.environmentIntensity = 0.45 * revealAnim.env;
+    scene.environmentIntensity = 0.45 * revealAnim.env;
 
     // project the active plane edge for the DOM placard (spec §10.7)
     const activeEntry = artworks[index];
     if (activeEntry) {
-      const h = PLANE_H;
-      const w = h * activeEntry.aspect;
-      const v = new THREE.Vector3(index * SPACING + w / 2, 1.6, 0.1);
+      const { width: w, height: h } = fitWork(activeEntry.aspect, PLANE_H, MAX_W);
+      const v = new THREE.Vector3(index * SPACING + w / 2, HANG_Y, 0.1);
       v.project(camera);
       placardAnchor.x = (v.x * 0.5 + 0.5) * size.width;
       placardAnchor.y = (-v.y * 0.5 + 0.5) * size.height;
@@ -195,7 +398,7 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
       artworkProjector.project = (u: number, vv: number) => {
         const p = new THREE.Vector3(
           index * SPACING + (u - 0.5) * w,
-          1.6 + (0.5 - vv) * h,
+          HANG_Y + (0.5 - vv) * h,
           0.05,
         );
         p.project(camera);
@@ -208,29 +411,32 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
   });
 
   const activeArt = loaded.get(index) ?? null;
+  if (!museum) return null;
+  const p = museum.style.palette;
+  const railW = artworks.length * SPACING + 24;
+  const centreX = ((artworks.length - 1) * SPACING) / 2;
 
   return (
     <group>
       <GlyphPrePass artwork={activeArt} rtSize={tier.rtSize} active />
 
-      {/* wall */}
-      <mesh position={[(artworks.length - 1) * SPACING * 0.5, 3.5, -0.12]}>
-        <planeGeometry args={[artworks.length * SPACING + 30, 7]} />
-        <meshStandardMaterial color={PAL.field} roughness={0.72} />
+      {/* the wall behind the bays, and the ceiling over them */}
+      <mesh position={[centreX, WALL_H / 2, -0.14]}>
+        <planeGeometry args={[railW, WALL_H + 2]} />
+        <meshStandardMaterial color={p.wallDeep} roughness={0.9} />
       </mesh>
-      {/* dado + skirting */}
-      <mesh position={[(artworks.length - 1) * SPACING * 0.5, 0.07, -0.09]}>
-        <boxGeometry args={[artworks.length * SPACING + 30, 0.14, 0.06]} />
-        <meshStandardMaterial color={PAL.highlight} roughness={0.7} />
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[centreX, WALL_H, 2]}>
+        <planeGeometry args={[railW, 14]} />
+        <meshStandardMaterial color={p.ceiling} roughness={0.9} />
       </mesh>
-      {/* ceiling */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[(artworks.length - 1) * SPACING * 0.5, 7, 2]}>
-        <planeGeometry args={[artworks.length * SPACING + 30, 14]} />
-        <meshStandardMaterial color={PAL.vault} roughness={0.85} />
+      {/* opposite wall, far behind the camera (true-3D parallax layer, §10B.3) */}
+      <mesh position={[centreX, WALL_H / 2, 10.5]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[railW, WALL_H + 2]} />
+        <meshStandardMaterial color={p.wallDeep} roughness={0.9} />
       </mesh>
       {/* reflective floor */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[(artworks.length - 1) * SPACING * 0.5, 0, 2]}>
-        <planeGeometry args={[artworks.length * SPACING + 30, 14]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[centreX, 0, 2]}>
+        <planeGeometry args={[railW, 14]} />
         <MeshReflectorMaterial
           resolution={tier.name === 'high' ? 1024 : 512}
           blur={[400, 100]}
@@ -239,32 +445,38 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
           roughness={0.18}
           depthScale={0.6}
           minDepthThreshold={0.4}
-          color={PAL.floorLight}
+          color={p.floor}
           metalness={0.12}
           mirror={0.45}
         />
       </mesh>
-      {/* opposite wall, far behind the camera (true-3D parallax layer, §10B.3) */}
-      <mesh position={[(artworks.length - 1) * SPACING * 0.5, 3.5, 10.5]} rotation={[0, Math.PI, 0]}>
-        <planeGeometry args={[artworks.length * SPACING + 30, 7]} />
-        <meshStandardMaterial color={PAL.field} roughness={0.72} />
-      </mesh>
 
-      {/* per-artist accent panel behind each canvas */}
-      {artworks.map((a, i) => (
-        <mesh key={`bg${a.id}`} position={[i * SPACING, 2.5, -0.1]} receiveShadow>
-          <planeGeometry args={[PLANE_H * a.aspect + 1.9, 4.6]} />
-          <meshStandardMaterial color={a.accent} roughness={0.86} />
-        </mesh>
-      ))}
+      {/* one fully moulded bay per painting */}
+      {artworks.map((a, i) => {
+        const { width, height } = fitWork(a.aspect, PLANE_H, MAX_W);
+        return (
+          <group key={`bay${a.id}`} position={[i * SPACING, 0, 0]}>
+            <MouldedBay artwork={a} museum={museum} width={width} height={height} />
+            <group position={[0, HANG_Y, 0.06]}>
+              <OrnateFrame
+                kind={museum.style.frame}
+                width={width}
+                height={height}
+                gilt={p.gilt}
+                dark={p.wallDeep}
+              />
+            </group>
+          </group>
+        );
+      })}
 
-      {/* planes */}
+      {/* the canvases themselves */}
       {artworks.map((a, i) => (
         <ArtworkPlane
           key={a.id}
           artwork={loaded.get(i) ?? null}
-          position={[i * SPACING, 1.6, 0]}
-          height={PLANE_H}
+          position={[i * SPACING, HANG_Y, 0.09]}
+          height={fitWork(a.aspect, PLANE_H, MAX_W).height}
           aspect={a.aspect}
           active={i === index}
           onEnter={() => {
@@ -301,26 +513,28 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
         />
       ))}
 
-      {/* lighting */}
-      <hemisphereLight args={['#FFF3E0', '#9C9080', 0.4]} />
+      {/* lighting: an accent-tinted fill, a picture light per bay, and the
+          reveal spot */}
+      <hemisphereLight ref={fillRef} args={['#FFF3E0', '#9C9080', 0.5]} />
       {artworks.map((_, i) => (
         <pointLight
           key={i}
-          position={[i * SPACING, 5.6, 2.4]}
-          color={LAMP}
-          intensity={10}
+          position={[i * SPACING, 4.8, 2.6]}
+          color={museum.style.light.lamp}
+          intensity={9}
           distance={11}
           decay={1.8}
         />
       ))}
       <spotLight
         ref={spotRef}
-        angle={0.42}
+        angle={0.46}
         penumbra={0.85}
-        distance={12}
+        distance={13}
         decay={1.4}
-        color={LAMP}
+        color={museum.style.light.lamp}
         target={spotTarget.current}
+        castShadow
       />
       <primitive object={spotTarget.current} />
     </group>

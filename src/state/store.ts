@@ -1,11 +1,16 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { canTransition } from './machine';
-import type { ArtworkIndexEntry, ArtworkRegion, GalleryData, Phase } from '../types';
+import type {
+  ArtworkIndexEntry,
+  ArtworkRegion,
+  MuseumData,
+  MuseumIndexEntry,
+  Phase,
+} from '../types';
 
 interface AppStore {
   phase: Phase;
-  galleryId: string | null;
   /** corridor scroll progress 0→1 */
   corridorT: number;
   /** current artwork index on the gallery rail */
@@ -21,13 +26,14 @@ interface AppStore {
 
   /** Thread Pull: Shift held over the canvas puts the cursor in extraction mode */
   extractionMode: boolean;
-  /** the region the cursor is over while in extraction mode */
   hoveredRegion: ArtworkRegion | null;
-  /** the region currently extracted into the reading panel */
   pulledRegion: ArtworkRegion | null;
 
-  artworks: ArtworkIndexEntry[];
-  gallery: GalleryData | null;
+  /** every museum in the exhibition, for the landing page */
+  museums: MuseumIndexEntry[];
+  /** the one currently entered — carries its corridor style, plan and works */
+  museum: MuseumData | null;
+  museumLoading: string | null;
 
   setPhase: (p: Phase) => void;
   setCorridorT: (t: number) => void;
@@ -36,16 +42,20 @@ interface AppStore {
   setDissolve: (d: number) => void;
   setPlacardExpanded: (e: boolean) => void;
   setCreditsOpen: (o: boolean) => void;
-  setData: (artworks: ArtworkIndexEntry[], gallery: GalleryData) => void;
+  setMuseums: (m: MuseumIndexEntry[]) => void;
+  setMuseum: (m: MuseumData | null) => void;
+  setMuseumLoading: (id: string | null) => void;
   setExtractionMode: (e: boolean) => void;
   setHoveredRegion: (r: ArtworkRegion | null) => void;
   setPulledRegion: (r: ArtworkRegion | null) => void;
 }
 
+/** the works of the museum currently entered — empty before one is chosen */
+export const selectArtworks = (s: AppStore): ArtworkIndexEntry[] => s.museum?.artworks ?? [];
+
 export const useStore = create<AppStore>()(
   subscribeWithSelector((set, get) => ({
     phase: 'boot',
-    galleryId: null,
     corridorT: 0,
     index: 0,
     revealed: false,
@@ -62,39 +72,58 @@ export const useStore = create<AppStore>()(
     hoveredRegion: null,
     pulledRegion: null,
 
-    artworks: [],
-    gallery: null,
+    museums: [],
+    museum: null,
+    museumLoading: null,
 
     setPhase: (p) => {
       const from = get().phase;
       if (from === p) return;
       if (!canTransition(from, p)) return;
+      // there is nothing to walk through until a museum has been chosen
+      if (p === 'corridor' && !get().museum) return;
       if (p === 'corridor' && from === 'landing') {
         sessionStorage.setItem('placard.seenIntro', '1');
       }
       set({
         phase: p,
         ...(p === 'corridor' && from === 'map' ? { corridorT: 0.8 } : {}),
-        ...(p === 'landing' ? { corridorT: 0 } : {}),
+        ...(p === 'landing' ? { corridorT: 0, museum: null, index: 0 } : {}),
         ...(p !== 'gallery' ? { revealed: false, dissolve: 0, placardExpanded: false } : {}),
       });
     },
     setCorridorT: (t) => set({ corridorT: Math.max(0, Math.min(1, t)) }),
     setIndex: (i) => {
-      const n = get().artworks.length;
+      const n = selectArtworks(get()).length;
       set({ index: Math.max(0, Math.min(n - 1, i)), revealed: false, placardExpanded: false });
     },
     setRevealed: (r) => set({ revealed: r, ...(r ? {} : { placardExpanded: false }) }),
     setDissolve: (d) => set({ dissolve: d }),
     setPlacardExpanded: (e) => set({ placardExpanded: e }),
     setCreditsOpen: (o) => set({ creditsOpen: o }),
-    setData: (artworks, gallery) => set({ artworks, gallery, galleryId: gallery.id }),
+    setMuseums: (museums) => set({ museums }),
+    setMuseum: (museum) => set({ museum, index: 0 }),
+    setMuseumLoading: (museumLoading) => set({ museumLoading }),
     setExtractionMode: (e) =>
       set(e ? { extractionMode: true } : { extractionMode: false, hoveredRegion: null }),
     setHoveredRegion: (r) => set({ hoveredRegion: r }),
     setPulledRegion: (r) => set({ pulledRegion: r }),
   })),
 );
+
+/** Fetch a museum's manifest and enter it. Cached, so re-entry is instant. */
+const museumCache = new Map<string, Promise<MuseumData>>();
+
+export function loadMuseum(id: string): Promise<MuseumData> {
+  const hit = museumCache.get(id);
+  if (hit) return hit;
+  const p = fetch(`/museums/${id}.json`).then((r) => {
+    if (!r.ok) throw new Error(`museum ${id}: ${r.status}`);
+    return r.json() as Promise<MuseumData>;
+  });
+  museumCache.set(id, p);
+  return p;
+}
 
 // debug/testing handle
 if (typeof window !== 'undefined') {

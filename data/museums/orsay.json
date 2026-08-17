@@ -1,0 +1,82 @@
+{
+  "id": "orsay",
+  "name": "Musée d'Orsay",
+  "city": "Paris",
+  "subtitle": "The central nave",
+  "blurb": "A railway station turned gallery: arched steel and glass overhead, carved stone terraces, the great clock at the end.",
+  "corridorNote": "Modelled on the vast central nave of the Gare d'Orsay. A colossal vaulted roof of arched steel and glass floods the hall with daylight; the walls and archways are light carved stone set with deep rosettes; raised galleries with modern glass railings flank a wide central promenade; and the enormous gilded clock hangs at the far end, which is where the corridor's vanishing point lands.",
+  "style": {
+    "ceiling": "steel-glass-arch",
+    "floor": "promenade",
+    "wall": "carved-stone",
+    "frame": "orsay-reeded",
+    "hang": "single",
+    "halfWidth": 5.2,
+    "wallHeight": 6.4,
+    "vaultHeight": 11.5,
+    "bays": 10,
+    "bayDepth": 5.4,
+    "palette": {
+      "wall": "#CFC5B2",
+      "wallDeep": "#B0A692",
+      "molding": "#E6DFCE",
+      "gilt": "#C9A227",
+      "ceiling": "#DFE6EC",
+      "ceilingAccent": "#C4CBD3",
+      "floor": "#CAC2B3",
+      "floorInlay": "#A79C89",
+      "accent": "#BEB5A1",
+      "sky": "#EFF5FB"
+    },
+    "light": {
+      "key": "#FFF8E8",
+      "keyIntensity": 2.5,
+      "keyFrom": [-4, 20, 7],
+      "sky": "#E6F0F8",
+      "ground": "#7C7362",
+      "ambient": 0.62,
+      "lamp": "#FFE2B2",
+      "lampIntensity": 5,
+      "exposure": 1.08,
+      "background": "#33302A",
+      "fog": ["#4C483E", 56, 160]
+    },
+    "fixtures": {
+      "sculpture": "pedestal-figures",
+      "seating": "bench",
+      "chandeliers": false,
+      "placards": true,
+      "clock": true,
+      "terraces": true
+    }
+  },
+  "plan": {
+    "viewBox": "20 30 520 260",
+    "level": "Nave & Level 5",
+    "rooms": [
+      { "id": "r-rhone", "name": "Rhône", "svgPath": "M40,44 L134,44 L134,124 L40,124 Z", "centroid": [87, 84], "active": true, "artworkIndex": 0 },
+      { "id": "r-moulin", "name": "Moulin", "svgPath": "M138,44 L232,44 L232,124 L138,124 Z", "centroid": [185, 84], "active": true, "artworkIndex": 1 },
+      { "id": "r-olympia", "name": "Olympia", "svgPath": "M236,44 L330,44 L330,124 L236,124 Z", "centroid": [283, 84], "active": true, "artworkIndex": 2 },
+      { "id": "r-dejeuner", "name": "Déjeuner", "svgPath": "M334,44 L428,44 L428,124 L334,124 Z", "centroid": [381, 84], "active": true, "artworkIndex": 3 },
+      { "id": "r-gleaners", "name": "Gleaners", "svgPath": "M40,196 L134,196 L134,276 L40,276 Z", "centroid": [87, 236], "active": true, "artworkIndex": 4 },
+      { "id": "r-apples", "name": "Apples", "svgPath": "M138,196 L232,196 L232,276 L138,276 Z", "centroid": [185, 236], "active": true, "artworkIndex": 5 },
+      { "id": "r-self", "name": "Self-Portrait", "svgPath": "M236,196 L330,196 L330,276 L236,276 Z", "centroid": [283, 236], "active": true, "artworkIndex": 6 },
+      { "id": "r-cards", "name": "Card Players", "svgPath": "M334,196 L428,196 L428,276 L334,276 Z", "centroid": [381, 236], "active": true, "artworkIndex": 7 },
+      { "id": "r-whistler", "name": "Whistler", "svgPath": "M434,44 L520,44 L520,156 L434,156 Z", "centroid": [477, 100], "active": true, "artworkIndex": 8 },
+      { "id": "r-scrapers", "name": "Scrapers", "svgPath": "M434,160 L520,160 L520,276 L434,276 Z", "centroid": [477, 218], "active": true, "artworkIndex": 9 },
+      { "id": "r-nave", "name": "Central nave", "svgPath": "M40,128 L428,128 L428,192 L40,192 Z", "centroid": [234, 160], "active": false, "artworkIndex": -1 }
+    ]
+  },
+  "artworks": [
+    "vangogh-starry-night-rhone",
+    "renoir-moulin-galette",
+    "manet-olympia",
+    "manet-dejeuner-sur-lherbe",
+    "millet-gleaners",
+    "cezanne-apples-oranges",
+    "vangogh-self-portrait",
+    "cezanne-card-players",
+    "whistler-mother",
+    "caillebotte-floor-scrapers"
+  ]
+}

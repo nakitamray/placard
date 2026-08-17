@@ -27,7 +27,7 @@
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { useStore } from '../state/store';
+import { selectArtworks, useStore } from '../state/store';
 import { artworkProjector, threadPullAnim } from '../threadpull/state';
 import { loadArtwork } from '../glyph/artworkLoader';
 import type { ArtworkRegion, DeviceTier } from '../types';
@@ -37,7 +37,7 @@ const FLIGHT_CHARS = 320;
 
 export function ThreadPull({ tier }: { tier: DeviceTier }) {
   const phase = useStore((s) => s.phase);
-  const artworks = useStore((s) => s.artworks);
+  const artworks = useStore(selectArtworks);
   const index = useStore((s) => s.index);
   const reducedMotion = useStore((s) => s.reducedMotion);
   const extractionMode = useStore((s) => s.extractionMode);

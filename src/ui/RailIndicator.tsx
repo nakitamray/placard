@@ -1,9 +1,9 @@
 /** Rail indicator — spec §10C.6. Hairline ticks; clicking a tick jumps the rail. */
-import { useStore } from '../state/store';
+import { selectArtworks, useStore } from '../state/store';
 
 export function RailIndicator() {
   const phase = useStore((s) => s.phase);
-  const artworks = useStore((s) => s.artworks);
+  const artworks = useStore(selectArtworks);
   const index = useStore((s) => s.index);
   const setIndex = useStore((s) => s.setIndex);
 

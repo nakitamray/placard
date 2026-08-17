@@ -7,7 +7,7 @@
  * where a real credit line sits.
  */
 import { useEffect, useRef, useState } from 'react';
-import { useStore } from '../state/store';
+import { selectArtworks, useStore } from '../state/store';
 import { placardAnchor } from '../scenes/GalleryScene';
 import { loadArtwork } from '../glyph/artworkLoader';
 import type { ArtworkMeta, DeviceTier } from '../types';
@@ -18,7 +18,7 @@ export function Placard({ tier }: { tier: DeviceTier }) {
   const revealed = useStore((s) => s.revealed);
   const expanded = useStore((s) => s.placardExpanded);
   const setExpanded = useStore((s) => s.setPlacardExpanded);
-  const artworks = useStore((s) => s.artworks);
+  const artworks = useStore(selectArtworks);
   const [meta, setMeta] = useState<ArtworkMeta | null>(null);
   const cardRef = useRef<HTMLElement>(null);
 

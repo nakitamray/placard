@@ -4,7 +4,7 @@
  * and references that informed the build.
  */
 import { useEffect, useState } from 'react';
-import { useStore } from '../state/store';
+import { selectArtworks, useStore } from '../state/store';
 import type { ArtworkMeta } from '../types';
 
 const REFERENCES: Array<{ name: string; url: string; note: string }> = [
@@ -38,7 +38,7 @@ const REFERENCES: Array<{ name: string; url: string; note: string }> = [
 export function Credits() {
   const open = useStore((s) => s.creditsOpen);
   const setOpen = useStore((s) => s.setCreditsOpen);
-  const artworks = useStore((s) => s.artworks);
+  const artworks = useStore(selectArtworks);
   const [metas, setMetas] = useState<ArtworkMeta[]>([]);
 
   useEffect(() => {

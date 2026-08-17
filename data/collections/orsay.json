@@ -1,0 +1,242 @@
+[
+  {
+    "id": "vangogh-starry-night-rhone",
+    "artist": "Vincent van Gogh",
+    "artistDates": "1853–1890",
+    "title": "Starry Night Over the Rhône",
+    "titleOriginal": "La Nuit étoilée",
+    "year": "1888",
+    "medium": "Oil on canvas",
+    "dimensions": "72.5 × 92 cm",
+    "room": "Level 5",
+    "accession": "",
+    "creditLine": "Gift of M. and Mme Robert Kahn-Sriber, 1975",
+    "accentColor": "#1E2A4A",
+    "labelText": "Painted at night on the quay at Arles, by gaslight, with candles fixed to the brim of his hat. The gas lamps along the far bank drag long yellow reflections down into the water; the Plough hangs above the town; and in the foreground a couple walk arm in arm at the edge of the picture, almost an afterthought. Van Gogh wrote to his brother that the night is more richly coloured than the day, and that the problem was simply to paint it on the spot.",
+    "extendedNote": "He had been in Arles since February and was working at a pace that alarmed everyone who knew him. The letters from this autumn are full of the same argument: that night is not black, that a starry sky is not a dark field with white dots in it, and that the only way to prove it is to set up an easel outdoors after dark and look.\n\nSo he did, on the bank of the Rhône a few minutes from the Yellow House, with candles on his hat for light. The constellation is the Great Bear, painted where it actually stood; the lights on the opposite bank are the gas lamps of Arles, which had only recently been installed and which he renders as flaring stars in their own right, so that town and sky rhyme. The reflections in the water are dragged straight down in long strokes of chrome yellow and orange over ultramarine — the complementary pair he was using all that year. The couple at the lower right were added last. They are the smallest thing in the picture and the reason it is not simply a landscape.",
+    "placeholder": {
+      "aspect": 1.269,
+      "archetype": "nocturne",
+      "palette": ["#0E1630", "#1E3060", "#3A5590", "#7E92B4", "#D8DCE6", "#F0C44A"],
+      "seed": 41
+    }
+  },
+  {
+    "id": "renoir-moulin-galette",
+    "artist": "Pierre-Auguste Renoir",
+    "artistDates": "1841–1919",
+    "title": "Bal du moulin de la Galette",
+    "titleOriginal": "Bal du moulin de la Galette",
+    "year": "1876",
+    "medium": "Oil on canvas",
+    "dimensions": "131 × 175 cm",
+    "room": "Level 5",
+    "accession": "",
+    "creditLine": "Gustave Caillebotte bequest, 1894",
+    "accentColor": "#4E4038",
+    "labelText": "A Sunday afternoon dance in the garden of a windmill on the Butte Montmartre, painted on the spot over a summer. Renoir's friends and local models fill the tables and the dance floor, and the whole surface is broken by sunlight falling through acacia leaves — blue-violet patches on jackets, straw hats, the ground. Contemporary critics thought the dappling looked like mould on the figures. It is the picture's entire subject.",
+    "extendedNote": "The Moulin de la Galette was a working-class dance hall, open on Sunday afternoons, cheap, and full of shop assistants and seamstresses. Renoir rented rooms nearby and, according to his friends, had the canvas carried up the hill and back every day so that he could work in front of the thing itself.\n\nWhat he was after was a problem no one had solved: how to paint a crowd under moving foliage without letting the light dissolve the people. His answer was to let it dissolve them a little. Faces come in and out of focus, a shoulder is bisected by a patch of violet shade, and the background dancers are handled as pure colour with no drawing at all — yet the foreground group at the table is specific enough that his sitters are identifiable by name. The 1876 Impressionist exhibition found it incomprehensible for exactly that reason. It came to the French state as part of Caillebotte's bequest in 1894, which the administration accepted only in part and after a long fight, and it has been one of the most popular pictures in Paris ever since.",
+    "placeholder": {
+      "aspect": 1.336,
+      "archetype": "figure-group",
+      "palette": ["#2A2420", "#4E4238", "#7A6A5A", "#B0A08C", "#EDE4D2", "#5A6EA8"],
+      "seed": 42
+    }
+  },
+  {
+    "id": "manet-olympia",
+    "artist": "Édouard Manet",
+    "artistDates": "1832–1883",
+    "title": "Olympia",
+    "titleOriginal": "Olympia",
+    "year": "1863",
+    "medium": "Oil on canvas",
+    "dimensions": "130 × 190 cm",
+    "room": "Level 0",
+    "accession": "RF 644",
+    "creditLine": "Offered to the State by public subscription, 1890",
+    "accentColor": "#3A3630",
+    "labelText": "A naked woman lies on a bed and looks at you. Not past you, not down, not asleep — at you, with her chin level and one hand closed over her thigh. A Black maid, Laure, brings in a bouquet from a client; a cat arches at the foot of the bed. The pose is Titian's Venus of Urbino almost exactly, and everything Titian's picture asks you to enjoy, this one asks you to account for.",
+    "extendedNote": "The Salon of 1865 accepted it and then had to post two guards in front of it. Visitors attacked the canvas with umbrellas. The critics wrote about a corpse, a female gorilla, a body the colour of dirty linen. The scandal was not nudity — the Salon was full of nudes that year — but the fact that this one was legible as a specific contemporary Parisian woman working in a specific trade: the orchid in her hair, the silk mule dangling from one foot, the black ribbon at her throat, the name Olympia itself, which was a courtesan's name.\n\nManet painted her flat, with almost no half-tones, lighting her frontally so the modelling collapses and the body reads as a silhouette against the cream sheet. That flatness was the other offence, and it is what painters took from the picture. Laure, the maid, was a woman Manet knew and painted more than once, and her presence sets the picture inside a real economy — flowers sent by a man who is standing, in effect, where the viewer is standing. When the state hesitated to accept the canvas after Manet's death, Monet organised a public subscription to buy it and force the issue.",
+    "placeholder": {
+      "aspect": 1.46,
+      "archetype": "interior",
+      "palette": ["#1E1A16", "#3E362E", "#6A5F52", "#A89A86", "#EFE8D6", "#8A2E34"],
+      "seed": 43
+    },
+    "regions": [
+      {
+        "id": "gaze",
+        "label": "The look",
+        "box": [0.28, 0.12, 0.52, 0.42],
+        "text": "Titian's Venus lowers her eyes; Goya's Maja is amused; the Salon's nudes of 1865 are all conveniently unaware of being looked at. Olympia's chin is level and her gaze is direct, unhurried and entirely unembarrassed, which puts the viewer in a defined position — as the person who has just come in, and whose flowers are being carried across the room."
+      },
+      {
+        "id": "maid",
+        "label": "Laure and the bouquet",
+        "box": [0.5, 0.05, 0.86, 0.7],
+        "text": "The maid is Laure, a model Manet knew and painted more than once, named in his notebooks. She brings in a wrapped bouquet sent by a client, which sets the whole picture inside an economy rather than a mythology. For a century most accounts of the painting described her as a compositional foil; she is the figure who explains what is happening."
+      },
+      {
+        "id": "cat",
+        "label": "The black cat",
+        "box": [0.76, 0.55, 1.0, 0.95],
+        "text": "Where Titian put a sleeping dog — fidelity, domesticity — Manet put a cat with its back up and its tail erect. Nineteenth-century Paris did not need the substitution explained. The caricaturists of 1865 seized on it immediately, and for months the picture was known in the press simply as the one with the cat."
+      }
+    ]
+  },
+  {
+    "id": "manet-dejeuner-sur-lherbe",
+    "artist": "Édouard Manet",
+    "artistDates": "1832–1883",
+    "title": "Luncheon on the Grass",
+    "titleOriginal": "Le Déjeuner sur l'herbe",
+    "year": "1863",
+    "medium": "Oil on canvas",
+    "dimensions": "208 × 264.5 cm",
+    "room": "Level 0",
+    "accession": "RF 1668",
+    "creditLine": "Étienne Moreau-Nélaton bequest, 1906",
+    "accentColor": "#2E3428",
+    "labelText": "Two clothed men in contemporary dress sit on the grass with a naked woman who is not looking at either of them but out at us; a second woman bathes in the stream behind. A picnic is scattered in the foreground, painted as a still life. Rejected by the Salon of 1863, it became the sensation of the Salon des Refusés that Napoleon III set up for the rejected work, and remained the most-mocked painting in France for a decade.",
+    "extendedNote": "The composition is borrowed openly. The group of three comes from an engraving after Raphael, and the pairing of dressed men with an undressed woman comes from Giorgione's Concert champêtre in the Louvre. Manet expected his audience to recognise both. What he changed was the register: the men wear the frock coats and student caps of 1863, and the woman is not a nymph but Victorine Meurent, a professional model whose face Paris knew.\n\nThe painting also refuses to behave optically. The bather in the middle distance is too large for where she stands, the light falls frontally with no shadow to model the bodies, and the woodland is brushed in as flat screens of green. Critics called it slapdash and indecent in the same sentence. Later painters read it as the first modern picture — not because of the scandal, but because Manet had stopped pretending the canvas was a window. The picnic in the lower left corner, a spill of bread, fruit and a blue dress, is as beautifully painted as anything in nineteenth-century France and is easy to miss entirely.",
+    "placeholder": {
+      "aspect": 1.27,
+      "archetype": "figure-group",
+      "palette": ["#1C2018", "#333C28", "#576046", "#8E9070", "#E6E2CC", "#A8965E"],
+      "seed": 44
+    }
+  },
+  {
+    "id": "millet-gleaners",
+    "artist": "Jean-François Millet",
+    "artistDates": "1814–1875",
+    "title": "The Gleaners",
+    "titleOriginal": "Des glaneuses",
+    "year": "1857",
+    "medium": "Oil on canvas",
+    "dimensions": "83.5 × 110 cm",
+    "room": "Level 0",
+    "accession": "",
+    "creditLine": "Gift of Mme Pommery, 1890",
+    "accentColor": "#5A5238",
+    "labelText": "Three women bend over a harvested field, picking up the grain the reapers left behind. Behind them, in bright distance, the harvest itself is going on — stacks, a cart, a mounted overseer. Gleaning was the ancient right of the poorest to what fell, and Millet painted it at the scale of history painting, with the bent backs given the weight and dignity that scale implies. The Salon of 1857 found this alarming.",
+    "extendedNote": "Millet had moved to Barbizon, at the edge of the forest of Fontainebleau, and painted rural labour for the rest of his life. He always denied any political programme and insisted he was painting what he saw. His critics, less than a decade after 1848, did not believe him: one review called the three figures the scaffolds of poverty, and another saw pikes behind them.\n\nThe picture's argument is entirely formal. The three women occupy the foreground on a low horizon, so the viewer's eye is at their level and the sky is pushed to a thin band; their poses are three stages of a single movement, stooping, reaching, straightening. Behind them the abundance is bathed in golden light and clearly separate — the overseer on his horse is a small dark mark at the right — so the composition states the distance between those who have the harvest and those who have the leavings without a word of commentary. Van Gogh copied Millet obsessively and called him the painter who had taught him what a peasant was. The picture entered the Louvre in 1890 over public objection and has been in the national collection since.",
+    "placeholder": {
+      "aspect": 1.317,
+      "archetype": "landscape",
+      "palette": ["#2E2A1C", "#54492C", "#867544", "#B8A46E", "#EFE0B8", "#8E4A32"],
+      "seed": 45
+    }
+  },
+  {
+    "id": "cezanne-apples-oranges",
+    "artist": "Paul Cézanne",
+    "artistDates": "1839–1906",
+    "title": "Apples and Oranges",
+    "titleOriginal": "Pommes et oranges",
+    "year": "c. 1899",
+    "medium": "Oil on canvas",
+    "dimensions": "74 × 93 cm",
+    "room": "Level 5",
+    "accession": "",
+    "creditLine": "Auguste Pellerin bequest, 1929",
+    "accentColor": "#4E4438",
+    "labelText": "Fruit on a rumpled white cloth, a patterned jug, a dish tipped forward. Nothing in the picture is seen from one place: the tabletop rises where a tabletop should recede, the dish is drawn from above while the jug is drawn from the side, and the cloth behaves like rock. Cézanne spent months on arrangements like this, using paper flowers and, eventually, fruit that had rotted — because what he was after took longer than fruit lasts.",
+    "extendedNote": "By the late 1890s Cézanne was working almost in isolation at Aix, sending occasional canvases to Paris and being visited by younger painters who had begun to treat him as an oracle. The late still lifes are the clearest statement of what he had spent thirty years doing: building a picture out of small planes of colour, each one placed in relation to its neighbours rather than in relation to a single viewpoint.\n\nThe result is a surface that is stable and an object that is not. Shift attention from the jug to the dish and the table underneath appears to move. Cézanne accepted these contradictions deliberately — he called it realising his sensations — because a person looking at a table does not hold their head still, and a painting that reconciles every angle is reporting something nobody has ever seen. The white cloth is where the argument is most visible: it is painted with the same weight and the same structural role as a mountainside, and in his landscapes of the same years, Mont Sainte-Victoire is painted like cloth. Within a decade Braque and Picasso would take this apart and call the result Cubism.",
+    "placeholder": {
+      "aspect": 1.257,
+      "archetype": "still-life",
+      "palette": ["#2A241C", "#4E4434", "#7C6E58", "#B4A88E", "#F0EADA", "#C46A22"],
+      "seed": 46
+    }
+  },
+  {
+    "id": "vangogh-self-portrait",
+    "artist": "Vincent van Gogh",
+    "artistDates": "1853–1890",
+    "title": "Self-Portrait",
+    "titleOriginal": "Portrait de l'artiste",
+    "year": "1889",
+    "medium": "Oil on canvas",
+    "dimensions": "65 × 54 cm",
+    "room": "Level 5",
+    "accession": "",
+    "creditLine": "Paul and Marguerite Gachet gift, 1949",
+    "accentColor": "#2E4A46",
+    "labelText": "Painted at the asylum of Saint-Rémy in the late summer of 1889, after a severe attack, and sent to his brother Theo with a note saying he hoped it would show he was calm. The suit and the background are the same cold blue-green, worked into a single field of writhing lines that curl around the head like weather. Inside it, the face is still: red beard, hollow cheeks, and eyes that are the most fixed thing in the picture.",
+    "extendedNote": "He committed himself voluntarily in May 1889 and stayed a year. Between attacks he was allowed to paint, and produced some of his best-known work in that room and the walled field outside it. This portrait belongs to a recovery — he wrote to Theo that he had begun it the day he got up, that he was thin and pale as a devil, and that painting it had steadied him.\n\nThe whole surface except the face is in motion. Each stroke of the ground is a separate curling line of pale green over blue, and the same rhythm runs through the jacket, so the sitter and the air around him are made of one substance. Only the head resists it, painted in flatter, denser strokes with the pink and orange of the skin holding against the surrounding green — the complementary opposition he had been using since Arles, now doing psychological rather than decorative work. It came to the state through Paul Gachet, son of the doctor who looked after Van Gogh in his last months at Auvers, and who kept a remarkable group of the paintings his father was given.",
+    "placeholder": {
+      "aspect": 0.83,
+      "archetype": "portrait",
+      "palette": ["#16261E", "#26463C", "#3E6A5C", "#7A9484", "#D2D6C0", "#C4622A"],
+      "seed": 47
+    }
+  },
+  {
+    "id": "cezanne-card-players",
+    "artist": "Paul Cézanne",
+    "artistDates": "1839–1906",
+    "title": "The Card Players",
+    "titleOriginal": "Les Joueurs de cartes",
+    "year": "1890–1895",
+    "medium": "Oil on canvas",
+    "dimensions": "47.5 × 57 cm",
+    "room": "Level 5",
+    "accession": "",
+    "creditLine": "Comte Isaac de Camondo bequest, 1911",
+    "accentColor": "#46403A",
+    "labelText": "Two men sit at a table with their cards up, a bottle standing exactly between them. There is no anecdote — no cheating, no drinking, no laughter, none of the tavern comedy the subject usually carried. The players are farm workers from the Jas de Bouffan, Cézanne's family estate, and they are painted with the gravity of donors in an altarpiece: still, symmetrical, absorbed, and impossible to read.",
+    "extendedNote": "Cézanne worked through the subject in a series of canvases with different numbers of figures, thinning the cast each time — five players, then four, then two — and reducing the setting until nothing was left but the table, the bottle and the men. This is one of the two-figure versions, and the most compressed.\n\nThe composition is built symmetrically around the bottle, with the two hats leaning in from either side, and then quietly unbalanced: the left player's shoulders are broader, the right player's forearm is longer, the table edge does not run straight through. Everything is painted in the same close range of ochres, blues and dull violets, so form is described by shifts of temperature rather than by light and shade. The men had sat for him individually as portraits, and he brought the studies together; the cards themselves are barely painted. What the picture is about is two people holding still while a third watches, and the enormous seriousness of an ordinary afternoon.",
+    "placeholder": {
+      "aspect": 1.2,
+      "archetype": "interior",
+      "palette": ["#241E18", "#453B30", "#6E6250", "#A0937C", "#DCD2BA", "#5E6E8A"],
+      "seed": 48
+    }
+  },
+  {
+    "id": "whistler-mother",
+    "artist": "James McNeill Whistler",
+    "artistDates": "1834–1903",
+    "title": "Arrangement in Grey and Black No. 1",
+    "titleOriginal": "Portrait of the Artist's Mother",
+    "year": "1871",
+    "medium": "Oil on canvas",
+    "dimensions": "144.3 × 162.4 cm",
+    "room": "Level 0",
+    "accession": "RF 699",
+    "creditLine": "Purchased by the State, 1891",
+    "accentColor": "#3A3A38",
+    "labelText": "Anna McNeill Whistler sits in profile against a grey wall, hands folded, feet on a stool, beside a patterned curtain and a framed etching by her son. Whistler insisted on the title: an arrangement in grey and black, in which the subject happens to be his mother. The picture is built from horizontals and verticals and two or three tones, and it is the sentimental icon of American motherhood almost entirely against its own intentions.",
+    "extendedNote": "The story that she stood in for a model who failed to arrive is probably true, and equally probably not the reason the picture looks like this. Whistler had been arguing for a decade that painting should be as abstract as music — hence his titles: nocturnes, symphonies, harmonies, arrangements — and that a portrait's likeness was of no more interest to the public than the identity of a note.\n\nThe Royal Academy took it in 1872 only after an argument and hung it badly. France understood it sooner: the state bought it in 1891, the first Whistler to enter a public collection anywhere, on the recommendation of Mallarmé and Clemenceau. What holds it together is an extremely narrow tonal range — the black dress, the grey wall, the white of the cap and cuffs — organised on a strict rectilinear grid, with the curtain's flowers as the only disorder. The sitter was a devout, widowed, Southern woman in her sixties who had crossed the Atlantic to live with a son whose life she disapproved of. None of that is in the painting, which is possibly why so many people have been able to put whatever they liked into it.",
+    "placeholder": {
+      "aspect": 1.125,
+      "archetype": "interior",
+      "palette": ["#1C1C1A", "#3A3A38", "#63635E", "#94948C", "#E4E2D8", "#6E6A5A"],
+      "seed": 49
+    }
+  },
+  {
+    "id": "caillebotte-floor-scrapers",
+    "artist": "Gustave Caillebotte",
+    "artistDates": "1848–1894",
+    "title": "The Floor Scrapers",
+    "titleOriginal": "Les Raboteurs de parquet",
+    "year": "1875",
+    "medium": "Oil on canvas",
+    "dimensions": "102 × 146.5 cm",
+    "room": "Level 5",
+    "accession": "",
+    "creditLine": "Gift of the artist's heirs, 1894",
+    "accentColor": "#5A4A34",
+    "labelText": "Three men, stripped to the waist, kneel on the bare boards of a Paris apartment scraping off the old varnish. Light from the balcony window falls the length of the floor, and the long curls of shaved wood catch it. The Salon rejected it in 1875 as vulgar. It is one of the first paintings in France to take the urban working body as its subject without turning it into either a peasant idyll or a political poster.",
+    "extendedNote": "Caillebotte was rich — he trained as a lawyer and an engineer, inherited a fortune, and spent much of it buying his friends' pictures — which is one reason he was for a long time treated as an amateur attached to the Impressionists rather than as one of the best of them. The room being renovated is almost certainly in his own building on the rue de Miromesnil.\n\nThe picture's method is not Impressionist at all. The drawing is exact, the perspective is aggressive, and the floorboards run away from the viewer in converging lines that Caillebotte had clearly worked out with a ruler — an engineer's picture. What is Impressionist is the light: raking, specific to a time of day, catching on the shavings and on the men's backs. He hung it in the second Impressionist exhibition of 1876, where Zola criticised it as photographic, which is a fair description of what makes it strange. His will left his collection to the state on condition it be hung; the resulting fight, and the partial acceptance in 1896, is a large part of how France ended up owning the Impressionists at all.",
+    "placeholder": {
+      "aspect": 1.436,
+      "archetype": "interior",
+      "palette": ["#241C12", "#4E3C22", "#836440", "#B79364", "#EFDCB8", "#8A5A2E"],
+      "seed": 50
+    }
+  }
+]

@@ -1,0 +1,262 @@
+[
+  {
+    "id": "michelangelo-creation-adam",
+    "artist": "Michelangelo Buonarroti",
+    "artistDates": "1475–1564",
+    "title": "The Creation of Adam",
+    "titleOriginal": "La creazione di Adamo",
+    "year": "1511–1512",
+    "medium": "Fresco, Sistine Chapel ceiling",
+    "dimensions": "280 × 570 cm",
+    "room": "Sistine Chapel",
+    "accession": "",
+    "creditLine": "Commissioned by Pope Julius II",
+    "accentColor": "#5E5344",
+    "labelText": "God, borne along inside a billowing red mantle crowded with figures, reaches out toward Adam, who lies on the bare earth and lifts one heavy arm to meet him. Their fingers do not touch. The entire panel is built on that gap — a few centimetres of plaster carrying the whole idea of a creature about to become alive — and everything else in the composition, the diagonal of the cloak, the slope of the ground, the angle of both bodies, drives toward it.",
+    "extendedNote": "Michelangelo did not want the job. He considered himself a sculptor, was in the middle of Julius II's tomb, and took the ceiling under pressure; he then spent four years on scaffolding painting some three hundred figures across a vault the length of a tennis court, in true fresco, which allows no revisions once the plaster sets. The Creation of Adam took about three working days of plaster.\n\nAdam is a sculptor's figure: modelled in the round, weighty, still slack, borrowed in part from an antique torso. God is the opposite — all motion, wrapped in drapery that the eye reads as a cross-section of the human brain if it is looking for one, which since 1990 a great many people have been. Whether Michelangelo intended anatomy or not, the figures crowded inside the mantle are certainly deliberate, and the one under God's left arm, looking out, is usually taken for Eve, existing already as an idea. The 1980s cleaning stripped away four centuries of soot and animal glue and returned colours nobody expected: acid pinks, apple greens, sharp lilacs. The restorers were accused of destroying Michelangelo's sombre tone. The sombre tone was dirt.",
+    "placeholder": {
+      "aspect": 2.04,
+      "archetype": "fresco",
+      "palette": ["#3A322A", "#6B5C48", "#96876C", "#C0B294", "#E8DEC6", "#9E4034"],
+      "seed": 31
+    },
+    "regions": [
+      {
+        "id": "gap",
+        "label": "The gap between the hands",
+        "box": [0.4, 0.36, 0.62, 0.6],
+        "text": "A few centimetres of bare plaster carrying the entire subject. God's finger is straight and charged; Adam's is slack, still falling, not yet capable of reaching. Michelangelo puts the moment immediately before contact rather than contact itself, so the fresco is permanently about to happen and never does."
+      },
+      {
+        "id": "mantle",
+        "label": "The red mantle",
+        "box": [0.5, 0.05, 1.0, 0.75],
+        "text": "God travels inside a billowing shell of drapery crowded with figures — angels without wings, and a young woman under his left arm looking out, usually identified as Eve, present as an idea before she exists as a body. Since 1990 the mantle's silhouette has also been read as a cross-section of the human brain. The anatomical claim is disputed; the crowding is not."
+      },
+      {
+        "id": "adam",
+        "label": "Adam on the ground",
+        "box": [0.0, 0.3, 0.45, 1.0],
+        "text": "A sculptor's body: modelled fully in the round, lying on bare earth at the edge of a slope, heavy and not yet animated. Michelangelo took the ceiling commission unwillingly — he thought of himself as a carver of marble — and Adam is the clearest evidence of it. The figure is a statue that has been laid down and painted."
+      }
+    ]
+  },
+  {
+    "id": "michelangelo-last-judgment",
+    "artist": "Michelangelo Buonarroti",
+    "artistDates": "1475–1564",
+    "title": "The Last Judgment",
+    "titleOriginal": "Il Giudizio Universale",
+    "year": "1536–1541",
+    "medium": "Fresco, Sistine Chapel altar wall",
+    "dimensions": "1370 × 1200 cm",
+    "room": "Sistine Chapel",
+    "accession": "",
+    "creditLine": "Commissioned by Pope Clement VII, completed under Paul III",
+    "accentColor": "#3E4652",
+    "labelText": "Painted a quarter-century after the ceiling and in a different world — Rome had been sacked, the Church had split — this is a wall of four hundred bodies turning in a blue void with no architecture to hold them. Christ is at the centre, beardless and athletic, one arm raised in a gesture that could be blessing or dismissal. The saved rise on the left; the damned are pulled down on the right, one of them holding a hand over one eye, having understood.",
+    "extendedNote": "Michelangelo was in his sixties. The commission originally called for a Resurrection and became a Judgment, and he painted it having lived through the Sack of Rome in 1527 and the Reformation, in a Church busy setting up the Inquisition. There is no consolation in it: even the elect look uncertain, and Christ's gesture has no clear verdict in it.\n\nTwo details caused most of the trouble. Saint Bartholomew, flayed alive, holds his own skin, and the face on the skin is Michelangelo's — a self-portrait as a discarded husk. And the papal master of ceremonies, Biagio da Cesena, who complained that the nudity belonged in a bathhouse, appears in hell as Minos with donkey's ears and a snake biting his genitals; when he asked the Pope to have it removed, Paul III is said to have replied that his jurisdiction did not extend to hell. Twenty-four years after the fresco was finished, the Council of Trent ordered the nudes covered, and Daniele da Volterra was hired to add the draperies that earned him the nickname il Braghettone, the breeches-maker. Some were removed in the 1990s cleaning; some are now historic enough to keep.",
+    "placeholder": {
+      "aspect": 0.876,
+      "archetype": "figure-group",
+      "palette": ["#1E2430", "#39465C", "#6E7386", "#A79E9E", "#DCCEB8", "#8C4A38"],
+      "seed": 32
+    }
+  },
+  {
+    "id": "raphael-school-athens",
+    "artist": "Raphael",
+    "artistDates": "1483–1520",
+    "title": "The School of Athens",
+    "titleOriginal": "Scuola di Atene",
+    "year": "1509–1511",
+    "medium": "Fresco, Stanza della Segnatura",
+    "dimensions": "500 × 770 cm at the base",
+    "room": "Raphael Rooms",
+    "accession": "",
+    "creditLine": "Commissioned by Pope Julius II",
+    "accentColor": "#5A5A4C",
+    "labelText": "Every philosopher of antiquity gathered under a barrel-vaulted hall that recalls the new St Peter's then being built next door. At the centre, framed by the last arch and the open sky, Plato points up and Aristotle levels a hand at the ground — idealism and empiricism given as a single gesture apiece. Around them the disciplines are staged in groups: geometry, astronomy, arithmetic, music, and a solitary figure sprawled on the steps who belongs to none of them.",
+    "extendedNote": "Julius II wanted his private library painted, and the four walls of the Stanza della Segnatura take the four categories under which his books were shelved: theology, philosophy, poetry, law. This is philosophy. Raphael was twenty-six and working a few rooms away from Michelangelo, who was on the Sistine scaffolding and would not let him in.\n\nThe fresco is a machine for organising a crowd. Fifty-eight figures are distributed across a perspective so disciplined that the vanishing point falls between Plato's and Aristotle's heads, and the architecture — coffered vaults, colossal statues of Apollo and Minerva — supplies the frame that the Judgment next door refuses. Raphael also filled it with living faces: Plato has Leonardo's, Euclid stooping over his compasses has the architect Bramante's, and Raphael put himself at the far right in a black cap, looking out. The brooding figure leaning on a block of marble in the foreground was added late, after Raphael got a look at the Sistine ceiling; it is Heraclitus, and it has Michelangelo's face and Michelangelo's body.",
+    "placeholder": {
+      "aspect": 1.54,
+      "archetype": "architectural",
+      "palette": ["#2E2A22", "#565044", "#847A64", "#B2A68A", "#E6DCC2", "#9E6A32"],
+      "seed": 33
+    },
+    "regions": [
+      {
+        "id": "centre",
+        "label": "Plato and Aristotle",
+        "box": [0.38, 0.18, 0.62, 0.72],
+        "text": "Plato holds the Timaeus and points upward; Aristotle holds the Ethics and levels his palm at the floor. Two entire philosophical traditions are compressed into two hand positions, and the fresco's perspective is arranged so that its vanishing point falls in the gap between their heads. Plato's face is Leonardo's."
+      },
+      {
+        "id": "steps",
+        "label": "The figure on the steps",
+        "box": [0.2, 0.55, 0.45, 0.95],
+        "text": "A man sits alone on a block of marble, elbow on knee, writing, belonging to none of the groups around him. He was not in Raphael's original design; the plaster shows he was added later, after Raphael was finally shown the Sistine ceiling. He is Heraclitus, and he has Michelangelo's face, Michelangelo's build and Michelangelo's boots."
+      },
+      {
+        "id": "geometry",
+        "label": "The geometers",
+        "box": [0.6, 0.62, 0.92, 1.0],
+        "text": "Euclid — given the features of Bramante, architect of the new St Peter's rising outside the window — stoops with a pair of compasses over a slate while students crane to follow the demonstration. One has just understood and the one beside him has not. It is the only place in the fresco where somebody is being taught rather than knowing."
+      }
+    ]
+  },
+  {
+    "id": "raphael-transfiguration",
+    "artist": "Raphael",
+    "artistDates": "1483–1520",
+    "title": "The Transfiguration",
+    "titleOriginal": "Trasfigurazione",
+    "year": "1516–1520",
+    "medium": "Tempera grassa on wood panel",
+    "dimensions": "410 × 279 cm",
+    "room": "Pinacoteca Vaticana",
+    "accession": "",
+    "creditLine": "Commissioned by Cardinal Giulio de' Medici",
+    "accentColor": "#3E4438",
+    "labelText": "Raphael's last painting, unfinished at his death at thirty-seven and carried through the streets at his funeral. It welds two episodes into one panel: above, Christ rises from the mountain in white light between Moses and Elijah while the apostles fall back blinded; below, in shadow, the disciples who stayed behind fail to heal a convulsing boy. Nobody in the lower half can see what is happening in the upper.",
+    "extendedNote": "The commission was a competition. Cardinal Giulio de' Medici ordered this panel from Raphael and a Raising of Lazarus from Sebastiano del Piombo, who was being coached by Michelangelo, and both were meant for the same cathedral in Narbonne. Raphael responded by making something that no longer looks like his own serene manner at all.\n\nThe painting is split by light and by knowledge. The top is airborne, weightless, radiant; the bottom is a knot of gesticulating figures in gloom, arms crossing in every direction, the possessed boy's eyes rolled back. A woman kneels between the two zones in a twisting pose, pointing at the child, and she is the only hinge. The theological argument — that the disciples fail because the source of power is elsewhere, on the mountain — is stated entirely through composition. Vasari says Raphael left the lower left figures to be finished after his death by Giulio Romano. Within a few years painters were treating the panel as the beginning of something new, and Mannerism has a fair claim to start here.",
+    "placeholder": {
+      "aspect": 0.68,
+      "archetype": "figure-group",
+      "palette": ["#22261E", "#414838", "#6E7458", "#A0A184", "#EFEADA", "#B08A2E"],
+      "seed": 34
+    }
+  },
+  {
+    "id": "caravaggio-entombment",
+    "artist": "Michelangelo Merisi da Caravaggio",
+    "artistDates": "1571–1610",
+    "title": "The Entombment of Christ",
+    "titleOriginal": "Deposizione",
+    "year": "1603–1604",
+    "medium": "Oil on canvas",
+    "dimensions": "300 × 203 cm",
+    "room": "Pinacoteca Vaticana",
+    "accession": "",
+    "creditLine": "From the Chiesa Nuova, Rome",
+    "accentColor": "#2E2620",
+    "labelText": "Six figures lower a body onto a slab of stone whose corner juts out of the picture toward you, at the height of an altar — so that the burial happens on the same stone where the mass is celebrated. Nicodemus, a labourer with dirty feet, looks straight out and takes the weight. Christ's arm hangs and the fingers graze the rock. Above, a woman throws her arms up into the darkness, and there is no landscape at all: only bodies coming out of black.",
+    "extendedNote": "Painted for the Vittrice chapel in Santa Maria in Vallicella, this was the most admired of Caravaggio's altarpieces in his own lifetime and the least controversial — the clergy who rejected his other commissions for indecorum accepted this one. Rubens copied it; so did Fragonard, Géricault and Cézanne.\n\nThe reason is the engineering. The whole composition is a downward diagonal from Mary of Cleophas's raised hands to Christ's trailing fingers, braced against the hard horizontal of the stone, and the stone is thrust into the viewer's space so that the mourners appear to be lowering the body out of the painting and onto the real altar below. Caravaggio painted from models off the street and lit them with a single hard raking source, which was his standing method and his standing scandal — a Virgin with a lined face and a workman with filthy soles. Here that realism serves the doctrine exactly: the body being handled is heavy, awkward and dead, and the picture insists on it. Napoleon's troops took the canvas to Paris in 1797; it came back in 1817 and stayed in the Vatican.",
+    "placeholder": {
+      "aspect": 0.677,
+      "archetype": "figure-group",
+      "palette": ["#120F0C", "#332A20", "#5E4C38", "#94765A", "#D8C2A0", "#8E2E22"],
+      "seed": 35
+    }
+  },
+  {
+    "id": "leonardo-st-jerome",
+    "artist": "Leonardo da Vinci",
+    "artistDates": "1452–1519",
+    "title": "St Jerome in the Wilderness",
+    "titleOriginal": "San Girolamo nel deserto",
+    "year": "c. 1480–1482",
+    "medium": "Oil and tempera on walnut panel, unfinished",
+    "dimensions": "103 × 75 cm",
+    "room": "Pinacoteca Vaticana",
+    "accession": "",
+    "creditLine": "Acquired for the papal collection, 1845",
+    "accentColor": "#4A4234",
+    "labelText": "An unfinished panel, and one of the most instructive objects in the Vatican. Jerome kneels in a rocky waste, a stone in his raised hand to beat his own chest, his neck and shoulder stripped to the anatomy Leonardo had been dissecting. At his feet a lion is laid in with a few brown strokes. Nothing is glazed, nothing is coloured beyond the underpainting — the picture stops at the stage where the thinking is still visible.",
+    "extendedNote": "Leonardo abandoned it, as he abandoned a great deal, and the panel then vanished for three centuries. It surfaced in the early 1800s in the possession of Cardinal Joseph Fesch, Napoleon's uncle, who — the story runs — found the lower part being used as the top of a chest in a junk shop and located the head later, cut out and serving as the seat of a stool in a cobbler's. The joins are still visible.\n\nWhat survives is the skeleton of a Leonardo. The composition is already complete and strange: a hollow of dark rock, a distant landscape opening at the right in the manner he would use for the rest of his life, and a figure built as a spiral around the raised arm. The neck is the famous passage — the sternocleidomastoid muscle rendered with a precision that no other painter of the 1480s could have managed, because no other painter of the 1480s was cutting up bodies to find out. Finished paintings hide that knowledge under glaze. This one leaves the evidence on the surface.",
+    "placeholder": {
+      "aspect": 0.728,
+      "archetype": "portrait",
+      "palette": ["#1E1A12", "#3E3626", "#665A42", "#94866A", "#C6BA9C", "#7A5E38"],
+      "seed": 36
+    }
+  },
+  {
+    "id": "raphael-deliverance-peter",
+    "artist": "Raphael",
+    "artistDates": "1483–1520",
+    "title": "The Deliverance of Saint Peter",
+    "titleOriginal": "Liberazione di San Pietro",
+    "year": "1513–1514",
+    "medium": "Fresco, Stanza di Eliodoro",
+    "dimensions": "660 cm at the base",
+    "room": "Raphael Rooms",
+    "accession": "",
+    "creditLine": "Commissioned by Pope Julius II",
+    "accentColor": "#2A3240",
+    "labelText": "A night scene painted around a window, so the real daylight coming through the wall competes with the painted light inside it. Three moments run left to right: guards on the stairs startled by a glow, the angel waking Peter in his cell behind the bars, and the sleeping soldiers as the two escape. Four separate light sources — the angel, a torch, the moon, and the window itself — are set against each other in wet plaster, which is close to the hardest thing fresco can be asked to do.",
+    "extendedNote": "The room was Julius II's audience chamber and its programme is about divine intervention on behalf of the Church, which in 1513 had a specific application: Julius had been Cardinal of San Pietro in Vincoli, the church of Saint Peter's chains, and his successor Leo X had recently been a prisoner of the French. A fresco about a pope miraculously released from custody was not a neutral choice of subject.\n\nRaphael's problem was architectural. The wall is mostly window, leaving an awkward lunette split by a real opening, and he turned the obstacle into the subject by making the fresco nocturnal. The angel in the central cell is the brightest thing, throwing hard bars of shadow from the grille across the floor; the torch on the stairs is orange and smoky; the moon behind the clouds is cold; and the daylight from the actual window sits in the middle of all three. Painters had done night scenes before. Nobody had done four kinds of night light at once, at that scale, in a medium that dries in a day and cannot be corrected.",
+    "placeholder": {
+      "aspect": 2.0,
+      "archetype": "nocturne",
+      "palette": ["#141A26", "#2C3A50", "#4E5E76", "#8892A0", "#D8CCAE", "#E8B24A"],
+      "seed": 37
+    }
+  },
+  {
+    "id": "giotto-stefaneschi-triptych",
+    "artist": "Giotto di Bondone",
+    "artistDates": "c. 1267–1337",
+    "title": "Stefaneschi Triptych",
+    "titleOriginal": "Trittico Stefaneschi",
+    "year": "c. 1320",
+    "medium": "Tempera and gold on panel",
+    "dimensions": "220 × 245 cm",
+    "room": "Pinacoteca Vaticana",
+    "accession": "",
+    "creditLine": "Commissioned by Cardinal Jacopo Stefaneschi for Old St Peter's",
+    "accentColor": "#5E4A28",
+    "labelText": "A double-sided altarpiece made for the high altar of the basilica that stood here before the present St Peter's. Christ enthroned on one face, Saint Peter enthroned on the other, with the crucifixion of Peter and the beheading of Paul on the wings. Kneeling at Peter's feet is Cardinal Stefaneschi himself, holding a small model of this very triptych — a painting containing a picture of itself, three centuries before anyone had a word for it.",
+    "extendedNote": "Giotto is the painter usually credited with dragging European art out of the Byzantine manner and into weight, space and human expression, and the panels here are a demonstration of both halves of the transition. The gold ground is entirely medieval; the bodies standing on it are not. They occupy volume, cast shadows on their own drapery, and turn in space; the thrones are drawn in a perspective that does not quite work but is genuinely attempting to.\n\nHow much of it Giotto painted himself is an old argument — the workshop was large and the commission enormous — but the design is unmistakably his. The self-reference is the detail that lingers. Stefaneschi kneels and offers the triptych to Peter, and in the painted model you can see the same panels, at doll size, including the panel showing him kneeling. Old St Peter's was demolished in the sixteenth century to build the church outside these windows. This object is one of the few large things that came through it intact.",
+    "placeholder": {
+      "aspect": 1.11,
+      "archetype": "architectural",
+      "palette": ["#2A2014", "#54401E", "#8A6A2E", "#BC9A4E", "#EAD9A4", "#B0342C"],
+      "seed": 38
+    }
+  },
+  {
+    "id": "raphael-madonna-foligno",
+    "artist": "Raphael",
+    "artistDates": "1483–1520",
+    "title": "Madonna of Foligno",
+    "titleOriginal": "Madonna di Foligno",
+    "year": "1511–1512",
+    "medium": "Oil on panel, transferred to canvas",
+    "dimensions": "320 × 194 cm",
+    "room": "Pinacoteca Vaticana",
+    "accession": "",
+    "creditLine": "Votive commission of Sigismondo de' Conti",
+    "accentColor": "#3E4650",
+    "labelText": "A votive altarpiece with a specific occasion: a cannonball, or a meteor, struck the house of the papal secretary Sigismondo de' Conti and did not kill him, and he ordered this in thanks. The event is painted into the landscape at the centre — a small town with a fireball falling on it — while above, the Virgin sits in a disc of gold cloud and below, four saints stand on the earth. Between them, a child holds up a blank tablet and looks straight at the viewer.",
+    "extendedNote": "The panel was later moved to Foligno, which gave it its name, taken to Paris by Napoleon, transferred from wood to canvas by French conservators in an operation that was pioneering and dangerous, and returned in 1816.\n\nIts structure is the standard sacra conversazione — heaven above, saints below — and what Raphael does inside it is not standard at all. The gold disc behind the Virgin is not a decorative mandorla but a mass of cloud made luminous, so the supernatural zone is rendered as weather. The landscape below is one of the most carefully painted he ever made, a real Italian valley in evening light with the miraculous fireball dropped into it like a piece of reportage. And the tablet the putto holds is empty: it was meant to carry the donor's inscription and never received it, so the picture's dedication remains a blank held up in the middle of the composition. Sigismondo, kneeling on the right in a red cloak, is the least idealised figure in the panel — an old man's face, painted from an old man.",
+    "placeholder": {
+      "aspect": 0.606,
+      "archetype": "fresco",
+      "palette": ["#242A2E", "#42505A", "#6E7C82", "#A5A794", "#E6DCBE", "#C08A34"],
+      "seed": 39
+    }
+  },
+  {
+    "id": "raphael-coronation-virgin",
+    "artist": "Raphael",
+    "artistDates": "1483–1520",
+    "title": "Coronation of the Virgin",
+    "titleOriginal": "Incoronazione della Vergine (Pala Oddi)",
+    "year": "1502–1504",
+    "medium": "Oil on canvas, transferred from panel",
+    "dimensions": "267 × 163 cm",
+    "room": "Pinacoteca Vaticana",
+    "accession": "",
+    "creditLine": "Commissioned by the Oddi family, Perugia",
+    "accentColor": "#46505E",
+    "labelText": "Raphael at about twenty, still working in Perugino's manner and already better at it than Perugino. The panel divides cleanly: above, Christ crowns the Virgin on a bank of cloud among music-making angels; below, the apostles stand around an empty sarcophagus that has filled with lilies and roses. One of them holds a flower and stares into the tomb, and the gap between the two halves is the whole subject.",
+    "extendedNote": "It was painted for the church of San Francesco al Prato in Perugia, taken to Paris under Napoleon, transferred from panel to canvas there, and returned to the papal collection in 1815. Being an early work, it is often passed over on the way to the Stanze upstairs, which is a mistake: it shows exactly what Raphael had and what he had not yet acquired.\n\nWhat he had was sweetness of line and an unfailing sense of interval — the angels' instruments, a violin and a tambourine, are placed with a musician's ear for spacing, and the apostles below are arranged in a semicircle that never crowds. What he had not yet found was the compression that makes the Roman work great; heaven and earth here are two neat registers rather than one event. Within eight years he would be painting the School of Athens, where a crowd of fifty-eight is held in a single space by perspective alone. The distance between this altarpiece and that wall is the shortest large development in the history of European painting.",
+    "placeholder": {
+      "aspect": 0.61,
+      "archetype": "figure-group",
+      "palette": ["#262C34", "#48545E", "#78827E", "#ADAE98", "#E8E0C8", "#B4923A"],
+      "seed": 40
+    }
+  }
+]

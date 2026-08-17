@@ -1,20 +1,18 @@
 /**
- * CorridorScene — spec §10.2 / §10A, with the art direction moved from the
- * spec's flat museum daylight to raking late-afternoon sun.
+ * CorridorScene — spec §10.2 / §10A.
  *
- * Procedural architecture: 12 bays × 4m, width 7m, walls to cornice at
- * 5.20m, barrel vault to 8.50m, terminal apse. One repeated module,
- * instanced elements, camera on rails with free look.
+ * One procedural machine, five museums. The architecture (ceiling, floor, wall
+ * treatment, fixtures, frames), the palette and the entire lighting rig come
+ * from the chosen museum's style record; nothing about a particular building
+ * is hard-coded here. Adding a sixth museum is a data change.
  *
- * LIGHT — a deliberate departure from §10A.6
- * ------------------------------------------
- * The spec's brightness guardrail asks for a uniformly light, warm, open
- * corridor. This build instead lights the space from a low sun through the
- * clerestory on the west wall: bright pools and hard mullion bars on the
- * floor, deep shadow between bays, warm lamps picking out each canvas. The
- * guardrail's real intent — never a murky black interior that hides
- * modelling — still holds: the vault stays the brightest large surface and
- * the sunlit floor is near-white. Contrast does the work that flat fill did.
+ * HANGING
+ * -------
+ * Every painting is centred on a shared hanging line, and the moulded panel
+ * behind it is centred on the same line — so a canvas sits in the middle of
+ * its surround rather than sinking to the bottom of it, whatever its
+ * proportions. Three hang patterns are supported: a dense salon stack, a
+ * single large work per bay, and works alternating between the two walls.
  *
  * CONTROLS
  *   move mouse      look around (wide yaw, so both walls are viewable)
@@ -24,317 +22,258 @@
  */
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { useStore } from '../state/store';
 import { corridor, warp, pointer, resetCorridor } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
-import { LAMP } from './Lighting';
 import { flash } from '../ui/Flash';
+import { OrnateFrame } from './OrnateFrame';
+import { frameReach } from './frames';
+import { fitWork } from './fit';
+import { Ceiling } from './corridor/Ceiling';
+import { Floor, Walls } from './corridor/Surfaces';
+import { Fixtures } from './corridor/Fixtures';
+import { bayZ, dimsFor, hangHeight, type Dims } from './corridor/dims';
+import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
 
-const BAYS = 12;
-const BAY = 4;
-const LENGTH = BAYS * BAY; // 48m
-const HALF_W = 3.5;
-const WALL_H = 5.2;
-const APSE_Z = -(LENGTH + 3.5);
-
-/** Moodier palette: warm stone that reads mid-tone in shade, near-white in sun. */
-const PAL = {
-  field: '#BFB3A0',
-  recess: '#B2A692',
-  highlight: '#D6CBB6',
-  vault: '#CDC3B1',
-  apse: '#8A7A63',
-  floorLight: '#B9AF9E',
-  floorInlay: '#8E836E',
-  plinth: '#1F1C19',
-  gilt: '#C9A227',
-  marble: '#E9E3D6',
-  sun: '#FFE2B0',
-};
-
-/** Sun direction, low and raking from the clerestory side (−x). */
-const SUN_FROM = new THREE.Vector3(-9, 11, 6);
-
-function useArtworkTextures() {
-  const artworks = useStore((s) => s.artworks);
+function useArtworkTextures(artworks: ArtworkIndexEntry[]) {
   return useMemo(() => {
     const loader = new THREE.TextureLoader();
-    return artworks.map((a) => {
+    const list = artworks.map((a) => {
       const t = loader.load(`/artworks/${a.id}/wall.jpg`);
       t.colorSpace = THREE.SRGBColorSpace;
       t.anisotropy = 4;
       return t;
     });
+    return list;
   }, [artworks]);
 }
 
 /**
- * Each bay carries one artwork on a panel tinted with that artist's accent,
- * so the works are distinguishable at a glance down the corridor.
+ * One hung painting: the accent panel it hangs against, its moulded frame, and
+ * the canvas itself — all sharing a centre.
  */
-function Bays() {
-  const artworks = useStore((s) => s.artworks);
-  const textures = useArtworkTextures();
+function HungWork({
+  artwork,
+  texture,
+  museum,
+  width,
+  height,
+  showPanel = true,
+}: {
+  artwork: ArtworkIndexEntry;
+  texture: THREE.Texture;
+  museum: MuseumData;
+  width: number;
+  height: number;
+  showPanel?: boolean;
+}) {
+  const reach = frameReach(museum.style.frame) * height;
+  // The painter's ground, pulled most of the way toward the wall tone. At full
+  // strength it reads as a coloured rectangle stuck on the wall, which no
+  // gallery has; at this strength it is a tonal shift you notice only once you
+  // are standing in front of it. The full accent belongs in the artwork room.
+  const ground = useMemo(() => {
+    const c = new THREE.Color(artwork.accent).lerp(new THREE.Color(museum.style.palette.wall), 0.66);
+    return `#${c.getHexString()}`;
+  }, [artwork.accent, museum.style.palette.wall]);
+
+  return (
+    <group>
+      {showPanel && (
+        <mesh position={[0, 0, -0.02]} receiveShadow>
+          <planeGeometry args={[width + reach * 2 + 0.42, height + reach * 2 + 0.42]} />
+          <meshStandardMaterial color={ground} roughness={0.9} />
+        </mesh>
+      )}
+      <OrnateFrame
+        kind={museum.style.frame}
+        width={width}
+        height={height}
+        gilt={museum.style.palette.gilt}
+        dark={museum.style.palette.wallDeep}
+      />
+      <mesh position={[0, 0, 0.028]}>
+        <planeGeometry args={[width, height]} />
+        <meshStandardMaterial
+          map={texture}
+          roughness={0.88}
+          emissiveMap={texture}
+          emissive="#ffffff"
+          emissiveIntensity={0.14}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * The works on the walls, distributed by the museum's hang pattern.
+ *
+ * salon       a large work centred on the hanging line with two smaller ones
+ *             stacked above it — the Louvre's densely packed wall
+ * single      one large work per bay, both walls
+ * alternating one work per bay, sides alternating
+ */
+function Bays({ museum, d }: { museum: MuseumData; d: Dims }) {
+  const artworks = museum.artworks;
+  const textures = useArtworkTextures(artworks);
+  const centre = hangHeight(d);
+  const hang = museum.style.hang;
   if (!artworks.length) return null;
 
   const nodes: React.ReactNode[] = [];
-  for (let bay = 0; bay < BAYS; bay++) {
-    const i = bay % artworks.length;
-    const a = artworks[i];
-    const z = -(bay * BAY + BAY / 2);
-    const side = bay % 2 === 0 ? 1 : -1; // alternate walls
-    const x = side * (HALF_W - 0.06);
-    const ry = side > 0 ? -Math.PI / 2 : Math.PI / 2;
 
-    const h = 1.9;
-    const w = h * a.aspect;
+  for (let bay = 0; bay < d.bays; bay++) {
+    const z = bayZ(d, bay);
+    const sides: Array<1 | -1> = hang === 'alternating' ? [bay % 2 === 0 ? 1 : -1] : [1, -1];
 
-    nodes.push(
-      <group key={bay} position={[x, 0, z]} rotation={[0, ry, 0]}>
-        {/* bolection surround, standing proud of the wall */}
-        <mesh position={[0, 2.8, 0.03]} castShadow>
-          <boxGeometry args={[3.22, 3.92, 0.06]} />
-          <meshStandardMaterial color={PAL.highlight} roughness={0.7} />
-        </mesh>
-        {/* accent field — the artist's own ground, in front of the surround */}
-        <mesh position={[0, 2.8, 0.062]} receiveShadow>
-          <planeGeometry args={[3.0, 3.7]} />
-          <meshStandardMaterial color={a.accent} roughness={0.88} />
-        </mesh>
-        {/* painting, hung on the shared 1.7m centre line */}
-        <group position={[0, 1.75, 0.085]}>
-          <mesh position={[0, 0, -0.02]} castShadow>
-            <boxGeometry args={[w + 0.2, h + 0.2, 0.08]} />
-            <meshStandardMaterial color={PAL.gilt} roughness={0.3} metalness={0.9} />
+    for (const side of sides) {
+      const slot = hang === 'alternating' ? bay : bay * 2 + (side > 0 ? 0 : 1);
+      const i = slot % artworks.length;
+      const x = side * (d.halfWidth - 0.09);
+      const ry = side > 0 ? -Math.PI / 2 : Math.PI / 2;
+      const maxH = hang === 'salon' ? d.wallHeight * 0.3 : Math.min(2.1, d.wallHeight * 0.36);
+      const main = fitWork(artworks[i].aspect, maxH, d.bayDepth * 0.78);
+
+      nodes.push(
+        <group key={`${bay}-${side}`} position={[x, 0, z]} rotation={[0, ry, 0]}>
+          <group position={[0, centre, 0.05]}>
+            <HungWork
+              artwork={artworks[i]}
+              texture={textures[i]}
+              museum={museum}
+              width={main.width}
+              height={main.height}
+            />
+          </group>
+
+          {hang === 'salon' &&
+            // two smaller canvases stacked above the principal work, the way a
+            // salon wall is filled to the cornice
+            [-1, 1].map((sx) => {
+              const j = (i + (sx > 0 ? 1 : 2)) % artworks.length;
+              const small = fitWork(artworks[j].aspect, maxH * 0.46, d.bayDepth * 0.32);
+              return (
+                <group
+                  key={sx}
+                  position={[
+                    sx * (d.bayDepth * 0.22),
+                    centre + main.height / 2 + small.height / 2 + 0.42,
+                    0.05,
+                  ]}
+                >
+                  <HungWork
+                    artwork={artworks[j]}
+                    texture={textures[j]}
+                    museum={museum}
+                    width={small.width}
+                    height={small.height}
+                    showPanel={false}
+                  />
+                </group>
+              );
+            })}
+        </group>,
+      );
+    }
+  }
+
+  return <>{nodes}</>;
+}
+
+/**
+ * The terminal wall. Walking into it is the transition to the floor plan, so
+ * it has to read as a destination from the far end of the corridor: it is
+ * lit brighter than anything else and carries either the museum's own
+ * terminal feature (Orsay's clock) or a single large canvas.
+ */
+function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
+  const p = museum.style.palette;
+  const artworks = museum.artworks;
+  const textures = useArtworkTextures(artworks);
+  const a = artworks[1] ?? artworks[0];
+  if (!a) return null;
+  const { width: aw, height: h } = fitWork(a.aspect, Math.min(2.6, d.wallHeight * 0.42), d.halfWidth * 1.2);
+
+  return (
+    <group>
+      {/* sized to the room it closes — anything taller reads as a slab
+          floating above the roofline rather than as the end of the corridor */}
+      <mesh
+        position={[0, (d.vaultHeight + 1) / 2, d.apseZ]}
+        receiveShadow
+      >
+        <planeGeometry args={[d.halfWidth * 2.1, d.vaultHeight + 1]} />
+        <meshStandardMaterial color={p.wallDeep} roughness={0.86} />
+      </mesh>
+      {!museum.style.fixtures.clock && (
+        <group position={[0, hangHeight(d) + 0.5, d.apseZ + 0.1]}>
+          <mesh position={[0, 0, -0.02]}>
+            <planeGeometry args={[aw + 1.6, h + 1.6]} />
+            <meshStandardMaterial color={a.accent} roughness={0.88} />
           </mesh>
-          <mesh position={[0, 0, 0.026]}>
-            <planeGeometry args={[w, h]} />
+          <OrnateFrame
+            kind={museum.style.frame}
+            width={aw}
+            height={h}
+            gilt={p.gilt}
+            dark={p.wallDeep}
+          />
+          <mesh position={[0, 0, 0.028]}>
+            <planeGeometry args={[aw, h]} />
             <meshStandardMaterial
-              map={textures[i]}
+              map={textures[1] ?? textures[0]}
               roughness={0.86}
-              emissiveMap={textures[i]}
+              emissiveMap={textures[1] ?? textures[0]}
               emissive="#ffffff"
-              emissiveIntensity={0.12}
+              emissiveIntensity={0.22}
             />
           </mesh>
         </group>
-        {/* wall label — the caption strip beside each canvas */}
-        <mesh position={[w / 2 + 0.42, 1.3, 0.075]}>
-          <planeGeometry args={[0.34, 0.18]} />
-          <meshStandardMaterial color="#F2EBDF" roughness={0.9} />
-        </mesh>
-      </group>,
-    );
-  }
-
-  // terminal apse painting — the magnet and the T2 trigger (spec §10A.7)
-  const a = artworks[1] ?? artworks[0];
-  const h = 2.1;
-  nodes.push(
-    <group key="apse" position={[0, 2.0, APSE_Z + 0.08]}>
-      <mesh position={[0, 0, -0.03]}>
-        <planeGeometry args={[h * a.aspect + 1.0, h + 1.0]} />
-        <meshStandardMaterial color={a.accent} roughness={0.85} />
-      </mesh>
-      <mesh position={[0, 0, -0.01]} castShadow>
-        <boxGeometry args={[h * a.aspect + 0.26, h + 0.26, 0.09]} />
-        <meshStandardMaterial color={PAL.gilt} roughness={0.3} metalness={0.9} />
-      </mesh>
-      <mesh position={[0, 0, 0.038]}>
-        <planeGeometry args={[h * a.aspect, h]} />
-        <meshStandardMaterial
-          map={textures[1] ?? textures[0]}
-          roughness={0.86}
-          emissiveMap={textures[1] ?? textures[0]}
-          emissive="#ffffff"
-          emissiveIntensity={0.2}
-        />
-      </mesh>
-    </group>,
-  );
-  return <>{nodes}</>;
-}
-
-function Pilasters() {
-  const ref = useRef<THREE.InstancedMesh>(null);
-  useEffect(() => {
-    const m = ref.current!;
-    const mat = new THREE.Matrix4();
-    let i = 0;
-    for (let b = 0; b <= BAYS; b++) {
-      for (const side of [-1, 1]) {
-        mat.setPosition(side * (HALF_W - 0.07), WALL_H / 2, -b * BAY);
-        m.setMatrixAt(i++, mat);
-      }
-    }
-    m.instanceMatrix.needsUpdate = true;
-  }, []);
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, (BAYS + 1) * 2]} castShadow receiveShadow>
-      <boxGeometry args={[0.14, WALL_H, 0.5]} />
-      <meshStandardMaterial color={PAL.highlight} roughness={0.75} />
-    </instancedMesh>
+      )}
+    </group>
   );
 }
 
-function VaultRibs() {
-  const ref = useRef<THREE.InstancedMesh>(null);
-  useEffect(() => {
-    const m = ref.current!;
-    const mat = new THREE.Matrix4();
-    const q = new THREE.Quaternion();
-    const pos = new THREE.Vector3();
-    const scl = new THREE.Vector3(1, 1, 1);
-    for (let b = 0; b <= BAYS; b++) {
-      pos.set(0, WALL_H - 0.2, -b * BAY);
-      mat.compose(pos, q, scl);
-      m.setMatrixAt(b, mat);
-    }
-    m.instanceMatrix.needsUpdate = true;
-  }, []);
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, BAYS + 1]}>
-      <torusGeometry args={[3.42, 0.09, 8, 28, Math.PI]} />
-      <meshStandardMaterial color={PAL.highlight} roughness={0.72} />
-    </instancedMesh>
-  );
-}
-
-/**
- * Clerestory windows on the −x side. The wall itself does not cast, so the
- * sun passes through it; the mullions do, which is what throws the hard
- * bars of light across the floor and the opposite wall.
- */
-function Clerestory() {
-  const nodes: React.ReactNode[] = [];
-  for (let b = 0; b < BAYS; b++) {
-    const z = -(b * BAY + BAY / 2);
-    // sky seen through the opening
-    nodes.push(
-      <mesh key={`w${b}`} position={[-HALF_W + 0.02, 4.35, z]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[2.4, 1.5]} />
-        <meshBasicMaterial color="#FFF1D6" toneMapped={false} />
-      </mesh>,
-    );
-    // mullions — the shadow casters
-    for (const dz of [-0.8, 0, 0.8]) {
-      nodes.push(
-        <mesh key={`m${b}-${dz}`} position={[-HALF_W + 0.06, 4.35, z + dz]} castShadow>
-          <boxGeometry args={[0.1, 1.5, 0.09]} />
-          <meshStandardMaterial color={PAL.highlight} roughness={0.8} />
-        </mesh>,
+/** Warm lamps washing the walls, plus the bright pool at the far end. */
+function Lamps({ museum, d }: { museum: MuseumData; d: Dims }) {
+  const l = museum.style.light;
+  const lights: React.ReactNode[] = [];
+  // chandeliers carry their own lights; adding lamps too would double up
+  if (!museum.style.fixtures.chandeliers) {
+    for (let b = 0; b < d.bays; b += 2) {
+      lights.push(
+        <pointLight
+          key={b}
+          position={[0, d.wallHeight - 0.6, bayZ(d, b)]}
+          color={l.lamp}
+          intensity={l.lampIntensity}
+          distance={d.bayDepth * 3.2}
+          decay={1.9}
+        />,
       );
     }
-    nodes.push(
-      <mesh key={`t${b}`} position={[-HALF_W + 0.06, 4.35, z]} castShadow>
-        <boxGeometry args={[0.1, 0.09, 2.4]} />
-        <meshStandardMaterial color={PAL.highlight} roughness={0.8} />
-      </mesh>,
-    );
-  }
-  return <>{nodes}</>;
-}
-
-/**
- * A faint warm haze on the floor where the sun lands. The bars themselves are
- * real shadows cast by the mullions — this only warms the light between them,
- * so it stays subtle enough never to read as a decal.
- */
-function SunPools() {
-  const nodes: React.ReactNode[] = [];
-  for (let b = 0; b < BAYS; b++) {
-    const z = -(b * BAY + BAY / 2);
-    nodes.push(
-      <mesh key={`f${b}`} rotation={[-Math.PI / 2, 0, 0]} position={[1.15, 0.012, z + 1.1]}>
-        <planeGeometry args={[3.2, 2.1]} />
-        <meshBasicMaterial
-          color={PAL.sun}
-          transparent
-          opacity={0.1}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </mesh>,
-    );
-  }
-  return <>{nodes}</>;
-}
-
-function PlinthsAndSculpture() {
-  const nodes: React.ReactNode[] = [];
-  for (let b = 1; b < BAYS; b += 2) {
-    const z = -(b * BAY + BAY / 2);
-    const s = 1 + ((b * 37) % 17) / 100 - 0.08;
-    nodes.push(
-      <group key={b} position={[-(HALF_W - 0.9), 0, z]} scale={[s, s, s]}>
-        <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.55, 1.1, 0.55]} />
-          <meshStandardMaterial color={PAL.plinth} roughness={0.55} />
-        </mesh>
-        <group position={[0, 1.1, 0]} rotation={[0, (b * 0.9) % Math.PI, 0]}>
-          <mesh position={[0, 0.42, 0]} castShadow>
-            <capsuleGeometry args={[0.16, 0.5, 6, 12]} />
-            <meshStandardMaterial color={PAL.marble} roughness={0.42} />
-          </mesh>
-          <mesh position={[0.02, 0.86, 0]} castShadow>
-            <sphereGeometry args={[0.12, 16, 12]} />
-            <meshStandardMaterial color={PAL.marble} roughness={0.42} />
-          </mesh>
-          <mesh position={[0, 0.08, 0]} castShadow>
-            <cylinderGeometry args={[0.22, 0.26, 0.16, 16]} />
-            <meshStandardMaterial color={PAL.marble} roughness={0.5} />
-          </mesh>
-        </group>
-      </group>,
-    );
-  }
-  return <>{nodes}</>;
-}
-
-function Lamps() {
-  const lights: React.ReactNode[] = [];
-  for (let b = 0; b < BAYS; b += 2) {
-    const z = -(b * BAY + BAY / 2);
-    lights.push(
-      <pointLight
-        key={b}
-        position={[0, WALL_H - 0.35, z]}
-        color={LAMP}
-        intensity={9}
-        distance={11}
-        decay={1.9}
-      />,
-    );
   }
   return (
     <>
       {lights}
-      {/* the apse burns brightest — the destination (spec §10A.7) */}
       <pointLight
-        position={[0, 3.4, APSE_Z + 1.8]}
-        color={LAMP}
-        intensity={22}
-        distance={12}
+        position={[0, d.wallHeight * 0.62, d.apseZ + 2.4]}
+        color={l.lamp}
+        intensity={l.lampIntensity * 2.6 + 8}
+        distance={d.bayDepth * 3}
         decay={1.7}
-      />
-      <pointLight
-        position={[0, 0.8, APSE_Z + 2.6]}
-        color={LAMP}
-        intensity={6}
-        distance={7}
-        decay={2}
       />
     </>
   );
 }
 
-export function CorridorScene() {
+export function CorridorScene({ tier }: { tier: DeviceTier }) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
   const phase = useStore((s) => s.phase);
+  const museum = useStore((s) => s.museum);
   const reducedMotion = useStore((s) => s.reducedMotion);
   const setPhase = useStore((s) => s.setPhase);
   const look = useRef({ x: 0, y: 0 });
@@ -342,8 +281,10 @@ export function CorridorScene() {
   const sprint = useRef<gsap.core.Tween | null>(null);
   const sunRef = useRef<THREE.DirectionalLight>(null);
 
-  // returning from the map drops you back short of the apse, so the T2
-  // trigger does not immediately re-fire
+  const d = useMemo(() => (museum ? dimsFor(museum.style) : null), [museum]);
+
+  // returning from the map drops you back short of the end, so the transition
+  // does not immediately re-fire
   useEffect(() => {
     if (phase === 'corridor' && corridor.t >= 0.93) resetCorridor(0.8);
   }, [phase]);
@@ -371,7 +312,6 @@ export function CorridorScene() {
 
     const accelerate = () => {
       sprint.current?.kill();
-      // ease all the way to the apse; T2 fires when the camera arrives
       sprint.current = gsap.to(corridor, {
         goal: 1,
         duration: reducedMotion ? 0.3 : 2.4 * (1 - corridor.t) + 0.5,
@@ -430,7 +370,7 @@ export function CorridorScene() {
     }
   }, [phase, reducedMotion]);
 
-  // T3 warp: map → gallery, straight through the apse (spec §11)
+  // T3 warp: map → gallery, straight through the end wall (spec §11)
   useEffect(() => {
     if (phase !== 'warp') return;
     warp.p = 0;
@@ -450,7 +390,7 @@ export function CorridorScene() {
   }, [phase, reducedMotion, setPhase]);
 
   useFrame((_, delta) => {
-    // held arrows walk the rail; everything else eases toward its target
+    if (!d) return;
     if (phase === 'corridor' && keys.current.size) {
       const speed = 0.16 * Math.min(delta, 0.05) * 60 * 0.35;
       if (keys.current.has('ArrowUp')) corridor.goal += speed;
@@ -461,15 +401,14 @@ export function CorridorScene() {
 
     if (phase === 'corridor' && corridor.t >= 0.95) setPhase('map');
 
-    const railZ = corridor.mouth + -LENGTH * corridor.t;
+    const railZ = corridor.mouth + -d.length * corridor.t;
     let z = railZ;
     let fov = 48;
     if (phase === 'warp') {
-      z = THREE.MathUtils.lerp(railZ, APSE_Z + 1.6, warp.p);
+      z = THREE.MathUtils.lerp(railZ, d.apseZ + 1.6, warp.p);
       fov = 48 + 30 * warp.p * warp.p;
     }
 
-    // free look — wide enough to face either wall and read the canvases
     const k = dampK(0.075, delta);
     const active = phase === 'corridor' && !reducedMotion;
     const px = active ? pointer.x : 0;
@@ -489,112 +428,51 @@ export function CorridorScene() {
       camera.updateProjectionMatrix();
     }
 
-    // the sun's shadow frustum follows the camera so the bars stay sharp
-    if (sunRef.current) {
+    // the key light's shadow frustum follows the camera so its bars stay sharp
+    if (sunRef.current && museum) {
+      const from = museum.style.light.keyFrom;
       const t = sunRef.current.target;
       t.position.set(0, 1.2, z - 6);
       t.updateMatrixWorld();
-      sunRef.current.position.set(SUN_FROM.x, SUN_FROM.y, z - 6 + SUN_FROM.z);
+      sunRef.current.position.set(from[0], from[1], z - 6 + from[2]);
       sunRef.current.updateMatrixWorld();
     }
   });
 
+  if (!museum || !d) return null;
+  const l = museum.style.light;
+  const reflectorRes = tier.name === 'high' ? 1024 : 512;
+
   return (
     <group>
-      {/* polished floor — the long specular streaks are half the look */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -LENGTH / 2 - 1]} receiveShadow>
-        <planeGeometry args={[7.2, LENGTH + 14]} />
-        <MeshReflectorMaterial
-          resolution={1024}
-          blur={[400, 100]}
-          mixBlur={0.8}
-          mixStrength={0.7}
-          roughness={0.2}
-          depthScale={0.7}
-          minDepthThreshold={0.4}
-          color={PAL.floorLight}
-          metalness={0.2}
-          mirror={0.55}
-        />
-      </mesh>
-      {[-2.6, 2.6].map((x) => (
-        <mesh key={x} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.004, -LENGTH / 2 - 1]}>
-          <planeGeometry args={[0.18, LENGTH + 14]} />
-          <meshStandardMaterial color={PAL.floorInlay} roughness={0.35} metalness={0.12} />
-        </mesh>
-      ))}
+      <Floor style={museum.style} d={d} reflectorRes={reflectorRes} />
+      <Walls style={museum.style} d={d} reflectorRes={reflectorRes} />
+      <Ceiling style={museum.style} d={d} />
+      <Bays museum={museum} d={d} />
+      <Fixtures style={museum.style} d={d} />
+      <Apse museum={museum} d={d} />
+      <Lamps museum={museum} d={d} />
 
-      {/* walls */}
-      {[-1, 1].map((side) => (
-        <mesh
-          key={side}
-          position={[side * HALF_W, WALL_H / 2, -LENGTH / 2 - 1]}
-          rotation={[0, side > 0 ? -Math.PI / 2 : Math.PI / 2, 0]}
-          receiveShadow
-        >
-          <planeGeometry args={[LENGTH + 14, WALL_H]} />
-          <meshStandardMaterial color={PAL.field} roughness={0.8} />
-        </mesh>
-      ))}
-
-      {/* continuous horizontals: skirting, dado rail, cornice (§10A.2) */}
-      {[-1, 1].map((side) => (
-        <group key={`bands${side}`}>
-          <mesh position={[side * (HALF_W - 0.015), 0.07, -LENGTH / 2 - 1]} receiveShadow>
-            <boxGeometry args={[0.06, 0.14, LENGTH + 14]} />
-            <meshStandardMaterial color={PAL.highlight} roughness={0.75} />
-          </mesh>
-          <mesh position={[side * (HALF_W - 0.025), 1.07, -LENGTH / 2 - 1]} receiveShadow>
-            <boxGeometry args={[0.1, 0.1, LENGTH + 14]} />
-            <meshStandardMaterial color={PAL.highlight} roughness={0.75} />
-          </mesh>
-          <mesh position={[side * (HALF_W - 0.05), 5.44, -LENGTH / 2 - 1]} castShadow>
-            <boxGeometry args={[0.2, 0.48, LENGTH + 14]} />
-            <meshStandardMaterial color={PAL.highlight} roughness={0.72} />
-          </mesh>
-        </group>
-      ))}
-
-      {/* barrel vault — still the brightest large surface */}
-      <mesh position={[0, WALL_H - 0.2, -LENGTH / 2 - 1]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[3.5, 3.5, LENGTH + 14, 48, 1, true, Math.PI / 2, Math.PI]} />
-        <meshStandardMaterial color={PAL.vault} roughness={0.85} side={THREE.BackSide} />
-      </mesh>
-      <VaultRibs />
-
-      <Pilasters />
-      <Clerestory />
-      <SunPools />
-      <Bays />
-      <PlinthsAndSculpture />
-
-      {/* apse — deeper in tone, brighter in incident light */}
-      <mesh position={[0, 4.25, APSE_Z]} receiveShadow>
-        <planeGeometry args={[7.2, 10]} />
-        <meshStandardMaterial color={PAL.apse} roughness={0.8} />
-      </mesh>
-
-      <Lamps />
-
-      {/* the sun: low, warm, and the only shadow caster */}
+      {/* the key light — skylight, window or dusk, per museum, and the only
+          shadow caster in the room */}
       <directionalLight
         ref={sunRef}
-        color="#FFD9A0"
-        intensity={2.6}
+        color={l.key}
+        intensity={l.keyIntensity}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-left={-9}
-        shadow-camera-right={9}
-        shadow-camera-top={12}
-        shadow-camera-bottom={-12}
+        shadow-mapSize-width={tier.name === 'low' ? 1024 : 2048}
+        shadow-mapSize-height={tier.name === 'low' ? 1024 : 2048}
+        shadow-camera-left={-12}
+        shadow-camera-right={12}
+        shadow-camera-top={14}
+        shadow-camera-bottom={-14}
         shadow-camera-near={0.5}
-        shadow-camera-far={40}
+        shadow-camera-far={48}
         shadow-bias={-0.0008}
         shadow-normalBias={0.02}
       />
-      {/* cool sky bounce filling the shadows, so nothing goes black */}
-      <hemisphereLight args={['#CFE0F0', '#6E6250', 0.42]} />
+      {/* sky bounce filling the shadows, so nothing goes black */}
+      <hemisphereLight args={[l.sky, l.ground, l.ambient]} />
     </group>
   );
 }

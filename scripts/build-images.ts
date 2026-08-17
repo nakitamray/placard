@@ -6,30 +6,61 @@
  *   wall.jpg    512px long edge, q80            (corridor / LOD texture)
  *   lqip.webp    24px long edge, q40, blurred   (blur-up placeholder)
  *
- * The source of truth is data/artworks/{id}/source.jpg — a PD-Art scan from
- * Wikimedia Commons. When it is absent (this environment cannot reach
- * Wikimedia), placeholder.svg is rasterised to source.generated.png and used
- * instead, so the whole pipeline still runs end-to-end. Drop the real scan in
- * and rebuild; nothing else changes.
+ * Source resolution, in order:
+ *   1. data/artworks/{id}/source.jpg    a real public-domain scan
+ *   2. data/artworks/{id}/placeholder.svg
+ *   3. the record's `placeholder` spec, rendered procedurally
+ *
+ * Only the first is authentic. The other two exist so the whole pipeline runs
+ * with no network access and so a half-authored collection still builds; drop
+ * a scan in at (1) and rebuild, and nothing else changes.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
-import { DATA, artworkData, artworkPublic } from './lib/paths.ts';
+import { CACHE, artworkData, artworkPublic } from './lib/paths.ts';
+import { renderPlaceholder } from './build-placeholder.ts';
+import type { ArtworkRecord } from './lib/records.ts';
 
-export async function buildImages(id: string) {
-  const dir = artworkData(id);
-  const outDir = artworkPublic(id);
+export interface BuiltImages {
+  /** the file build-glyphs should analyse */
+  sourcePath: string;
+  authentic: boolean;
+  width: number;
+  height: number;
+}
+
+async function resolveSource(record: ArtworkRecord): Promise<{ file: string; authentic: boolean }> {
+  const dir = artworkData(record.id);
+
+  const scan = path.join(dir, 'source.jpg');
+  if (fs.existsSync(scan)) return { file: scan, authentic: true };
+
+  const generatedDir = path.join(CACHE, 'sources');
+  fs.mkdirSync(generatedDir, { recursive: true });
+  const generated = path.join(generatedDir, `${record.id}.png`);
+
+  const handSvg = path.join(dir, 'placeholder.svg');
+  if (fs.existsSync(handSvg)) {
+    await sharp(handSvg, { density: 96 }).png().toFile(generated);
+    return { file: generated, authentic: false };
+  }
+
+  if (!record.placeholder) {
+    throw new Error(
+      `${record.id}: no data/artworks/${record.id}/source.jpg and no "placeholder" spec in the record`,
+    );
+  }
+  const svg = renderPlaceholder(record.placeholder);
+  await sharp(Buffer.from(svg), { density: 96 }).png().toFile(generated);
+  return { file: generated, authentic: false };
+}
+
+export async function buildImages(record: ArtworkRecord): Promise<BuiltImages> {
+  const outDir = artworkPublic(record.id);
   fs.mkdirSync(outDir, { recursive: true });
 
-  let source = path.join(dir, 'source.jpg');
-  if (!fs.existsSync(source)) {
-    const svg = path.join(dir, 'placeholder.svg');
-    if (!fs.existsSync(svg)) throw new Error(`${id}: neither source.jpg nor placeholder.svg`);
-    source = path.join(dir, 'source.generated.png');
-    await sharp(svg, { density: 96 }).png().toFile(source);
-    console.log(`  (no source.jpg — rasterised placeholder.svg)`);
-  }
+  const { file: source, authentic } = await resolveSource(record);
 
   const meta = await sharp(source).metadata();
   const landscape = (meta.width ?? 1) >= (meta.height ?? 1);
@@ -51,17 +82,11 @@ export async function buildImages(id: string) {
     .webp({ quality: 40 })
     .toFile(path.join(outDir, 'lqip.webp'));
 
-  console.log(`  full.jpg / wall.jpg / lqip.webp`);
-  return { width: meta.width ?? 0, height: meta.height ?? 0 };
-}
-
-const isMain = process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]));
-if (isMain) {
-  const order: string[] = JSON.parse(
-    fs.readFileSync(path.join(DATA, 'artworks', 'order.json'), 'utf8'),
-  );
-  for (const id of order) {
-    console.log(id);
-    await buildImages(id);
-  }
+  console.log(`  images     ${authentic ? 'from source.jpg' : 'generated stand-in'}`);
+  return {
+    sourcePath: source,
+    authentic,
+    width: meta.width ?? 0,
+    height: meta.height ?? 0,
+  };
 }

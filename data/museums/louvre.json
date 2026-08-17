@@ -1,0 +1,82 @@
+{
+  "id": "louvre",
+  "name": "Musée du Louvre",
+  "city": "Paris",
+  "subtitle": "Grande Galerie",
+  "blurb": "Salon hang under a white barrel vault, deep blue-grey walls, diffused daylight from arched skylights.",
+  "corridorNote": "Modelled on the Louvre's grand painting galleries: a bright white vaulted ceiling pierced by a sequence of arched skylights, thick ornate classical molding at the springing line, matte deep blue-grey walls that throw the gold frames forward, canvases stacked salon-style, pale stone floor, sculptures on pedestals and low dark benches down the centre.",
+  "style": {
+    "ceiling": "barrel-skylight",
+    "floor": "stone",
+    "wall": "salon",
+    "frame": "louvre-salon",
+    "hang": "salon",
+    "halfWidth": 4.2,
+    "wallHeight": 6.0,
+    "vaultHeight": 9.4,
+    "bays": 10,
+    "bayDepth": 5.2,
+    "palette": {
+      "wall": "#4C5462",
+      "wallDeep": "#3C4451",
+      "molding": "#F2EFE7",
+      "gilt": "#C9A227",
+      "ceiling": "#F0EEE8",
+      "ceilingAccent": "#DCE8F2",
+      "floor": "#CEC5B4",
+      "floorInlay": "#AEA48F",
+      "accent": "#5B6472",
+      "sky": "#EDF4FB"
+    },
+    "light": {
+      "key": "#FFF8EC",
+      "keyIntensity": 2.1,
+      "keyFrom": [-3, 16, 5],
+      "sky": "#DCEAF6",
+      "ground": "#6A6459",
+      "ambient": 0.58,
+      "lamp": "#FFE2B4",
+      "lampIntensity": 5,
+      "exposure": 1.06,
+      "background": "#2B303A",
+      "fog": ["#3A414E", 52, 150]
+    },
+    "fixtures": {
+      "sculpture": "pedestal-figures",
+      "seating": "bench",
+      "chandeliers": false,
+      "placards": true,
+      "clock": false,
+      "terraces": false
+    }
+  },
+  "plan": {
+    "viewBox": "20 20 520 312",
+    "level": "Denon & Sully wings",
+    "rooms": [
+      { "id": "r-mona-lisa", "name": "Mona Lisa", "svgPath": "M40,36 L150,36 L150,106 L40,106 Z", "centroid": [95, 71], "active": true, "artworkIndex": 0 },
+      { "id": "r-liberty", "name": "Liberty", "svgPath": "M154,36 L264,36 L264,106 L154,106 Z", "centroid": [209, 71], "active": true, "artworkIndex": 1 },
+      { "id": "r-coronation", "name": "Coronation", "svgPath": "M268,36 L378,36 L378,106 L268,106 Z", "centroid": [323, 71], "active": true, "artworkIndex": 2 },
+      { "id": "r-medusa", "name": "Medusa", "svgPath": "M382,36 L492,36 L492,106 L382,106 Z", "centroid": [437, 71], "active": true, "artworkIndex": 3 },
+      { "id": "r-cana", "name": "Cana", "svgPath": "M40,110 L150,110 L150,176 L40,176 Z", "centroid": [95, 143], "active": true, "artworkIndex": 4 },
+      { "id": "r-horatii", "name": "Horatii", "svgPath": "M40,180 L150,180 L150,246 L40,246 Z", "centroid": [95, 213], "active": true, "artworkIndex": 5 },
+      { "id": "r-lacemaker", "name": "Lacemaker", "svgPath": "M40,250 L150,250 L150,316 L40,316 Z", "centroid": [95, 283], "active": true, "artworkIndex": 6 },
+      { "id": "r-odalisque", "name": "Odalisque", "svgPath": "M382,110 L492,110 L492,176 L382,176 Z", "centroid": [437, 143], "active": true, "artworkIndex": 7 },
+      { "id": "r-sardanapalus", "name": "Sardanapalus", "svgPath": "M382,180 L492,180 L492,246 L382,246 Z", "centroid": [437, 213], "active": true, "artworkIndex": 8 },
+      { "id": "r-st-john", "name": "St John", "svgPath": "M382,250 L492,250 L492,316 L382,316 Z", "centroid": [437, 283], "active": true, "artworkIndex": 9 },
+      { "id": "r-cour", "name": "Cour Napoléon", "svgPath": "M154,110 L378,110 L378,316 L154,316 Z", "centroid": [266, 213], "active": false, "artworkIndex": -1 }
+    ]
+  },
+  "artworks": [
+    "leonardo-mona-lisa",
+    "delacroix-liberty",
+    "david-coronation-napoleon",
+    "gericault-raft-medusa",
+    "veronese-wedding-cana",
+    "david-oath-horatii",
+    "vermeer-lacemaker",
+    "ingres-grande-odalisque",
+    "delacroix-death-sardanapalus",
+    "leonardo-st-john-baptist"
+  ]
+}

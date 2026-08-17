@@ -1,0 +1,82 @@
+{
+  "id": "british-museum",
+  "name": "The British Museum",
+  "city": "London",
+  "subtitle": "Crimson skylit room",
+  "blurb": "Deep crimson walls under a pitched glass lantern, gilded archways, polished light wood underfoot.",
+  "corridorNote": "The reference photograph for this corridor is Room 32 at the National Gallery, London — the Julia and Hans Rausing Room — not a British Museum gallery; the corridor follows it faithfully. Deep crimson walls behind large gold-framed works, a pitched arched glass skylight running the length of the room on white ribs, vaulted ceiling sections in warm red and gold divided by intricate gilded archways, polished light wood floor, dark tufted leather seating down the centre. The collection hung here is the British Museum's own painted holdings, which are prints, frescoes, scrolls and painted papyri rather than gallery canvases.",
+  "style": {
+    "ceiling": "pitched-glass",
+    "floor": "parquet",
+    "wall": "crimson-enfilade",
+    "frame": "gallery-swept",
+    "hang": "single",
+    "halfWidth": 4.6,
+    "wallHeight": 5.6,
+    "vaultHeight": 9.8,
+    "bays": 9,
+    "bayDepth": 5.6,
+    "palette": {
+      "wall": "#7C1D23",
+      "wallDeep": "#5C1319",
+      "molding": "#E9DEC6",
+      "gilt": "#CBA13A",
+      "ceiling": "#F1EEE6",
+      "ceilingAccent": "#8E2A26",
+      "floor": "#C9A97C",
+      "floorInlay": "#8B6C46",
+      "accent": "#8E2F2C",
+      "sky": "#F3F7FC"
+    },
+    "light": {
+      "key": "#FFF9F0",
+      "keyIntensity": 2.3,
+      "keyFrom": [-1, 18, 3],
+      "sky": "#E8F0F8",
+      "ground": "#70503E",
+      "ambient": 0.5,
+      "lamp": "#FFDCA6",
+      "lampIntensity": 7,
+      "exposure": 1.02,
+      "background": "#2C1517",
+      "fog": ["#3C1B1D", 48, 140]
+    },
+    "fixtures": {
+      "sculpture": "none",
+      "seating": "ottoman",
+      "chandeliers": false,
+      "placards": true,
+      "clock": false,
+      "terraces": false
+    }
+  },
+  "plan": {
+    "viewBox": "20 20 520 300",
+    "level": "Great Court galleries",
+    "rooms": [
+      { "id": "r-great-wave", "name": "Great Wave", "svgPath": "M100,30 L200,30 L200,95 L100,95 Z", "centroid": [150, 62], "active": true, "artworkIndex": 0 },
+      { "id": "r-nebamun", "name": "Nebamun", "svgPath": "M210,30 L310,30 L310,95 L210,95 Z", "centroid": [260, 62], "active": true, "artworkIndex": 1 },
+      { "id": "r-admonitions", "name": "Admonitions", "svgPath": "M320,30 L420,30 L420,95 L320,95 Z", "centroid": [370, 62], "active": true, "artworkIndex": 2 },
+      { "id": "r-fayum", "name": "Fayum", "svgPath": "M30,105 L95,105 L95,185 L30,185 Z", "centroid": [62, 145], "active": true, "artworkIndex": 3 },
+      { "id": "r-meidum", "name": "Meidum", "svgPath": "M30,195 L95,195 L95,275 L30,275 Z", "centroid": [62, 235], "active": true, "artworkIndex": 4 },
+      { "id": "r-white", "name": "John White", "svgPath": "M425,105 L490,105 L490,185 L425,185 Z", "centroid": [457, 145], "active": true, "artworkIndex": 5 },
+      { "id": "r-schouman", "name": "Schouman", "svgPath": "M425,195 L490,195 L490,275 L425,275 Z", "centroid": [457, 235], "active": true, "artworkIndex": 6 },
+      { "id": "r-ani", "name": "Book of Ani", "svgPath": "M100,285 L200,285 L200,310 L100,310 Z", "centroid": [150, 298], "active": true, "artworkIndex": 7 },
+      { "id": "r-dunhuang", "name": "Dunhuang", "svgPath": "M210,285 L310,285 L310,310 L210,310 Z", "centroid": [260, 298], "active": true, "artworkIndex": 8 },
+      { "id": "r-codices", "name": "Codices", "svgPath": "M320,285 L420,285 L420,310 L320,310 Z", "centroid": [370, 298], "active": true, "artworkIndex": 9 },
+      { "id": "r-court", "name": "Great Court", "svgPath": "M260,105 m-72,0 a72,72 0 1,0 144,0 a72,72 0 1,0 -144,0", "centroid": [260, 105], "active": false, "artworkIndex": -1 }
+    ]
+  },
+  "artworks": [
+    "hokusai-great-wave",
+    "nebamun-marshes",
+    "gu-kaizhi-admonitions",
+    "fayum-mummy-portraits",
+    "geese-of-meidum",
+    "white-portrait-lady",
+    "schouman-birds",
+    "book-of-the-dead-ani",
+    "dunhuang-cave-17",
+    "aztec-codices"
+  ]
+}

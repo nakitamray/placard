@@ -1,0 +1,82 @@
+{
+  "id": "vatican",
+  "name": "Vatican Museums",
+  "city": "Vatican City",
+  "subtitle": "Gallery of Maps",
+  "blurb": "A frescoed vault in heavy gilded stucco, map panels the length of the walls, marble underfoot in red, white and green.",
+  "corridorNote": "Modelled on the Galleria delle Carte Geografiche. The vault is covered end to end in vibrant multi-coloured fresco framed by deeply carved gilded stucco; sun pours through a row of tall windows on one side and lands on a polished marble floor laid in geometric white, red and green; the opposite wall carries enormous topographical maps of Italy painted in fresco. Crystal chandeliers hang at regular intervals down the centre and marble busts line the base of the walls.",
+  "style": {
+    "ceiling": "fresco-vault",
+    "floor": "marble-inlay",
+    "wall": "fresco-maps",
+    "frame": "vatican-tabernacle",
+    "hang": "alternating",
+    "halfWidth": 3.6,
+    "wallHeight": 5.4,
+    "vaultHeight": 8.6,
+    "bays": 11,
+    "bayDepth": 4.6,
+    "palette": {
+      "wall": "#B9A67E",
+      "wallDeep": "#8C7752",
+      "molding": "#D9B84E",
+      "gilt": "#D4AF37",
+      "ceiling": "#E6D9BA",
+      "ceilingAccent": "#9C3B34",
+      "floor": "#EFE9DC",
+      "floorInlay": "#7C2E2C",
+      "accent": "#C3AF84",
+      "sky": "#FFF6DC"
+    },
+    "light": {
+      "key": "#FFEFC8",
+      "keyIntensity": 2.7,
+      "keyFrom": [12, 9, 5],
+      "sky": "#F2E8D0",
+      "ground": "#7C6C50",
+      "ambient": 0.48,
+      "lamp": "#FFD98A",
+      "lampIntensity": 11,
+      "exposure": 1.0,
+      "background": "#3A3122",
+      "fog": ["#4C4029", 44, 130]
+    },
+    "fixtures": {
+      "sculpture": "busts",
+      "seating": "none",
+      "chandeliers": true,
+      "placards": false,
+      "clock": false,
+      "terraces": false
+    }
+  },
+  "plan": {
+    "viewBox": "20 40 520 240",
+    "level": "Galleria delle Carte Geografiche",
+    "rooms": [
+      { "id": "r-creation", "name": "Creation", "svgPath": "M40,55 L130,55 L130,141 L40,141 Z", "centroid": [85, 98], "active": true, "artworkIndex": 0 },
+      { "id": "r-judgment", "name": "Last Judgment", "svgPath": "M138,55 L228,55 L228,141 L138,141 Z", "centroid": [183, 98], "active": true, "artworkIndex": 1 },
+      { "id": "r-athens", "name": "Athens", "svgPath": "M236,55 L326,55 L326,141 L236,141 Z", "centroid": [281, 98], "active": true, "artworkIndex": 2 },
+      { "id": "r-transfiguration", "name": "Transfiguration", "svgPath": "M334,55 L424,55 L424,141 L334,141 Z", "centroid": [379, 98], "active": true, "artworkIndex": 3 },
+      { "id": "r-entombment", "name": "Entombment", "svgPath": "M432,55 L522,55 L522,141 L432,141 Z", "centroid": [477, 98], "active": true, "artworkIndex": 4 },
+      { "id": "r-jerome", "name": "St Jerome", "svgPath": "M40,179 L130,179 L130,265 L40,265 Z", "centroid": [85, 222], "active": true, "artworkIndex": 5 },
+      { "id": "r-peter", "name": "St Peter", "svgPath": "M138,179 L228,179 L228,265 L138,265 Z", "centroid": [183, 222], "active": true, "artworkIndex": 6 },
+      { "id": "r-stefaneschi", "name": "Stefaneschi", "svgPath": "M236,179 L326,179 L326,265 L236,265 Z", "centroid": [281, 222], "active": true, "artworkIndex": 7 },
+      { "id": "r-foligno", "name": "Foligno", "svgPath": "M334,179 L424,179 L424,265 L334,265 Z", "centroid": [379, 222], "active": true, "artworkIndex": 8 },
+      { "id": "r-virgin", "name": "Coronation", "svgPath": "M432,179 L522,179 L522,265 L432,265 Z", "centroid": [477, 222], "active": true, "artworkIndex": 9 },
+      { "id": "r-gallery", "name": "Gallery of Maps", "svgPath": "M40,147 L522,147 L522,173 L40,173 Z", "centroid": [281, 160], "active": false, "artworkIndex": -1 }
+    ]
+  },
+  "artworks": [
+    "michelangelo-creation-adam",
+    "michelangelo-last-judgment",
+    "raphael-school-athens",
+    "raphael-transfiguration",
+    "caravaggio-entombment",
+    "leonardo-st-jerome",
+    "raphael-deliverance-peter",
+    "giotto-stefaneschi-triptych",
+    "raphael-madonna-foligno",
+    "raphael-coronation-virgin"
+  ]
+}

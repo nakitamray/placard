@@ -1,53 +1,54 @@
 import { Suspense, useEffect, useMemo, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useStore } from './state/store';
+import { selectArtworks, useStore } from './state/store';
 import { attachPointer } from './state/motion';
 import { detectTier, webgl2Supported } from './lib/deviceTier';
 import { CorridorScene } from './scenes/CorridorScene';
 import { GalleryScene } from './scenes/GalleryScene';
-import { Environment, HemisphereFill } from './scenes/Lighting';
+import { Environment } from './scenes/Lighting';
 import { LandingLayer } from './ui/LandingLayer';
 import { MapOverlay } from './ui/MapOverlay';
 import { Placard } from './ui/Placard';
 import { RailIndicator } from './ui/RailIndicator';
 import { Credits } from './ui/Credits';
 import { ThreadPull } from './ui/ThreadPull';
-import { CorridorHints } from './ui/CorridorHints';
+import { ControlHints } from './ui/ControlHints';
 import { CursorRing } from './ui/CursorRing';
 import { LoadingBar } from './ui/LoadingBar';
 import { FlashLayer } from './ui/Flash';
 import { endReveal } from './transitions/reveal';
-import type { ArtworkIndexEntry, GalleryData } from './types';
+import type { MuseumIndexEntry } from './types';
 
 export default function App() {
   const phase = useStore((s) => s.phase);
   const revealed = useStore((s) => s.revealed);
+  const museum = useStore((s) => s.museum);
   const setPhase = useStore((s) => s.setPhase);
-  const setData = useStore((s) => s.setData);
-  const artworks = useStore((s) => s.artworks);
+  const setMuseums = useStore((s) => s.setMuseums);
+  const artworks = useStore(selectArtworks);
   const [progress, setProgress] = useState(0);
   const [webgl] = useState(webgl2Supported);
   const tier = useMemo(detectTier, []);
 
   useEffect(() => attachPointer(), []);
 
-  // BOOT: fetch the index + gallery data, then land
+  // BOOT: fetch the list of museums, then land. The chosen museum's own
+  // manifest is fetched on selection, so entering one wing never costs the
+  // download of the other four.
   useEffect(() => {
     if (!webgl) return;
     let alive = true;
     (async () => {
-      setProgress(0.2);
+      setProgress(0.25);
       try {
-        const [index, gallery] = await Promise.all([
-          fetch('/artworks/index.json').then((r) => r.json() as Promise<ArtworkIndexEntry[]>),
-          fetch('/galleries/orsay.json').then((r) => r.json() as Promise<GalleryData>),
-        ]);
+        const list = (await fetch('/museums/index.json').then((r) =>
+          r.json(),
+        )) as MuseumIndexEntry[];
         if (!alive) return;
-        setProgress(0.7);
-        setData(index, gallery);
+        setMuseums(list);
       } catch {
-        // assets missing (build:assets not run) — land anyway with empty data
+        // assets missing (build:assets not run) — land anyway and say so
       }
       if (!alive) return;
       setProgress(1);
@@ -56,7 +57,7 @@ export default function App() {
     return () => {
       alive = false;
     };
-  }, [webgl, setData, setPhase]);
+  }, [webgl, setMuseums, setPhase]);
 
   // global Esc: exits reveal, gallery→map, map→corridor (spec §9)
   useEffect(() => {
@@ -85,8 +86,14 @@ export default function App() {
     );
   }
 
-  const inCorridor = phase === 'landing' || phase === 'corridor' || phase === 'map' || phase === 'warp';
+  const inCorridor =
+    phase === 'landing' || phase === 'corridor' || phase === 'map' || phase === 'warp';
   const inGallery = phase === 'gallery';
+  // background and fog start from the museum's own night tone; the gallery
+  // then eases them toward the current painter's accent
+  const bg = museum?.style.light.background ?? '#171412';
+  const fog = museum?.style.light.fog ?? ['#2A2119', 38, 120];
+  const exposure = museum?.style.light.exposure ?? 1.0;
 
   return (
     <>
@@ -95,22 +102,19 @@ export default function App() {
           dpr={[1, tier.dprCap]}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
           shadows={{ type: THREE.PCFSoftShadowMap }}
-          camera={{ fov: 48, position: [0, 1.6, 4], near: 0.1, far: 120 }}
+          camera={{ fov: 48, position: [0, 1.6, 4], near: 0.1, far: 160 }}
           onCreated={({ gl }) => {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
-            // pulled down from the spec's 1.15: the corridor is now lit by
-            // raking sun rather than flat fill, so highlights carry the scene
-            gl.toneMappingExposure = 0.95;
             gl.outputColorSpace = THREE.SRGBColorSpace;
           }}
         >
-          <color attach="background" args={['#171412']} />
+          <ExposureRig exposure={exposure} />
+          <color attach="background" args={[bg]} />
           {/* light haze for depth only — the far bays should still read */}
-          <fog attach="fog" args={['#2A2119', 38, 120]} />
+          <fog attach="fog" args={[fog[0], fog[1], fog[2]]} />
           <Suspense fallback={null}>
-            <Environment intensity={inGallery ? 0.4 : 0.24} />
-            <HemisphereFill intensity={inGallery ? 0.34 : 0.12} />
-            {inCorridor && artworks.length > 0 && <CorridorScene />}
+            <Environment intensity={inGallery ? 0.4 : 0.26} />
+            {inCorridor && museum && artworks.length > 0 && <CorridorScene tier={tier} />}
             {inGallery && <GalleryScene tier={tier} />}
           </Suspense>
         </Canvas>
@@ -130,14 +134,18 @@ export default function App() {
           <button className="caption gallery-back" onClick={() => setPhase('landing')}>
             ← Entrance
           </button>
-          <CorridorHints />
+          <p className="caption corridor-title">
+            {museum?.name}
+            <span className="corridor-sub"> · {museum?.subtitle}</span>
+          </p>
         </>
       )}
       {inGallery && (
         <button className="caption gallery-back" onClick={() => setPhase('map')}>
-          ← Map
+          ← {museum?.name ?? 'Map'}
         </button>
       )}
+      <ControlHints />
       <Credits />
       <FlashLayer />
       <CursorRing />
@@ -148,8 +156,21 @@ export default function App() {
   );
 }
 
+/**
+ * Tone-mapping exposure follows the museum — the Met's court is a dusk room
+ * and the Orsay nave is full of noon daylight, and one exposure cannot serve
+ * both. Lives inside the Canvas so it can reach the renderer.
+ */
+function ExposureRig({ exposure }: { exposure: number }) {
+  const gl = useThree((s) => s.gl);
+  useEffect(() => {
+    gl.toneMappingExposure = exposure;
+  }, [gl, exposure]);
+  return null;
+}
+
 function ArtworkProxies() {
-  const artworks = useStore((s) => s.artworks);
+  const artworks = useStore(selectArtworks);
   const index = useStore((s) => s.index);
   const setIndex = useStore((s) => s.setIndex);
   return (

@@ -11,19 +11,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
-import { DATA, artworkData, artworkPublic } from './lib/paths.ts';
+import { CACHE, artworkPublic } from './lib/paths.ts';
 import { GLYPH_MAGIC, GLYPH_VERSION, HEADER_BYTES, RECORD_BYTES } from '../shared/glyphFormat.ts';
-
-interface GlyphConfig {
-  workingWidth: number;
-  minCell: number;
-  maxCell: number;
-  varianceThreshold: number;
-  fontScale: number;
-  paletteSize: number;
-  saturationBoost: number;
-  contrastBoost: number;
-}
+import type { GlyphConfig } from './lib/records.ts';
 
 interface Emitted {
   x: number;
@@ -140,16 +130,17 @@ function nearestPaletteIndex(palette: Uint8Array, r: number, g: number, b: numbe
 
 // ---------- main per-artwork build ----------
 
-export async function buildGlyphs(id: string, suffix = '', minCellOverride?: number) {
-  const dir = artworkData(id);
-  const cfg: GlyphConfig = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8'));
+export async function buildGlyphs(
+  id: string,
+  sourcePath: string,
+  cfg: GlyphConfig,
+  suffix = '',
+  minCellOverride?: number,
+) {
   const minCell = minCellOverride ?? cfg.minCell;
 
-  const sourcePath = fs.existsSync(path.join(dir, 'source.jpg'))
-    ? path.join(dir, 'source.jpg')
-    : path.join(dir, 'source.generated.png');
   if (!fs.existsSync(sourcePath)) {
-    throw new Error(`${id}: no source image — run build-images first`);
+    throw new Error(`${id}: no source image at ${sourcePath} — run build-images first`);
   }
 
   const img = sharp(sourcePath).resize({ width: cfg.workingWidth });
@@ -294,23 +285,13 @@ export async function buildGlyphs(id: string, suffix = '', minCellOverride?: num
       )
       .join('');
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#111"/>${rects}</svg>`;
-    await sharp(Buffer.from(svg)).png().toFile(path.join(dir, 'preview.png'));
+    const previewDir = path.join(CACHE, 'previews');
+    fs.mkdirSync(previewDir, { recursive: true });
+    await sharp(Buffer.from(svg)).png().toFile(path.join(previewDir, `${id}.png`));
   }
 
   console.log(
-    `  glyphs${suffix}.bin  ${emitted.length} glyphs, ${paletteSize} colours, ${(buf.length / 1024).toFixed(0)} KB (${W}×${H})`,
+    `  glyphs${suffix || '   '}  ${emitted.length} glyphs, ${paletteSize} colours, ${(buf.length / 1024).toFixed(0)} KB (${W}×${H})`,
   );
   return emitted.length;
-}
-
-// CLI
-const isMain = process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]));
-if (isMain) {
-  const order: string[] = JSON.parse(
-    fs.readFileSync(path.join(DATA, 'artworks', 'order.json'), 'utf8'),
-  );
-  for (const id of order) {
-    console.log(id);
-    await buildGlyphs(id);
-  }
 }

@@ -1,0 +1,163 @@
+/**
+ * The authoring contract.
+ *
+ * A museum is one file in data/museums/ (identity, corridor style, floor plan,
+ * and the ordered list of works it hangs). Its works are one file in
+ * data/collections/ — an array of self-contained records. Everything the
+ * pipeline needs is in those two files.
+ *
+ * data/artworks/{id}/ is optional and exists only to override generated
+ * assets for a particular work:
+ *
+ *   source.jpg     a real public-domain scan, used instead of the generated
+ *                  stand-in — this is the one file worth adding
+ *   corpus/ +
+ *   sources.json   real historical texts to build the glyph corpus from,
+ *                  instead of deriving it from the record's own placard text
+ *   regions.json   hand-authored Thread Pull regions (a record may also carry
+ *                  them inline, which is the usual way)
+ *   config.json    per-artwork glyph tuning
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import { DATA, artworkData, collectionData, museumData } from './paths.ts';
+import type { PlaceholderSpec } from '../build-placeholder.ts';
+
+export interface ArtworkRegionRecord {
+  id: string;
+  label: string;
+  box: [number, number, number, number];
+  text: string;
+}
+
+export interface ArtworkRecord {
+  id: string;
+  artist: string;
+  artistDates: string;
+  title: string;
+  titleOriginal?: string;
+  year: string;
+  medium: string;
+  dimensions: string;
+  room: string;
+  accession: string;
+  creditLine: string;
+  /** the painter's identifying colour — the whole artwork room takes it */
+  accentColor: string;
+  labelText: string;
+  extendedNote: string;
+  placeholder: PlaceholderSpec;
+  regions?: ArtworkRegionRecord[];
+}
+
+export interface MuseumRecord {
+  id: string;
+  name: string;
+  city: string;
+  subtitle: string;
+  blurb: string;
+  corridorNote: string;
+  style: unknown;
+  plan: unknown;
+  artworks: string[];
+}
+
+export interface GlyphConfig {
+  workingWidth: number;
+  minCell: number;
+  maxCell: number;
+  varianceThreshold: number;
+  fontScale: number;
+  paletteSize: number;
+  saturationBoost: number;
+  contrastBoost: number;
+}
+
+/** Sensible defaults for every artwork; data/artworks/{id}/config.json wins. */
+export const DEFAULT_GLYPH_CONFIG: GlyphConfig = {
+  workingWidth: 1200,
+  minCell: 5,
+  maxCell: 16,
+  varianceThreshold: 0.005,
+  fontScale: 1.1,
+  paletteSize: 96,
+  saturationBoost: 1.08,
+  contrastBoost: 1.05,
+};
+
+const readJson = <T>(p: string): T => JSON.parse(fs.readFileSync(p, 'utf8')) as T;
+
+export function museumOrder(): string[] {
+  return readJson<string[]>(path.join(DATA, 'museums', 'order.json'));
+}
+
+export function loadMuseum(id: string): MuseumRecord {
+  return readJson<MuseumRecord>(museumData(id));
+}
+
+export function loadCollection(museumId: string): ArtworkRecord[] {
+  return readJson<ArtworkRecord[]>(collectionData(museumId));
+}
+
+/** Museum record + its works, joined and validated. */
+export function loadMuseumWithWorks(id: string): {
+  museum: MuseumRecord;
+  works: ArtworkRecord[];
+} {
+  const museum = loadMuseum(id);
+  const collection = loadCollection(id);
+  const byId = new Map(collection.map((w) => [w.id, w]));
+  const works = museum.artworks.map((workId) => {
+    const rec = byId.get(workId);
+    if (!rec) {
+      throw new Error(
+        `${id}: "${workId}" is listed in data/museums/${id}.json but missing from data/collections/${id}.json`,
+      );
+    }
+    return rec;
+  });
+  return { museum, works };
+}
+
+export function glyphConfig(id: string): GlyphConfig {
+  const override = path.join(artworkData(id), 'config.json');
+  if (!fs.existsSync(override)) return DEFAULT_GLYPH_CONFIG;
+  return { ...DEFAULT_GLYPH_CONFIG, ...readJson<Partial<GlyphConfig>>(override) };
+}
+
+/** Hand-authored regions on disk win over the ones inline in the record. */
+export function regionsFor(record: ArtworkRecord): ArtworkRegionRecord[] {
+  const override = path.join(artworkData(record.id), 'regions.json');
+  if (fs.existsSync(override)) {
+    return readJson<{ regions: ArtworkRegionRecord[] }>(override).regions;
+  }
+  if (record.regions?.length) return record.regions;
+  return derivedRegions(record);
+}
+
+/**
+ * Thread Pull needs somewhere to pull from on every canvas, not only the ones
+ * with hand-authored regions. Falling back to three horizontal registers —
+ * upper, middle, foreground — carrying successive passages of the work's own
+ * extended note keeps the interaction alive everywhere, and any work that
+ * deserves better gets `regions` written into its record.
+ */
+function derivedRegions(record: ArtworkRecord): ArtworkRegionRecord[] {
+  const paragraphs = record.extendedNote
+    .split('\n\n')
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (!paragraphs.length) return [];
+
+  const passages = [record.labelText, ...paragraphs];
+  const bands: Array<{ id: string; label: string; box: [number, number, number, number] }> = [
+    { id: 'upper', label: 'The upper register', box: [0.0, 0.0, 1.0, 0.34] },
+    { id: 'middle', label: 'The middle ground', box: [0.0, 0.34, 1.0, 0.68] },
+    { id: 'foreground', label: 'The foreground', box: [0.0, 0.68, 1.0, 1.0] },
+  ];
+
+  return bands.map((band, i) => ({
+    ...band,
+    text: passages[i % passages.length],
+  }));
+}

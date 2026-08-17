@@ -3,15 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Placard — Where History Paints the Masterpiece. A web-based digital art exhibition where famous paintings are reconstructed out of moving text drawn from their own history.",
+  "description": "Placard \u2014 Where History Paints the Masterpiece. A web-based digital art exhibition where famous paintings are reconstructed out of moving text drawn from their own history.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "build:assets": "tsx scripts/build-all.ts",
-    "build:glyphs": "tsx scripts/build-glyphs.ts",
-    "build:corpus": "tsx scripts/build-corpus.ts",
-    "build:images": "tsx scripts/build-images.ts"
+    "build:assets": "tsx scripts/build-all.ts"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",

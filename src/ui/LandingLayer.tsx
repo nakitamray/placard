@@ -2,13 +2,14 @@
  * Landing — spec §10.1 / §10C.3.
  *
  * Full-bleed painting backgrounds with a slow Ken Burns crossfade, dark
- * vignette, left-aligned gallery selector. T1: the selector becomes a
- * clip-path aperture and the landing pushes through into the corridor
- * already rendering behind it (spec §11.1).
+ * vignette, left-aligned museum selector. Choosing a museum fetches its
+ * manifest — corridor style, floor plan and works — and then plays T1: the
+ * landing layers push outward while the corridor, already rendering behind,
+ * dollies in from the mouth (spec §11.1).
  */
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { useStore } from '../state/store';
+import { loadMuseum, useStore } from '../state/store';
 import { pointer } from '../state/motion';
 
 const HOLD_MS = 6000;
@@ -18,12 +19,17 @@ export function LandingLayer() {
   const phase = useStore((s) => s.phase);
   const reducedMotion = useStore((s) => s.reducedMotion);
   const seenIntro = useStore((s) => s.seenIntro);
+  const museums = useStore((s) => s.museums);
+  const loadingId = useStore((s) => s.museumLoading);
   const setPhase = useStore((s) => s.setPhase);
+  const setMuseum = useStore((s) => s.setMuseum);
+  const setMuseumLoading = useStore((s) => s.setMuseumLoading);
   const setCreditsOpen = useStore((s) => s.setCreditsOpen);
 
   const [images, setImages] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
   const [leaving, setLeaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -58,9 +64,8 @@ export function LandingLayer() {
       const nbx = cur.bx + (pointer.x * -24 - cur.bx) * 0.06;
       const nby = cur.by + (pointer.y * -24 - cur.by) * 0.06;
       const ntx = cur.tx + (pointer.x * 6 - cur.tx) * 0.06;
-      // stop writing transforms once the layers have settled, so the DOM
-      // goes quiet when the pointer does (sub-pixel churn otherwise keeps
-      // every element in the tree perpetually "moving")
+      // stop writing transforms once the layers have settled, so the DOM goes
+      // quiet when the pointer does
       if (Math.abs(nbx - cur.bx) + Math.abs(nby - cur.by) + Math.abs(ntx - cur.tx) > 0.01) {
         cur.bx = nbx;
         cur.by = nby;
@@ -76,12 +81,24 @@ export function LandingLayer() {
 
   if (phase !== 'landing' && !leaving) return null;
 
-  const enterGallery = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (leaving) return;
+  const enter = async (id: string, el: HTMLElement) => {
+    if (leaving || loadingId) return;
+    setError(null);
+    setMuseumLoading(id);
+    let museum;
+    try {
+      museum = await loadMuseum(id);
+    } catch {
+      setMuseumLoading(null);
+      setError('That wing could not be opened. Run `pnpm build:assets` and reload.');
+      return;
+    }
+    setMuseum(museum);
+    setMuseumLoading(null);
     setLeaving(true);
+
     const root = rootRef.current!;
-    const short = reducedMotion || seenIntro;
-    if (short) {
+    if (reducedMotion || seenIntro) {
       gsap.to(root, {
         opacity: 0,
         duration: 0.4,
@@ -92,17 +109,16 @@ export function LandingLayer() {
       });
       return;
     }
+
     // T1 push-through: landing layers scale outward at differing rates
-    // (foreground fastest) while the corridor, already rendering behind,
-    // dollies in from the mouth (spec §11.1)
-    e.currentTarget.classList.add('is-chosen');
+    // (foreground fastest) while the corridor dollies in behind (spec §11.1)
+    el.classList.add('is-chosen');
     const finish = () => {
       setLeaving(false);
       gsap.set([root, bgRef.current, contentRef.current], { clearProps: 'all' });
     };
-    // the overlay must come down even if the timeline never reports complete
-    // (a stalled ticker or a killed tween would otherwise leave a full-screen
-    // layer sitting over the corridor, swallowing every click)
+    // the overlay must come down even if the timeline never reports complete,
+    // or a full-screen layer sits over the corridor swallowing every click
     const failsafe = window.setTimeout(finish, 1600);
     const tl = gsap.timeline({
       onComplete: () => {
@@ -113,7 +129,7 @@ export function LandingLayer() {
     tl.to(contentRef.current, { opacity: 0, scale: 1.22, duration: 0.7, ease: 'power2.in' }, 0.15);
     tl.to(bgRef.current, { scale: 1.12, duration: 1.2, ease: 'power2.inOut' }, 0);
     tl.to(root, { opacity: 0, duration: 0.9, ease: 'power2.inOut' }, 0.3);
-    setPhase('corridor'); // corridor starts its mouth dolly behind the fade
+    setPhase('corridor');
   };
 
   return (
@@ -132,8 +148,8 @@ export function LandingLayer() {
         ))}
       </div>
       <div className="landing-vignette" aria-hidden />
-      <a className="skip-link" href="#gallery-list">
-        Skip to gallery list
+      <a className="skip-link" href="#museum-list">
+        Skip to the list of museums
       </a>
       <div className="landing-content" ref={contentRef}>
         <p className="landing-mark caption">Placard</p>
@@ -143,27 +159,34 @@ export function LandingLayer() {
           the masterpiece
         </h1>
         <hr className="hairline" />
-        <p className="meta landing-choose">Choose a gallery</p>
-        <ul className="gallery-list" id="gallery-list">
-          <li>
-            <button className="gallery-row" onClick={enterGallery}>
-              <span className="gallery-name">Musée d'Orsay</span>
-              <span className="caption gallery-city">Paris</span>
-            </button>
-          </li>
-          <li>
-            <div className="gallery-row is-disabled" aria-disabled>
-              <span className="gallery-name">The Met</span>
-              <span className="caption gallery-city">(soon)</span>
-            </div>
-          </li>
-          <li>
-            <div className="gallery-row is-disabled" aria-disabled>
-              <span className="gallery-name">Rijksmuseum</span>
-              <span className="caption gallery-city">(soon)</span>
-            </div>
-          </li>
+        <p className="meta landing-choose">Choose a museum</p>
+        <ul className="museum-list" id="museum-list">
+          {museums.map((m) => (
+            <li key={m.id}>
+              <button
+                className={`museum-row ${loadingId === m.id ? 'is-loading' : ''}`}
+                onClick={(e) => void enter(m.id, e.currentTarget)}
+                disabled={!!loadingId}
+              >
+                <span className="museum-name">{m.name}</span>
+                <span className="museum-meta">
+                  <span className="caption museum-sub">{m.subtitle}</span>
+                  <span className="caption museum-city">
+                    {m.city} · {m.count} works
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+          {!museums.length && (
+            <li>
+              <p className="caption landing-empty">
+                No museums found. Run <code>pnpm build:assets</code> and reload.
+              </p>
+            </li>
+          )}
         </ul>
+        {error && <p className="caption landing-error">{error}</p>}
         <button className="caption credits-link" onClick={() => setCreditsOpen(true)}>
           Credits &amp; sources
         </button>

@@ -117,23 +117,30 @@ button:active { transform: translateY(1px); }
 .landing-content .hero { margin: 0 0 var(--s5); }
 .landing-content .hairline { border-color: rgba(216, 205, 186, 0.4); width: 220px; margin-left: 0; }
 .landing-choose { color: var(--stone); opacity: 0.85; margin: var(--s5) 0 var(--s3); }
-.gallery-list { list-style: none; margin: 0; padding: 0; }
-.gallery-list li { border-bottom: 1px solid rgba(216, 205, 186, 0.28); }
-.gallery-row {
-  display: flex; align-items: baseline; justify-content: space-between;
-  width: 100%; height: 64px; align-items: center;
+.museum-list { list-style: none; margin: 0; padding: 0; }
+.museum-list li { border-bottom: 1px solid rgba(216, 205, 186, 0.28); }
+.museum-row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s4);
+  width: 100%; min-height: 62px; padding: var(--s2) 0;
   position: relative; text-align: left; color: var(--bone);
 }
-.gallery-row .gallery-name { font-size: 21px; transition: transform var(--d-fast) var(--e-out); }
-.gallery-row::after {
+.museum-row .museum-name { font-size: 20px; transition: transform var(--d-fast) var(--e-out); }
+.museum-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.museum-sub { color: var(--stone); opacity: 0.72; text-transform: none; letter-spacing: 0.03em; }
+.museum-city { color: var(--taupe); }
+.museum-row::after {
   content: ''; position: absolute; left: 0; bottom: -1px; height: 1px; width: 100%;
   background: var(--gilt); transform: scaleX(0); transform-origin: left center;
   transition: transform var(--d-fast) var(--e-out);
 }
-.gallery-row:hover::after, .gallery-row.is-chosen::after { transform: scaleX(1); }
-.gallery-row:hover .gallery-name { transform: translateX(4px); }
-.gallery-row.is-disabled { color: var(--taupe); cursor: not-allowed; }
-.gallery-city { color: var(--taupe); }
+.museum-row:hover::after, .museum-row.is-chosen::after { transform: scaleX(1); }
+.museum-row:hover .museum-name { transform: translateX(4px); }
+.museum-row:disabled { cursor: progress; }
+.museum-row.is-loading .museum-name { opacity: 0.55; }
+.landing-empty, .landing-error { color: var(--taupe); text-transform: none; letter-spacing: 0.02em; }
+.landing-error { color: #E2A08A; margin-top: var(--s4); }
+.landing-empty code { font-family: ui-monospace, Menlo, Consolas, monospace; }
+
 .credits-link { margin-top: var(--s6); color: var(--taupe); }
 .credits-link:hover { color: var(--gilt); }
 
@@ -149,17 +156,17 @@ button:active { transform: translateY(1px); }
   position: fixed; inset: 0; z-index: 30;
   background: rgba(242, 235, 223, 0.82); /* bone scrim */
   display: flex; flex-direction: column; align-items: center;
-  animation: map-in var(--d-base) var(--e-out);
   color: var(--ink);
+  /* entrance is tweened in MapOverlay.tsx — see the note there */
 }
-@keyframes map-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
 .map-header {
   width: 100%; display: flex; justify-content: space-between;
   padding: var(--s5) var(--s6); color: var(--umber);
 }
 .map-back:hover { color: var(--gilt); }
-.map-title { margin: var(--s6) 0 var(--s7); }
-.map-plan { width: min(720px, 92vw); }
+.map-title { margin: var(--s5) 0 var(--s2); }
+.map-lede { color: var(--umber); max-width: 46ch; text-align: center; margin: 0 0 var(--s6); }
+.map-plan { width: min(780px, 92vw); }
 .map-svg { width: 100%; height: auto; overflow: visible; }
 .map-room {
   fill: var(--stone); stroke: var(--limestone); stroke-width: 1;
@@ -175,7 +182,7 @@ button:active { transform: translateY(1px); }
 }
 g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
 .map-label.is-inactive { fill: var(--taupe); }
-.map-footnote { margin-top: var(--s7); color: var(--taupe); }
+.map-footnote { margin-top: var(--s6); color: var(--taupe); }
 .map-footnote-sub { margin-top: var(--s2); color: var(--taupe); opacity: 0.8; }
 
 /* ─── placard — spec §10C.5 ─── */
@@ -227,7 +234,7 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
 
 /* ─── rail indicator — spec §10C.6 ─── */
 .rail {
-  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  position: fixed; bottom: 92px; left: 50%; transform: translateX(-50%);
   z-index: 20; text-align: center;
 }
 .rail-ticks { display: flex; gap: 24px; align-items: center; justify-content: center; }
@@ -282,36 +289,64 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
 .credits-source a:hover { color: var(--gilt); }
 .credits-imgsrc { color: var(--taupe); text-transform: none; letter-spacing: 0.02em; }
 
-/* ─── cursor — spec §10C.7 ─── */
+/* ─── cursor — spec §10C.7 ───────────────────────────────────────────────
+   A thin light ring carrying its own dark contact shadow, so it reads against
+   the black corridor AND the bone map scrim without changing colour. */
 .cursor-ring {
   position: fixed; top: 0; left: 0; z-index: 80; pointer-events: none;
-  width: 18px; height: 18px; margin: -9px 0 0 -9px;
-  border: 1px solid rgba(36, 31, 26, 0.4); border-radius: 50%;
+  width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px;
+  border: 1px solid rgba(248, 244, 236, 0.9); border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(18, 15, 12, 0.42), 0 1px 5px rgba(0, 0, 0, 0.4);
   display: grid; place-items: center;
-  transition: width var(--d-fast), height var(--d-fast), margin var(--d-fast),
-    background-color var(--d-fast);
+  transition: width var(--d-fast) var(--e-out), height var(--d-fast) var(--e-out),
+    margin var(--d-fast) var(--e-out), background-color var(--d-fast),
+    border-color var(--d-fast);
+}
+.cursor-dot {
+  width: 2px; height: 2px; border-radius: 50%;
+  background: rgba(248, 244, 236, 0.95);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.75);
 }
 .cursor-ring.is-interactive {
-  width: 34px; height: 34px; margin: -17px 0 0 -17px;
-  background: rgba(36, 31, 26, 0.06);
+  width: 30px; height: 30px; margin: -15px 0 0 -15px;
+  background: rgba(201, 162, 39, 0.14); border-color: var(--gilt);
 }
-.cursor-ring.is-contracted { width: 10px; height: 10px; margin: -5px 0 0 -5px; background: var(--ink); }
-.cursor-label { position: absolute; top: 22px; color: var(--ink); white-space: nowrap; }
+.cursor-ring.is-down { width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; }
 
-/* ─── corridor movement hints ─── */
-.corridor-hints {
-  position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%);
-  z-index: 20; display: flex; gap: var(--s6); color: var(--bone);
-  opacity: 0.72; transition: opacity var(--d-slow) var(--e-both);
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.7);
-  pointer-events: none; white-space: nowrap;
+/* ─── control hints ──────────────────────────────────────────────────────
+   Softest type in the system, along the bottom. Settles rather than
+   disappears: still findable a minute in, never loud. */
+.control-hints {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  z-index: 20; display: flex; flex-wrap: wrap; justify-content: center;
+  gap: var(--s2) var(--s6); max-width: min(920px, 92vw);
+  color: var(--stone); opacity: 0.66;
+  font-size: 10px; letter-spacing: 0.13em;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
+  transition: opacity 900ms var(--e-both);
+  pointer-events: none;
 }
-.corridor-hints.is-faded { opacity: 0; }
-.corridor-hints kbd {
+.control-hints.is-settled { opacity: 0.3; }
+.control-hints.is-on-light {
+  color: var(--umber); text-shadow: none; bottom: 26px;
+}
+.control-hint { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.control-hints kbd {
   font: inherit; border: 1px solid currentColor; border-radius: 2px;
-  padding: 1px 5px; margin: 0 2px; opacity: 0.9;
+  padding: 1px 4px; opacity: 0.85; line-height: 1.3;
 }
-@media (max-width: 720px) { .corridor-hints { display: none; } }
+.hint-sep { padding: 0 4px; opacity: 0.7; }
+/* the rail indicator sits at the bottom too — lift the hints clear of it */
+.rail ~ .control-hints, .control-hints { bottom: 22px; }
+@media (max-width: 720px) { .control-hints { display: none; } }
+
+/* museum name, top right of the corridor */
+.corridor-title {
+  position: fixed; top: var(--s5); right: var(--s6); z-index: 20; margin: 0;
+  color: var(--stone); opacity: 0.6; text-align: right;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); pointer-events: none;
+}
+.corridor-sub { color: var(--taupe); }
 
 /* ─── Thread Pull ─── */
 .is-extracting, .is-extracting * { cursor: crosshair !important; }
@@ -391,5 +426,4 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
 
 @media (prefers-reduced-motion: reduce) {
   .canvas-wrap, .placard, .map-overlay, .reveal-vignette { transition-duration: 1ms !important; }
-  .map-overlay { animation: none; }
 }
