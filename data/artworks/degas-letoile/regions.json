@@ -1,0 +1,22 @@
+{
+  "regions": [
+    {
+      "id": "wings",
+      "label": "The wings",
+      "box": [0.0, 0.0, 0.38, 0.44],
+      "text": "Behind the painted flats wait the others: the shadowed legs of the corps de ballet under drooping skirts, and a man in black evening dress, faceless, hands in his pockets. He is an abonné — a season subscriber of the Paris Opéra, one of the men whose subscription bought the run of the wings and whose favour could make a dancer's career. Degas states the fact without comment, in the corner, where such facts actually stood."
+    },
+    {
+      "id": "star",
+      "label": "The star",
+      "box": [0.32, 0.40, 0.82, 0.90],
+      "text": "She is caught at the instant of the révérence, the bow taken alone after a solo: chin lifted, throat bare, eyes closed, one shoulder dipped. The footlights strike her from below — the lighting that makes theatrical faces strange — and burn the front of her tutu to a white flare scattered with flower colour. The sheet is pastel worked over a printed monotype, which is what gives the light its powdery, granular flare."
+    },
+    {
+      "id": "floor",
+      "label": "The stage floor",
+      "box": [0.0, 0.84, 1.0, 1.0],
+      "text": "We look down from a box above the stage, so the floor tips up behind the dancer like a wall of amber light and she floats against it with nothing else in focus. The viewpoint is the picture's first invention and its most modern feature — an angle no earlier painter of the theatre would have chosen, borrowed from the sightlines of the building itself and from the cropped framing of photography."
+    }
+  ]
+}

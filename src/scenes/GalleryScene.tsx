@@ -18,15 +18,18 @@ import { loadArtwork, prefetchAround, type LoadedArtwork } from '../glyph/artwor
 import { ArtworkPlane } from './ArtworkPlane';
 import { startReveal, endReveal, revealAnim } from '../transitions/reveal';
 import { LAMP } from './Lighting';
+import { artworkProjector, regionAt } from '../threadpull/state';
 import type { DeviceTier } from '../types';
 
 const SPACING = 8;
 const CAM_Z = 3.4;
+/** shared painting height — the museum hanging line (spec §10A.2) */
+export const PLANE_H = 2.4;
 const PAL = {
-  field: '#E8DFD0',
-  highlight: '#F2EBDF',
-  floorLight: '#E9E2D5',
-  vault: '#EFE8DB',
+  field: '#C6BAA6',
+  highlight: '#DACFBA',
+  floorLight: '#BDB3A2',
+  vault: '#D2C8B6',
 };
 
 /** screen-space projection of the active plane for the DOM placard (§10.7) */
@@ -68,21 +71,21 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
 
   // rail input: wheel / drag / arrows; scroll exits a reveal (spec §9)
   useEffect(() => {
-    gallery.target = index * SPACING;
+    gallery.goal = index * SPACING;
     gallery.x = index * SPACING;
     const wheelEnd = { t: 0 };
     const onWheel = (e: WheelEvent) => {
       const s = useStore.getState();
       if (s.revealed) endReveal(s.reducedMotion);
-      gallery.target += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * 0.01;
-      gallery.target = Math.max(-1.5, Math.min((artworks.length - 1) * SPACING + 1.5, gallery.target));
+      gallery.goal += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * 0.01;
+      gallery.goal = Math.max(-1.5, Math.min((artworks.length - 1) * SPACING + 1.5, gallery.goal));
       wheelEnd.t = performance.now();
       // magnetic snap after the wheel settles (spec §10.4)
       setTimeout(() => {
         if (performance.now() - wheelEnd.t < 140) return;
-        const i = Math.round(gallery.target / SPACING);
+        const i = Math.round(gallery.goal / SPACING);
         const clamped = Math.max(0, Math.min(artworks.length - 1, i));
-        gsap.to(gallery, { target: clamped * SPACING, duration: 0.5, ease: 'power3.out' });
+        gsap.to(gallery, { goal: clamped * SPACING, duration: 0.5, ease: 'power3.out' });
         if (clamped !== useStore.getState().index) setIndex(clamped);
       }, 150);
     };
@@ -93,12 +96,12 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
       if (!touch.current.active) return;
       const dx = touch.current.x - e.touches[0].clientX;
       touch.current.x = e.touches[0].clientX;
-      gallery.target += dx * 0.02;
+      gallery.goal += dx * 0.02;
     };
     const onTouchEnd = () => {
       touch.current.active = false;
-      const i = Math.max(0, Math.min(artworks.length - 1, Math.round(gallery.target / SPACING)));
-      gsap.to(gallery, { target: i * SPACING, duration: 0.5, ease: 'power3.out' });
+      const i = Math.max(0, Math.min(artworks.length - 1, Math.round(gallery.goal / SPACING)));
+      gsap.to(gallery, { goal: i * SPACING, duration: 0.5, ease: 'power3.out' });
       if (i !== useStore.getState().index) setIndex(i);
     };
     const onKey = (e: KeyboardEvent) => {
@@ -110,7 +113,7 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
         if (s.revealed) endReveal(s.reducedMotion);
         setIndex(next);
         gsap.to(gallery, {
-          target: next * SPACING,
+          goal: next * SPACING,
           duration: s.reducedMotion ? 0.05 : 0.7,
           ease: 'expo.out',
         });
@@ -137,7 +140,7 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
     const onJump = () => {
       const s = useStore.getState();
       gsap.to(gallery, {
-        target: s.index * SPACING,
+        goal: s.index * SPACING,
         duration: s.reducedMotion ? 0.05 : 0.7,
         ease: 'expo.out',
       });
@@ -146,7 +149,7 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
   }, []);
 
   useFrame((state, delta) => {
-    gallery.x = damp(gallery.x, gallery.target, 0.09, delta);
+    gallery.x = damp(gallery.x, gallery.goal, 0.09, delta);
 
     // pointer parallax, damped (spec §10B)
     const k = dampK(0.06, delta);
@@ -178,13 +181,29 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
     // project the active plane edge for the DOM placard (spec §10.7)
     const activeEntry = artworks[index];
     if (activeEntry) {
-      const h = 2.4;
+      const h = PLANE_H;
       const w = h * activeEntry.aspect;
       const v = new THREE.Vector3(index * SPACING + w / 2, 1.6, 0.1);
       v.project(camera);
       placardAnchor.x = (v.x * 0.5 + 0.5) * size.width;
       placardAnchor.y = (-v.y * 0.5 + 0.5) * size.height;
       placardAnchor.visible = true;
+
+      // Thread Pull: image space (u,v normalised, y-down) → viewport pixels.
+      // Recomputed from the live camera on every call, so a resize mid-flight
+      // simply produces new coordinates rather than a stale cached path.
+      artworkProjector.project = (u: number, vv: number) => {
+        const p = new THREE.Vector3(
+          index * SPACING + (u - 0.5) * w,
+          1.6 + (0.5 - vv) * h,
+          0.05,
+        );
+        p.project(camera);
+        return {
+          x: (p.x * 0.5 + 0.5) * size.width,
+          y: (-p.y * 0.5 + 0.5) * size.height,
+        };
+      };
     }
   });
 
@@ -231,33 +250,59 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
         <meshStandardMaterial color={PAL.field} roughness={0.72} />
       </mesh>
 
+      {/* per-artist accent panel behind each canvas */}
+      {artworks.map((a, i) => (
+        <mesh key={`bg${a.id}`} position={[i * SPACING, 2.5, -0.1]} receiveShadow>
+          <planeGeometry args={[PLANE_H * a.aspect + 1.9, 4.6]} />
+          <meshStandardMaterial color={a.accent} roughness={0.86} />
+        </mesh>
+      ))}
+
       {/* planes */}
       {artworks.map((a, i) => (
         <ArtworkPlane
           key={a.id}
           artwork={loaded.get(i) ?? null}
           position={[i * SPACING, 1.6, 0]}
+          height={PLANE_H}
           aspect={a.aspect}
           active={i === index}
           onEnter={() => {
             if (i !== index) return;
+            if (useStore.getState().extractionMode) return; // Shift = extract, not reveal
             if (matchMedia('(pointer: fine)').matches) startReveal(reducedMotion);
           }}
           onLeave={() => {
             if (i !== index) return;
+            useStore.getState().setHoveredRegion(null);
             if (matchMedia('(pointer: fine)').matches) endReveal(reducedMotion);
           }}
-          onTap={() => {
+          onMove={(u, v) => {
             if (i !== index) return;
-            if (matchMedia('(pointer: fine)').matches) return;
             const s = useStore.getState();
+            if (!s.extractionMode || s.pulledRegion) return;
+            const art = loaded.get(i);
+            const region = art ? regionAt(art.meta.regions ?? [], u, v) : null;
+            if (region?.id !== s.hoveredRegion?.id) s.setHoveredRegion(region);
+          }}
+          onTap={(u, v) => {
+            if (i !== index) return;
+            const s = useStore.getState();
+            // Thread Pull: Shift-click extracts the region under the cursor
+            if (s.extractionMode) {
+              const art = loaded.get(i);
+              const region = art ? regionAt(art.meta.regions ?? [], u, v) : null;
+              if (region) s.setPulledRegion(region);
+              return;
+            }
+            if (matchMedia('(pointer: fine)').matches) return;
             s.revealed ? endReveal(reducedMotion) : startReveal(reducedMotion);
           }}
         />
       ))}
 
       {/* lighting */}
-      <hemisphereLight args={['#FFF3E0', '#C9BCA6', 0.55]} />
+      <hemisphereLight args={['#FFF3E0', '#9C9080', 0.4]} />
       {artworks.map((_, i) => (
         <pointLight
           key={i}

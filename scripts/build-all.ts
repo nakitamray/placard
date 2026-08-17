@@ -23,7 +23,13 @@ const order: string[] = JSON.parse(
   fs.readFileSync(path.join(DATA, 'artworks', 'order.json'), 'utf8'),
 );
 
-const index: Array<{ id: string; artist: string; title: string; aspect: number }> = [];
+const index: Array<{
+  id: string;
+  artist: string;
+  title: string;
+  aspect: number;
+  accent: string;
+}> = [];
 
 for (const id of order) {
   console.log(`\n▸ ${id}`);
@@ -35,9 +41,15 @@ for (const id of order) {
   await buildGlyphs(id, '-lo', cfg.minCell * 2);
 
   const placard = JSON.parse(fs.readFileSync(path.join(artworkData(id), 'placard.json'), 'utf8'));
+  // Thread Pull semantic regions (normalised boxes → readable passages)
+  const regionsPath = path.join(artworkData(id), 'regions.json');
+  const regions = fs.existsSync(regionsPath)
+    ? JSON.parse(fs.readFileSync(regionsPath, 'utf8')).regions
+    : [];
   const full = await sharp(path.join(artworkPublic(id), 'full.jpg')).metadata();
   const meta = {
     ...placard,
+    regions,
     corpus: {
       length: corpus.length,
       segments: corpus.segments,
@@ -60,6 +72,8 @@ for (const id of order) {
     artist: placard.artist,
     title: placard.title,
     aspect: (full.width ?? 1) / (full.height ?? 1),
+    // per-artist wall tone, so each painting reads against its own ground
+    accent: placard.accentColor ?? '#6E6B63',
   });
 }
 

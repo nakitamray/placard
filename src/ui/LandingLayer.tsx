@@ -55,12 +55,19 @@ export function LandingLayer() {
     let raf = 0;
     const cur = { bx: 0, by: 0, tx: 0 };
     const tick = () => {
-      cur.bx += (pointer.x * -24 - cur.bx) * 0.06;
-      cur.by += (pointer.y * -24 - cur.by) * 0.06;
-      cur.tx += (pointer.x * 6 - cur.tx) * 0.06;
-      if (bgRef.current) bgRef.current.style.transform = `translate(${cur.bx}px, ${cur.by}px)`;
-      if (contentRef.current)
-        contentRef.current.style.transform = `translate(${cur.tx}px, 0)`;
+      const nbx = cur.bx + (pointer.x * -24 - cur.bx) * 0.06;
+      const nby = cur.by + (pointer.y * -24 - cur.by) * 0.06;
+      const ntx = cur.tx + (pointer.x * 6 - cur.tx) * 0.06;
+      // stop writing transforms once the layers have settled, so the DOM
+      // goes quiet when the pointer does (sub-pixel churn otherwise keeps
+      // every element in the tree perpetually "moving")
+      if (Math.abs(nbx - cur.bx) + Math.abs(nby - cur.by) + Math.abs(ntx - cur.tx) > 0.01) {
+        cur.bx = nbx;
+        cur.by = nby;
+        cur.tx = ntx;
+        if (bgRef.current) bgRef.current.style.transform = `translate(${nbx}px, ${nby}px)`;
+        if (contentRef.current) contentRef.current.style.transform = `translate(${ntx}px, 0)`;
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -89,10 +96,18 @@ export function LandingLayer() {
     // (foreground fastest) while the corridor, already rendering behind,
     // dollies in from the mouth (spec §11.1)
     e.currentTarget.classList.add('is-chosen');
+    const finish = () => {
+      setLeaving(false);
+      gsap.set([root, bgRef.current, contentRef.current], { clearProps: 'all' });
+    };
+    // the overlay must come down even if the timeline never reports complete
+    // (a stalled ticker or a killed tween would otherwise leave a full-screen
+    // layer sitting over the corridor, swallowing every click)
+    const failsafe = window.setTimeout(finish, 1600);
     const tl = gsap.timeline({
       onComplete: () => {
-        setLeaving(false);
-        gsap.set([root, bgRef.current, contentRef.current], { clearProps: 'all' });
+        window.clearTimeout(failsafe);
+        finish();
       },
     });
     tl.to(contentRef.current, { opacity: 0, scale: 1.22, duration: 0.7, ease: 'power2.in' }, 0.15);
@@ -102,7 +117,7 @@ export function LandingLayer() {
   };
 
   return (
-    <div className="landing" ref={rootRef}>
+    <div className={`landing ${leaving ? 'is-leaving' : ''}`} ref={rootRef}>
       <div className="landing-bg" ref={bgRef} aria-hidden>
         {images.map((src, i) => (
           <div

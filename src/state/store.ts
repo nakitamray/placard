@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { canTransition } from './machine';
-import type { ArtworkIndexEntry, GalleryData, Phase } from '../types';
+import type { ArtworkIndexEntry, ArtworkRegion, GalleryData, Phase } from '../types';
 
 interface AppStore {
   phase: Phase;
@@ -19,6 +19,13 @@ interface AppStore {
   reducedMotion: boolean;
   seenIntro: boolean;
 
+  /** Thread Pull: Shift held over the canvas puts the cursor in extraction mode */
+  extractionMode: boolean;
+  /** the region the cursor is over while in extraction mode */
+  hoveredRegion: ArtworkRegion | null;
+  /** the region currently extracted into the reading panel */
+  pulledRegion: ArtworkRegion | null;
+
   artworks: ArtworkIndexEntry[];
   gallery: GalleryData | null;
 
@@ -30,6 +37,9 @@ interface AppStore {
   setPlacardExpanded: (e: boolean) => void;
   setCreditsOpen: (o: boolean) => void;
   setData: (artworks: ArtworkIndexEntry[], gallery: GalleryData) => void;
+  setExtractionMode: (e: boolean) => void;
+  setHoveredRegion: (r: ArtworkRegion | null) => void;
+  setPulledRegion: (r: ArtworkRegion | null) => void;
 }
 
 export const useStore = create<AppStore>()(
@@ -47,6 +57,10 @@ export const useStore = create<AppStore>()(
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     seenIntro:
       typeof window !== 'undefined' && sessionStorage.getItem('placard.seenIntro') === '1',
+
+    extractionMode: false,
+    hoveredRegion: null,
+    pulledRegion: null,
 
     artworks: [],
     gallery: null,
@@ -75,6 +89,10 @@ export const useStore = create<AppStore>()(
     setPlacardExpanded: (e) => set({ placardExpanded: e }),
     setCreditsOpen: (o) => set({ creditsOpen: o }),
     setData: (artworks, gallery) => set({ artworks, gallery, galleryId: gallery.id }),
+    setExtractionMode: (e) =>
+      set(e ? { extractionMode: true } : { extractionMode: false, hoveredRegion: null }),
+    setHoveredRegion: (r) => set({ hoveredRegion: r }),
+    setPulledRegion: (r) => set({ pulledRegion: r }),
   })),
 );
 

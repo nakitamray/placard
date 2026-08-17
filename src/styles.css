@@ -92,6 +92,8 @@ button:active { transform: translateY(1px); }
 
 /* ─── landing — spec §10C.3 ─── */
 .landing { position: fixed; inset: 0; z-index: 40; background: var(--ink); overflow: hidden; }
+/* once the portal has started, the layer must never intercept a click */
+.landing.is-leaving { pointer-events: none; }
 .landing-bg { position: absolute; inset: -32px; }
 .landing-img {
   position: absolute; inset: 0;
@@ -295,6 +297,93 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
 }
 .cursor-ring.is-contracted { width: 10px; height: 10px; margin: -5px 0 0 -5px; background: var(--ink); }
 .cursor-label { position: absolute; top: 22px; color: var(--ink); white-space: nowrap; }
+
+/* ─── corridor movement hints ─── */
+.corridor-hints {
+  position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%);
+  z-index: 20; display: flex; gap: var(--s6); color: var(--bone);
+  opacity: 0.72; transition: opacity var(--d-slow) var(--e-both);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.7);
+  pointer-events: none; white-space: nowrap;
+}
+.corridor-hints.is-faded { opacity: 0; }
+.corridor-hints kbd {
+  font: inherit; border: 1px solid currentColor; border-radius: 2px;
+  padding: 1px 5px; margin: 0 2px; opacity: 0.9;
+}
+@media (max-width: 720px) { .corridor-hints { display: none; } }
+
+/* ─── Thread Pull ─── */
+.is-extracting, .is-extracting * { cursor: crosshair !important; }
+.is-extracting .cursor-ring { opacity: 0; }
+
+.tp-outline {
+  position: fixed; inset: 0; z-index: 18; pointer-events: none;
+  width: 100vw; height: 100vh;
+}
+.tp-outline rect {
+  fill: rgba(201, 162, 39, 0.07);
+  stroke: var(--gilt); stroke-width: 1; stroke-dasharray: 3 3;
+  opacity: 0; transition: opacity var(--d-fast);
+}
+.tp-prompt {
+  position: fixed; top: var(--s5); left: 50%; transform: translateX(-50%);
+  z-index: 24; color: var(--gilt); pointer-events: none;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+}
+
+.tp-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 26;
+  width: min(430px, 92vw);
+  background: var(--bone);
+  border-left: 1px solid var(--limestone);
+  box-shadow: -24px 0 60px rgba(36, 31, 26, 0.24);
+  display: flex; flex-direction: column;
+  animation: tp-in var(--d-base) var(--e-out);
+}
+@keyframes tp-in { from { transform: translateX(18px); opacity: 0; } to { transform: none; opacity: 1; } }
+.tp-panel.is-closing { pointer-events: none; }
+
+.tp-head {
+  padding: var(--s6) var(--s6) var(--s4);
+  border-bottom: 1px solid var(--limestone);
+  position: relative;
+}
+.tp-eyebrow { color: var(--gilt); margin: 0 0 var(--s2); }
+.tp-title { margin: 0; }
+.tp-close {
+  position: absolute; top: var(--s6); right: var(--s6); color: var(--umber);
+}
+.tp-close:hover { color: var(--gilt); }
+
+.tp-body {
+  position: relative; flex: 1; overflow-y: auto;
+  padding: var(--s6); scrollbar-width: thin;
+}
+/* in flight: the canvas's own monospace, so the seam never shows */
+.tp-flight {
+  position: absolute; top: var(--s6); left: var(--s6); right: var(--s6);
+  margin: 0;
+  font-family: 'Source Code Pro', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13px; line-height: 26px; letter-spacing: 0.02em;
+  color: var(--ink); word-break: break-word;
+}
+.tp-flight span { display: inline-block; white-space: pre; will-change: transform, opacity; }
+.tp-settled { opacity: 0; }
+.tp-settled p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .tp-settled { opacity: 1; } .tp-flight { display: none; } }
+
+.tp-foot {
+  padding: var(--s4) var(--s6) var(--s6);
+  border-top: 1px solid var(--limestone);
+}
+.tp-pin { color: var(--gilt); }
+.tp-hint { color: var(--taupe); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 
 /* ─── screen-reader proxies ─── */
 .sr-proxies { position: fixed; left: -9999px; top: 0; }

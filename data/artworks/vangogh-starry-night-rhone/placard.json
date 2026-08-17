@@ -26,5 +26,6 @@
     "source": "Wikimedia Commons (PD-Art) — placeholder rendering shipped until the scan is dropped into data/artworks/vangogh-starry-night-rhone/source.jpg",
     "license": "PD-Art",
     "photoCredit": ""
-  }
+  },
+  "accentColor": "#3F4E66"
 }

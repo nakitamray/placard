@@ -1,0 +1,28 @@
+{
+  "regions": [
+    {
+      "id": "curtain",
+      "label": "The curtain",
+      "box": [0.0, 0.0, 0.24, 1.0],
+      "text": "At the left edge hangs a patterned curtain, its flecks scattered like stars across a dark ground. It is the one passage of ornament Whistler allowed himself, and it does structural work: without it the wall would run flat to the frame edge and the picture would lose its left-hand weight. He painted it thin, dragging a loaded brush across dry paint so the flecks sit on the surface rather than in it."
+    },
+    {
+      "id": "etching",
+      "label": "The framed etching",
+      "box": [0.25, 0.05, 0.50, 0.29],
+      "text": "The print on the wall is one of Whistler's own Thames etchings, hung high and slightly left of centre. Placing a picture inside a picture is an old device for declaring what kind of object you are looking at. Here it also fixes the grid: the rectangle of the frame answers the rectangle of the curtain, the dado, and the canvas itself, and the whole arrangement locks together."
+    },
+    {
+      "id": "profile",
+      "label": "The profile",
+      "box": [0.50, 0.22, 0.72, 0.44],
+      "text": "Anna McNeill Whistler sits in strict profile, the pose of a coin or a memorial relief. Her face is the lightest note in the upper half of the canvas and the eye returns to it constantly, though Whistler insisted this was incidental — an arrangement of tone, he said, and what can or ought the public to care about the identity of the portrait. The lace cap is painted wet into wet, a few strokes standing for the whole."
+    },
+    {
+      "id": "dress",
+      "label": "The black dress",
+      "box": [0.38, 0.52, 0.88, 1.0],
+      "text": "The dress is the great dark mass that anchors the lower two-thirds of the canvas, and it is not simply black. Within it are warm and cool notes laid with extraordinary delicacy, so the shape reads as cloth with weight and fall rather than a silhouette cut from paper. The white handkerchief folded over her hands is the only interruption, and it is placed exactly where the composition needs a stop."
+    }
+  ]
+}

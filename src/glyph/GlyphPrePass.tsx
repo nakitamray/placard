@@ -13,6 +13,7 @@ import { getGlyphAtlas } from './glyphAtlas';
 import { createGlyphMaterial } from './GlyphMaterial';
 import type { LoadedArtwork } from './artworkLoader';
 import { useStore } from '../state/store';
+import { threadPullAnim } from '../threadpull/state';
 
 export const glyphRT: { current: THREE.WebGLRenderTarget | null } = { current: null };
 
@@ -113,6 +114,14 @@ export function GlyphPrePass({
     u.uBreathe.value = timeRef.current * 1.4;
     u.uDissolve.value = useStore.getState().dissolve;
 
+    // Thread Pull: fade the extracted region out of the canvas while the DOM
+    // text assembles, and hold its characters still (spec: the rest of the
+    // painting remains intact and moving)
+    const tp = threadPullAnim;
+    u.uDetachAmt.value = tp.detach;
+    u.uCharOffsetFrozen.value = tp.frozenOffset;
+    u.uDetachBox.value.set(tp.box[0], tp.box[1], tp.box[2], tp.box[3]);
+
     const prev = gl.getRenderTarget();
     gl.setRenderTarget(rt);
     gl.setClearColor('#241f1a', 1);
@@ -125,6 +134,7 @@ export function GlyphPrePass({
       count: artwork.glyphs.count,
       corpusLen: artwork.corpusLen,
       charOffset: u.uCharOffset.value,
+      detach: tp.detach,
     };
   }, -1); // negative priority = before the default render (spec §7.3)
 

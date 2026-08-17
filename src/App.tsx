@@ -12,6 +12,8 @@ import { MapOverlay } from './ui/MapOverlay';
 import { Placard } from './ui/Placard';
 import { RailIndicator } from './ui/RailIndicator';
 import { Credits } from './ui/Credits';
+import { ThreadPull } from './ui/ThreadPull';
+import { CorridorHints } from './ui/CorridorHints';
 import { CursorRing } from './ui/CursorRing';
 import { LoadingBar } from './ui/LoadingBar';
 import { FlashLayer } from './ui/Flash';
@@ -62,9 +64,11 @@ export default function App() {
       if (e.key !== 'Escape') return;
       const s = useStore.getState();
       if (s.creditsOpen) return s.setCreditsOpen(false);
+      if (s.pulledRegion) return s.setPulledRegion(null);
       if (s.phase === 'gallery' && s.revealed) return endReveal(s.reducedMotion);
       if (s.phase === 'gallery') return s.setPhase('map');
       if (s.phase === 'map') return s.setPhase('corridor');
+      if (s.phase === 'corridor') return s.setPhase('landing');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -90,17 +94,22 @@ export default function App() {
         <Canvas
           dpr={[1, tier.dprCap]}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
-          camera={{ fov: 45, position: [0, 1.6, 4], near: 0.1, far: 120 }}
+          shadows={{ type: THREE.PCFSoftShadowMap }}
+          camera={{ fov: 48, position: [0, 1.6, 4], near: 0.1, far: 120 }}
           onCreated={({ gl }) => {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
-            gl.toneMappingExposure = 1.15; // spec §10A.5
+            // pulled down from the spec's 1.15: the corridor is now lit by
+            // raking sun rather than flat fill, so highlights carry the scene
+            gl.toneMappingExposure = 0.95;
             gl.outputColorSpace = THREE.SRGBColorSpace;
           }}
         >
-          <color attach="background" args={['#EFE8DB']} />
+          <color attach="background" args={['#171412']} />
+          {/* light haze for depth only — the far bays should still read */}
+          <fog attach="fog" args={['#2A2119', 38, 120]} />
           <Suspense fallback={null}>
-            <Environment intensity={0.45} />
-            <HemisphereFill intensity={0.4} />
+            <Environment intensity={inGallery ? 0.4 : 0.24} />
+            <HemisphereFill intensity={inGallery ? 0.34 : 0.12} />
             {inCorridor && artworks.length > 0 && <CorridorScene />}
             {inGallery && <GalleryScene tier={tier} />}
           </Suspense>
@@ -114,7 +123,16 @@ export default function App() {
       <LandingLayer />
       <MapOverlay />
       <Placard tier={tier} />
+      <ThreadPull tier={tier} />
       <RailIndicator />
+      {phase === 'corridor' && (
+        <>
+          <button className="caption gallery-back" onClick={() => setPhase('landing')}>
+            ← Entrance
+          </button>
+          <CorridorHints />
+        </>
+      )}
       {inGallery && (
         <button className="caption gallery-back" onClick={() => setPhase('map')}>
           ← Map

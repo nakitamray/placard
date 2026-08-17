@@ -26,5 +26,6 @@
     "source": "Wikimedia Commons (PD-Art) — placeholder rendering shipped until the scan is dropped into data/artworks/whistler-mother/source.jpg",
     "license": "PD-Art",
     "photoCredit": ""
-  }
+  },
+  "accentColor": "#6E6B63"
 }

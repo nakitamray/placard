@@ -3,6 +3,17 @@ export interface ArtworkIndexEntry {
   artist: string;
   title: string;
   aspect: number;
+  /** per-artist wall tone behind the painting */
+  accent: string;
+}
+
+/** Thread Pull: a semantic area of the canvas mapped to a readable passage. */
+export interface ArtworkRegion {
+  id: string;
+  label: string;
+  /** normalised x0, y0, x1, y1 — image space, y-down */
+  box: [number, number, number, number];
+  text: string;
 }
 
 export interface CorpusSource {
@@ -37,6 +48,8 @@ export interface ArtworkMeta {
     url: string;
   };
   image: { file: string; source: string; license: string; photoCredit: string };
+  accentColor?: string;
+  regions: ArtworkRegion[];
   corpus: {
     length: number;
     segments: Array<{ sourceId: string; offset: number; length: number }>;

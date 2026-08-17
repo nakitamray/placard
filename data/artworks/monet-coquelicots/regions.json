@@ -1,0 +1,22 @@
+{
+  "regions": [
+    {
+      "id": "sky",
+      "label": "The sky",
+      "box": [0.0, 0.0, 1.0, 0.42],
+      "text": "Nearly half the canvas is weather. The cloud is laid in broad, wet strokes of white and grey over a blue that shifts warm and cool across its width, and the line of trees closing the horizon keeps it from floating away. This is painting done outdoors and quickly, before the light changed — the whole doctrine of impressionism visible in the speed of the marks."
+    },
+    {
+      "id": "poppies",
+      "label": "The poppy field",
+      "box": [0.0, 0.46, 0.62, 1.0],
+      "text": "Close to, the poppies are only touches of vermilion — some of them absurdly large, floating free of any stem. The nearer the flower, the bigger and looser the dab, until botany dissolves into a pure vibration of red against green. Contemporaries found this careless. It is in fact exact: Monet is painting not the flowers but the experience of seeing a field of them at a glance, in sunlight, from a moving vantage."
+    },
+    {
+      "id": "walkers",
+      "label": "The walkers",
+      "box": [0.52, 0.40, 0.88, 1.0],
+      "text": "A woman with a parasol and a small boy appear twice — once at the crest of the slope against the sky, once again at the bottom of the field, the same pair a minute later on the same walk. Between the two pairs runs an invisible diagonal path, and the eye takes it without being asked. They are Camille, the painter's wife, and Jean, their son."
+    }
+  ]
+}

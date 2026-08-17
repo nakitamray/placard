@@ -1,0 +1,22 @@
+{
+  "regions": [
+    {
+      "id": "great-bear",
+      "label": "The Great Bear",
+      "box": [0.02, 0.0, 0.98, 0.32],
+      "text": "On the aquamarine field of the sky the Great Bear is a sparkling green and pink, whose discreet paleness contrasts with the brutal gold of the gas. Van Gogh took care that the constellation should be recognisable — this is a night observed, not invented. Each star is a soft burst of separated strokes, white and green and rose, laid over a sky that he described to Theo as aquamarine rather than black."
+    },
+    {
+      "id": "gaslight",
+      "label": "The gaslight on the water",
+      "box": [0.0, 0.44, 1.0, 0.82],
+      "text": "The gas is yellow and the reflections are russet gold descending down to green-bronze. The new municipal lamps of Arles threw their light across the Rhône, and Van Gogh dragged that gold down through royal blue in long molten columns, ragged at the edges where the current broke them. Two kinds of light share this canvas — the stars above and the town's own burning below — and the river between them turns like shot silk."
+    },
+    {
+      "id": "lovers",
+      "label": "The lovers",
+      "box": [0.12, 0.78, 0.38, 1.0],
+      "text": "Two colourful little figures of lovers in the foreground, he wrote, almost as an afterthought at the end of the description. They walk at the water's edge with their backs to us, small and unremarkable, and they are the note of ordinary human warmth Van Gogh rarely omitted even from his most visionary pictures. Without them the night would be sublime and empty; with them it is a place where people live."
+    }
+  ]
+}

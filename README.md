@@ -44,6 +44,47 @@ The build prefers `source.jpg` automatically; nothing else changes. Check
 `data/artworks/{id}/preview.png` after building — it is the fastest iteration
 loop for tuning `config.json` (variance threshold, cell sizes, palette).
 
+## Moving through the exhibition
+
+| Where | Input | What happens |
+|---|---|---|
+| Corridor | move the mouse | look around — wide enough to face either wall and read the canvases |
+| Corridor | <kbd>↑</kbd> / <kbd>↓</kbd> | walk forward / backward |
+| Corridor | <kbd>Shift</kbd> or <kbd>Enter</kbd> | accelerate to the apse at the far end |
+| Corridor | wheel / drag | also moves along the rail |
+| Gallery | wheel / <kbd>←</kbd> <kbd>→</kbd> | move between paintings, with magnetic snap |
+| Gallery | hover / tap a painting | the text dissolves and the painting is revealed |
+| Gallery | hold <kbd>Shift</kbd> + hover | **Thread Pull** — extract a region's text to read it |
+| Anywhere | <kbd>Esc</kbd> | step back one level |
+
+Every screen also has a visible back control, and `Esc` walks the whole way
+out: artwork → gallery → map → corridor → entrance.
+
+## Thread Pull
+
+Hold <kbd>Shift</kbd> over a painting and the cursor enters extraction mode.
+Hovering a semantic region — the sky, the profile, the clown in the
+foreground — lifts that region's text out of the artwork and assembles it
+into a reading panel.
+
+- **Regions** are hand-authored per artwork in `data/artworks/{id}/regions.json`:
+  a normalised box and the passage it carries. A near miss snaps to the
+  closest box, so hunting for an invisible edge never feels broken.
+- **The canvas** keeps its paint. Extraction drains the *letterforms* out of
+  the region while its colour wash stays, so the area reads as having had
+  its text pulled from it rather than as a hole punched in the picture. The
+  rest of the painting keeps drifting; the extracted characters freeze.
+- **The flight** launches DOM spans from the exact viewport coordinates of
+  their home cells — projected live from the 3D camera, so resizing mid-flight
+  simply yields new coordinates — set in the same monospace as the canvas
+  glyphs. Only once they land does the block cross-fade into the reading
+  serif. The typeface changes at the settle, never during the flight.
+- **Release** <kbd>Shift</kbd> and they fly home; click **Pin this thread** to
+  keep the panel open for a long passage. The timeline is a single
+  interruptible GSAP instance, so rapid toggling reverses cleanly.
+- Only the first 320 characters animate individually; the tail fades in as a
+  block, and every animated property is a transform or opacity.
+
 ## How it works
 
 - **Build time** (`scripts/`): each painting is analysed once by a quadtree
@@ -59,11 +100,19 @@ loop for tuning `config.json` (variance threshold, cell sizes, palette).
   positions and colours stay fixed, so the painting holds still while its
   history scrolls through it. The mesh renders into a reused render target
   sampled by the active artwork plane; only the nearest artwork is live.
-- **Scenes** (`src/scenes/`): a procedural 12-bay corridor (Louis XVI-ish
-  boiserie register, reflective floor, warm 3000K lamps, terminal apse — kept
-  deliberately light and warm per the spec's brightness guardrail) and a
-  horizontal gallery rail with magnetic snap, spotlight reveal and a
-  projected DOM placard.
+- **Tone** — a letterform covers only ~20–30% of its cell, so drawing letters
+  alone over a dark ground reproduces a painting at a quarter of its true
+  luminance: every canvas reads as black with faint text on it. Each glyph
+  instead fills its cell with the cell's mean colour at `uWash` opacity and
+  draws the letterform brighter on top. The painting's tonal structure is
+  correct at a distance; up close the surface is unmistakably moving type.
+- **Scenes** (`src/scenes/`): a procedural 12-bay corridor (boiserie
+  register, reflective floor, terminal apse) lit by a low sun through the
+  clerestory — the mullions are the only shadow casters, so they throw hard
+  bars of light across the floor while the wall itself passes light through.
+  Each artist's canvas hangs on its own accent-toned panel. The gallery is a
+  horizontal rail with magnetic snap, spotlight reveal and a projected DOM
+  placard.
 
 ## Deviations from the spec (and why)
 
@@ -75,6 +124,7 @@ loop for tuning `config.json` (variance threshold, cell sizes, palette).
 | `@react-three/postprocessing` bloom | Omitted for v1 | Keeps the frame budget honest under software rendering; the gilt reads via env reflections |
 | T1 clip-path aperture | Push-through scale/fade layers | A true "hole" clip (landing visible *outside* an expanding window) isn't expressible with a single `clip-path: inset()`; the layered push-through reads correctly and stays cheap |
 | CC0 sculpture scans | Abstracted procedural marble forms | Scan the World / Smithsonian unreachable from the build environment |
+| §10A.6 brightness guardrail (flat, uniformly light corridor) | Raking late-afternoon sun, deep shade between bays | Deliberate art-direction change. The guardrail's real intent — never a murky interior that hides modelling — still holds: the vault is the brightest large surface and the sunlit floor is near-white. Contrast does the work flat fill used to |
 
 Everything else — the binary format, corpus reading order, staggered dissolve,
 reveal choreography ("add light to the artwork, don't darken the room"),

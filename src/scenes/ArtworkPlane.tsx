@@ -49,6 +49,7 @@ export function ArtworkPlane({
   active,
   onEnter,
   onLeave,
+  onMove,
   onTap,
 }: {
   artwork: LoadedArtwork | null;
@@ -58,7 +59,9 @@ export function ArtworkPlane({
   active: boolean;
   onEnter?: () => void;
   onLeave?: () => void;
-  onTap?: () => void;
+  /** u,v normalised across the canvas, y-down — image space */
+  onMove?: (u: number, v: number) => void;
+  onTap?: (u: number, v: number) => void;
 }) {
   const width = height * aspect;
   const matRef = useRef<THREE.ShaderMaterial>(null);
@@ -116,7 +119,14 @@ export function ArtworkPlane({
         position={[0, 0, 0.045]}
         onPointerEnter={onEnter}
         onPointerLeave={onLeave}
-        onClick={onTap}
+        onPointerMove={(e) => {
+          if (!onMove || !e.uv) return;
+          onMove(e.uv.x, 1 - e.uv.y);
+        }}
+        onClick={(e) => {
+          if (!onTap) return;
+          onTap(e.uv?.x ?? 0.5, e.uv ? 1 - e.uv.y : 0.5);
+        }}
       >
         <planeGeometry args={[width, height]} />
         <shaderMaterial
