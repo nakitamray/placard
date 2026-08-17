@@ -201,18 +201,25 @@ function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
     <group>
       {/* sized to the room it closes — anything taller reads as a slab
           floating above the roofline rather than as the end of the corridor */}
-      <mesh
-        position={[0, (d.vaultHeight + 1) / 2, d.apseZ]}
-        receiveShadow
-      >
+      <mesh position={[0, (d.vaultHeight + 1) / 2, d.apseZ]} receiveShadow>
         <planeGeometry args={[d.halfWidth * 2.1, d.vaultHeight + 1]} />
-        <meshStandardMaterial color={p.wallDeep} roughness={0.86} />
+        {museum.style.fixtures.glazedEnd ? (
+          // a window, not a wall: the light at the end of the corridor is
+          // outside, which is what makes a covered court read as a courtyard
+          <meshBasicMaterial color={p.sky} toneMapped={false} />
+        ) : (
+          <meshStandardMaterial color={p.wallDeep} roughness={0.86} />
+        )}
       </mesh>
+      {museum.style.fixtures.glazedEnd && <EndGlazing d={d} colour={p.molding} />}
       {!museum.style.fixtures.clock && (
         <group position={[0, hangHeight(d) + 0.5, d.apseZ + 0.1]}>
           <mesh position={[0, 0, -0.02]}>
             <planeGeometry args={[aw + 1.6, h + 1.6]} />
-            <meshStandardMaterial color={a.accent} roughness={0.88} />
+            <meshStandardMaterial
+              color={museum.style.fixtures.glazedEnd ? p.wall : a.accent}
+              roughness={0.88}
+            />
           </mesh>
           <OrnateFrame
             kind={museum.style.frame}
@@ -235,6 +242,32 @@ function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
       )}
     </group>
   );
+}
+
+/** The mullion grid over a glazed corridor end. */
+function EndGlazing({ d, colour }: { d: Dims; colour: string }) {
+  const w = d.halfWidth * 2.1;
+  const h = d.vaultHeight + 1;
+  const cols = Math.round(w / 1.15);
+  const rows = Math.round(h / 1.35);
+  const bars: React.ReactNode[] = [];
+  for (let i = 1; i < cols; i++) {
+    bars.push(
+      <mesh key={`c${i}`} position={[-w / 2 + (i / cols) * w, h / 2, d.apseZ + 0.06]}>
+        <boxGeometry args={[0.09, h, 0.09]} />
+        <meshStandardMaterial color={colour} roughness={0.6} />
+      </mesh>,
+    );
+  }
+  for (let j = 1; j < rows; j++) {
+    bars.push(
+      <mesh key={`r${j}`} position={[0, (j / rows) * h, d.apseZ + 0.06]}>
+        <boxGeometry args={[w, 0.09, 0.09]} />
+        <meshStandardMaterial color={colour} roughness={0.6} />
+      </mesh>,
+    );
+  }
+  return <>{bars}</>;
 }
 
 /** Warm lamps washing the walls, plus the bright pool at the far end. */

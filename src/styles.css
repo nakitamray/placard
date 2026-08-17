@@ -44,6 +44,10 @@ body { margin: 0; overflow: hidden; background: var(--ink); }
 .display { font-size: 34px; line-height: 40px; letter-spacing: -0.01em; font-weight: 500; }
 .hero    { font-size: 54px; line-height: 58px; letter-spacing: -0.02em; font-weight: 500; }
 @media (max-width: 720px) { .hero { font-size: 38px; line-height: 42px; } }
+@media (max-height: 780px) {
+  .hero { font-size: 40px; line-height: 44px; }
+  .landing-content .museum-row { min-height: 46px; }
+}
 
 .hairline { border: 0; border-top: 1px solid var(--limestone); margin: var(--s4) 0; }
 
@@ -109,19 +113,28 @@ button:active { transform: translateY(1px); }
   position: absolute; inset: 0;
   background: radial-gradient(ellipse at center, rgba(36,31,26,0.30) 0%, rgba(36,31,26,0.75) 100%);
 }
+/* Centred with flex, NOT with translateY(-50%): the pointer-parallax loop
+   writes `transform` on this element every frame, which would overwrite a
+   transform-based centring and drop the whole block half its own height down
+   the page — taking the last museums in the list off the bottom of the
+   screen. Anything that needs to move this element must go through flex or
+   margins, never `transform`. Scrolls rather than clips when it cannot fit. */
 .landing-content {
-  position: absolute; top: 50%; left: 12vw; transform: translateY(-50%);
+  position: absolute; top: 0; bottom: 0; left: 12vw;
+  display: flex; flex-direction: column; justify-content: center;
   width: 480px; max-width: 88vw; color: var(--bone);
+  padding: 4vh 0; overflow-y: auto; scrollbar-width: none;
 }
-.landing-mark { color: var(--gilt); letter-spacing: 0.35em; margin: 0 0 var(--s5); }
-.landing-content .hero { margin: 0 0 var(--s5); }
+.landing-content::-webkit-scrollbar { display: none; }
+.landing-mark { color: var(--gilt); letter-spacing: 0.35em; margin: 0 0 var(--s4); flex: none; }
+.landing-content .hero { margin: 0 0 var(--s4); flex: none; }
 .landing-content .hairline { border-color: rgba(216, 205, 186, 0.4); width: 220px; margin-left: 0; }
-.landing-choose { color: var(--stone); opacity: 0.85; margin: var(--s5) 0 var(--s3); }
-.museum-list { list-style: none; margin: 0; padding: 0; }
+.landing-choose { color: var(--stone); opacity: 0.85; margin: var(--s4) 0 var(--s2); flex: none; }
+.museum-list { list-style: none; margin: 0; padding: 0; flex: none; }
 .museum-list li { border-bottom: 1px solid rgba(216, 205, 186, 0.28); }
 .museum-row {
   display: flex; align-items: center; justify-content: space-between; gap: var(--s4);
-  width: 100%; min-height: 62px; padding: var(--s2) 0;
+  width: 100%; min-height: 54px; padding: var(--s2) 0;
   position: relative; text-align: left; color: var(--bone);
 }
 .museum-row .museum-name { font-size: 20px; transition: transform var(--d-fast) var(--e-out); }
@@ -141,7 +154,7 @@ button:active { transform: translateY(1px); }
 .landing-error { color: #E2A08A; margin-top: var(--s4); }
 .landing-empty code { font-family: ui-monospace, Menlo, Consolas, monospace; }
 
-.credits-link { margin-top: var(--s6); color: var(--taupe); }
+.credits-link { margin-top: var(--s5); color: var(--taupe); flex: none; align-self: flex-start; }
 .credits-link:hover { color: var(--gilt); }
 
 .skip-link {
@@ -244,12 +257,12 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
   transition: width 300ms var(--e-out), background-color 300ms;
 }
 .rail-tick.is-active { width: 24px; height: 2px; background-color: var(--gilt); background-clip: content-box; }
-.rail-label { color: var(--umber); margin: 2px 0 0; }
+.rail-label { color: var(--bone); margin: 4px 0 0; font-size: 11px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.6); }
 
-.gallery-back {
-  position: fixed; top: var(--s5); left: var(--s6); z-index: 20; color: var(--umber);
-}
-.gallery-back:hover { color: var(--gilt); }
+/* positioning only — the treatment is with .corridor-title, so both top
+   corners of the screen read as one pair */
+.gallery-back { position: fixed; top: var(--s5); left: var(--s6); z-index: 20; }
 
 /* ─── reveal vignette — spec §10.6: 18% opacity, generous radius ─── */
 .reveal-vignette {
@@ -314,39 +327,62 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
 .cursor-ring.is-down { width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; }
 
 /* ─── control hints ──────────────────────────────────────────────────────
-   Softest type in the system, along the bottom. Settles rather than
-   disappears: still findable a minute in, never loud. */
+   Quiet, but legible. The exhibition labels nothing else, so this line is the
+   only place the controls are stated — it can be understated, it cannot be
+   unreadable. It sits on its own scrim so it holds against a white marble
+   floor and a black vault alike, and settles rather than disappearing. */
 .control-hints {
-  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
   z-index: 20; display: flex; flex-wrap: wrap; justify-content: center;
-  gap: var(--s2) var(--s6); max-width: min(920px, 92vw);
-  color: var(--stone); opacity: 0.66;
-  font-size: 10px; letter-spacing: 0.13em;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
-  transition: opacity 900ms var(--e-both);
+  align-items: center; gap: var(--s2) var(--s5);
+  max-width: min(1000px, 94vw);
+  padding: 9px var(--s5);
+  background: rgba(20, 17, 14, 0.52);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  border: 1px solid rgba(242, 235, 223, 0.14);
+  border-radius: 3px;
+  color: var(--bone);
+  font-size: 12px; letter-spacing: 0.1em; line-height: 16px;
+  opacity: 1;
+  transition: opacity 900ms var(--e-both), background-color 900ms var(--e-both);
   pointer-events: none;
 }
-.control-hints.is-settled { opacity: 0.3; }
+.control-hints.is-settled { opacity: 0.78; background: rgba(20, 17, 14, 0.4); }
 .control-hints.is-on-light {
-  color: var(--umber); text-shadow: none; bottom: 26px;
+  background: rgba(255, 253, 248, 0.82);
+  border-color: rgba(36, 31, 26, 0.16);
+  color: var(--ink);
 }
-.control-hint { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.control-hint { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .control-hints kbd {
-  font: inherit; border: 1px solid currentColor; border-radius: 2px;
-  padding: 1px 4px; opacity: 0.85; line-height: 1.3;
+  font: inherit; font-size: 11px;
+  border: 1px solid currentColor; border-radius: 2px;
+  padding: 1px 5px; opacity: 0.95; line-height: 1.35;
 }
-.hint-sep { padding: 0 4px; opacity: 0.7; }
-/* the rail indicator sits at the bottom too — lift the hints clear of it */
-.rail ~ .control-hints, .control-hints { bottom: 22px; }
-@media (max-width: 720px) { .control-hints { display: none; } }
+.hint-sep { padding: 0 5px; opacity: 0.75; }
+@media (max-width: 860px) { .control-hints { font-size: 11px; gap: 6px var(--s4); } }
+@media (max-width: 640px) { .control-hints { display: none; } }
 
 /* museum name, top right of the corridor */
 .corridor-title {
   position: fixed; top: var(--s5); right: var(--s6); z-index: 20; margin: 0;
-  color: var(--stone); opacity: 0.6; text-align: right;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); pointer-events: none;
+  color: var(--bone); text-align: right; font-size: 12px; letter-spacing: 0.11em;
+  padding: 6px 12px; border-radius: 3px;
+  background: rgba(20, 17, 14, 0.42);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
 }
-.corridor-sub { color: var(--taupe); }
+.corridor-sub { opacity: 0.72; }
+
+/* the back control shares the treatment, so both corners read the same */
+.gallery-back {
+  color: var(--bone); font-size: 12px; letter-spacing: 0.11em;
+  padding: 6px 12px; border-radius: 3px;
+  background: rgba(20, 17, 14, 0.42);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.gallery-back:hover { color: var(--gilt); background: rgba(20, 17, 14, 0.6); }
 
 /* ─── Thread Pull ─── */
 .is-extracting, .is-extracting * { cursor: crosshair !important; }

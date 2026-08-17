@@ -3,8 +3,8 @@
   "name": "The Metropolitan Museum of Art",
   "city": "New York",
   "subtitle": "Petrie Sculpture Court",
-  "blurb": "An indoor courtyard at dusk: peaked glass overhead, pale stone against red brick, marble under warm spotlights.",
-  "corridorNote": "Modelled on the Carroll and Milton Petrie European Sculpture Court in the evening. A large peaked triangular skylight roofs what reads as an outdoor courtyard wedged between two buildings: one wall smooth pale stone with illuminated rectangular panels and arched doorways, the other a facade of dark red brick set with white stone arches and circular medallions. A floor-to-ceiling glass wall closes the far end, and white marble figures stand down the paving under warm spotlights.",
+  "blurb": "A sunlit indoor courtyard: a peaked glass roof over pale stone and red brick, and light off every surface.",
+  "corridorNote": "Modelled on the Carroll and Milton Petrie European Sculpture Court by day. A great peaked skylight of white steel and glass roofs what reads as an outdoor courtyard wedged between two buildings, with a lower run of flat glazing along the eaves; daylight floods the room and lies in bars across the paving. One wall is smooth pale stone with arched openings and illuminated panels, the other a facade of dark red brick set with white stone arches and circular medallions. A floor-to-ceiling glass wall closes the far end. The court's own sculpture is left out here: this exhibition is about the paintings.",
   "style": {
     "ceiling": "peaked-court",
     "floor": "court-paving",
@@ -17,54 +17,173 @@
     "bays": 10,
     "bayDepth": 5.0,
     "palette": {
-      "wall": "#D5CEBF",
-      "wallDeep": "#6B3B33",
-      "molding": "#E9E3D5",
+      "wall": "#E4DED0",
+      "wallDeep": "#8A4A3C",
+      "molding": "#F6F2E8",
       "gilt": "#C0982E",
-      "ceiling": "#2B3440",
-      "ceilingAccent": "#8A94A2",
-      "floor": "#BCB5A7",
-      "floorInlay": "#989182",
+      "ceiling": "#E8F1FA",
+      "ceilingAccent": "#F4F2EC",
+      "floor": "#DCD6C8",
+      "floorInlay": "#BEB6A6",
       "accent": "#8A5B4C",
-      "sky": "#233042"
+      "sky": "#EAF3FC"
     },
     "light": {
-      "key": "#7E96B8",
-      "keyIntensity": 0.85,
-      "keyFrom": [0, 18, -6],
-      "sky": "#3C4C60",
-      "ground": "#463E36",
-      "ambient": 0.3,
-      "lamp": "#FFD59A",
-      "lampIntensity": 15,
-      "exposure": 1.14,
-      "background": "#12161C",
-      "fog": ["#1B222B", 38, 120]
+      "key": "#FFF9EE",
+      "keyIntensity": 2.7,
+      "keyFrom": [
+        -4,
+        20,
+        7
+      ],
+      "sky": "#E8F1FA",
+      "ground": "#8A8272",
+      "ambient": 0.72,
+      "lamp": "#FFEBCE",
+      "lampIntensity": 4,
+      "exposure": 1.12,
+      "background": "#C7C2B6",
+      "fog": [
+        "#DCD6C9",
+        60,
+        180
+      ]
     },
     "fixtures": {
-      "sculpture": "court-figures",
+      "sculpture": "none",
       "seating": "bench",
       "chandeliers": false,
       "placards": true,
       "clock": false,
-      "terraces": false
+      "terraces": false,
+      "glazedEnd": true
     }
   },
   "plan": {
     "viewBox": "20 20 540 280",
     "level": "European Paintings & the Court",
     "rooms": [
-      { "id": "r-delaware", "name": "Delaware", "svgPath": "M40,36 L160,36 L160,100 L40,100 Z", "centroid": [100, 68], "active": true, "artworkIndex": 0 },
-      { "id": "r-socrates", "name": "Socrates", "svgPath": "M166,36 L286,36 L286,100 L166,100 Z", "centroid": [226, 68], "active": true, "artworkIndex": 1 },
-      { "id": "r-lilies", "name": "Water Lilies", "svgPath": "M292,36 L412,36 L412,100 L292,100 Z", "centroid": [352, 68], "active": true, "artworkIndex": 2 },
-      { "id": "r-madame-x", "name": "Madame X", "svgPath": "M418,36 L538,36 L538,100 L418,100 Z", "centroid": [478, 68], "active": true, "artworkIndex": 3 },
-      { "id": "r-toledo", "name": "Toledo", "svgPath": "M40,106 L160,106 L160,186 L40,186 Z", "centroid": [100, 146], "active": true, "artworkIndex": 4 },
-      { "id": "r-aristotle", "name": "Aristotle", "svgPath": "M40,192 L160,192 L160,272 L40,272 Z", "centroid": [100, 232], "active": true, "artworkIndex": 5 },
-      { "id": "r-pitcher", "name": "Water Pitcher", "svgPath": "M418,106 L538,106 L538,186 L418,186 Z", "centroid": [478, 146], "active": true, "artworkIndex": 6 },
-      { "id": "r-straw-hat", "name": "Straw Hat", "svgPath": "M418,192 L538,192 L538,272 L418,272 Z", "centroid": [478, 232], "active": true, "artworkIndex": 7 },
-      { "id": "r-dance", "name": "Dance Class", "svgPath": "M166,218 L286,218 L286,272 L166,272 Z", "centroid": [226, 245], "active": true, "artworkIndex": 8 },
-      { "id": "r-pareja", "name": "Juan de Pareja", "svgPath": "M292,218 L412,218 L412,272 L292,272 Z", "centroid": [352, 245], "active": true, "artworkIndex": 9 },
-      { "id": "r-court", "name": "Sculpture court", "svgPath": "M166,106 L412,106 L412,212 L166,212 Z", "centroid": [289, 159], "active": false, "artworkIndex": -1 }
+      {
+        "id": "r-delaware",
+        "name": "Delaware",
+        "svgPath": "M40,36 L160,36 L160,100 L40,100 Z",
+        "centroid": [
+          100,
+          68
+        ],
+        "active": true,
+        "artworkIndex": 0
+      },
+      {
+        "id": "r-socrates",
+        "name": "Socrates",
+        "svgPath": "M166,36 L286,36 L286,100 L166,100 Z",
+        "centroid": [
+          226,
+          68
+        ],
+        "active": true,
+        "artworkIndex": 1
+      },
+      {
+        "id": "r-lilies",
+        "name": "Water Lilies",
+        "svgPath": "M292,36 L412,36 L412,100 L292,100 Z",
+        "centroid": [
+          352,
+          68
+        ],
+        "active": true,
+        "artworkIndex": 2
+      },
+      {
+        "id": "r-madame-x",
+        "name": "Madame X",
+        "svgPath": "M418,36 L538,36 L538,100 L418,100 Z",
+        "centroid": [
+          478,
+          68
+        ],
+        "active": true,
+        "artworkIndex": 3
+      },
+      {
+        "id": "r-toledo",
+        "name": "Toledo",
+        "svgPath": "M40,106 L160,106 L160,186 L40,186 Z",
+        "centroid": [
+          100,
+          146
+        ],
+        "active": true,
+        "artworkIndex": 4
+      },
+      {
+        "id": "r-aristotle",
+        "name": "Aristotle",
+        "svgPath": "M40,192 L160,192 L160,272 L40,272 Z",
+        "centroid": [
+          100,
+          232
+        ],
+        "active": true,
+        "artworkIndex": 5
+      },
+      {
+        "id": "r-pitcher",
+        "name": "Water Pitcher",
+        "svgPath": "M418,106 L538,106 L538,186 L418,186 Z",
+        "centroid": [
+          478,
+          146
+        ],
+        "active": true,
+        "artworkIndex": 6
+      },
+      {
+        "id": "r-straw-hat",
+        "name": "Straw Hat",
+        "svgPath": "M418,192 L538,192 L538,272 L418,272 Z",
+        "centroid": [
+          478,
+          232
+        ],
+        "active": true,
+        "artworkIndex": 7
+      },
+      {
+        "id": "r-dance",
+        "name": "Dance Class",
+        "svgPath": "M166,218 L286,218 L286,272 L166,272 Z",
+        "centroid": [
+          226,
+          245
+        ],
+        "active": true,
+        "artworkIndex": 8
+      },
+      {
+        "id": "r-pareja",
+        "name": "Juan de Pareja",
+        "svgPath": "M292,218 L412,218 L412,272 L292,272 Z",
+        "centroid": [
+          352,
+          245
+        ],
+        "active": true,
+        "artworkIndex": 9
+      },
+      {
+        "id": "r-court",
+        "name": "The court",
+        "svgPath": "M166,106 L412,106 L412,212 L166,212 Z",
+        "centroid": [
+          289,
+          159
+        ],
+        "active": false,
+        "artworkIndex": -1
+      }
     ]
   },
   "artworks": [

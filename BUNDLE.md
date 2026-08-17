@@ -1,10 +1,10 @@
-# Applying `placard-iteration-2.bundle`
+# Applying `placard-iteration-3.bundle`
 
 A git bundle is a single file containing real git history. You pull from it
 exactly as you would from a remote, so nothing is overwritten without you
 asking and every commit keeps its authorship.
 
-**This bundle contains one commit**, on the branch
+**This bundle contains two commits**, on the branch
 `claude/project-iteration-one-ui-1fzn9d`, on top of the commit your repository
 is already on (`37a67ad`). It carries the complete history, so it works against
 an existing clone *or* on a machine with no clone at all.
@@ -20,34 +20,34 @@ From inside your `placard` checkout:
 git log --oneline -1
 
 # 2. pull the branch out of the bundle
-git fetch /full/path/to/placard-iteration-2.bundle \
-  claude/project-iteration-one-ui-1fzn9d:iteration-2
+git fetch /full/path/to/placard-iteration-3.bundle \
+  claude/project-iteration-one-ui-1fzn9d:iteration-3
 
 # 3. look before you leap
-git log --oneline iteration-2
-git diff --stat HEAD iteration-2
+git log --oneline iteration-3
+git diff --stat HEAD iteration-3
 ```
 
-That leaves a new local branch called `iteration-2` and changes nothing else.
+That leaves a new local branch called `iteration-3` and changes nothing else.
 When you are happy with it:
 
 ```bash
-git checkout iteration-2
+git checkout iteration-3
 ```
 
-To put it on your own branch name instead, replace `iteration-2` in step 2 with
+To put it on your own branch name instead, replace `iteration-3` in step 2 with
 whatever you want to call it.
 
 **To push it to GitHub yourself** (this session was not permitted to push):
 
 ```bash
-git push -u origin iteration-2
+git push -u origin iteration-3
 ```
 
 ## Option B — fresh machine, no clone
 
 ```bash
-git clone placard-iteration-2.bundle placard
+git clone placard-iteration-3.bundle placard
 cd placard
 git checkout claude/project-iteration-one-ui-1fzn9d
 ```
@@ -84,7 +84,9 @@ pnpm build && pnpm preview
 
 ---
 
-## What is in this commit
+## What is in these commits
+
+### 1 — Five museums, ten works each
 
 **Five museums, ten works each** — the Louvre, the British Museum, the Vatican,
 the Musée d'Orsay and the Met — replacing the single gallery of five.
@@ -106,6 +108,31 @@ the Musée d'Orsay and the Met — replacing the single gallery of five.
   landing page and in the corridor.
 - **The controls are stated** in the softest type in the system along the
   bottom of the screen, in the corridor, on the floor plan and in the gallery.
+
+### 2 — Daylight, sculpture and legibility
+
+- **The Met is a day room.** Bright key light, glazed ceiling, higher exposure,
+  pale palette — it was lit for dusk, which made the one museum whose reference
+  is full of sunlight the darkest room in the exhibition. Its skylight is
+  rebuilt to your reference: a glazed peak on a fine grid of white glazing
+  bars, flat glazing out to each wall, purlins, a ridge and a truss per bay.
+  The corridor ends in a floor-to-ceiling window rather than brick, and no
+  sculpture stands in it — that room hangs paintings.
+- **Four classical statue types** replace the single capsule on a plinth:
+  draped standing female, contrapposto male nude, seated philosopher, orator
+  with a raised arm, distributed round the museums that place figures. Roman
+  portrait busts rebuilt around the cut that identifies them.
+- **The interface is readable.** Control hints, museum name and back control
+  sit on their own scrim at 12px, so they hold against a white marble floor and
+  a black vault alike.
+- **The landing page shows all five museums.** It centred itself with a
+  transform that the parallax loop overwrote every frame, dropping the block
+  half its height and pushing the last two museums off the bottom of the
+  screen — which is why zooming out appeared to fix it.
+- **Entering a museum resets you to the start of its corridor.** Corridor
+  position lives outside React, so the second museum you visited dropped you
+  wherever you left the first.
+- Both pitched roofs were being built as valleys rather than gables.
 
 Full detail, including the authoring format and the five style records, is in
 `README.md`.

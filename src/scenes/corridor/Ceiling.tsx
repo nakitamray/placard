@@ -142,7 +142,7 @@ function PitchedGlass({ style, d }: Props) {
         <group
           key={side}
           position={[(side * r * 0.62) / 2, (eaves + ridge) / 2, mid]}
-          rotation={[0, 0, side * slope]}
+          rotation={[0, 0, -side * slope]}
         >
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[slopeLen, runLength]} />
@@ -156,7 +156,7 @@ function PitchedGlass({ style, d }: Props) {
         place={(i, m) => {
           const side = i % 2 ? 1 : -1;
           const z = -(i >> 1) * d.bayDepth;
-          m.makeRotationZ(side * slope);
+          m.makeRotationZ(-side * slope);
           m.setPosition((side * r * 0.62) / 2, (eaves + ridge) / 2, z);
         }}
       >
@@ -348,58 +348,121 @@ function PeakedCourt({ style, d }: Props) {
   const r = d.halfWidth;
   const eaves = d.wallHeight;
   const ridge = d.vaultHeight;
-  const slope = Math.atan2(ridge - eaves, r);
-  const slopeLen = Math.hypot(ridge - eaves, r);
+  // the peak covers the middle of the court; a lower flat run of glazing
+  // carries on from the eaves to the walls, as it does over the real court
+  const peakHalf = r * 0.66;
+  const slope = Math.atan2(ridge - eaves, peakHalf);
+  const slopeLen = Math.hypot(ridge - eaves, peakHalf);
   const mid = -d.length / 2;
   const runLength = d.length + d.bayDepth * 3;
+  /** glazing bars every ~1.3m, which is what makes the roof read as glass */
+  const barsPerBay = Math.max(3, Math.round(d.bayDepth / 1.3));
+  const barCount = d.bays * barsPerBay + 1;
+  const glazingStep = runLength / barCount;
 
   return (
     <group>
-      {/* night glass: dark, but not black — it is still a sky */}
+      {/* The glazed slopes. Emissive rather than lit: a skylight is the light
+          source in the room, and a shaded surface up there reads as a painted
+          ceiling instead of as open sky. */}
       {[-1, 1].map((side) => (
         <group
           key={side}
-          position={[(side * r) / 2, (eaves + ridge) / 2, mid]}
-          rotation={[0, 0, side * slope]}
+          position={[(side * peakHalf) / 2, (eaves + ridge) / 2, mid]}
+          rotation={[0, 0, -side * slope]}
         >
           {/* laid along the corridor by the mesh, tilted by the group — see
               the note on the National Gallery lantern */}
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[slopeLen, runLength]} />
-            <meshStandardMaterial
-              color={p.ceiling}
-              roughness={0.25}
-              metalness={0.35}
-              side={THREE.DoubleSide}
-            />
+            <meshBasicMaterial color={p.sky} toneMapped={false} side={THREE.DoubleSide} />
           </mesh>
         </group>
       ))}
-      {/* the truss: rafters both sides, plus a ridge beam and tie rods */}
+
+      {/* the lower flat glazing, eaves to wall head, both sides */}
+      {[-1, 1].map((side) => (
+        <mesh
+          key={`flat${side}`}
+          position={[side * ((peakHalf + r) / 2), eaves - 0.06, mid]}
+          rotation={[Math.PI / 2, 0, 0]}
+        >
+          <planeGeometry args={[r - peakHalf, runLength]} />
+          <meshBasicMaterial color={p.ceiling} toneMapped={false} side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+
+      {/* Glazing bars across both slopes and both flat runs — the dense white
+          grid is the single most recognisable thing about this roof. */}
       <Repeated
-        count={(d.bays + 1) * 4}
+        count={barCount * 2}
         place={(i, m) => {
           const side = i % 2 ? 1 : -1;
-          const step = i >> 1;
-          const z = (-step * d.bayDepth) / 2;
-          m.makeRotationZ(side * slope);
-          m.setPosition((side * r) / 2, (eaves + ridge) / 2, z);
+          const z = -(i >> 1) * glazingStep * 2;
+          m.makeRotationZ(-side * slope);
+          m.setPosition((side * peakHalf) / 2, (eaves + ridge) / 2, z);
         }}
       >
-        <boxGeometry args={[slopeLen, 0.09, 0.09]} />
-        <meshStandardMaterial color={p.ceilingAccent} metalness={0.6} roughness={0.45} />
+        <boxGeometry args={[slopeLen, 0.07, 0.07]} />
+        <meshStandardMaterial color={p.ceilingAccent} roughness={0.55} />
       </Repeated>
+      <Repeated
+        count={barCount * 2}
+        place={(i, m) => {
+          const side = i % 2 ? 1 : -1;
+          const z = -(i >> 1) * glazingStep * 2;
+          m.makeTranslation(side * ((peakHalf + r) / 2), eaves - 0.04, z);
+        }}
+      >
+        <boxGeometry args={[r - peakHalf, 0.07, 0.07]} />
+        <meshStandardMaterial color={p.ceilingAccent} roughness={0.55} />
+      </Repeated>
+
+      {/* longitudinal purlins running the length of each slope */}
+      {[-1, 1].map((side) =>
+        [0.3, 0.62, 0.9].map((t) => (
+          <mesh
+            key={`pu${side}${t}`}
+            position={[
+              side * peakHalf * t,
+              ridge - (ridge - eaves) * t,
+              mid,
+            ]}
+          >
+            <boxGeometry args={[0.06, 0.06, runLength]} />
+            <meshStandardMaterial color={p.ceilingAccent} roughness={0.55} />
+          </mesh>
+        )),
+      )}
+
+      {/* ridge beam and eaves fascias */}
       <mesh position={[0, ridge, mid]}>
-        <boxGeometry args={[0.2, 0.18, runLength]} />
-        <meshStandardMaterial color={p.ceilingAccent} metalness={0.6} roughness={0.45} />
+        <boxGeometry args={[0.22, 0.2, runLength]} />
+        <meshStandardMaterial color={p.ceilingAccent} roughness={0.5} />
       </mesh>
-      {/* tie beams at the eaves — the court reads as roofed, not enclosed */}
+      {[-1, 1].map((side) => (
+        <mesh key={`fa${side}`} position={[side * peakHalf, eaves - 0.02, mid]}>
+          <boxGeometry args={[0.16, 0.22, runLength]} />
+          <meshStandardMaterial color={p.ceilingAccent} roughness={0.5} />
+        </mesh>
+      ))}
+
+      {/* the trusses: a tie beam and king post at every bay */}
       <Repeated
         count={d.bays + 1}
-        place={(i, m) => m.makeTranslation(0, eaves + 0.05, -i * d.bayDepth)}
+        place={(i, m) => m.makeTranslation(0, eaves + 0.08, -i * d.bayDepth)}
       >
-        <boxGeometry args={[r * 2, 0.12, 0.12]} />
-        <meshStandardMaterial color={p.ceilingAccent} metalness={0.55} roughness={0.5} />
+        <boxGeometry args={[peakHalf * 2, 0.11, 0.11]} />
+        <meshStandardMaterial color={p.ceilingAccent} roughness={0.5} />
+      </Repeated>
+      <Repeated
+        count={d.bays + 1}
+        place={(i, m) =>
+          m.makeTranslation(0, (eaves + ridge) / 2, -i * d.bayDepth)
+        }
+      >
+        <boxGeometry args={[0.08, ridge - eaves, 0.08]} />
+        <meshStandardMaterial color={p.ceilingAccent} roughness={0.5} />
       </Repeated>
     </group>
   );

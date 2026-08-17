@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { canTransition } from './machine';
+import { resetCorridor } from './motion';
 import type {
   ArtworkIndexEntry,
   ArtworkRegion,
@@ -102,7 +103,15 @@ export const useStore = create<AppStore>()(
     setPlacardExpanded: (e) => set({ placardExpanded: e }),
     setCreditsOpen: (o) => set({ creditsOpen: o }),
     setMuseums: (museums) => set({ museums }),
-    setMuseum: (museum) => set({ museum, index: 0 }),
+    setMuseum: (museum) => {
+      // Entering a museum always starts you at the mouth of its corridor.
+      // Corridor progress lives outside React (it is mutated per frame), so
+      // without this the second museum you visit drops you wherever you left
+      // the first one — usually at the far wall, which fires the transition to
+      // the floor plan before you have seen the room.
+      resetCorridor(0);
+      set({ museum, index: 0 });
+    },
     setMuseumLoading: (museumLoading) => set({ museumLoading }),
     setExtractionMode: (e) =>
       set(e ? { extractionMode: true } : { extractionMode: false, hoveredRegion: null }),

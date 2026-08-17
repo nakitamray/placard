@@ -10,7 +10,7 @@ lighting, alongside a museum wall placard.
 **Five museums, ten works each.** Every corridor is built from the real room it
 is modelled on — the Louvre's white barrel vault, the crimson skylit gallery in
 London, the Vatican's frescoed Gallery of Maps, the Orsay's train-shed nave, the
-Met's sculpture court at dusk.
+Met's sunlit sculpture court.
 
 Navigation is spatial: **Landing → 3D corridor → floor plan → horizontal
 gallery roll → individual artwork.**
@@ -39,7 +39,7 @@ glyph field twice.
 | **The British Museum** | crimson walls, pitched glass lantern on gilded archways, warm red and gold coving, polished light wood, tufted leather seating | heavy swept gilt with a fluted cove | single large work per bay |
 | **Vatican Museums** | frescoed vault in deeply carved gilded stucco, map panels between gilded pilasters, geometric marble inlay, crystal chandeliers, marble busts | architectural tabernacle — pilasters, entablature, pediment | alternating walls |
 | **Musée d'Orsay** | colossal arched steel-and-glass roof, carved stone terraces behind glass railings, the great gilded clock closing the nave | slim reeded gilt, the impressionist standard | single large work per bay |
-| **The Metropolitan Museum of Art** | evening court under a peaked skylight, pale stone one side and red brick with white arches the other, marble figures under warm spotlights | broad flat-topped American gilt | alternating walls |
+| **The Metropolitan Museum of Art** | sunlit court under a peaked glass skylight, pale stone one side and red brick with white arches the other, a glass wall closing the far end | broad flat-topped American gilt | alternating walls |
 
 A note on the second one: the reference photograph is **Room 32 at the National
 Gallery, London** — the Julia and Hans Rausing Room — not a British Museum
@@ -78,8 +78,8 @@ the glyph field for a work and is the fastest loop for tuning
 
 ## Moving through the exhibition
 
-The controls are also stated in the interface, in the softest type in the
-system, along the bottom of the screen.
+The controls are also stated in the interface, on a quiet scrim along the
+bottom of the screen, in the corridor, on the floor plan and in the gallery.
 
 | Where | Input | What happens |
 |---|---|---|
@@ -163,7 +163,11 @@ list its id in `data/museums/orsay.json`.
   merged by material before they reach the GPU, so an elaborate five-course
   frame with ornament costs three draw calls.
 - **Corridors** (`src/scenes/corridor/`): ceiling, floor, wall treatment and
-  fixtures are five implementations each, selected by the style record.
+  fixtures are five implementations each, selected by the style record. The
+  sculpture is four classical types — draped standing female, contrapposto
+  male nude, seated philosopher, orator with a raised arm — distributed round
+  the museums that place figures, plus a Roman portrait bust for the wall
+  bases at the Vatican. The Met's court hangs paintings only.
   Everything repeated — ribs, purlins, mullions, pilasters, brick courses,
   paving joints, dentils, bead courses — is instanced.
 - **Hanging**: every work is centred on a shared hanging line and the moulded

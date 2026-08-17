@@ -24,50 +24,238 @@ const MARBLE = '#E9E3D6';
  * abstractions: a mass, a torso, a head, drapery, at the right scale and with
  * the right silhouette at corridor distance.
  */
-function Figure({ seed, scale = 1 }: { seed: number; scale?: number }) {
-  const turn = (seed * 1.7) % Math.PI;
-  const lean = ((seed % 5) - 2) * 0.05;
+const marble = (rough = 0.44) => (
+  <meshStandardMaterial color={MARBLE} roughness={rough} />
+);
+
+/** limb, torso, drapery fold — everything on these figures is a capsule */
+function Limb({
+  p,
+  r,
+  len,
+  rot,
+  rough = 0.44,
+}: {
+  p: [number, number, number];
+  r: number;
+  len: number;
+  rot?: [number, number, number];
+  rough?: number;
+}) {
   return (
-    <group rotation={[0, turn, lean]} scale={scale}>
-      <mesh position={[0, 0.1, 0]} castShadow>
-        <cylinderGeometry args={[0.24, 0.28, 0.2, 14]} />
-        <meshStandardMaterial color={MARBLE} roughness={0.5} />
+    <mesh position={p} rotation={rot} castShadow>
+      <capsuleGeometry args={[r, len, 5, 10]} />
+      {marble(rough)}
+    </mesh>
+  );
+}
+
+/** the head, with the mass of hair that reads at ten metres */
+function Head({ p, r = 0.115 }: { p: [number, number, number]; r?: number }) {
+  return (
+    <group position={p}>
+      <mesh castShadow>
+        <sphereGeometry args={[r, 16, 12]} />
+        {marble(0.42)}
       </mesh>
-      <mesh position={[0, 0.62, 0]} castShadow>
-        <capsuleGeometry args={[0.17, 0.62, 6, 12]} />
-        <meshStandardMaterial color={MARBLE} roughness={0.42} />
-      </mesh>
-      {/* drapery falling from the hip */}
-      <mesh position={[0.08, 0.42, 0.04]} rotation={[0, 0, -0.18]} castShadow>
-        <capsuleGeometry args={[0.12, 0.5, 5, 10]} />
-        <meshStandardMaterial color={MARBLE} roughness={0.55} />
-      </mesh>
-      {/* raised arm, on some figures */}
-      {seed % 3 === 0 && (
-        <mesh position={[-0.19, 0.92, 0.02]} rotation={[0, 0, 0.7]} castShadow>
-          <capsuleGeometry args={[0.055, 0.42, 4, 8]} />
-          <meshStandardMaterial color={MARBLE} roughness={0.45} />
-        </mesh>
-      )}
-      <mesh position={[0.01, 1.14, 0]} castShadow>
-        <sphereGeometry args={[0.125, 16, 12]} />
-        <meshStandardMaterial color={MARBLE} roughness={0.42} />
+      <mesh position={[0, r * 0.42, -r * 0.28]} scale={[1.12, 0.86, 1.1]} castShadow>
+        <sphereGeometry args={[r, 14, 10]} />
+        {marble(0.55)}
       </mesh>
     </group>
   );
 }
 
+/**
+ * Four classical types, distributed around the exhibition.
+ *
+ * Real museum sculpture is scanned and the CC0 scan libraries are unreachable
+ * from this build, so these are honest abstractions — but a single capsule on
+ * a plinth reads as a bollard, not as a statue. What makes a figure legible
+ * down a gallery is the silhouette: two legs with a gap between them, a
+ * weight-bearing hip, an arm that leaves the body, and a head that sits
+ * forward of the shoulders. Each type below is built for that outline.
+ *
+ *   0  draped standing female — the peplophoros, a column of drapery
+ *   1  contrapposto male nude — weight on one leg, the Doryphoros type
+ *   2  seated philosopher — knees forward, leaning on one arm
+ *   3  orator with a raised arm — the one dynamic silhouette in the set
+ */
+function Figure({ seed, scale = 1 }: { seed: number; scale?: number }) {
+  const variant = Math.abs(Math.round(seed)) % 4;
+  const turn = (seed * 1.7) % Math.PI;
+
+  return (
+    <group rotation={[0, turn, 0]} scale={scale}>
+      {/* plinth block every type stands on */}
+      <mesh position={[0, 0.05, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.26, 0.29, 0.1, 16]} />
+        {marble(0.55)}
+      </mesh>
+
+      {variant === 0 && (
+        <group>
+          {/* drapery to the ankles — a fluted column with a body inside it */}
+          <mesh position={[0, 0.52, 0]} castShadow>
+            <cylinderGeometry args={[0.19, 0.27, 0.86, 14]} />
+            {marble(0.52)}
+          </mesh>
+          {/* folds */}
+          {[-0.11, 0.02, 0.13].map((x, i) => (
+            <Limb key={i} p={[x, 0.5, 0.15 - i * 0.03]} r={0.035} len={0.72} rough={0.6} />
+          ))}
+          <Limb p={[0, 1.06, 0]} r={0.145} len={0.24} />
+          {/* arms: one down inside the drapery, one across the waist */}
+          <Limb p={[-0.19, 0.98, 0.02]} r={0.05} len={0.34} rot={[0, 0, 0.08]} />
+          <Limb p={[0.17, 0.96, 0.1]} r={0.05} len={0.3} rot={[0.3, 0, -0.5]} />
+          <Head p={[0, 1.32, 0.01]} />
+        </group>
+      )}
+
+      {variant === 1 && (
+        <group>
+          {/* weight leg straight, free leg bent and trailing */}
+          <Limb p={[-0.09, 0.38, 0]} r={0.075} len={0.52} />
+          <Limb p={[0.1, 0.36, -0.06]} r={0.07} len={0.46} rot={[0.16, 0, -0.1]} />
+          {/* hips shifted over the weight leg — the whole point of the type */}
+          <mesh position={[-0.03, 0.74, 0]} castShadow>
+            <sphereGeometry args={[0.16, 14, 12]} />
+            {marble()}
+          </mesh>
+          <mesh position={[-0.01, 0.98, 0]} scale={[1, 1.15, 0.72]} castShadow>
+            <sphereGeometry args={[0.19, 16, 12]} />
+            {marble()}
+          </mesh>
+          {/* one arm hanging, one bent across */}
+          <Limb p={[-0.24, 0.92, 0.02]} r={0.048} len={0.44} rot={[0, 0, 0.12]} />
+          <Limb p={[0.23, 0.95, 0.06]} r={0.048} len={0.36} rot={[0.4, 0, -0.35]} />
+          <Head p={[0.02, 1.28, 0.02]} />
+        </group>
+      )}
+
+      {variant === 2 && (
+        <group>
+          {/* the seat */}
+          <mesh position={[0, 0.28, -0.08]} castShadow receiveShadow>
+            <boxGeometry args={[0.46, 0.36, 0.4]} />
+            {marble(0.6)}
+          </mesh>
+          {/* thighs forward, shins down */}
+          <Limb p={[-0.11, 0.5, 0.12]} r={0.075} len={0.3} rot={[1.42, 0, 0]} />
+          <Limb p={[0.11, 0.5, 0.14]} r={0.075} len={0.32} rot={[1.3, 0, 0]} />
+          <Limb p={[-0.11, 0.24, 0.28]} r={0.06} len={0.3} />
+          <Limb p={[0.11, 0.24, 0.3]} r={0.06} len={0.28} />
+          {/* torso leaning back, drapery over the lap */}
+          <mesh position={[0, 0.8, -0.02]} rotation={[-0.16, 0, 0]} castShadow>
+            <capsuleGeometry args={[0.15, 0.3, 6, 12]} />
+            {marble()}
+          </mesh>
+          {/* shoulders and neck, so the head is not sitting on the chest */}
+          <mesh position={[0, 0.97, -0.03]} scale={[1.4, 0.6, 0.85]} castShadow>
+            <sphereGeometry args={[0.14, 14, 10]} />
+            {marble()}
+          </mesh>
+          <mesh position={[0, 1.06, -0.02]} castShadow>
+            <cylinderGeometry args={[0.045, 0.055, 0.09, 10]} />
+            {marble()}
+          </mesh>
+          <mesh position={[0, 0.62, 0.16]} rotation={[1.35, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.2, 0.22, 0.34, 12]} />
+            {marble(0.58)}
+          </mesh>
+          {/* one arm propping, one resting on the knee */}
+          <Limb p={[-0.25, 0.72, -0.06]} r={0.05} len={0.36} rot={[0, 0, 0.22]} />
+          <Limb p={[0.2, 0.74, 0.16]} r={0.05} len={0.3} rot={[0.9, 0, -0.2]} />
+          <Head p={[0, 1.18, 0]} r={0.1} />
+        </group>
+      )}
+
+      {variant === 3 && (
+        <group>
+          <Limb p={[-0.1, 0.36, 0.02]} r={0.072} len={0.48} rot={[0, 0, 0.06]} />
+          <Limb p={[0.12, 0.34, -0.1]} r={0.068} len={0.42} rot={[-0.22, 0, -0.14]} />
+          <mesh position={[0, 0.72, 0]} castShadow>
+            <sphereGeometry args={[0.155, 14, 12]} />
+            {marble()}
+          </mesh>
+          {/* torso twisted toward the raised arm */}
+          <mesh position={[-0.02, 0.96, 0]} rotation={[0, 0.3, 0.06]} scale={[1, 1.12, 0.74]} castShadow>
+            <sphereGeometry args={[0.185, 16, 12]} />
+            {marble()}
+          </mesh>
+          {/* the raised arm — upper arm out, forearm up */}
+          <Limb p={[-0.26, 1.06, 0.04]} r={0.048} len={0.3} rot={[0, 0, 0.95]} />
+          <Limb p={[-0.4, 1.3, 0.06]} r={0.043} len={0.28} rot={[0, 0, 0.28]} />
+          {/* the other holds a fold of cloak that falls behind */}
+          <Limb p={[0.24, 0.92, 0.04]} r={0.048} len={0.38} rot={[0, 0, -0.1]} />
+          <mesh position={[0.28, 0.74, -0.1]} rotation={[0.1, 0, -0.16]} castShadow>
+            <capsuleGeometry args={[0.1, 0.52, 5, 10]} />
+            {marble(0.58)}
+          </mesh>
+          <Head p={[-0.04, 1.28, 0.03]} />
+        </group>
+      )}
+    </group>
+  );
+}
+
+/**
+ * Roman portrait bust.
+ *
+ * Stacking two spheres of similar size makes a snowman, not a bust. What
+ * reads is the cut: a Roman bust is a wide, square-shouldered mass that stops
+ * abruptly at the chest, a distinctly narrower neck, and a head noticeably
+ * smaller than the shoulders.
+ */
 function Bust({ seed }: { seed: number }) {
+  const variant = Math.abs(Math.round(seed)) % 4;
   return (
     <group rotation={[0, (seed * 2.3) % Math.PI, 0]}>
-      <mesh position={[0, 0.2, 0]} castShadow>
-        <cylinderGeometry args={[0.16, 0.2, 0.4, 12]} />
-        <meshStandardMaterial color={MARBLE} roughness={0.48} />
+      {/* the socle the bust is cut off onto */}
+      <mesh position={[0, 0.06, 0]} castShadow>
+        <cylinderGeometry args={[0.1, 0.14, 0.12, 12]} />
+        {marble(0.55)}
       </mesh>
-      <mesh position={[0, 0.5, 0]} castShadow>
-        <sphereGeometry args={[0.14, 14, 12]} />
-        <meshStandardMaterial color={MARBLE} roughness={0.44} />
+      {/* chest — wide, shallow, and squared off at the bottom */}
+      <mesh position={[0, 0.26, 0]} scale={[1, 1, 0.62]} castShadow>
+        <cylinderGeometry args={[0.23, 0.13, 0.3, 16]} />
+        {marble(0.48)}
       </mesh>
+      {/* shoulders */}
+      <mesh position={[0, 0.4, 0]} scale={[1.5, 0.5, 0.85]} castShadow>
+        <sphereGeometry args={[0.16, 16, 12]} />
+        {marble(0.46)}
+      </mesh>
+      {/* toga over one shoulder on half of them */}
+      {variant % 2 === 0 && (
+        <mesh position={[0.13, 0.34, 0.06]} rotation={[0, 0, -0.6]} castShadow>
+          <capsuleGeometry args={[0.05, 0.18, 4, 8]} />
+          {marble(0.6)}
+        </mesh>
+      )}
+      {/* neck, clearly narrower than both */}
+      <mesh position={[0, 0.5, 0.01]} castShadow>
+        <cylinderGeometry args={[0.052, 0.062, 0.1, 10]} />
+        {marble(0.44)}
+      </mesh>
+      {/* head — smaller than the shoulders, turned a little off axis */}
+      <group position={[0, 0.62, 0.01]} rotation={[0, variant > 1 ? 0.3 : -0.22, 0]}>
+        <mesh scale={[0.86, 1, 0.92]} castShadow>
+          <sphereGeometry args={[0.098, 16, 12]} />
+          {marble(0.42)}
+        </mesh>
+        {/* the mass of hair and beard that gives a bust its silhouette */}
+        <mesh position={[0, 0.036, -0.026]} scale={[1.1, 0.8, 1.05]} castShadow>
+          <sphereGeometry args={[0.098, 14, 10]} />
+          {marble(0.56)}
+        </mesh>
+        {variant === 3 && (
+          <mesh position={[0, -0.05, 0.03]} scale={[0.9, 0.72, 0.8]} castShadow>
+            <sphereGeometry args={[0.075, 12, 10]} />
+            {marble(0.58)}
+          </mesh>
+        )}
+      </group>
     </group>
   );
 }
@@ -299,13 +487,17 @@ export function Fixtures({ style, d }: Props) {
   const nodes: React.ReactNode[] = [];
 
   if (f.sculpture === 'pedestal-figures') {
-    // one figure every other bay, set against the wall opposite the light
+    // One figure every other bay, against the wall opposite the light. The
+    // seed is a running count, not the bay number: stepping the bay by two
+    // walks the variant by two as well, so half the types would never appear.
+    let n = 0;
     for (let b = 1; b < d.bays; b += 2) {
+      const seed = n++;
       nodes.push(
         <group key={`s${b}`} position={[-(d.halfWidth - 1.1), 0, bayZ(d, b)]}>
           <Plinth h={1.05} w={0.58} color={p.floorInlay} />
           <group position={[0, 1.09, 0]}>
-            <Figure seed={b} scale={0.95 + ((b * 7) % 11) / 60} />
+            <Figure seed={seed} scale={0.95 + ((b * 7) % 11) / 60} />
           </group>
         </group>,
       );
@@ -314,16 +506,21 @@ export function Fixtures({ style, d }: Props) {
 
   if (f.sculpture === 'busts') {
     // busts line the base of both walls, at close intervals
+    let n = 0;
     for (let b = 0; b < d.bays; b++) {
+      if (b % 2) continue; // a bust in every bay on both walls reads as fencing
       for (const side of [-1, 1]) {
+        const seed = n++;
         nodes.push(
           <group
             key={`bu${b}${side}`}
             position={[side * (d.halfWidth - 0.62), 0, bayZ(d, b)]}
           >
-            <Plinth h={1.25} w={0.4} color={p.molding} />
-            <group position={[0, 1.29, 0]}>
-              <Bust seed={b * 3 + side} />
+            {/* stone, not gilt: a gold column under every bust turned the
+                wall base into a row of pillars taller than the sculpture */}
+            <Plinth h={1.1} w={0.34} color={p.floor} />
+            <group position={[0, 1.14, 0]}>
+              <Bust seed={seed} />
             </group>
           </group>,
         );
@@ -333,9 +530,11 @@ export function Fixtures({ style, d }: Props) {
 
   if (f.sculpture === 'court-figures') {
     // the Met court: figures spaced down the paving on both sides of the walk
+    let n = 0;
     for (let b = 0; b < d.bays; b++) {
       for (const side of [-1, 1]) {
         if ((b + (side > 0 ? 1 : 0)) % 2) continue;
+        const seed = n++;
         nodes.push(
           <group
             key={`c${b}${side}`}
@@ -343,7 +542,7 @@ export function Fixtures({ style, d }: Props) {
           >
             <Plinth h={0.85} w={0.66} color={p.molding} />
             <group position={[0, 0.89, 0]}>
-              <Figure seed={b * 5 + side} scale={1.05} />
+              <Figure seed={seed} scale={1.05} />
             </group>
           </group>,
         );

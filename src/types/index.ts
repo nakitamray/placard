@@ -165,6 +165,8 @@ export interface MuseumStyle {
     clock: boolean;
     /** Orsay's raised side terraces with glass railings */
     terraces: boolean;
+    /** the corridor ends in a floor-to-ceiling window rather than a solid wall */
+    glazedEnd?: boolean;
   };
 }
 
