@@ -1,0 +1,61 @@
+{
+  "id": "orsay",
+  "name": "Musée d'Orsay",
+  "city": "Paris",
+  "wallTint": "#B9A88F",
+  "floors": [
+    {
+      "level": 5,
+      "rooms": [
+        {
+          "id": "r-whistler",
+          "name": "Whistler",
+          "svgPath": "M40,60 L150,60 L150,170 L40,170 Z",
+          "centroid": [95, 115],
+          "active": true,
+          "artworkIndex": 0
+        },
+        {
+          "id": "r-vangogh",
+          "name": "Van Gogh",
+          "svgPath": "M158,60 L268,60 L268,170 L158,170 Z",
+          "centroid": [213, 115],
+          "active": true,
+          "artworkIndex": 1
+        },
+        {
+          "id": "r-seurat",
+          "name": "Seurat",
+          "svgPath": "M276,60 L386,60 L386,170 L276,170 Z",
+          "centroid": [331, 115],
+          "active": true,
+          "artworkIndex": 2
+        },
+        {
+          "id": "r-sculpture",
+          "name": "Sculpture",
+          "svgPath": "M40,178 L268,178 L268,258 L40,258 Z",
+          "centroid": [154, 218],
+          "active": false,
+          "artworkIndex": -1
+        },
+        {
+          "id": "r-monet",
+          "name": "Monet",
+          "svgPath": "M394,60 L504,60 L504,170 L394,170 Z",
+          "centroid": [449, 115],
+          "active": true,
+          "artworkIndex": 3
+        },
+        {
+          "id": "r-degas",
+          "name": "Degas",
+          "svgPath": "M276,178 L504,178 L504,258 L276,258 Z",
+          "centroid": [390, 218],
+          "active": true,
+          "artworkIndex": 4
+        }
+      ]
+    }
+  ]
+}
