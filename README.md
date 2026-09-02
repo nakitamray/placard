@@ -26,6 +26,10 @@ pnpm build:assets   # regenerates public/ from data/ (images, corpora, glyphs)
 pnpm dev            # or: pnpm build && pnpm preview
 ```
 
+For a hosted site you do not need to run any of that locally — push to `main`
+and the included GitHub Actions workflow fetches, builds and deploys. See
+**Hosting** below.
+
 `fetch:images` is optional — skip it and the exhibition runs on procedural
 stand-ins. See **Artwork images** below.
 
@@ -132,6 +136,95 @@ bottom of the screen, in the corridor, on the floor plan and in the gallery.
 
 `Esc` walks the whole way out: artwork → gallery → floor plan → corridor →
 entrance.
+
+## Performance
+
+The exhibition is a real-time 3D room, so what it costs to draw is a budget
+rather than a fixed price. Three of them, chosen from the device and
+overridable by the visitor from the control bottom-right — **Smooth**,
+**Balanced**, **Rich**.
+
+Measured in the corridor at 1280×720, per frame:
+
+| Budget | Draw calls | Triangles |
+|---|---|---|
+| Smooth | ~400 | ~70k |
+| Balanced | ~530 | ~100k |
+| Rich | ~930 | ~225k |
+
+What each switch buys, in `src/lib/quality.ts`:
+
+- **Reflections** — the mirrored floor is *a second full render of the scene*
+  into a mirror buffer. It roughly doubles draw calls on its own and is by far
+  the most expensive thing here, so it belongs to Rich alone. Below that the
+  floor is a polished standard material: still glossy under the lamps, one
+  draw call.
+- **Shadows** — a third scene pass into the shadow map. Buys the bars of light
+  across the floor.
+- **Ornament** — bead courses, cartouches and reeding on frames. Only the
+  nearest few bays get carved frames; a bead course is invisible at ten metres
+  and costs tens of thousands of triangles across a salon wall.
+- **Atmosphere** — light shafts and drifting dust. Cheap, and the first thing
+  anyone notices, so it survives further down than it deserves to.
+
+Auto-detection never picks Rich. It reads a renderer string and a core count,
+which says what the machine is and nothing about what else it is doing —
+guessing high and being wrong costs a stuttering first impression, and a
+stuttering room reads as broken where a plainer one just reads as a room. A
+frame watchdog also samples real frame times for a few seconds and steps the
+budget down once if the median is below about 24fps, but it never steps up
+(oscillating is worse than sitting on the lower level) and never overrides a
+visitor who has chosen.
+
+The bundle is split so the renderer caches separately from the exhibition:
+`three` (192kB gzip) changes only on a dependency upgrade, while the app
+itself (~30kB gzip) changes every time a placard is edited.
+
+## Hosting
+
+Nothing heavy needs to run on your machine. `.github/workflows/deploy.yml`
+fetches the paintings, builds the assets and publishes on every push to
+`main`.
+
+To turn it on: **Settings → Pages → Source: GitHub Actions**, then push. The
+site lands at `https://<user>.github.io/<repo>/`.
+
+Two caches carry the cost across runs:
+
+| Cache | Keyed on | Effect |
+|---|---|---|
+| Fetched scans | `data/image-sources.json`, `data/collections/*` | Wikimedia is hit once, not on every deploy |
+| Built assets | `data/**`, `scripts/**`, `shared/**` | editing one placard rebuilds that work, reuses the other 49 |
+
+A cold first run is around ten minutes; later ones are usually under two.
+`workflow_dispatch` has a **refetch** checkbox for pulling the paintings again
+deliberately.
+
+The image fetch is `continue-on-error`: if Commons is unreachable or a work
+cannot be resolved, that work falls back to its stand-in rather than failing
+the deploy. The run's summary prints what was fetched and what failed.
+
+### Serving from a subpath
+
+Every generated-asset URL goes through `src/lib/asset.ts`, which prefixes
+Vite's `BASE_URL`. Set `BASE_PATH` at build time and the whole site moves:
+
+```bash
+BASE_PATH=/placard/ pnpm build     # GitHub Pages project site
+pnpm build                          # domain root — Vercel, Netlify, S3
+```
+
+The workflow sets it from the repository name automatically; override it with
+a `BASE_PATH` repository variable if you put the site on a custom domain (use
+`/`).
+
+### Other hosts
+
+`vercel.json` is still there and works — its build command runs
+`build:assets && build`. Add `fetch:images` to it if you want Vercel to pull
+the paintings too, but note it has no persistent `data/artworks` cache between
+builds, so it will re-download every time. The Actions route is kinder to
+Wikimedia and much faster.
 
 ## Authoring
 

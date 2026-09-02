@@ -5,6 +5,7 @@
  */
 import { useEffect, useState } from 'react';
 import { selectArtworks, useStore } from '../state/store';
+import { asset } from '../lib/asset';
 import type { ArtworkMeta } from '../types';
 
 const REFERENCES: Array<{ name: string; url: string; note: string }> = [
@@ -45,7 +46,7 @@ export function Credits() {
     if (!open || metas.length) return;
     Promise.all(
       artworks.map((a) =>
-        fetch(`/artworks/${a.id}/meta.json`).then((r) => r.json() as Promise<ArtworkMeta>),
+        fetch(asset(`artworks/${a.id}/meta.json`)).then((r) => r.json() as Promise<ArtworkMeta>),
       ),
     ).then(setMetas);
   }, [open, artworks, metas.length]);

@@ -1,10 +1,10 @@
-# Applying `placard-iteration-5.bundle`
+# Applying `placard-iteration-6.bundle`
 
 A git bundle is a single file containing real git history. You pull from it
 exactly as you would from a remote, so nothing is overwritten without you
 asking and every commit keeps its authorship.
 
-**This bundle contains four commits**, on the branch
+**This bundle contains five commits**, on the branch
 `claude/project-iteration-one-ui-1fzn9d`, on top of the commit your repository
 is already on (`37a67ad`). It carries the complete history, so it works against
 an existing clone *or* on a machine with no clone at all.
@@ -19,35 +19,42 @@ From inside your `placard` checkout:
 # 1. sanity check: this should print 37a67ad...
 git log --oneline -1
 
-# 2. pull the branch out of the bundle
-git fetch /full/path/to/placard-iteration-5.bundle \
-  claude/project-iteration-one-ui-1fzn9d:iteration-5
+# 2. pull the branch out of the bundle — ONE line, no line continuation
+git fetch /full/path/to/placard-iteration-6.bundle claude/project-iteration-one-ui-1fzn9d:iteration-6
 
 # 3. look before you leap
-git log --oneline iteration-5
-git diff --stat HEAD iteration-5
+git log --oneline iteration-6
+git diff --stat HEAD iteration-6
 ```
 
-That leaves a new local branch called `iteration-5` and changes nothing else.
+On Windows, quote the path and keep the fetch on one line — PowerShell reads a
+trailing `\` as a literal argument, not as a line continuation, and git then
+rejects it with `fatal: invalid refspec '\'`:
+
+```powershell
+git fetch "C:\Users\you\Downloads\placard-iteration-6.bundle" claude/project-iteration-one-ui-1fzn9d:iteration-6
+```
+
+That leaves a new local branch called `iteration-6` and changes nothing else.
 When you are happy with it:
 
 ```bash
-git checkout iteration-5
+git checkout iteration-6
 ```
 
-To put it on your own branch name instead, replace `iteration-5` in step 2 with
+To put it on your own branch name instead, replace `iteration-6` in step 2 with
 whatever you want to call it.
 
 **To push it to GitHub yourself** (this session was not permitted to push):
 
 ```bash
-git push -u origin iteration-5
+git push -u origin iteration-6
 ```
 
 ## Option B — fresh machine, no clone
 
 ```bash
-git clone placard-iteration-5.bundle placard
+git clone placard-iteration-6.bundle placard
 cd placard
 git checkout claude/project-iteration-one-ui-1fzn9d
 ```
@@ -61,6 +68,13 @@ git remote set-url origin https://github.com/nakitamray/placard
 ---
 
 ## After applying, in either case
+
+**If you just want it hosted, you do not need to run any of this.** Push the
+branch to `main`, turn on **Settings → Pages → Source: GitHub Actions**, and
+the included workflow fetches the paintings, builds the assets and publishes
+the site. See *5* below.
+
+To run it locally:
 
 ```bash
 pnpm install
@@ -167,6 +181,32 @@ author alongside it, which `build:assets` then publishes onto the placard.
 
 **This could not be run or verified from the environment it was written in** —
 Wikimedia is blocked there by network policy, so the first real run will be on
-your machine. Everything up to the network call is tested, including the
-candidate scoring; the network path is not. Run `--dry` first, read the table,
-and pin anything wrong by exact file name in `data/image-sources.json`.
+your machine or on a CI runner. Everything up to the network call is tested,
+including the candidate scoring; the network path is not. Run `--dry` first,
+read the table, and pin anything wrong by exact file name in
+`data/image-sources.json`.
+
+### 5 — Fast enough to host, and built in CI
+
+Measured before: **951 draw calls and 425k triangles per frame** at the Met,
+912 and **1.31M** at the Louvre. Both several times what this room should cost.
+
+- **Three rendering budgets** — Smooth, Balanced, Rich — picked from the device
+  and overridable by the visitor from the control bottom-right. The Louvre goes
+  from 912 draws / 1.31M triangles to **355 / 58k** on Smooth.
+- The mirrored floor was the single biggest cost: it renders the entire scene a
+  second time. It is now Rich only.
+- Carved frame ornament is built only for the nearest few bays. Auto-detection
+  never picks Rich, and a watchdog steps the budget down if real frame times
+  are bad.
+- **Three genuine bugs**: the instancing helpers had no dependency array, so
+  every brick, rib and voussoir matrix was rewritten on every React render;
+  wall textures were being loaded twice per museum; ornament was casting into
+  the shadow map.
+- **The bundle is split** so the renderer (192kB gzip) caches separately from
+  the exhibition (~30kB gzip).
+- **`.github/workflows/deploy.yml`** fetches, builds and publishes to GitHub
+  Pages on push, with caches so Wikimedia is hit once and editing one placard
+  rebuilds one work. Nothing heavy runs on your laptop.
+- Asset URLs were absolute and would have 404'd from any subpath; they now go
+  through `BASE_PATH`. Verified in a browser against a `/placard/` build.

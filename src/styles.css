@@ -494,3 +494,30 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .canvas-wrap, .placard, .map-overlay, .reveal-vignette { transition-duration: 1ms !important; }
 }
+
+/* ─── quality toggle ──────────────────────────────────────────────────────
+   Bottom-right, in the same veil as the hints. Auto-detection is wrong often
+   enough that the visitor needs the last word on how much the room costs. */
+.quality-toggle {
+  position: fixed; bottom: 20px; right: var(--s5); z-index: 21;
+  display: flex; gap: 2px; padding: 3px;
+  background: rgba(28, 24, 20, 0.3);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(242, 235, 223, 0.09);
+  border-radius: 999px;
+  opacity: 0.55; transition: opacity var(--d-base) var(--e-out);
+}
+.quality-toggle:hover { opacity: 1; }
+.quality-toggle button {
+  color: var(--bone); font-size: 10px; letter-spacing: 0.12em;
+  padding: 5px 11px; border-radius: 999px;
+  opacity: 0.65; transition: opacity var(--d-fast), background-color var(--d-fast);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+}
+.quality-toggle button:hover { opacity: 1; }
+.quality-toggle button.is-on {
+  opacity: 1; color: var(--gilt);
+  background: rgba(242, 235, 223, 0.12);
+}
+@media (max-width: 860px) { .quality-toggle { display: none; } }

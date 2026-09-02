@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { loadMuseum, useStore } from '../state/store';
 import { pointer } from '../state/motion';
+import { asset } from '../lib/asset';
 
 const HOLD_MS = 6000;
 const FADE_MS = 1200;
@@ -35,9 +36,9 @@ export function LandingLayer() {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch('/landing/manifest.json')
+    fetch(asset('landing/manifest.json'))
       .then((r) => r.json())
-      .then((files: string[]) => setImages(files.map((f) => `/landing/${f}`)))
+      .then((files: string[]) => setImages(files.map((f) => asset(`landing/${f}`))))
       .catch(() => setImages([]));
   }, []);
 

@@ -31,24 +31,40 @@ import { flash } from '../ui/Flash';
 import { OrnateFrame } from './OrnateFrame';
 import { frameReach } from './frames';
 import { fitWork } from './fit';
+import { asset } from '../lib/asset';
 import { Ceiling } from './corridor/Ceiling';
 import { Floor, Walls } from './corridor/Surfaces';
 import { Fixtures } from './corridor/Fixtures';
 import { bayZ, dimsFor, hangHeight, type Dims } from './corridor/dims';
 import { Atmosphere } from './corridor/Atmosphere';
-import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
+import type { ArtworkIndexEntry, MuseumData } from '../types';
+import type { Quality } from '../lib/quality';
+
+/**
+ * Wall textures, cached by artwork id for the life of the page.
+ *
+ * This hook is called from more than one component in the same scene, and a
+ * TextureLoader per call site means the same ten JPEGs are fetched, decoded
+ * and uploaded to the GPU once per caller. Caching by id makes re-entering a
+ * museum free as well.
+ */
+const wallTextures = new Map<string, THREE.Texture>();
+const wallLoader = new THREE.TextureLoader();
 
 function useArtworkTextures(artworks: ArtworkIndexEntry[]) {
-  return useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    const list = artworks.map((a) => {
-      const t = loader.load(`/artworks/${a.id}/wall.jpg`);
-      t.colorSpace = THREE.SRGBColorSpace;
-      t.anisotropy = 4;
-      return t;
-    });
-    return list;
-  }, [artworks]);
+  return useMemo(
+    () =>
+      artworks.map((a) => {
+        const hit = wallTextures.get(a.id);
+        if (hit) return hit;
+        const t = wallLoader.load(asset(`artworks/${a.id}/wall.jpg`));
+        t.colorSpace = THREE.SRGBColorSpace;
+        t.anisotropy = 4;
+        wallTextures.set(a.id, t);
+        return t;
+      }),
+    [artworks],
+  );
 }
 
 /**
@@ -63,6 +79,7 @@ function HungWork({
   width,
   height,
   showPanel = true,
+  detail = 'full',
 }: {
   artwork: ArtworkIndexEntry;
   /** position in the museum's running order — what clicking this opens */
@@ -72,6 +89,7 @@ function HungWork({
   width: number;
   height: number;
   showPanel?: boolean;
+  detail?: 'full' | 'plain';
 }) {
   const canvasMat = useRef<THREE.MeshStandardMaterial>(null);
   const group = useRef<THREE.Group>(null);
@@ -147,6 +165,7 @@ function HungWork({
         height={height}
         gilt={museum.style.palette.gilt}
         dark={museum.style.palette.wallDeep}
+        detail={detail}
       />
       <mesh
         position={[0, 0, 0.028]}
@@ -182,7 +201,15 @@ function HungWork({
  * single      one large work per bay, both walls
  * alternating one work per bay, sides alternating
  */
-function Bays({ museum, d }: { museum: MuseumData; d: Dims }) {
+function Bays({
+  museum,
+  d,
+  quality,
+}: {
+  museum: MuseumData;
+  d: Dims;
+  quality: Quality;
+}) {
   const artworks = museum.artworks;
   const textures = useArtworkTextures(artworks);
   const centre = hangHeight(d);
@@ -202,6 +229,11 @@ function Bays({ museum, d }: { museum: MuseumData; d: Dims }) {
       const ry = side > 0 ? -Math.PI / 2 : Math.PI / 2;
       const maxH = hang === 'salon' ? d.wallHeight * 0.3 : Math.min(2.1, d.wallHeight * 0.36);
       const main = fitWork(artworks[i].aspect, maxH, d.bayDepth * 0.78);
+      // Carving is only legible close up. Past a few bays the bead course and
+      // cartouches cost tens of thousands of triangles to render something
+      // smaller than a pixel, so distant frames keep the turned courses only.
+      const detail: 'full' | 'plain' =
+        quality.ornament && bay < quality.detailBays ? 'full' : 'plain';
 
       nodes.push(
         <group key={`${bay}-${side}`} position={[x, 0, z]} rotation={[0, ry, 0]}>
@@ -213,6 +245,7 @@ function Bays({ museum, d }: { museum: MuseumData; d: Dims }) {
               museum={museum}
               width={main.width}
               height={main.height}
+              detail={detail}
             />
           </group>
 
@@ -239,6 +272,7 @@ function Bays({ museum, d }: { museum: MuseumData; d: Dims }) {
                     width={small.width}
                     height={small.height}
                     showPanel={false}
+                    detail="plain"
                   />
                 </group>
               );
@@ -355,12 +389,23 @@ function EndGlazing({ d, colour }: { d: Dims; colour: string }) {
 }
 
 /** Warm lamps washing the walls, plus the bright pool at the far end. */
-function Lamps({ museum, d }: { museum: MuseumData; d: Dims }) {
+function Lamps({
+  museum,
+  d,
+  quality,
+}: {
+  museum: MuseumData;
+  d: Dims;
+  quality: Quality;
+}) {
   const l = museum.style.light;
   const lights: React.ReactNode[] = [];
-  // chandeliers carry their own lights; adding lamps too would double up
+  // Every point light is evaluated per fragment across every lit surface in
+  // the room, so the count is a budget rather than a look: they are spread
+  // evenly down the corridor and thinned rather than truncated.
   if (!museum.style.fixtures.chandeliers) {
-    for (let b = 0; b < d.bays; b += 2) {
+    const step = Math.max(2, Math.ceil(d.bays / quality.maxLamps));
+    for (let b = 0; b < d.bays; b += step) {
       lights.push(
         <pointLight
           key={b}
@@ -387,7 +432,7 @@ function Lamps({ museum, d }: { museum: MuseumData; d: Dims }) {
   );
 }
 
-export function CorridorScene({ tier }: { tier: DeviceTier }) {
+export function CorridorScene({ quality }: { quality: Quality }) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
   const phase = useStore((s) => s.phase);
   const museum = useStore((s) => s.museum);
@@ -558,18 +603,20 @@ export function CorridorScene({ tier }: { tier: DeviceTier }) {
 
   if (!museum || !d) return null;
   const l = museum.style.light;
-  const reflectorRes = tier.name === 'high' ? 1024 : 512;
+
 
   return (
     <group>
-      <Floor style={museum.style} d={d} reflectorRes={reflectorRes} />
-      <Walls style={museum.style} d={d} reflectorRes={reflectorRes} />
+      <Floor style={museum.style} d={d} quality={quality} />
+      <Walls style={museum.style} d={d} quality={quality} />
       <Ceiling style={museum.style} d={d} />
-      <Bays museum={museum} d={d} />
+      <Bays museum={museum} d={d} quality={quality} />
       <Fixtures style={museum.style} d={d} />
-      <Atmosphere style={museum.style} d={d} quality={tier.name} />
+      {quality.atmosphere && (
+        <Atmosphere style={museum.style} d={d} quality={quality.name} />
+      )}
       <Apse museum={museum} d={d} />
-      <Lamps museum={museum} d={d} />
+      <Lamps museum={museum} d={d} quality={quality} />
 
       {/* the key light — skylight, window or dusk, per museum, and the only
           shadow caster in the room */}
@@ -577,9 +624,9 @@ export function CorridorScene({ tier }: { tier: DeviceTier }) {
         ref={sunRef}
         color={l.key}
         intensity={l.keyIntensity}
-        castShadow
-        shadow-mapSize-width={tier.name === 'low' ? 1024 : 2048}
-        shadow-mapSize-height={tier.name === 'low' ? 1024 : 2048}
+        castShadow={quality.shadows}
+        shadow-mapSize-width={quality.shadowMapSize}
+        shadow-mapSize-height={quality.shadowMapSize}
         shadow-camera-left={-12}
         shadow-camera-right={12}
         shadow-camera-top={14}

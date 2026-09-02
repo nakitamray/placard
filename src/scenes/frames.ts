@@ -185,6 +185,8 @@ export function buildFrame(
   kind: FrameKind,
   width: number,
   height: number,
+  /** carve the bead course, cartouches and reeding */
+  ornament = true,
 ): FrameGeometry {
   const spec = SPECS[kind] ?? SPECS['louvre-salon'];
   const s = height; // every dimension in the spec is a fraction of the height
@@ -202,7 +204,7 @@ export function buildFrame(
   }
 
   // corner cartouches — raised carved blocks breaking the run of the moulding
-  if (spec.cartouche) {
+  if (spec.cartouche && ornament) {
     const outer = Math.max(...spec.courses.map((c) => c.offset + c.width));
     const size = spec.cartouche.size * s;
     const cx = width / 2 + outer * s - size * 0.28;
@@ -218,7 +220,7 @@ export function buildFrame(
   }
 
   // reeding — the repeated flutes running along the rails
-  if (spec.reeding) {
+  if (spec.reeding && ornament) {
     const r = spec.reeding;
     const size = r.size * s;
     const along = (length: number, count: number) =>
@@ -292,7 +294,7 @@ export function buildFrame(
   const beads: THREE.Vector3[] = [];
   let beadRadius = 0.01;
   let beadRole: Role = 'gilt';
-  if (spec.bead) {
+  if (spec.bead && ornament) {
     beadRadius = spec.bead.radius * s;
     beadRole = spec.bead.role;
     const bx = width / 2 + spec.bead.offset * s;

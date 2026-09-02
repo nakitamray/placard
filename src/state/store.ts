@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { canTransition } from './machine';
 import { resetCorridor } from './motion';
+import { asset } from '../lib/asset';
 import type {
   ArtworkIndexEntry,
   ArtworkRegion,
@@ -133,7 +134,7 @@ const museumCache = new Map<string, Promise<MuseumData>>();
 export function loadMuseum(id: string): Promise<MuseumData> {
   const hit = museumCache.get(id);
   if (hit) return hit;
-  const p = fetch(`/museums/${id}.json`).then((r) => {
+  const p = fetch(asset(`museums/${id}.json`)).then((r) => {
     if (!r.ok) throw new Error(`museum ${id}: ${r.status}`);
     return r.json() as Promise<MuseumData>;
   });

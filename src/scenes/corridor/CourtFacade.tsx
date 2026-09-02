@@ -19,11 +19,13 @@
 import { useLayoutEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type { MuseumStyle } from '../../types';
+import type { Quality } from '../../lib/quality';
 import { bayZ, type Dims } from './dims';
 
 interface Props {
   style: MuseumStyle;
   d: Dims;
+  quality: Quality;
 }
 
 function Instanced({
@@ -48,7 +50,10 @@ function Instanced({
     }
     mesh.instanceMatrix.needsUpdate = true;
     mesh.computeBoundingSphere();
-  });
+    // The dependency array matters: without it this rewrites every instance
+    // matrix on every React render, which for a wall of several thousand
+    // bricks is thousands of Matrix4 writes each time anything re-renders.
+  }, [count, place]);  // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <instancedMesh
       ref={ref}
@@ -133,6 +138,7 @@ function Arch({
       {/* voussoirs */}
       <Instanced
         count={N}
+        castShadow={false}
         place={(i, m) => {
           const a = Math.PI * ((i + 0.5) / N);
           m.makeRotationZ(a - Math.PI / 2);
@@ -230,7 +236,7 @@ function Sconce({ x, y, colour }: { x: number; y: number; colour: string }) {
   );
 }
 
-export function CourtFacade({ style, d }: Props) {
+export function CourtFacade({ style, d, quality }: Props) {
   const p = style.palette;
   const run = d.length + d.bayDepth * 3;
   const mid = -d.length / 2;
@@ -362,6 +368,7 @@ export function CourtFacade({ style, d }: Props) {
             <StringCourse y={H - 1.0} length={run} depth={0.24} height={0.16} colour={p.molding} />
             <Instanced
               count={Math.round(run / 0.34)}
+              castShadow={false}
               place={(i, m) =>
                 m.makeTranslation(mid - run / 2 + i * 0.34, H - 0.62, 0.2)
               }
@@ -390,11 +397,12 @@ export function CourtFacade({ style, d }: Props) {
 
       {/* one warm light per bay, alternating walls, close enough to the
           masonry to graze it — this is what makes brick look like brick */}
-      {Array.from({ length: d.bays }, (_, b) => {
+      {Array.from({ length: Math.min(d.bays, quality.maxLamps) }, (_, k) => {
+        const b = Math.round((k * d.bays) / Math.min(d.bays, quality.maxLamps));
         const side = b % 2 ? 1 : -1;
         return (
           <pointLight
-            key={b}
+            key={k}
             position={[side * (d.halfWidth - 0.7), 3.4, -b * d.bayDepth - d.bayDepth * 1.5]}
             color={glow}
             intensity={style.light.lampIntensity * 2.4}

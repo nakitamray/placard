@@ -37,7 +37,10 @@ function Repeated({
     }
     mesh.instanceMatrix.needsUpdate = true;
     mesh.computeBoundingSphere();
-  });
+    // The dependency array matters: without it this rewrites every instance
+    // matrix on every React render, which for a wall of several thousand
+    // bricks is thousands of Matrix4 writes each time anything re-renders.
+  }, [count, place]);  // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, count]}>
       {children}

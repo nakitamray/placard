@@ -1,9 +1,17 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { selectArtworks, useStore } from './state/store';
 import { attachPointer, pointer } from './state/motion';
 import { detectTier, webgl2Supported } from './lib/deviceTier';
+import {
+  initialQuality,
+  qualityFor,
+  stepDown,
+  storeQuality,
+  storedQuality,
+  type QualityName,
+} from './lib/quality';
 import { CorridorScene } from './scenes/CorridorScene';
 import { GalleryScene } from './scenes/GalleryScene';
 import { Environment } from './scenes/Lighting';
@@ -18,6 +26,7 @@ import { CursorRing } from './ui/CursorRing';
 import { LoadingBar } from './ui/LoadingBar';
 import { FlashLayer } from './ui/Flash';
 import { endReveal } from './transitions/reveal';
+import { asset } from './lib/asset';
 import type { MuseumIndexEntry } from './types';
 
 export default function App() {
@@ -30,6 +39,13 @@ export default function App() {
   const [progress, setProgress] = useState(0);
   const [webgl] = useState(webgl2Supported);
   const tier = useMemo(detectTier, []);
+  const [qualityName, setQualityName] = useState<QualityName>(() => initialQuality(tier).name);
+  const quality = useMemo(() => qualityFor(qualityName), [qualityName]);
+
+  const chooseQuality = (name: QualityName) => {
+    storeQuality(name);
+    setQualityName(name);
+  };
 
   useEffect(() => attachPointer(), []);
 
@@ -42,7 +58,7 @@ export default function App() {
     (async () => {
       setProgress(0.25);
       try {
-        const list = (await fetch('/museums/index.json').then((r) =>
+        const list = (await fetch(asset('museums/index.json')).then((r) =>
           r.json(),
         )) as MuseumIndexEntry[];
         if (!alive) return;
@@ -99,9 +115,9 @@ export default function App() {
     <>
       <div className={`canvas-wrap ${phase === 'map' ? 'is-blurred' : ''}`}>
         <Canvas
-          dpr={[1, tier.dprCap]}
+          dpr={[1, quality.dprCap]}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
-          shadows={{ type: THREE.PCFSoftShadowMap }}
+          shadows={quality.shadows ? { type: THREE.PCFSoftShadowMap } : false}
           camera={{ fov: 48, position: [0, 1.6, 4], near: 0.1, far: 160 }}
           onCreated={({ gl }) => {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
@@ -109,13 +125,14 @@ export default function App() {
           }}
         >
           <ExposureRig exposure={exposure} />
+          <FrameWatchdog quality={qualityName} onStruggling={setQualityName} />
           <color attach="background" args={[bg]} />
           {/* light haze for depth only — the far bays should still read */}
           <fog attach="fog" args={[fog[0], fog[1], fog[2]]} />
           <Suspense fallback={null}>
             <Environment intensity={inGallery ? 0.4 : 0.26} />
-            {inCorridor && museum && artworks.length > 0 && <CorridorScene tier={tier} />}
-            {inGallery && <GalleryScene tier={tier} />}
+            {inCorridor && museum && artworks.length > 0 && <CorridorScene quality={quality} />}
+            {inGallery && <GalleryScene tier={tier} quality={quality} />}
           </Suspense>
         </Canvas>
       </div>
@@ -147,6 +164,9 @@ export default function App() {
         </button>
       )}
       <ControlHints />
+      {(phase === 'corridor' || inGallery) && (
+        <QualityToggle value={qualityName} onChange={chooseQuality} />
+      )}
       <Credits />
       <FlashLayer />
       <CursorRing />
@@ -168,6 +188,86 @@ function ExposureRig({ exposure }: { exposure: number }) {
     gl.toneMappingExposure = exposure;
   }, [gl, exposure]);
   return null;
+}
+
+/**
+ * Drops the budget a step if the room is genuinely not keeping up.
+ *
+ * Detection guesses from hardware; this measures. It samples frame times over
+ * a few seconds of real rendering and steps down once if the median is below
+ * roughly 24fps, which is where panning starts to feel like it is dragging.
+ *
+ * Two things it deliberately does not do: it never steps *up*, because
+ * oscillating between budgets is worse than sitting on the lower one; and it
+ * never overrides a visitor who has picked a level, because being second-
+ * guessed by the page is more annoying than a slow frame.
+ */
+function FrameWatchdog({
+  quality,
+  onStruggling,
+}: {
+  quality: QualityName;
+  onStruggling: (q: QualityName) => void;
+}) {
+  const samples = useRef<number[]>([]);
+  const done = useRef(false);
+  const last = useRef(0);
+
+  useFrame(() => {
+    if (done.current || storedQuality()) return;
+    const now = performance.now();
+    if (last.current) {
+      const dt = now - last.current;
+      // ignore the first frames after a scene swap, which are always slow
+      if (dt < 500) samples.current.push(dt);
+    }
+    last.current = now;
+
+    if (samples.current.length < 180) return;
+    done.current = true;
+    const sorted = [...samples.current].sort((a, b) => a - b);
+    const median = sorted[sorted.length >> 1];
+    if (median > 1000 / 24) {
+      const next = stepDown(quality);
+      if (next) onStruggling(next);
+    }
+  });
+  return null;
+}
+
+/**
+ * The visitor's own control over how much the room costs to draw.
+ *
+ * Auto-detection gets the tier roughly right and is wrong often enough to
+ * matter — an old machine with a good GPU, a new one throttled on battery —
+ * so the choice is theirs, three plain words, remembered per browser.
+ */
+function QualityToggle({
+  value,
+  onChange,
+}: {
+  value: QualityName;
+  onChange: (q: QualityName) => void;
+}) {
+  const options: Array<[QualityName, string]> = [
+    ['low', 'Smooth'],
+    ['mid', 'Balanced'],
+    ['high', 'Rich'],
+  ];
+  return (
+    <div className="quality-toggle caption" role="group" aria-label="Rendering quality">
+      {options.map(([name, label]) => (
+        <button
+          key={name}
+          className={value === name ? 'is-on' : ''}
+          aria-pressed={value === name}
+          onClick={() => onChange(name)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 /**

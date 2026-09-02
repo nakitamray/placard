@@ -4,6 +4,7 @@
  */
 import * as THREE from 'three';
 import { loadGlyphs, type GlyphSet } from './loadGlyphs';
+import { asset } from '../lib/asset';
 import type { ArtworkMeta, DeviceTier } from '../types';
 
 export interface LoadedArtwork {
@@ -42,7 +43,7 @@ export function loadArtwork(id: string, tier: DeviceTier): Promise<LoadedArtwork
   if (hit) return hit;
 
   const p = (async (): Promise<LoadedArtwork> => {
-    const base = `/artworks/${id}`;
+    const base = asset(`artworks/${id}`);
     const [meta, glyphBuf, corpusBuf, wallTex] = await Promise.all([
       fetch(`${base}/meta.json`).then((r) => r.json() as Promise<ArtworkMeta>),
       fetch(`${base}/glyphs${tier.glyphSuffix}.bin`).then((r) => r.arrayBuffer()),
