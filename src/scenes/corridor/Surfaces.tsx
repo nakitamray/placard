@@ -9,14 +9,14 @@ import { useLayoutEffect, useRef } from 'react';
 import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import type { MuseumStyle } from '../../types';
+import type { Quality } from '../../lib/quality';
 import { bayZ, type Dims } from './dims';
 import { CourtFacade } from './CourtFacade';
 
 interface Props {
   style: MuseumStyle;
   d: Dims;
-  /** reflection resolution drops on weaker devices */
-  reflectorRes: number;
+  quality: Quality;
 }
 
 function Instanced({
@@ -41,7 +41,10 @@ function Instanced({
     }
     mesh.instanceMatrix.needsUpdate = true;
     mesh.computeBoundingSphere();
-  });
+    // The dependency array matters: without it this rewrites every instance
+    // matrix on every React render, which for a wall of several thousand
+    // bricks is thousands of Matrix4 writes each time anything re-renders.
+  }, [count, place]);  // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, count]} castShadow={castShadow}>
       {children}
@@ -51,7 +54,7 @@ function Instanced({
 
 /* ── floors ─────────────────────────────────────────────────────────────── */
 
-export function Floor({ style, d, reflectorRes }: Props) {
+export function Floor({ style, d, quality }: Props) {
   const p = style.palette;
   const kind = style.floor;
   const mid = -d.length / 2;
@@ -66,20 +69,33 @@ export function Floor({ style, d, reflectorRes }: Props) {
 
   return (
     <group>
+      {/* The mirrored floor renders the whole scene a second time into a
+          buffer. It is the most expensive thing in the room by a wide margin,
+          so below the top budget it becomes a polished standard material:
+          still glossy under the lamps, no second pass. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, mid]} receiveShadow>
         <planeGeometry args={[w, run]} />
-        <MeshReflectorMaterial
-          resolution={reflectorRes}
-          blur={[400, 100]}
-          mixBlur={0.85}
-          mixStrength={kind === 'court-paving' ? 0.35 : 0.6}
-          roughness={roughness}
-          depthScale={0.7}
-          minDepthThreshold={0.4}
-          color={p.floor}
-          metalness={0.18}
-          mirror={mirror}
-        />
+        {quality.reflections ? (
+          <MeshReflectorMaterial
+            resolution={quality.reflectionRes}
+            blur={[400, 100]}
+            mixBlur={0.85}
+            mixStrength={kind === 'court-paving' ? 0.35 : 0.6}
+            roughness={roughness}
+            depthScale={0.7}
+            minDepthThreshold={0.4}
+            color={p.floor}
+            metalness={0.18}
+            mirror={mirror}
+          />
+        ) : (
+          <meshStandardMaterial
+            color={p.floor}
+            roughness={Math.min(0.55, roughness + 0.22)}
+            metalness={0.24}
+            envMapIntensity={1.2}
+          />
+        )}
       </mesh>
 
       {kind === 'parquet' && (
@@ -171,7 +187,7 @@ export function Floor({ style, d, reflectorRes }: Props) {
 
 /* ── wall treatments ────────────────────────────────────────────────────── */
 
-export function Walls({ style, d }: Props) {
+export function Walls({ style, d, quality }: Props) {
   const p = style.palette;
   const mid = -d.length / 2;
   const run = d.length + d.bayDepth * 3;
@@ -203,7 +219,7 @@ export function Walls({ style, d }: Props) {
     </group>
   );
 
-  if (kind === 'court-facade') return <CourtFacade style={style} d={d} />;
+  if (kind === 'court-facade') return <CourtFacade style={style} d={d} quality={quality} />;
 
   if (kind === 'fresco-maps') {
     // Painted map panels between gilded pilasters, busts along the base.

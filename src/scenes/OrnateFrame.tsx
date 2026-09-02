@@ -18,6 +18,15 @@ export function OrnateFrame({
   dark = '#2E241A',
   /** how far in front of the wall the frame's sight edge sits */
   z = 0,
+  /**
+   * 'full' carves the frame; 'plain' keeps only the turned courses.
+   *
+   * The bead course is the expensive part — forty-odd spheres per frame, and
+   * a salon wall carries sixty frames. Beads are invisible past a few metres
+   * and cost tens of thousands of triangles, so anything small or distant
+   * gets the mouldings without the carving.
+   */
+  detail = 'full',
 }: {
   kind: FrameKind;
   width: number;
@@ -25,8 +34,12 @@ export function OrnateFrame({
   gilt?: string;
   dark?: string;
   z?: number;
+  detail?: 'full' | 'plain';
 }) {
-  const frame = useMemo(() => buildFrame(kind, width, height), [kind, width, height]);
+  const frame = useMemo(
+    () => buildFrame(kind, width, height, detail === 'full'),
+    [kind, width, height, detail],
+  );
   const beadRef = useRef<THREE.InstancedMesh>(null);
 
   useEffect(
@@ -73,9 +86,8 @@ export function OrnateFrame({
         <instancedMesh
           ref={beadRef}
           args={[undefined, undefined, frame.beads.length]}
-          castShadow
         >
-          <sphereGeometry args={[frame.beadRadius, 8, 6]} />
+          <sphereGeometry args={[frame.beadRadius, 6, 4]} />
           <meshStandardMaterial color={beadColor} metalness={0.85} roughness={0.3} />
         </instancedMesh>
       )}

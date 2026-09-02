@@ -1,0 +1,116 @@
+# Build and publish the exhibition.
+#
+# The whole point of this workflow is that nothing heavy runs on a laptop.
+# Fetching fifty paintings and analysing each of them into two glyph fields
+# takes minutes and a few gigabytes of scratch; it belongs on a runner.
+#
+# Two caches carry the cost across runs:
+#
+#   source scans   keyed on data/image-sources.json, so Wikimedia is hit once
+#                  and not again until the list of wanted files changes
+#   built assets   keyed on the data/ that produced them, so editing a placard
+#                  rebuilds that work and reuses the other forty-nine
+#
+# A first run takes ten minutes or so. Later runs are usually under two.
+name: Build & deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      refetch:
+        description: 'Re-fetch every painting from Wikimedia Commons'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The paintings themselves. Cached on the wanted-file list rather than on
+      # a run number, so a normal push reuses them and touching
+      # image-sources.json refetches.
+      - name: Restore fetched scans
+        id: scans
+        uses: actions/cache@v4
+        with:
+          path: data/artworks
+          key: scans-${{ hashFiles('data/image-sources.json', 'data/collections/*.json') }}
+
+      - name: Fetch paintings from Wikimedia Commons
+        if: steps.scans.outputs.cache-hit != 'true' || inputs.refetch
+        run: pnpm fetch:images ${{ inputs.refetch && '--force' || '' }}
+        continue-on-error: true # a stand-in is better than a failed deploy
+
+      - name: Report what was fetched
+        if: always()
+        run: |
+          if [ -f data/.cache/fetch-report.json ]; then
+            node -e "
+              const r = require('./data/.cache/fetch-report.json');
+              const by = r.reduce((a, x) => (a[x.status] = (a[x.status] || 0) + 1, a), {});
+              console.log('fetch summary:', JSON.stringify(by));
+              for (const x of r.filter((x) => x.status === 'failed'))
+                console.log('  failed:', x.id, '-', x.error);
+            "
+          else
+            echo 'no fetch report (cache hit — scans reused)'
+          fi
+
+      # The expensive part: images, corpora and two glyph fields per work.
+      - name: Restore built assets
+        id: assets
+        uses: actions/cache@v4
+        with:
+          path: public
+          key: assets-${{ hashFiles('data/**', 'scripts/**', 'shared/**') }}
+
+      - name: Build assets
+        if: steps.assets.outputs.cache-hit != 'true'
+        run: pnpm build:assets
+
+      - name: Typecheck and bundle
+        # BASE_PATH lets the same build serve from a domain root or from
+        # /<repo>/ on GitHub Pages; every asset URL goes through lib/asset.ts.
+        env:
+          BASE_PATH: ${{ vars.BASE_PATH || format('/{0}/', github.event.repository.name) }}
+        run: pnpm build
+
+      - name: Bundle size
+        run: du -sh dist && ls -lh dist/assets | head -20
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

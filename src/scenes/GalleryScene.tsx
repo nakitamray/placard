@@ -33,6 +33,7 @@ import { fitWork } from './fit';
 import { startReveal, endReveal, revealAnim } from '../transitions/reveal';
 import { artworkProjector, regionAt } from '../threadpull/state';
 import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
+import type { Quality } from '../lib/quality';
 
 const SPACING = 8;
 const CAM_Z = 5.6;
@@ -219,7 +220,7 @@ function Dentils({ width, y, color }: { width: number; y: number; color: string 
 
 /* ── the scene ──────────────────────────────────────────────────────────── */
 
-export function GalleryScene({ tier }: { tier: DeviceTier }) {
+export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Quality }) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
   const scene = useThree((s) => s.scene);
   const size = useThree((s) => s.size);
@@ -437,18 +438,29 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
       {/* reflective floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[centreX, 0, 2]}>
         <planeGeometry args={[railW, 14]} />
-        <MeshReflectorMaterial
-          resolution={tier.name === 'high' ? 1024 : 512}
-          blur={[400, 100]}
-          mixBlur={0.75}
-          mixStrength={0.5}
-          roughness={0.18}
-          depthScale={0.6}
-          minDepthThreshold={0.4}
-          color={p.floor}
-          metalness={0.12}
-          mirror={0.45}
-        />
+        {/* see the note in corridor/Surfaces.tsx: reflections are a second
+            full render of the scene, so they are the top budget only */}
+        {quality.reflections ? (
+          <MeshReflectorMaterial
+            resolution={quality.reflectionRes}
+            blur={[400, 100]}
+            mixBlur={0.75}
+            mixStrength={0.5}
+            roughness={0.18}
+            depthScale={0.6}
+            minDepthThreshold={0.4}
+            color={p.floor}
+            metalness={0.12}
+            mirror={0.45}
+          />
+        ) : (
+          <meshStandardMaterial
+            color={p.floor}
+            roughness={0.4}
+            metalness={0.2}
+            envMapIntensity={1.2}
+          />
+        )}
       </mesh>
 
       {/* one fully moulded bay per painting */}
@@ -464,6 +476,9 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
                 height={height}
                 gilt={p.gilt}
                 dark={p.wallDeep}
+                detail={
+                  quality.ornament && Math.abs(i - index) <= 1 ? 'full' : 'plain'
+                }
               />
             </group>
           </group>
@@ -534,7 +549,7 @@ export function GalleryScene({ tier }: { tier: DeviceTier }) {
         decay={1.4}
         color={museum.style.light.lamp}
         target={spotTarget.current}
-        castShadow
+        castShadow={quality.shadows}
       />
       <primitive object={spotTarget.current} />
     </group>
