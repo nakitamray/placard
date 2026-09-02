@@ -99,7 +99,15 @@ jobs:
         run: pnpm build
 
       - name: Bundle size
-        run: du -sh dist && ls -lh dist/assets | head -20
+        # The published payload is on disk here; what a visitor actually
+        # downloads is a small fraction of it, since the ladder means only one
+        # size in one format is ever asked for. Printing both keeps the two
+        # numbers from being confused for each other.
+        run: |
+          du -sh dist
+          ls -lh dist/assets | head -20
+          echo "published pictures: $(du -sh public/artworks | cut -f1) on disk across 3 sizes x 3 formats"
+          echo "landing backgrounds: $(du -sh public/landing | cut -f1) on disk; one is fetched on load"
 
       - uses: actions/upload-pages-artifact@v3
         with:

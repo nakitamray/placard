@@ -68,19 +68,34 @@ pnpm fetch:images          # fetch every work that has no scan yet
 pnpm build:assets          # rebuild the exhibition around the real paintings
 ```
 
-`fetch:images` resolves each work on Commons, downloads a ~2600px render, and
+`fetch:images` resolves each work on Commons, downloads a 2000px render, and
 writes `data/artworks/{id}/source.jpg` plus an `image-credit.json` recording
 the exact Commons file, its stated licence and its author. `build:assets`
 prefers `source.jpg` automatically and publishes that credit onto the work's
 placard, so the Credits panel says which reproduction is on the wall and under
 what terms.
 
+It asks Commons to render each file to 2000px rather than pulling the master
+scan, which for a well-photographed painting can be eighty megapixels and a
+hundred megabytes — nothing is downloaded that the build then throws away.
+Fifty works come down in roughly fifteen megabytes. Four works are resolved at
+once, but every outbound request passes through one gate that keeps them a
+quarter of a second apart, so the run stays inside what Commons asks of
+automated clients however wide you open `--concurrency`.
+
 | Flag | |
 |---|---|
 | `--dry` | resolve and print the table, download nothing |
 | `--force` | re-fetch works that already have a scan |
+| `--pin` | write the resolved file names back into `data/image-sources.json` |
+| `--concurrency 6` | works in flight at once (default 4, max 8) |
 | `--museum louvre` | one museum only |
 | `--only id1,id2` | named works only |
+
+**Run once with `--pin` and commit the result.** It records the exact Commons
+file it chose for every work, so from then on the fetch is a lookup rather
+than a search. Search rankings drift; an exhibition that hangs a different
+picture next month is not one you can point people at.
 
 **Run `--dry` first and read the table.** Search can return the wrong picture,
 and a wrong painting hung under the right label is worse than no painting at
@@ -94,8 +109,10 @@ To correct one, open it on Commons and pin the exact file in
 "manet-olympia": { "commonsFile": "File:Edouard Manet - Olympia - Google Art Project 3.jpg" }
 ```
 
-then `pnpm fetch:images --force --only manet-olympia`. A pinned file is used as
-given and skips search entirely.
+then `pnpm fetch:images --only manet-olympia`. A pinned file is used as given
+and skips search entirely — and changing a pin is enough on its own, because a
+scan on disk that came from a different file is treated as stale and
+re-fetched without `--force`.
 
 A few entries need judgement rather than search: the Fayum portrait and John
 White's album are whole classes of object rather than one work, the Admonitions
@@ -180,6 +197,72 @@ The bundle is split so the renderer caches separately from the exhibition:
 `three` (192kB gzip) changes only on a dependency upgrade, while the app
 itself (~30kB gzip) changes every time a placard is edited.
 
+### What a visit downloads
+
+Frame rate is only half of "fast". The other half is what comes down the wire,
+and this exhibition asks for two heavy kinds of thing: reproductions of
+paintings, and the glyph field each one is rebuilt from. Both are now paid for
+only at the moment they are needed.
+
+Measured end to end in a browser, at 1440×900, on the built site — pictures,
+glyph binaries and manifests, excluding the JavaScript bundle, which is
+unchanged and cached after the first visit:
+
+| | Before | Now |
+|---|---|---|
+| Landing, first paint | 622 KB · 10 pictures | 22 KB · 2 pictures |
+| Walking into a corridor | 294 KB | 39 KB |
+| Opening a painting's room | — | 34 KB |
+| Revealing the painting | 462 KB | 77 KB |
+| **A full visit** | **1.38 MB** | **0.18 MB** |
+
+Four things account for that.
+
+The glyph field also moved out of the corridor: reading a wall label used to
+load the whole work behind it, so walking past ten canvases in the Louvre
+fetched a glyph binary nobody had asked to see. A placard is five kilobytes of
+JSON now, and the glyph field is loaded when you walk into the room.
+
+**The landing page fetched every background at once.** Ten full-bleed
+paintings were mounted and nine hidden behind `opacity: 0` — which does not
+stop a browser fetching a `background-image`. It now mounts the one showing,
+the one fading out and the one coming next, so the first impression costs one
+picture rather than ten.
+
+**Every artwork loaded its 2000px reproduction whether or not you looked at
+it.** The warm zone loads four works around the rail, so arriving in a gallery
+pulled four reproductions nobody had asked to see. Each painting is now
+published as a ladder — 512px for the corridor, 1200px for the reveal, 2000px
+for the upgrade — and the reveal is fetched when a reveal is asked for. The
+512px texture already in hand is what it crosses over from, so the blur-up
+costs no extra request. The 2000px rung follows only if you stay with the work
+for about a second, and never on a device whose render target could not show
+the difference.
+
+**Every picture is published as AVIF, WebP and JPEG,** and the browser is
+handed the smallest it can decode — probed once with a two-pixel image of each
+format rather than guessed from a user-agent string. On these paintings AVIF is
+roughly half a JPEG. It is not automatic, though: on heavy impasto, AVIF above
+about q52 comes out *larger* than the JPEG, so each variant is checked against
+its JPEG at build time and re-encoded a notch lower until it actually wins.
+
+**The low device tier was not low.** `glyphs-lo.bin` was built by doubling the
+quadtree's minimum cell — but the tree bottoms out on the *maximum* cell long
+before it reaches the minimum, so the "low" field came out within two percent
+of the full one: 128 KB and sixteen thousand instances either way. Doubling
+both bounds is what actually quarters it. Every glyph field also now has a
+budget (`maxGlyphs`, 20 000 full / 5 000 low); if the quadtree exceeds it, the
+detail threshold is raised and the pass re-run, which prunes flat sky and dark
+ground first and leaves faces and brushwork alone. Without that, swapping the
+stand-ins for real scans would have quietly doubled both the payload and the
+per-frame instance count, because a real painting keeps finding variance all
+the way down where a smooth stand-in does not.
+
+The numbers above were measured with the procedural stand-ins in place. Real
+scans are larger on both sides of the table — but they are larger in the same
+proportion, and three of the four changes are structural rather than a matter
+of compression.
+
 ## Hosting
 
 Nothing heavy needs to run on your machine. `.github/workflows/deploy.yml`
@@ -259,7 +342,7 @@ Thread Pull `regions`.
 | `source.jpg` | the generated stand-in — the one file worth adding |
 | `sources.json` + `corpus/*.txt` | building the glyph corpus from the record's own placard text |
 | `regions.json` | Thread Pull regions (records may also carry them inline) |
-| `config.json` | glyph tuning — cell sizes, variance threshold, palette size |
+| `config.json` | glyph tuning — cell sizes, variance threshold, palette size, `maxGlyphs` |
 
 `data/artworks/` also still holds three further Orsay works from the first
 iteration — Monet's *Coquelicots*, Seurat's *Le Cirque* and Degas' *L'Étoile* —
@@ -269,10 +352,14 @@ list its id in `data/museums/orsay.json`.
 
 ## How it works
 
-- **Build time** (`scripts/`): each painting is analysed once by a quadtree
-  variance subdivision — small glyphs across faces and detail, large glyphs
-  across sky and flat fields — and emitted as a compact binary (`glyphs.bin`,
-  format documented in `shared/glyphFormat.ts`). The artwork's corpus is
+- **Build time** (`scripts/`): each painting is published as three sizes in
+  three formats — `wall` 512px for the corridor, `view` 1200px for the reveal,
+  `full` 2000px for the upgrade, each as AVIF, WebP and JPEG — and analysed
+  once by a quadtree variance subdivision — small glyphs across faces and
+  detail, large glyphs across sky and flat fields — and emitted as a compact
+  binary (`glyphs.bin`, format documented in `shared/glyphFormat.ts`) held to
+  a glyph budget so no one painting can cost several times what its neighbours
+  do. The artwork's corpus is
   cleaned, stripped of whitespace and encoded as charset indices
   (`corpus.bin`). Where a work has no historical texts on disk, the corpus is
   built from its own wall label and extended note, which is the premise stated

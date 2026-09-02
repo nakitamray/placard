@@ -25,7 +25,7 @@ import { selectArtworks, useStore } from '../state/store';
 import { gallery, pointer } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
 import { GlyphPrePass } from '../glyph/GlyphPrePass';
-import { loadArtwork, prefetchAround, type LoadedArtwork } from '../glyph/artworkLoader';
+import { loadReveal, prefetchAround, type LoadedArtwork } from '../glyph/artworkLoader';
 import { ArtworkPlane } from './ArtworkPlane';
 import { OrnateFrame } from './OrnateFrame';
 import { frameReach } from './frames';
@@ -239,24 +239,36 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
   const touch = useRef({ x: 0, active: false });
   const roomTone = useRef(new THREE.Color('#3A3630'));
 
-  // load current + warm zone (spec §7.5)
+  // load current + warm zone (spec §7.5). The work in front of the visitor
+  // loads immediately; its neighbours wait for an idle moment, so a prefetch
+  // never delays the only painting on screen.
   useEffect(() => {
     if (!artworks.length) return;
     const ids = artworks.map((a) => a.id);
-    prefetchAround(ids, index, tier);
-    let alive = true;
-    for (const di of [0, 1, -1, 2]) {
-      const i = index + di;
-      if (i < 0 || i >= ids.length) continue;
-      loadArtwork(ids[i], tier).then((art) => {
-        if (!alive) return;
-        setLoaded((m) => (m.has(i) ? m : new Map(m).set(i, art)));
-      });
-    }
-    return () => {
-      alive = false;
-    };
+    return prefetchAround(ids, index, tier, (i, art) =>
+      setLoaded((m) => (m.has(i) ? m : new Map(m).set(i, art))),
+    );
   }, [artworks, index, tier]);
+
+  /*
+   * The reproduction is fetched here and nowhere else.
+   *
+   * Until a reveal is asked for, the only picture of a work the browser has
+   * downloaded is its 512px corridor texture — which is what the canvas shows
+   * behind the text, and what the reveal crossfades out of. Revealing asks for
+   * the 1200px rung, which is larger than the canvas is ever drawn; if the
+   * visitor is still standing there a second later, and the device has the
+   * pixels to show it, the 2000px one follows.
+   */
+  useEffect(() => {
+    if (!revealed) return;
+    const art = loaded.get(index);
+    if (!art) return;
+    void loadReveal(art, 'view');
+    if (tier.name !== 'high') return;
+    const upgrade = window.setTimeout(() => void loadReveal(art, 'full'), 900);
+    return () => window.clearTimeout(upgrade);
+  }, [revealed, index, loaded, tier]);
 
   // rail input: wheel / drag / arrows; scroll exits a reveal (spec §9)
   useEffect(() => {

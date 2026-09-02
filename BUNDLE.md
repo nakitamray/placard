@@ -1,13 +1,14 @@
-# Applying `placard-iteration-6.bundle`
+# Applying `placard-iteration-7.bundle`
 
 A git bundle is a single file containing real git history. You pull from it
 exactly as you would from a remote, so nothing is overwritten without you
 asking and every commit keeps its authorship.
 
-**This bundle contains five commits**, on the branch
+**This bundle contains six commits**, on the branch
 `claude/project-iteration-one-ui-1fzn9d`, on top of the commit your repository
 is already on (`37a67ad`). It carries the complete history, so it works against
-an existing clone *or* on a machine with no clone at all.
+an existing clone *or* on a machine with no clone at all. If you already
+applied iteration 6, the sixth commit is the only new one.
 
 ---
 
@@ -20,11 +21,11 @@ From inside your `placard` checkout:
 git log --oneline -1
 
 # 2. pull the branch out of the bundle — ONE line, no line continuation
-git fetch /full/path/to/placard-iteration-6.bundle claude/project-iteration-one-ui-1fzn9d:iteration-6
+git fetch /full/path/to/placard-iteration-7.bundle claude/project-iteration-one-ui-1fzn9d:iteration-7
 
 # 3. look before you leap
-git log --oneline iteration-6
-git diff --stat HEAD iteration-6
+git log --oneline iteration-7
+git diff --stat HEAD iteration-7
 ```
 
 On Windows, quote the path and keep the fetch on one line — PowerShell reads a
@@ -32,29 +33,29 @@ trailing `\` as a literal argument, not as a line continuation, and git then
 rejects it with `fatal: invalid refspec '\'`:
 
 ```powershell
-git fetch "C:\Users\you\Downloads\placard-iteration-6.bundle" claude/project-iteration-one-ui-1fzn9d:iteration-6
+git fetch "C:\Users\you\Downloads\placard-iteration-7.bundle" claude/project-iteration-one-ui-1fzn9d:iteration-7
 ```
 
-That leaves a new local branch called `iteration-6` and changes nothing else.
+That leaves a new local branch called `iteration-7` and changes nothing else.
 When you are happy with it:
 
 ```bash
-git checkout iteration-6
+git checkout iteration-7
 ```
 
-To put it on your own branch name instead, replace `iteration-6` in step 2 with
+To put it on your own branch name instead, replace `iteration-7` in step 2 with
 whatever you want to call it.
 
 **To push it to GitHub yourself** (this session was not permitted to push):
 
 ```bash
-git push -u origin iteration-6
+git push -u origin iteration-7
 ```
 
 ## Option B — fresh machine, no clone
 
 ```bash
-git clone placard-iteration-6.bundle placard
+git clone placard-iteration-7.bundle placard
 cd placard
 git checkout claude/project-iteration-one-ui-1fzn9d
 ```
@@ -88,7 +89,9 @@ pnpm dev
 missing paintings from Wikimedia Commons and records the licence and author for
 each. Run `--dry` first and read the table — search occasionally picks the
 wrong picture, and anything wrong can be pinned by exact file name in
-`data/image-sources.json`. Full detail in the README under **Artwork images**.
+`data/image-sources.json`. Then run it once more with `--pin` and commit what
+it writes back, so every run after it fetches the same pictures without
+searching. Full detail in the README under **Artwork images**.
 
 `pnpm build:assets` is **required**, not optional. It regenerates
 `public/artworks`, `public/landing` and `public/museums` from `data/`, and none
@@ -210,3 +213,55 @@ Measured before: **951 draw calls and 425k triangles per frame** at the Met,
   rebuilds one work. Nothing heavy runs on your laptop.
 - Asset URLs were absolute and would have 404'd from any subpath; they now go
   through `BASE_PATH`. Verified in a browser against a `/placard/` build.
+
+### 6 — Fetching the paintings lightly, and serving them lightly
+
+The fetch and the delivery are the same problem seen from two ends, so both
+moved.
+
+**Fetching.** It now asks Commons to render each file to exactly the 2000px the
+site publishes, rather than pulling the master scan — for a well-photographed
+painting that can be eighty megapixels and a hundred megabytes, all of it
+thrown away by the next step. Fifty works come down in roughly fifteen
+megabytes. Four are resolved at once, but every request still passes through
+one gate that keeps them a quarter-second apart, so opening `--concurrency`
+wider never makes the run less polite. `--pin` writes the resolved file names
+back into `data/image-sources.json`: run it once, commit it, and the fetch
+becomes a lookup instead of a search — which matters, because search rankings
+drift and an exhibition that hangs a different picture next month is not one
+you can point people at.
+
+**Serving.** Measured in a browser on the built site, everything but the
+JavaScript bundle:
+
+| | Before | Now |
+|---|---|---|
+| Landing, first paint | 622 KB · 10 pictures | 22 KB · 2 pictures |
+| Walking into a corridor | 294 KB | 39 KB |
+| Opening a painting's room | — | 34 KB |
+| Revealing a painting | 462 KB | 77 KB |
+| **A full visit** | **1.38 MB** | **0.18 MB** |
+
+- **The landing page was fetching all ten backgrounds at once.** Nine were
+  hidden behind `opacity: 0`, which does not stop a browser downloading a
+  `background-image`. It mounts three now.
+- **Every artwork was loading its 2000px reproduction whether you looked at it
+  or not** — four of them, every time you arrived at a rail. Each painting is
+  now published as a ladder (512 / 1200 / 2000px) and the reproduction is
+  fetched when a reveal asks for it, upgrading to 2000px only if you stay.
+- **Every picture is published as AVIF, WebP and JPEG** and the browser is
+  handed the smallest it can decode. AVIF is about half a JPEG here — but not
+  always, so each variant is checked against its JPEG at build time and
+  re-encoded lower until it genuinely wins.
+- **The low device tier was not low.** `glyphs-lo.bin` came out within two
+  percent of the full field — 128 KB and sixteen thousand instances either way
+  — because it doubled the quadtree's *minimum* cell when the tree bottoms out
+  on the maximum. It is a quarter of the size now, and every glyph field has a
+  budget so that swapping in real scans cannot quietly double the payload and
+  the per-frame cost.
+- The wall label no longer drags a glyph field in behind it: reading a placard
+  fetches five kilobytes of JSON, not the whole work.
+
+Two of those were bugs rather than tuning, and both were invisible until
+measured: the landing page and the low tier were each doing roughly ten times
+the work they appeared to be doing.

@@ -5,19 +5,26 @@
     "  search       the query sent to the Commons search API (namespace 6, files)",
     "  commonsFile  an exact file, e.g. 'File:Mona Lisa.jpg' — used as given,",
     "               skipping search entirely. Add one to pin anything search",
-    "               gets wrong, then re-run with --force --only <id>.",
+    "               gets wrong, then re-run with --only <id>. Changing a pin is",
+    "               enough on its own: a scan fetched from a different file is",
+    "               treated as stale, so --force is not needed to correct one.",
     "  note         why a work is awkward, where it is awkward",
     "",
     "Run `pnpm fetch:images --dry` first and read the table it prints: search",
     "can return the wrong picture, and a wrong painting under the right label",
     "is worse than no painting at all.",
     "",
+    "Then run `pnpm fetch:images --pin` once and commit what it writes back",
+    "here. It records the exact file it chose for every work, so every run after",
+    "it — including every CI run — is a lookup rather than a search. Search",
+    "rankings drift, and an exhibition that hangs a different picture next month",
+    "is not one you can point people at.",
+    "",
     "Everything listed here is a work whose original is old enough to be in the",
     "public domain. Reproductions of them are PD-Art in the US and in most of",
     "Europe; the fetcher records the licence Commons states for each file in",
     "data/artworks/{id}/image-credit.json, and the Credits panel shows it."
   ],
-
   "leonardo-mona-lisa": {
     "commonsFile": "File:Mona Lisa, by Leonardo da Vinci, from C2RMF retouched.jpg",
     "search": "Mona Lisa Leonardo da Vinci Louvre"
@@ -49,7 +56,6 @@
   "leonardo-st-john-baptist": {
     "search": "Leonardo da Vinci Saint John the Baptist Louvre painting"
   },
-
   "hokusai-great-wave": {
     "search": "Hokusai Great Wave off Kanagawa woodblock print"
   },
@@ -85,7 +91,6 @@
   "aztec-codices": {
     "search": "Codex Zouche-Nuttall page Mixtec"
   },
-
   "michelangelo-creation-adam": {
     "search": "Michelangelo Creation of Adam Sistine Chapel"
   },
@@ -116,7 +121,6 @@
   "raphael-coronation-virgin": {
     "search": "Raphael Coronation of the Virgin Oddi altarpiece"
   },
-
   "vangogh-starry-night-rhone": {
     "search": "Van Gogh Starry Night Over the Rhone 1888"
   },
@@ -148,7 +152,6 @@
   "caillebotte-floor-scrapers": {
     "search": "Caillebotte Les raboteurs de parquet Floor Scrapers 1875"
   },
-
   "leutze-washington-delaware": {
     "search": "Emanuel Leutze Washington Crossing the Delaware 1851"
   },

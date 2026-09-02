@@ -9,10 +9,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { selectArtworks, useStore } from '../state/store';
 import { placardAnchor } from '../scenes/GalleryScene';
-import { loadArtwork } from '../glyph/artworkLoader';
-import type { ArtworkMeta, DeviceTier } from '../types';
+import { loadMeta } from '../glyph/artworkLoader';
+import type { ArtworkMeta } from '../types';
 
-export function Placard({ tier }: { tier: DeviceTier }) {
+export function Placard() {
   const phase = useStore((s) => s.phase);
   const index = useStore((s) => s.index);
   const revealed = useStore((s) => s.revealed);
@@ -26,13 +26,15 @@ export function Placard({ tier }: { tier: DeviceTier }) {
     const entry = artworks[index];
     if (!entry) return;
     let alive = true;
-    loadArtwork(entry.id, tier).then((a) => {
-      if (alive) setMeta(a.meta);
+    // only meta.json — the glyph field this work will need is loaded by the
+    // gallery, when and if you actually walk into the room
+    loadMeta(entry.id).then((m) => {
+      if (alive) setMeta(m);
     });
     return () => {
       alive = false;
     };
-  }, [artworks, index, tier]);
+  }, [artworks, index]);
 
   // track the projected plane edge (spec §10.7: offset 40px right of frame,
   // clamped 24px from the viewport edge)

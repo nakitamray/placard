@@ -71,6 +71,13 @@ export interface GlyphConfig {
   paletteSize: number;
   saturationBoost: number;
   contrastBoost: number;
+  /**
+   * Ceiling on the glyphs one work may emit. The visitor pays for every glyph
+   * twice — eight bytes down the wire and one instance in the animated draw —
+   * so this is the single number that decides what a painting costs. If the
+   * quadtree exceeds it, build-glyphs raises the cell floor and runs again.
+   */
+  maxGlyphs: number;
 }
 
 /** Sensible defaults for every artwork; data/artworks/{id}/config.json wins. */
@@ -83,7 +90,24 @@ export const DEFAULT_GLYPH_CONFIG: GlyphConfig = {
   paletteSize: 96,
   saturationBoost: 1.08,
   contrastBoost: 1.05,
+  maxGlyphs: 20000,
 };
+
+/**
+ * The low device tier's variant of the same painting.
+ *
+ * This used to be `minCell × 2` alone, which did almost nothing: the quadtree
+ * bottoms out on `maxCell` long before it reaches the floor, so glyphs-lo.bin
+ * came out within two percent of glyphs.bin — 128KB either way, sixteen
+ * thousand instances either way. The tier existed in the file names and
+ * nowhere else. Doubling the ceiling as well as the floor is what actually
+ * quarters it.
+ */
+export const LOW_TIER_GLYPHS = (cfg: GlyphConfig): Partial<GlyphConfig> => ({
+  minCell: cfg.minCell * 2,
+  maxCell: cfg.maxCell * 2,
+  maxGlyphs: Math.round(cfg.maxGlyphs / 4),
+});
 
 const readJson = <T>(p: string): T => JSON.parse(fs.readFileSync(p, 'utf8')) as T;
 

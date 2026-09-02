@@ -6,15 +6,30 @@
  * manifest — corridor style, floor plan and works — and then plays T1: the
  * landing layers push outward while the corridor, already rendering behind,
  * dollies in from the mouth (spec §11.1).
+ *
+ * Only two backgrounds are ever in the DOM: the one showing and the one about
+ * to. Mounting all ten and hiding nine behind `opacity: 0` does not stop the
+ * browser fetching them — a `background-image` is honoured whatever the
+ * element's opacity — so the landing page used to pull ten full-bleed
+ * paintings before anyone had chosen anything, on the slowest connection in
+ * the visit. It now pulls one, in AVIF or WebP where the browser takes them,
+ * and the next arrives during the six seconds the first one holds.
  */
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { loadMuseum, useStore } from '../state/store';
 import { pointer } from '../state/motion';
 import { asset } from '../lib/asset';
+import { bestFormat } from '../lib/image';
 
 const HOLD_MS = 6000;
 const FADE_MS = 1200;
+
+/** what build-all.ts writes to public/landing/manifest.json */
+interface LandingManifest {
+  files: string[];
+  formats: string[];
+}
 
 export function LandingLayer() {
   const phase = useStore((s) => s.phase);
@@ -29,30 +44,58 @@ export function LandingLayer() {
 
   const [images, setImages] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
+  const [warm, setWarm] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // the previously shown slide, so the outgoing image stays mounted while it
+  // fades — read during render, written after commit
+  const prevRef = useRef<number | null>(null);
+  const prevIndex = prevRef.current;
   const rootRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch(asset('landing/manifest.json'))
-      .then((r) => r.json())
-      .then((files: string[]) => setImages(files.map((f) => asset(`landing/${f}`))))
-      .catch(() => setImages([]));
+    let alive = true;
+    void (async () => {
+      try {
+        const [manifest, format] = await Promise.all([
+          fetch(asset('landing/manifest.json')).then((r) => r.json() as Promise<LandingManifest>),
+          bestFormat(),
+        ]);
+        if (!alive) return;
+        // the manifest names which formats were actually published, so a build
+        // run with PLACARD_SKIP_AVIF=1 does not leave the page asking for them
+        const ext = manifest.formats.includes(format) ? format : manifest.formats.at(-1) ?? 'jpg';
+        setImages(manifest.files.map((f) => asset(`landing/${f}.${ext}`)));
+      } catch {
+        if (alive) setImages([]);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  // slideshow with next-image preload (spec §10.1)
+  useEffect(() => {
+    prevRef.current = current;
+  }, [current]);
+
+  // Hold the next slide back for a couple of seconds. Each one holds for six,
+  // so there is plenty of room to fetch it — and nothing should compete with
+  // the first painting anyone sees.
+  useEffect(() => {
+    setWarm(false);
+    const t = window.setTimeout(() => setWarm(true), 2000);
+    return () => window.clearTimeout(t);
+  }, [current, images]);
+
+  // slideshow (spec §10.1). No explicit preload of the one after next: the
+  // next slide is already mounted and fetching, and reaching further ahead is
+  // how this page ended up downloading the whole set.
   useEffect(() => {
     if (images.length < 2 || reducedMotion) return;
-    const id = setInterval(() => {
-      setCurrent((c) => {
-        const next = (c + 1) % images.length;
-        const pre = new Image();
-        pre.src = images[(next + 1) % images.length];
-        return next;
-      });
-    }, HOLD_MS);
+    const id = setInterval(() => setCurrent((c) => (c + 1) % images.length), HOLD_MS);
     return () => clearInterval(id);
   }, [images, reducedMotion]);
 
@@ -79,6 +122,19 @@ export function LandingLayer() {
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [reducedMotion]);
+
+  // The slide showing; the one it came from, still fading out; and the one it
+  // is about to move to, once there has been a moment to spare for it. On
+  // first paint that is exactly one request instead of ten.
+  const mounted = images.length
+    ? [
+        ...new Set(
+          [prevIndex, current, warm ? (current + 1) % images.length : null].filter(
+            (i) => i !== null,
+          ),
+        ),
+      ].map((i) => ({ i: i as number, src: images[i as number] }))
+    : [];
 
   if (phase !== 'landing' && !leaving) return null;
 
@@ -136,7 +192,7 @@ export function LandingLayer() {
   return (
     <div className={`landing ${leaving ? 'is-leaving' : ''}`} ref={rootRef}>
       <div className="landing-bg" ref={bgRef} aria-hidden>
-        {images.map((src, i) => (
+        {mounted.map(({ src, i }) => (
           <div
             key={src}
             className={`landing-img ${i === current ? 'is-active' : ''}`}

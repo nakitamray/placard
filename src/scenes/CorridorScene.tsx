@@ -31,7 +31,7 @@ import { flash } from '../ui/Flash';
 import { OrnateFrame } from './OrnateFrame';
 import { frameReach } from './frames';
 import { fitWork } from './fit';
-import { asset } from '../lib/asset';
+import { fallbackUrl, imageUrl } from '../lib/image';
 import { Ceiling } from './corridor/Ceiling';
 import { Floor, Walls } from './corridor/Surfaces';
 import { Fixtures } from './corridor/Fixtures';
@@ -44,12 +44,37 @@ import type { Quality } from '../lib/quality';
  * Wall textures, cached by artwork id for the life of the page.
  *
  * This hook is called from more than one component in the same scene, and a
- * TextureLoader per call site means the same ten JPEGs are fetched, decoded
- * and uploaded to the GPU once per caller. Caching by id makes re-entering a
- * museum free as well.
+ * TextureLoader per call site means the same ten thumbnails are fetched,
+ * decoded and uploaded to the GPU once per caller. Caching by id makes
+ * re-entering a museum free as well.
+ *
+ * A corridor is the only place where ten pictures load at once, so it is the
+ * one place the format matters most: these are asked for as AVIF or WebP
+ * where the browser can take them, which is most of a megabyte saved on the
+ * way into a room, and stepped down to JPEG where it cannot.
  */
 const wallTextures = new Map<string, THREE.Texture>();
-const wallLoader = new THREE.TextureLoader();
+
+function loadWallTexture(id: string): THREE.Texture {
+  const tex = new THREE.Texture();
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  const attempt = (url: string) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      tex.image = img;
+      tex.needsUpdate = true;
+    };
+    img.onerror = () => {
+      const next = fallbackUrl(url);
+      if (next) attempt(next);
+    };
+    img.src = url;
+  };
+  attempt(imageUrl(id, 'wall'));
+  return tex;
+}
 
 function useArtworkTextures(artworks: ArtworkIndexEntry[]) {
   return useMemo(
@@ -57,9 +82,7 @@ function useArtworkTextures(artworks: ArtworkIndexEntry[]) {
       artworks.map((a) => {
         const hit = wallTextures.get(a.id);
         if (hit) return hit;
-        const t = wallLoader.load(asset(`artworks/${a.id}/wall.jpg`));
-        t.colorSpace = THREE.SRGBColorSpace;
-        t.anisotropy = 4;
+        const t = loadWallTexture(a.id);
         wallTextures.set(a.id, t);
         return t;
       }),

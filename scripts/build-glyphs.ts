@@ -130,20 +130,27 @@ function nearestPaletteIndex(palette: Uint8Array, r: number, g: number, b: numbe
 
 // ---------- main per-artwork build ----------
 
+/**
+ * Build glyphs.bin for one work.
+ *
+ * `overrides` lets the caller build a coarser variant of the same painting
+ * from the same source — that is how the low device tier's glyphs-lo.bin is
+ * produced.
+ */
 export async function buildGlyphs(
   id: string,
   sourcePath: string,
   cfg: GlyphConfig,
   suffix = '',
-  minCellOverride?: number,
+  overrides: Partial<GlyphConfig> = {},
 ) {
-  const minCell = minCellOverride ?? cfg.minCell;
+  const conf: GlyphConfig = { ...cfg, ...overrides };
 
   if (!fs.existsSync(sourcePath)) {
     throw new Error(`${id}: no source image at ${sourcePath} — run build-images first`);
   }
 
-  const img = sharp(sourcePath).resize({ width: cfg.workingWidth });
+  const img = sharp(sourcePath).resize({ width: conf.workingWidth });
   const { data, info } = await img.raw().toBuffer({ resolveWithObject: true });
   const W = info.width;
   const H = info.height;
@@ -173,67 +180,109 @@ export async function buildGlyphs(
   const satG = new SAT(W, H, linG);
   const satB = new SAT(W, H, linB);
 
-  const emitted: Emitted[] = [];
+  /** one quadtree pass at a given cell floor, ceiling and detail threshold */
+  const subdivide = (minCell: number, maxCell: number, varianceThreshold: number): Emitted[] => {
+    const out: Emitted[] = [];
 
-  const emit = (x0: number, y0: number, x1: number, y1: number) => {
-    const n = (x1 - x0) * (y1 - y0);
-    if (n <= 0) return;
-    // mean colour in LINEAR space, then re-encode (spec §4.2)
-    let r = satR.sum(x0, y0, x1, y1) / n;
-    let g = satG.sum(x0, y0, x1, y1) / n;
-    let b = satB.sum(x0, y0, x1, y1) / n;
-    // saturation boost around the luminance axis, still in linear space
-    const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    r = l + (r - l) * cfg.saturationBoost;
-    g = l + (g - l) * cfg.saturationBoost;
-    b = l + (b - l) * cfg.saturationBoost;
-    // contrast boost around mid-grey
-    const mid = 0.18;
-    r = mid + (r - mid) * cfg.contrastBoost;
-    g = mid + (g - mid) * cfg.contrastBoost;
-    b = mid + (b - mid) * cfg.contrastBoost;
-    emitted.push({
-      x: (x0 + x1) / 2,
-      y: (y0 + y1) / 2,
-      size: Math.min(63.75, (x1 - x0) * cfg.fontScale),
-      r: linearToSrgb(Math.max(0, r)),
-      g: linearToSrgb(Math.max(0, g)),
-      b: linearToSrgb(Math.max(0, b)),
-    });
-  };
+    const emit = (x0: number, y0: number, x1: number, y1: number) => {
+      const n = (x1 - x0) * (y1 - y0);
+      if (n <= 0) return;
+      // mean colour in LINEAR space, then re-encode (spec §4.2)
+      let r = satR.sum(x0, y0, x1, y1) / n;
+      let g = satG.sum(x0, y0, x1, y1) / n;
+      let b = satB.sum(x0, y0, x1, y1) / n;
+      // saturation boost around the luminance axis, still in linear space
+      const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      r = l + (r - l) * conf.saturationBoost;
+      g = l + (g - l) * conf.saturationBoost;
+      b = l + (b - l) * conf.saturationBoost;
+      // contrast boost around mid-grey
+      const mid = 0.18;
+      r = mid + (r - mid) * conf.contrastBoost;
+      g = mid + (g - mid) * conf.contrastBoost;
+      b = mid + (b - mid) * conf.contrastBoost;
+      out.push({
+        x: (x0 + x1) / 2,
+        y: (y0 + y1) / 2,
+        size: Math.min(63.75, (x1 - x0) * conf.fontScale),
+        r: linearToSrgb(Math.max(0, r)),
+        g: linearToSrgb(Math.max(0, g)),
+        b: linearToSrgb(Math.max(0, b)),
+      });
+    };
 
-  // quadtree — iterative queue (spec §4.2)
-  const queue: Array<[number, number, number, number]> = [[0, 0, W, H]];
-  while (queue.length) {
-    const [x0, y0, x1, y1] = queue.pop()!;
-    const size = Math.max(x1 - x0, y1 - y0);
-    if (size <= minCell) {
-      emit(x0, y0, x1, y1);
-      continue;
-    }
-    const n = (x1 - x0) * (y1 - y0);
-    const mean = satL.sum(x0, y0, x1, y1) / n;
-    const variance = Math.max(0, satL2.sum(x0, y0, x1, y1) / n - mean * mean);
-    if (variance > cfg.varianceThreshold || size > cfg.maxCell) {
-      const mx = (x0 + x1) >> 1;
-      const my = (y0 + y1) >> 1;
-      // guard degenerate splits on non-square roots
-      if (mx > x0 && my > y0) {
-        queue.push([x0, y0, mx, my], [mx, y0, x1, my], [x0, my, mx, y1], [mx, my, x1, y1]);
-      } else if (mx > x0) {
-        queue.push([x0, y0, mx, y1], [mx, y0, x1, y1]);
-      } else if (my > y0) {
-        queue.push([x0, y0, x1, my], [x0, my, x1, y1]);
+    // quadtree — iterative queue (spec §4.2)
+    const queue: Array<[number, number, number, number]> = [[0, 0, W, H]];
+    while (queue.length) {
+      const [x0, y0, x1, y1] = queue.pop()!;
+      const size = Math.max(x1 - x0, y1 - y0);
+      if (size <= minCell) {
+        emit(x0, y0, x1, y1);
+        continue;
+      }
+      const n = (x1 - x0) * (y1 - y0);
+      const mean = satL.sum(x0, y0, x1, y1) / n;
+      const variance = Math.max(0, satL2.sum(x0, y0, x1, y1) / n - mean * mean);
+      if (variance > varianceThreshold || size > maxCell) {
+        const mx = (x0 + x1) >> 1;
+        const my = (y0 + y1) >> 1;
+        // guard degenerate splits on non-square roots
+        if (mx > x0 && my > y0) {
+          queue.push([x0, y0, mx, my], [mx, y0, x1, my], [x0, my, mx, y1], [mx, my, x1, y1]);
+        } else if (mx > x0) {
+          queue.push([x0, y0, mx, y1], [mx, y0, x1, y1]);
+        } else if (my > y0) {
+          queue.push([x0, y0, x1, my], [x0, my, x1, y1]);
+        } else {
+          emit(x0, y0, x1, y1);
+        }
       } else {
         emit(x0, y0, x1, y1);
       }
-    } else {
-      emit(x0, y0, x1, y1);
     }
+    return out;
+  };
+
+  /**
+   * Hold the glyph count to a budget.
+   *
+   * The count is what the visitor pays for twice over: eight bytes each down
+   * the wire, and one instance each in the draw that animates them. A smooth
+   * stand-in bottoms out on `maxCell` and lands around sixteen thousand, but a
+   * real scan — canvas weave, craquelure, a crowd scene — keeps finding
+   * variance all the way down to `minCell` and can emit four times that from
+   * the same image. Left alone, swapping in the authentic paintings would have
+   * quietly quadrupled both the payload and the per-frame cost.
+   *
+   * So: raise the cell floor and re-run until the count fits. The summed-area
+   * tables are already built, so each extra pass is a few milliseconds, and
+   * the result degrades the way you would want — the finest strokes coarsen
+   * first, the composition survives.
+   */
+  let minCell = conf.minCell;
+  let maxCell = conf.maxCell;
+  let threshold = conf.varianceThreshold;
+  let emitted = subdivide(minCell, maxCell, threshold);
+  let passes = 0;
+  while (emitted.length > conf.maxGlyphs && passes < 12) {
+    if (passes < 8) {
+      // Raise the detail threshold first. This is the gentle knob: it stops
+      // the quadtree chasing variance into the flattest parts of the canvas —
+      // sky, a wall, a dark ground — and leaves the faces and the brushwork
+      // exactly as they were.
+      threshold *= 1.7;
+    } else {
+      // Only if that has not been enough, coarsen the cells themselves. Each
+      // doubling quarters the count, which is blunt, hence its being last.
+      minCell *= 2;
+      if (minCell > maxCell) maxCell *= 2;
+    }
+    emitted = subdivide(minCell, maxCell, threshold);
+    passes++;
   }
 
   // sort row-major: y band (by maxCell), then x — CORPUS READING ORDER (spec §4.2)
-  const band = cfg.maxCell;
+  const band = maxCell;
   emitted.sort((a, b) => {
     const ba = Math.floor(a.y / band);
     const bb = Math.floor(b.y / band);
@@ -243,7 +292,7 @@ export async function buildGlyphs(
   // palette: quantise emitted colours via median-cut (spec §4.2 step 7)
   const palette = medianCut(
     emitted.map((e) => [e.r, e.g, e.b] as [number, number, number]),
-    cfg.paletteSize,
+    conf.paletteSize,
   );
   const paletteSize = palette.length / 3;
 
@@ -291,7 +340,9 @@ export async function buildGlyphs(
   }
 
   console.log(
-    `  glyphs${suffix || '   '}  ${emitted.length} glyphs, ${paletteSize} colours, ${(buf.length / 1024).toFixed(0)} KB (${W}×${H})`,
+    `  glyphs${suffix || '   '}  ${emitted.length} glyphs, ${paletteSize} colours, ` +
+      `${(buf.length / 1024).toFixed(0)} KB (${W}×${H})` +
+      (passes ? `  [coarsened ${passes}× to fit ${conf.maxGlyphs}]` : ''),
   );
   return emitted.length;
 }

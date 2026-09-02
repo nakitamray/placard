@@ -48,6 +48,17 @@ export interface ArtworkMeta {
     url: string;
   };
   image: { file: string; source: string; license: string; photoCredit: string };
+  /**
+   * Which variants of this painting were actually published, and what each
+   * one weighs. Written by scripts/build-images.ts; `src/lib/image.ts` names
+   * the same files by convention, so nothing at runtime has to read this —
+   * it is here so a build can be audited without listing the directory.
+   */
+  images?: {
+    formats: string[];
+    sizes: Array<{ name: string; long: number }>;
+    bytes: Record<string, number>;
+  };
   accentColor?: string;
   regions: ArtworkRegion[];
   corpus: {

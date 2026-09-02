@@ -2,9 +2,16 @@
  * ArtworkPlane — the painting surface in the gallery.
  *
  * Active plane samples the shared glyph render target; inactive planes show
- * their static wall.jpg, dimmed (spec §7.4 LOD). The reveal crossfades to the
- * authentic painting (full.jpg, lqip blur-up first). Fidelity path:
- * tone mapping is skipped so the reproduction stays faithful.
+ * their 512px corridor texture, dimmed (spec §7.4 LOD). The reveal crossfades
+ * to the authentic painting. Fidelity path: tone mapping is skipped so the
+ * reproduction stays faithful.
+ *
+ * The reproduction is fetched only once a reveal asks for it, so for the first
+ * moment of a reveal there is nothing to cross-fade to yet. `uHasPaint` is
+ * that moment: it holds at 0 while the only picture in hand is the 512px
+ * texture — which is exactly the blur-up the spec wants, at no extra request —
+ * and eases to 1 over a third of a second when the reproduction lands. Without
+ * it the painting snaps into focus mid-dissolve on a slow connection.
  */
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -79,13 +86,14 @@ export function ArtworkPlane({
     [],
   );
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const u = uniforms;
     if (artwork) {
       u.uWall.value = artwork.wallTex;
-      const paint = artwork.fullTex ?? artwork.wallTex;
-      u.uPaint.value = paint;
-      u.uHasPaint.value = 1;
+      u.uPaint.value = artwork.fullTex ?? artwork.wallTex;
+      const want = artwork.fullTex ? 1 : 0;
+      const k = 1 - Math.pow(0.001, Math.min(delta, 0.1) / 0.35);
+      u.uHasPaint.value += (want - u.uHasPaint.value) * k;
     }
     if (active && glyphRT.current) {
       u.uGlyph.value = glyphRT.current.texture;

@@ -143,7 +143,7 @@ export default function App() {
       {phase === 'boot' && <LoadingBar progress={progress} />}
       <LandingLayer />
       <MapOverlay />
-      <Placard tier={tier} />
+      <Placard />
       <ThreadPull tier={tier} />
       <RailIndicator />
       {phase === 'corridor' && (
