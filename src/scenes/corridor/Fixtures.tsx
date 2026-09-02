@@ -275,18 +275,25 @@ function Plinth({ h, w, color }: { h: number; w: number; color: string }) {
   );
 }
 
-/** low dark bench, the kind that sits down the middle of a painting gallery */
+/**
+ * Low bench, the kind that sits down the middle of a painting gallery.
+ *
+ * Read as a black hole in the floor at the old value: a near-black diffuse
+ * surface under a dim room returns almost nothing, so a bench close to the
+ * camera came out as a flat void rather than as furniture. Waxed dark oak
+ * with some sheen catches the lamps and reads as an object.
+ */
 function Bench({ length }: { length: number }) {
   return (
     <group>
       <mesh position={[0, 0.42, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.62, 0.1, length]} />
-        <meshStandardMaterial color="#2A2420" roughness={0.5} />
+        <meshStandardMaterial color="#54443A" roughness={0.38} metalness={0.05} />
       </mesh>
       {[-1, 1].map((s) => (
         <mesh key={s} position={[0, 0.19, (s * length) / 3]} castShadow>
           <boxGeometry args={[0.5, 0.36, 0.12]} />
-          <meshStandardMaterial color="#1E1A16" roughness={0.6} />
+          <meshStandardMaterial color="#42342C" roughness={0.5} />
         </mesh>
       ))}
     </group>

@@ -17,26 +17,48 @@
     "placeholder": {
       "aspect": 1.475,
       "archetype": "wave",
-      "palette": ["#0E1C2E", "#1E3A5C", "#3E6A96", "#8FA9BF", "#E8E2D2", "#F2EFE6"],
+      "palette": [
+        "#0E1C2E",
+        "#1E3A5C",
+        "#3E6A96",
+        "#8FA9BF",
+        "#E8E2D2",
+        "#F2EFE6"
+      ],
       "seed": 21
     },
     "regions": [
       {
         "id": "claw",
         "label": "The claw of foam",
-        "box": [0.16, 0.02, 0.66, 0.46],
+        "box": [
+          0.16,
+          0.02,
+          0.66,
+          0.46
+        ],
         "text": "The crest breaks into fingers that reach over the boats — a shape Hokusai arrived at over decades of drawing water, and one that photography would later confirm as roughly what a breaking wave actually does. It also puts the wave in the compositional position of a mountain peak, which is the print's central joke and its central idea."
       },
       {
         "id": "fuji",
         "label": "Mount Fuji",
-        "box": [0.38, 0.55, 0.62, 0.82],
+        "box": [
+          0.38,
+          0.55,
+          0.62,
+          0.82
+        ],
         "text": "The sacred mountain, the subject of the whole series of thirty-six views, is here reduced to a small white triangle sitting in the trough, so far away that a wave can cover it. The permanent thing is made small and the momentary thing is made enormous. Every other print in the series argues the opposite."
       },
       {
         "id": "boats",
         "label": "The boats",
-        "box": [0.1, 0.42, 0.9, 0.78],
+        "box": [
+          0.1,
+          0.42,
+          0.9,
+          0.78
+        ],
         "text": "Three oshiokuri-bune, the fast, narrow craft that raced live fish into Edo. There are eight rowers to a boat and they are not flailing — they are crouched flat along the thwarts in the practised posture of men who have met this before and expect to meet it again tomorrow."
       }
     ]
@@ -59,7 +81,14 @@
     "placeholder": {
       "aspect": 1.18,
       "archetype": "register",
-      "palette": ["#2E2216", "#5C4526", "#8A6C38", "#B99A62", "#E6D9B8", "#2F7A78"],
+      "palette": [
+        "#2E2216",
+        "#5C4526",
+        "#8A6C38",
+        "#B99A62",
+        "#E6D9B8",
+        "#2F7A78"
+      ],
       "seed": 22
     }
   },
@@ -77,12 +106,18 @@
     "creditLine": "Acquired 1903",
     "accentColor": "#4A4034",
     "labelText": "One of the earliest Chinese paintings to survive in any form: nine scenes illustrating a third-century text of instruction for palace women, painted in fine line and thin colour on silk. A handscroll is not meant to be hung. It is opened an arm's width at a time, read right to left, and rolled shut behind you — so the picture is experienced as duration rather than as a single view. The section shown here is one of those arm's-widths.",
-    "extendedNote": "The scroll is almost certainly a Tang copy of a lost original attributed to Gu Kaizhi, one of the first Chinese painters known by name. That layering is normal in Chinese painting, where copying a master was scholarship rather than forgery, and where the copy carries the original forward when the original perishes.\n\nIts surface is a record of everyone who ever owned it. Emperor Huizong wrote on it in the twelfth century; the Qianlong Emperor added an orchid he painted himself and a great many seals; collectors stamped their marks in red across the silk for a thousand years. It left the Summer Palace during the looting of 1900 and was sold to the British Museum for twenty-five pounds by a cavalry officer who thought the jade toggle was the valuable part. The painting itself is deliberately plain in technique — even, wire-thin outline, colour laid inside it like a wash — because the point of the images is the text they carry, which advises court women that beauty without virtue is a danger and that no one, however favoured, is safe."
-    ,
+    "extendedNote": "The scroll is almost certainly a Tang copy of a lost original attributed to Gu Kaizhi, one of the first Chinese painters known by name. That layering is normal in Chinese painting, where copying a master was scholarship rather than forgery, and where the copy carries the original forward when the original perishes.\n\nIts surface is a record of everyone who ever owned it. Emperor Huizong wrote on it in the twelfth century; the Qianlong Emperor added an orchid he painted himself and a great many seals; collectors stamped their marks in red across the silk for a thousand years. It left the Summer Palace during the looting of 1900 and was sold to the British Museum for twenty-five pounds by a cavalry officer who thought the jade toggle was the valuable part. The painting itself is deliberately plain in technique — even, wire-thin outline, colour laid inside it like a wash — because the point of the images is the text they carry, which advises court women that beauty without virtue is a danger and that no one, however favoured, is safe.",
     "placeholder": {
       "aspect": 3.4,
       "archetype": "register",
-      "palette": ["#2A2218", "#4E4232", "#7A6A52", "#A99878", "#DCCFB4", "#8C3A2E"],
+      "palette": [
+        "#2A2218",
+        "#4E4232",
+        "#7A6A52",
+        "#A99878",
+        "#DCCFB4",
+        "#8C3A2E"
+      ],
       "seed": 23
     }
   },
@@ -104,7 +139,14 @@
     "placeholder": {
       "aspect": 0.58,
       "archetype": "portrait",
-      "palette": ["#1A120C", "#3A281C", "#5E4430", "#8E6E4E", "#C9A882", "#9C2E22"],
+      "palette": [
+        "#1A120C",
+        "#3A281C",
+        "#5E4430",
+        "#8E6E4E",
+        "#C9A882",
+        "#9C2E22"
+      ],
       "seed": 24
     }
   },
@@ -126,7 +168,14 @@
     "placeholder": {
       "aspect": 3.0,
       "archetype": "register",
-      "palette": ["#2C2418", "#584828", "#877044", "#B79B6C", "#E8DDC2", "#A6402A"],
+      "palette": [
+        "#2C2418",
+        "#584828",
+        "#877044",
+        "#B79B6C",
+        "#E8DDC2",
+        "#A6402A"
+      ],
       "seed": 25
     }
   },
@@ -148,7 +197,14 @@
     "placeholder": {
       "aspect": 0.6,
       "archetype": "portrait",
-      "palette": ["#302A20", "#544A38", "#7E7258", "#ADA184", "#E4DCC6", "#8A5C3A"],
+      "palette": [
+        "#302A20",
+        "#544A38",
+        "#7E7258",
+        "#ADA184",
+        "#E4DCC6",
+        "#8A5C3A"
+      ],
       "seed": 26
     }
   },
@@ -170,29 +226,43 @@
     "placeholder": {
       "aspect": 1.38,
       "archetype": "still-life",
-      "palette": ["#2A2C22", "#4E5440", "#7B8264", "#ADB08C", "#EAE6D2", "#C4682E"],
+      "palette": [
+        "#2A2C22",
+        "#4E5440",
+        "#7B8264",
+        "#ADB08C",
+        "#EAE6D2",
+        "#C4682E"
+      ],
       "seed": 27
     }
   },
   {
-    "id": "book-of-the-dead-ani",
-    "artist": "Unknown scribes and painters, Thebes",
-    "artistDates": "New Kingdom, Dynasty XIX",
-    "title": "The Book of the Dead of Ani",
-    "titleOriginal": "The Papyrus of Ani",
-    "year": "c. 1250 BC",
-    "medium": "Painted and inscribed papyrus",
-    "dimensions": "42 cm high; over 23 m long — shown here as a section",
-    "room": "Egyptian galleries",
-    "accession": "EA 10470",
-    "creditLine": "Acquired 1888",
-    "accentColor": "#6A4E2C",
-    "labelText": "The finest surviving copy of the Egyptian funerary text we call the Book of the Dead, made for a scribe named Ani and his wife Tutu. Its most famous section shows the weighing of the heart: Ani's heart in one pan of a balance, the feather of Maat in the other, Anubis adjusting the plumb, Thoth recording the verdict, and beside the scales a composite monster waiting to eat anyone who fails. Ani passes.",
-    "extendedNote": "The papyrus was bought for the British Museum in 1888 by E. A. Wallis Budge, who cut it into thirty-seven sheets to get it out of Egypt — an act that made it portable and did permanent damage, and which is now part of what the object is. It runs to over twenty-three metres of spells, illustrated in a register above the text with figures drawn in confident outline and filled with flat mineral colour.\n\nWhat the book is for is practical rather than devotional. It is a set of instructions and passwords: how to answer the forty-two assessors, what to say to the gatekeepers, how to stop your heart from testifying against you. The scribes assembled each copy from a common stock of spells to order, leaving blanks for the owner's name to be dropped in — which is visible here and there, where the name was written by a second, hastier hand. Ani was a real official who managed temple property, and the astonishing thing about the manuscript is how carefully something so standardised was made for one particular man.",
+    "id": "durer-rhinoceros",
+    "artist": "Albrecht Dürer",
+    "artistDates": "1471–1528",
+    "title": "The Rhinoceros",
+    "titleOriginal": "Rhinocerus",
+    "year": "1515",
+    "medium": "Woodcut on paper",
+    "dimensions": "21.4 × 29.8 cm",
+    "room": "Prints and Drawings",
+    "accession": "1895,0122.714",
+    "creditLine": "British Museum, London",
+    "accentColor": "#4A3B2A",
+    "labelText": "Dürer never saw a rhinoceros. One had arrived in Lisbon in 1515, the first in Europe since the Roman empire, and a sketch and a written description travelled north to Nuremberg. From those he cut this: armour-plated, riveted, scaled at the shoulder, with a small twisted horn on its back that no rhinoceros has ever had. It is wrong, and it was believed. For two hundred and fifty years European schoolbooks drew the rhinoceros from this woodcut rather than from the animal.",
+    "extendedNote": "The block is cut with the confidence of something observed. Dürer gives the hide the logic of plate armour — gorget, pauldron, tasset — because armour was the closest thing in his workshop's visual vocabulary to a skin arranged in overlapping folds. The engraved-looking texture that covers the legs is a shorthand for reptile scale, and the whole animal is drawn standing on a shallow strip of ground with no landscape at all behind it, so that nothing competes with the description.\n\nThe text block above it repeats what Dürer had been told: the date of the animal's arrival, its Indian origin, its supposed enmity with the elephant. It is a news report as much as a picture, and it sold in that spirit — impressions were still being pulled from the block in the eighteenth century. The British Museum's impression comes from the first edition, before the block cracked.",
     "placeholder": {
-      "aspect": 3.0,
-      "archetype": "register",
-      "palette": ["#2A2014", "#54402A", "#836848", "#B49874", "#E9DEC4", "#B03A24"],
+      "aspect": 1.394,
+      "archetype": "still-life",
+      "palette": [
+        "#241C12",
+        "#4A3A26",
+        "#7C6743",
+        "#AD9668",
+        "#DCCCA6",
+        "#F0E7D2"
+      ],
       "seed": 28
     }
   },
@@ -214,29 +284,42 @@
     "placeholder": {
       "aspect": 0.7,
       "archetype": "fresco",
-      "palette": ["#2A1E16", "#4E3A28", "#7C6244", "#AC9068", "#E2D2B0", "#B0442C"],
+      "palette": [
+        "#2A1E16",
+        "#4E3A28",
+        "#7C6244",
+        "#AC9068",
+        "#E2D2B0",
+        "#B0442C"
+      ],
       "seed": 29
     }
   },
   {
-    "id": "aztec-codices",
-    "artist": "Mixtec painter-scribes",
-    "artistDates": "before 1521",
-    "title": "The Codex Zouche-Nuttall",
-    "titleOriginal": "Mixtec painted screenfold",
-    "year": "14th–15th century",
-    "medium": "Mineral pigment on gessoed deerskin, screenfold",
-    "dimensions": "19 cm high; 11.4 m long — shown here as a section",
-    "room": "Americas galleries",
-    "accession": "Am1902,0308.1",
-    "creditLine": "Acquired 1902",
-    "accentColor": "#6A3A2A",
-    "labelText": "A screenfold of deerskin, gessoed white and painted on both sides in red, ochre, black and turquoise, folded like a concertina into forty-seven leaves. It is not decoration and not writing in the alphabetic sense: it is a history, recording the dynastic genealogy of Mixtec rulers and the campaigns of the warlord Eight Deer Jaguar Claw, in a pictorial system that encodes names, dates, places and events with complete precision.",
-    "extendedNote": "Only a handful of Mesoamerican books survived the Spanish invasion and the burnings that followed it. This one left Mexico early, passed through a Florentine monastery, and reached the British Museum in 1902; it is named after the collector Robert Curzon, Baron Zouche, and the scholar Zelia Nuttall, who published it.\n\nReading it means learning its conventions. Individuals are named by their calendar date of birth — Eight Deer, Six Monkey — with a personal name attached as a picture; places are shown as glyphic hill-signs; the sequence runs in a boustrophedon, back and forth along red guide lines, so the eye is steered through the page rather than left to scan it. The painting is flat, outlined in black and filled with unmodulated colour, and every element is legible at a glance to anyone trained in the system. That system was a technology of government, and it was destroyed almost completely within a generation of 1521. What is left in this case is one dynasty's account of itself, made by its own scribes, in its own terms — which is rarer than the object's modest appearance suggests.",
+    "id": "hiroshige-sudden-shower",
+    "artist": "Utagawa Hiroshige",
+    "artistDates": "1797–1858",
+    "title": "Sudden Shower over Shin-Ōhashi Bridge and Atake",
+    "titleOriginal": "大はしあたけの夕立 · Ōhashi Atake no yūdachi",
+    "year": "1857",
+    "medium": "Colour woodblock print, from One Hundred Famous Views of Edo",
+    "dimensions": "36.2 × 24.2 cm",
+    "room": "Japanese galleries",
+    "accession": "",
+    "accentColor": "#27384F",
+    "labelText": "Rain drawn as line. The downpour is cut into the block as two crossing sets of fine parallel strokes, laid at slightly different angles so the shower has depth, and the figures on the bridge hurry under it with their backs bent and their umbrellas tipped forward. The far bank at Atake has already dissolved into a flat grey band. Nothing in the picture is dramatic except the weather, and the weather is only straight lines.",
+    "extendedNote": "The bridge cuts the sheet on a diagonal from lower left to upper right, and everything else is arranged against it: the raft below, the dark water, the vertical rain. Hiroshige uses the bokashi gradation the Edo printers had perfected — ink wiped from the block by hand before each impression — so the river darkens toward the bottom edge and the sky darkens toward the top, and the lit band across the middle is where the whole composition breathes.\n\nVan Gogh copied it in oil in 1887, squaring it up and surrounding it with a border of invented Japanese characters. He could not reproduce the rain: what is a single confident cut in the woodblock became, in paint, a thicket of brushstrokes. The print is the argument for the medium — a shower rendered by a knife in cherrywood, printed identically several thousand times.",
     "placeholder": {
-      "aspect": 2.4,
-      "archetype": "register",
-      "palette": ["#241A14", "#4E2E20", "#8A5230", "#BC8A54", "#EEE2C6", "#2C7A82"],
+      "aspect": 0.669,
+      "archetype": "landscape",
+      "palette": [
+        "#141C28",
+        "#27384F",
+        "#4C627E",
+        "#8496A6",
+        "#C4C8C4",
+        "#E4E0D4"
+      ],
       "seed": 30
     }
   }

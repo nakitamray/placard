@@ -1,14 +1,14 @@
-# Applying `placard-iteration-7.bundle`
+# Applying `placard-iteration-8.bundle`
 
 A git bundle is a single file containing real git history. You pull from it
 exactly as you would from a remote, so nothing is overwritten without you
 asking and every commit keeps its authorship.
 
-**This bundle contains six commits**, on the branch
+**This bundle contains seven commits**, on the branch
 `claude/project-iteration-one-ui-1fzn9d`, on top of the commit your repository
 is already on (`37a67ad`). It carries the complete history, so it works against
 an existing clone *or* on a machine with no clone at all. If you already
-applied iteration 6, the sixth commit is the only new one.
+applied iteration 7, the seventh commit is the only new one.
 
 ---
 
@@ -21,11 +21,11 @@ From inside your `placard` checkout:
 git log --oneline -1
 
 # 2. pull the branch out of the bundle — ONE line, no line continuation
-git fetch /full/path/to/placard-iteration-7.bundle claude/project-iteration-one-ui-1fzn9d:iteration-7
+git fetch /full/path/to/placard-iteration-8.bundle claude/project-iteration-one-ui-1fzn9d:iteration-8
 
 # 3. look before you leap
-git log --oneline iteration-7
-git diff --stat HEAD iteration-7
+git log --oneline iteration-8
+git diff --stat HEAD iteration-8
 ```
 
 On Windows, quote the path and keep the fetch on one line — PowerShell reads a
@@ -33,29 +33,29 @@ trailing `\` as a literal argument, not as a line continuation, and git then
 rejects it with `fatal: invalid refspec '\'`:
 
 ```powershell
-git fetch "C:\Users\you\Downloads\placard-iteration-7.bundle" claude/project-iteration-one-ui-1fzn9d:iteration-7
+git fetch "C:\Users\you\Downloads\placard-iteration-8.bundle" claude/project-iteration-one-ui-1fzn9d:iteration-8
 ```
 
-That leaves a new local branch called `iteration-7` and changes nothing else.
+That leaves a new local branch called `iteration-8` and changes nothing else.
 When you are happy with it:
 
 ```bash
-git checkout iteration-7
+git checkout iteration-8
 ```
 
-To put it on your own branch name instead, replace `iteration-7` in step 2 with
+To put it on your own branch name instead, replace `iteration-8` in step 2 with
 whatever you want to call it.
 
 **To push it to GitHub yourself** (this session was not permitted to push):
 
 ```bash
-git push -u origin iteration-7
+git push -u origin iteration-8
 ```
 
 ## Option B — fresh machine, no clone
 
 ```bash
-git clone placard-iteration-7.bundle placard
+git clone placard-iteration-8.bundle placard
 cd placard
 git checkout claude/project-iteration-one-ui-1fzn9d
 ```
@@ -265,3 +265,59 @@ JavaScript bundle:
 Two of those were bugs rather than tuning, and both were invisible until
 measured: the landing page and the low tier were each doing roughly ten times
 the work they appeared to be doing.
+
+### 7 — The right pictures, and a room you can actually look at
+
+**The pictures.** Every one of your complaints about the images was the same
+bug: the fetcher chose a file by matching words in its name, and Commons is
+full of files whose names match perfectly and whose contents are a photograph
+of the painting *in its frame*, or on a gallery wall with people in front of
+it, or an engraving after it. That is now three steps instead of one — a
+hand-pinned file, then **Wikidata's own statement of which picture is this
+artwork** (found and then *proved*: it has to be typed as an artwork and its
+description has to name the artist), and only then a scored search.
+
+The sharpest new test is arithmetic. Every record already states the work's
+real dimensions, so its true proportions are known before anything is
+downloaded — and a frame or a room around a canvas changes them by far more
+than two reproductions of the same painting ever differ. A picture that does
+not have the shape of the painting is refused, and so is anything that cannot
+clear a minimum score: **a work left on its stand-in is honest, a wrong one is
+not.**
+
+And every run now writes **`data/.cache/contact-sheet.html`** — all fifty
+pictures on one page with the file each came from and a copyable *pin this*
+block. Open it after fetching. Checking fifty works by clicking through fifty
+Commons pages is why nobody checks.
+
+**The British Museum.** The Papyrus of Ani and the Codex Zouche-Nuttall are
+gone — you were right, they are books. In their place: **Dürer's *Rhinoceros***
+and **Hiroshige's *Sudden Shower over Shin-Ōhashi Bridge***.
+
+**The paintings are bigger.** Every frame moulding is thirty percent narrower
+radially while keeping its depth, so it still steps and catches light across
+five planes but takes a third less of the canvas. The canvas itself is larger
+in both the corridor and the artwork room, the camera stands closer, and the
+wall label no longer sits on top of the picture — the room slides aside for it
+and the label holds the right-hand column instead of chasing the frame edge.
+
+**The label stays up.** It used to be tied to the cursor being over the
+canvas, which meant reading it required holding the mouse somewhere other than
+where you were reading, and scrolling to the end of the note dismissed it.
+Hovering still reveals loosely — the text field is the exhibition and brushing
+past a work should not cost you it — but **clicking the canvas, pressing Enter,
+or just moving the cursor onto the label latches it open**, with a ✕ to close.
+Scrolling inside it no longer moves the room.
+
+**Smooth / Balanced / Rich now say what they are.** Hovering one names the
+trade in a sentence and lists what it turns on; choosing one prints a line
+saying what just changed.
+
+**The corridor lights one work at a time.** Bring the cursor onto a canvas and
+the room's exposure drops while a narrow warm spot comes up on that painting —
+which is how a gallery is actually lit.
+
+**Zoom.** `+` and `−`, ⌘/Ctrl-scroll, or pinch. In the corridor it narrows the
+lens so the far end of the enfilade comes to you; in a room it steps you toward
+the canvas, close enough to read the individual letters the painting is built
+from. `0` returns to the composed distance.

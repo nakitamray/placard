@@ -2,10 +2,12 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { selectArtworks, useStore } from './state/store';
-import { attachPointer, pointer } from './state/motion';
+import { attachPointer, attachZoom, pointer, resetZoom } from './state/motion';
 import { detectTier, webgl2Supported } from './lib/deviceTier';
 import {
+  QUALITY_INFO,
   initialQuality,
+  qualityDelta,
   qualityFor,
   stepDown,
   storeQuality,
@@ -48,6 +50,9 @@ export default function App() {
   };
 
   useEffect(() => attachPointer(), []);
+  useEffect(() => attachZoom(), []);
+  // a new room is seen at the distance it was composed for
+  useEffect(() => resetZoom(), [phase]);
 
   // BOOT: fetch the list of museums, then land. The chosen museum's own
   // manifest is fetched on selection, so entering one wing never costs the
@@ -249,23 +254,63 @@ function QualityToggle({
   value: QualityName;
   onChange: (q: QualityName) => void;
 }) {
-  const options: Array<[QualityName, string]> = [
-    ['low', 'Smooth'],
-    ['mid', 'Balanced'],
-    ['high', 'Rich'],
-  ];
+  const order: QualityName[] = ['low', 'mid', 'high'];
+  // what the pointer is over, else what was just chosen, else nothing
+  const [peek, setPeek] = useState<QualityName | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+
+  const choose = (name: QualityName) => {
+    if (name !== value) setNote(qualityDelta(value, name));
+    onChange(name);
+  };
+
+  // the confirmation is a receipt, not a panel: it says what changed and goes
+  useEffect(() => {
+    if (!note) return;
+    const t = window.setTimeout(() => setNote(null), 3600);
+    return () => window.clearTimeout(t);
+  }, [note]);
+
+  const shown = peek ?? (note ? value : null);
+  const info = shown ? QUALITY_INFO[shown] : null;
+
   return (
-    <div className="quality-toggle caption" role="group" aria-label="Rendering quality">
-      {options.map(([name, label]) => (
-        <button
-          key={name}
-          className={value === name ? 'is-on' : ''}
-          aria-pressed={value === name}
-          onClick={() => onChange(name)}
-        >
-          {label}
-        </button>
-      ))}
+    <div className="quality" onPointerLeave={() => setPeek(null)}>
+      {(info || note) && (
+        <div className="quality-card caption" role="status">
+          {note ? (
+            <p className="quality-changed">{note}</p>
+          ) : (
+            info && (
+              <>
+                <p className="quality-name">{info.label}</p>
+                <p className="quality-summary">{info.summary}</p>
+                <ul className="quality-buys">
+                  {info.buys.map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
+              </>
+            )
+          )}
+        </div>
+      )}
+      <div className="quality-toggle caption" role="group" aria-label="Rendering quality">
+        {order.map((name) => (
+          <button
+            key={name}
+            className={value === name ? 'is-on' : ''}
+            aria-pressed={value === name}
+            onClick={() => choose(name)}
+            onPointerEnter={() => setPeek(name)}
+            onFocus={() => setPeek(name)}
+            onBlur={() => setPeek(null)}
+            title={QUALITY_INFO[name].summary}
+          >
+            {QUALITY_INFO[name].label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

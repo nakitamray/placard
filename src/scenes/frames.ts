@@ -51,7 +51,7 @@ interface FrameSpec {
  * All dimensions are fractions of the painting's height, so a frame keeps its
  * proportions whether it is around a Vermeer or around the Raft of the Medusa.
  */
-const SPECS: Record<FrameKind, FrameSpec> = {
+const MEASURED: Record<FrameKind, FrameSpec> = {
   // Deep salon frame: gilt sight lip, dark cove, broad gilt ogee, bead course
   // and corner cartouches. The Louvre's densely stacked hang needs frames that
   // separate one canvas from the next at three metres.
@@ -114,6 +114,68 @@ const SPECS: Record<FrameKind, FrameSpec> = {
     bead: { offset: 0.105, radius: 0.007, spacing: 0.038, role: 'gilt' },
   },
 };
+
+/**
+ * Frames are for the painting, not the other way round.
+ *
+ * The first version of these mouldings was drawn from real salon frames,
+ * which on a real wall are seen from four metres in a room full of other
+ * things. On a screen, at the one distance the camera ever stands, the same
+ * proportions read as a slab of gilt with a picture in the middle of it — the
+ * ornament wins and the painting loses, which is exactly backwards.
+ *
+ * So every course is narrowed radially while keeping most of its depth. The
+ * frame still steps and still catches light across four or five planes, which
+ * is what makes it read as carved rather than printed; it simply takes a
+ * third less of the canvas's height doing it. The numbers below stay as
+ * measured from the real thing, so the reference is still legible in the
+ * source, and this is the one place the compromise is stated.
+ */
+const SLIM = {
+  /** radial width and offset — how much of the painting the frame eats */
+  radial: 0.7,
+  /** relief off the wall, kept high so the mouldings still turn in the light */
+  depth: 0.9,
+  ornament: 0.78,
+};
+
+function slim(spec: FrameSpec): FrameSpec {
+  return {
+    courses: spec.courses.map((c) => ({
+      ...c,
+      offset: c.offset * SLIM.radial,
+      width: c.width * SLIM.radial,
+      depth: c.depth * SLIM.depth,
+      z: c.z * SLIM.depth,
+      bevel: c.bevel * SLIM.radial,
+    })),
+    bead: spec.bead && {
+      ...spec.bead,
+      offset: spec.bead.offset * SLIM.radial,
+      radius: spec.bead.radius * SLIM.ornament,
+      spacing: spec.bead.spacing * SLIM.radial,
+    },
+    cartouche: spec.cartouche && {
+      ...spec.cartouche,
+      size: spec.cartouche.size * SLIM.ornament,
+      depth: spec.cartouche.depth * SLIM.depth,
+    },
+    reeding: spec.reeding && {
+      ...spec.reeding,
+      offset: spec.reeding.offset * SLIM.radial,
+      size: spec.reeding.size * SLIM.ornament,
+    },
+    tabernacle: spec.tabernacle && {
+      ...spec.tabernacle,
+      pilaster: spec.tabernacle.pilaster * SLIM.radial,
+      pediment: spec.tabernacle.pediment * SLIM.ornament,
+    },
+  };
+}
+
+const SPECS: Record<FrameKind, FrameSpec> = Object.fromEntries(
+  Object.entries(MEASURED).map(([k, v]) => [k, slim(v)]),
+) as Record<FrameKind, FrameSpec>;
 
 /** total outward reach of a frame, as a fraction of the painting height */
 export function frameReach(kind: FrameKind): number {

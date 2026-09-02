@@ -68,9 +68,40 @@ pnpm fetch:images          # fetch every work that has no scan yet
 pnpm build:assets          # rebuild the exhibition around the real paintings
 ```
 
-`fetch:images` resolves each work on Commons, downloads a 2000px render, and
-writes `data/artworks/{id}/source.jpg` plus an `image-credit.json` recording
-the exact Commons file, its stated licence and its author. `build:assets`
+`fetch:images` resolves each work, downloads a 2000px render, and writes
+`data/artworks/{id}/source.jpg` plus an `image-credit.json` recording the exact
+Commons file, its stated licence and its author.
+
+**How a picture is chosen — three steps, most trustworthy first.**
+
+1. **`commonsFile`** in `data/image-sources.json` — an exact file, used as
+   given, because a person looked at it and said so.
+2. **Wikidata.** The work's own item carries P18: a curated statement that this
+   file is the image *of this artwork*, maintained by people who care which of
+   the forty scans on Commons is the plain one. Nothing is hand-typed — the
+   item is found by search and then *proved* before it is trusted: it has to be
+   typed as an artwork, and its description has to name the artist, so a "Mona
+   Lisa" that turns out to be a pop song is discarded rather than hung.
+3. **Commons file search, scored.**
+
+Scoring exists because search is the only step that can be confidently wrong.
+Candidates lose points for being the things this exhibition actually ended up
+hanging: the work photographed *in its frame*, the work on a gallery wall with
+visitors in front of it, an engraving after it, a detail, or plainly a
+different painting. The sharpest test is arithmetic rather than vocabulary —
+**every record states the work's real dimensions, so its true proportions are
+known before anything is downloaded**, and a frame or a room around the canvas
+changes them by far more than two reproductions of the same painting ever
+differ. Nothing that fails to clear the threshold is hung at all: a work left
+on its stand-in is honest, a wrong one is not.
+
+Words are read in context, too. "Engraving" is damning for a painting and
+merely accurate for a Dürer woodcut, so the reproductive-print penalty is
+suppressed for works whose own medium is a print; and a candidate is matched
+against the work's names in *every* language it is catalogued under, because
+Commons files Vermeer's Girl under *Meisje met de parel* and judging that on
+the English title marks the single most canonical file for the work as a
+stranger. `build:assets`
 prefers `source.jpg` automatically and publishes that credit onto the work's
 placard, so the Credits panel says which reproduction is on the wall and under
 what terms.
@@ -88,6 +119,7 @@ automated clients however wide you open `--concurrency`.
 | `--dry` | resolve and print the table, download nothing |
 | `--force` | re-fetch works that already have a scan |
 | `--pin` | write the resolved file names back into `data/image-sources.json` |
+| `--sheet` | build the contact sheet even on a `--dry` run |
 | `--concurrency 6` | works in flight at once (default 4, max 8) |
 | `--museum louvre` | one museum only |
 | `--only id1,id2` | named works only |
@@ -97,9 +129,15 @@ file it chose for every work, so from then on the fetch is a lookup rather
 than a search. Search rankings drift; an exhibition that hangs a different
 picture next month is not one you can point people at.
 
-**Run `--dry` first and read the table.** Search can return the wrong picture,
-and a wrong painting hung under the right label is worse than no painting at
-all. Every run also writes `data/.cache/fetch-report.json` with the file, size,
+**Then open `data/.cache/contact-sheet.html`.** Every run builds it: one page
+showing all fifty pictures with the file each came from, the catalogued
+dimensions, and how it was resolved. Fifty works is too many to check by
+clicking through fifty Commons pages, and not checking is how an exhibition
+ends up hanging a photograph of a frame. Anything wrong is obvious at a glance,
+and each card carries a **pin this** block to paste straight into
+`data/image-sources.json`.
+
+Every run also writes `data/.cache/fetch-report.json` with the file, size,
 licence and Commons URL it chose for each work.
 
 To correct one, open it on Commons and pin the exact file in
@@ -147,12 +185,28 @@ bottom of the screen, in the corridor, on the floor plan and in the gallery.
 | Corridor | wheel / drag | also moves along the rail |
 | Floor plan | click a room | choose a painter and warp into their room |
 | Gallery | wheel / <kbd>←</kbd> <kbd>→</kbd> | move between paintings, with magnetic snap |
-| Gallery | hover / tap a painting | the text dissolves and the painting is revealed |
+| Gallery | hover a painting | the text dissolves and the painting is revealed |
+| Gallery | click a painting, or <kbd>Enter</kbd> | the same, but it *stays* revealed so the label can be read |
 | Gallery | hold <kbd>Shift</kbd> + hover | **Thread Pull** — extract a region's text to read it |
+| Anywhere | <kbd>+</kbd> <kbd>−</kbd>, ⌘/Ctrl-scroll, pinch | zoom: a longer lens in the corridor, a step toward the canvas in a room |
+| Anywhere | <kbd>0</kbd> | back to the distance the room was composed for |
 | Anywhere | <kbd>Esc</kbd> | step back one level |
 
 `Esc` walks the whole way out: artwork → gallery → floor plan → corridor →
 entrance.
+
+**Revealing is two gestures, not one.** Hovering a canvas reveals the painting
+and moving away puts the text back, because the text field *is* the
+exhibition and brushing past a work should not cost you it. Clicking the
+canvas, pressing <kbd>Enter</kbd>, or simply moving the cursor onto the wall
+label latches the reveal open — so the label can be read, scrolled and expanded
+without the painting closing behind you. Latched, it closes on <kbd>Esc</kbd>,
+on the ✕, or when you move to another work.
+
+**The corridor lights one work at a time.** Bringing the cursor onto a canvas
+drops the room's exposure and brings a narrow warm spot up on that painting,
+which is how a gallery is actually lit and what makes a wall of fifty
+rectangles resolve into one thing worth looking at.
 
 ## Performance
 
@@ -183,6 +237,13 @@ What each switch buys, in `src/lib/quality.ts`:
   and costs tens of thousands of triangles across a salon wall.
 - **Atmosphere** — light shafts and drifting dust. Cheap, and the first thing
   anyone notices, so it survives further down than it deserves to.
+
+Each of the three says what it is: hovering one names the trade in a sentence
+and lists what it turns on, and choosing one prints a line saying what just
+changed. Three one-syllable labels in the corner of a screen are otherwise a
+control that appears not to work — the differences are real, but "Balanced" on
+its own does not tell you that it is buying carved frames, floor shadows and
+dust in the light shafts.
 
 Auto-detection never picks Rich. It reads a renderer string and a core count,
 which says what the machine is and nothing about what else it is doing —
@@ -343,6 +404,13 @@ Thread Pull `regions`.
 | `sources.json` + `corpus/*.txt` | building the glyph corpus from the record's own placard text |
 | `regions.json` | Thread Pull regions (records may also carry them inline) |
 | `config.json` | glyph tuning — cell sizes, variance threshold, palette size, `maxGlyphs` |
+
+The British Museum hangs paintings, prints and painted objects — a Hokusai and
+a Hiroshige, Dürer's *Rhinoceros*, the Fayum portrait, the Nebamun fowling
+scene, the Dunhuang banner. The Papyrus of Ani and the Codex Zouche-Nuttall
+were replaced: both are magnificent and neither is a picture, and a
+twenty-three-metre scroll shown as one section reads on a wall as a strip of
+writing rather than as a work of art.
 
 `data/artworks/` also still holds three further Orsay works from the first
 iteration — Monet's *Coquelicots*, Seurat's *Le Cirque* and Degas' *L'Étoile* —

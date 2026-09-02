@@ -21,15 +21,17 @@ interface Hint {
 const CORRIDOR: Hint[] = [
   { keys: ['↑', '↓'], text: 'walk' },
   { keys: ['⇧', '⏎'], sep: 'or', text: 'hurry to the end' },
-  { text: 'move the mouse to look around' },
+  { text: 'move the mouse to look around · click a painting to enter' },
+  { keys: ['+', '−'], text: 'zoom' },
   { keys: ['esc'], text: 'back' },
 ];
 
 const GALLERY: Hint[] = [
   { keys: ['←', '→'], text: 'move between paintings' },
-  { text: 'hover a canvas to reveal the painting' },
+  { text: 'hover or click a canvas to reveal the painting' },
+  { keys: ['+', '−'], text: 'lean in' },
   { keys: ['⇧'], text: '+ hover to pull a thread of text' },
-  { keys: ['esc'], text: 'back' },
+  { keys: ['esc'], text: 'close · back' },
 ];
 
 const MAP: Hint[] = [

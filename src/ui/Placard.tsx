@@ -5,11 +5,19 @@
  * (wall label shown immediately, extended note on expand). Provenance gets
  * two treatments: housing prominent and plain; text origin in small italics
  * where a real credit line sits.
+ *
+ * The card stays up once a work is revealed. It used to be tied to the
+ * cursor being over the canvas, which meant reading it required holding the
+ * mouse somewhere other than where you were reading — and scrolling to reach
+ * the end of the note dismissed it outright. It now behaves like a wall
+ * label: it appears when you look at the work, it stays while you read it,
+ * and it goes when you say so.
  */
 import { useEffect, useRef, useState } from 'react';
 import { selectArtworks, useStore } from '../state/store';
 import { placardAnchor } from '../scenes/GalleryScene';
 import { loadMeta } from '../glyph/artworkLoader';
+import { endReveal, latchReveal } from '../transitions/reveal';
 import type { ArtworkMeta } from '../types';
 
 export function Placard() {
@@ -19,8 +27,10 @@ export function Placard() {
   const expanded = useStore((s) => s.placardExpanded);
   const setExpanded = useStore((s) => s.setPlacardExpanded);
   const artworks = useStore(selectArtworks);
+  const reducedMotion = useStore((s) => s.reducedMotion);
   const [meta, setMeta] = useState<ArtworkMeta | null>(null);
   const cardRef = useRef<HTMLElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const entry = artworks[index];
@@ -48,9 +58,19 @@ export function Placard() {
         const h = el.offsetHeight;
         const coarse = matchMedia('(pointer: coarse)').matches;
         if (!coarse) {
-          const x = Math.min(placardAnchor.x + 40, window.innerWidth - w - 24);
+          /*
+           * Pinned to the right margin, not to the frame.
+           *
+           * Following the painting's edge was fine when the canvas was small,
+           * but it now fills most of the screen, so "just right of the frame"
+           * is on top of the picture. The gallery slides left while the label
+           * is open (see GalleryScene) and the label holds the right-hand
+           * column, which also means it stops jumping about as you move
+           * between works of different widths.
+           */
+          const x = Math.max(24, window.innerWidth - w - 24);
           const y = Math.max(24, Math.min(placardAnchor.y - h / 2, window.innerHeight - h - 24));
-          el.style.transform = `translate(${Math.max(24, x)}px, ${y}px)`;
+          el.style.transform = `translate(${x}px, ${y}px)`;
         } else {
           el.style.transform = '';
         }
@@ -70,8 +90,19 @@ export function Placard() {
       ref={cardRef}
       className={`placard ${visible ? 'is-visible' : ''} ${expanded ? 'is-expanded' : ''}`}
       aria-hidden={!visible}
+      // reaching the label is itself the decision to read it: the reveal stops
+      // being a hover state the moment the cursor lands here
+      onPointerEnter={latchReveal}
     >
-      <div className="placard-scroll">
+      <button
+        className="placard-close"
+        onClick={() => endReveal(reducedMotion)}
+        aria-label="Close the wall label"
+        title="Close (Esc)"
+      >
+        ✕
+      </button>
+      <div className="placard-scroll" ref={scrollRef}>
         <p className="meta placard-artist">{meta.artist.toUpperCase()}</p>
         <p className="caption placard-dates">{meta.artistDates}</p>
 

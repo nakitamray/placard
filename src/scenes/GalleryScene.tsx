@@ -22,7 +22,7 @@ import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { selectArtworks, useStore } from '../state/store';
-import { gallery, pointer } from '../state/motion';
+import { gallery, pointer, view } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
 import { GlyphPrePass } from '../glyph/GlyphPrePass';
 import { loadReveal, prefetchAround, type LoadedArtwork } from '../glyph/artworkLoader';
@@ -30,19 +30,28 @@ import { ArtworkPlane } from './ArtworkPlane';
 import { OrnateFrame } from './OrnateFrame';
 import { frameReach } from './frames';
 import { fitWork } from './fit';
-import { startReveal, endReveal, revealAnim } from '../transitions/reveal';
+import { startReveal, endReveal, latchReveal, releaseReveal, revealAnim } from '../transitions/reveal';
 import { artworkProjector, regionAt } from '../threadpull/state';
 import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
 import type { Quality } from '../lib/quality';
 
 const SPACING = 8;
-const CAM_Z = 5.6;
+/**
+ * How far back the camera stands, and how big the canvas is drawn.
+ *
+ * These four numbers are one decision: how much of the screen the painting
+ * gets. The room used to win — a 2.2m canvas at 5.6m through a 45° lens fills
+ * about three fifths of the frame, and once a salon moulding is wrapped round
+ * it the picture itself is barely half. A visitor who has walked down a
+ * corridor and chosen this painting should be looking at the painting.
+ */
+const CAM_Z = 5.2;
 /** the height a work is hung at unless it is too wide to allow it */
-export const PLANE_H = 2.2;
+export const PLANE_H = 2.55;
 /** widest a work may be drawn before its height gives way (spec: fit.ts) */
-const MAX_W = 5.4;
+const MAX_W = 6.2;
 /** height every canvas is centred on */
-export const HANG_Y = 2.05;
+export const HANG_Y = 2.15;
 const WALL_H = 6.2;
 
 /** screen-space projection of the active plane for the DOM placard (§10.7) */
@@ -111,7 +120,7 @@ function MouldedBay({
   const panelW = width + reach * 2 + 0.55;
   const panelH = height + reach * 2 + 0.55;
   const pilasterX = panelW / 2 + 0.42;
-  const pilasterH = 4.0;
+  const pilasterH = 4.35;
   const bayW = pilasterX * 2 + 0.84;
 
   return (
@@ -236,6 +245,8 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
   const fillRef = useRef<THREE.HemisphereLight>(null);
   const spotTarget = useRef<THREE.Object3D>(new THREE.Object3D());
   const look = useRef({ x: 0, y: 0 });
+  /** how far the room slides aside to make room for the wall label */
+  const shift = useRef(0);
   const touch = useRef({ x: 0, active: false });
   const roomTone = useRef(new THREE.Color('#3A3630'));
 
@@ -277,6 +288,8 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     const wheelEnd = { t: 0 };
     const onWheel = (e: WheelEvent) => {
       const s = useStore.getState();
+      // a wheel inside a panel is scrolling that panel, not moving the room
+      if ((e.target as Element | null)?.closest?.('.placard, .thread-panel, .credits')) return;
       if (s.revealed) endReveal(s.reducedMotion);
       gallery.goal += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * 0.01;
       gallery.goal = Math.max(-1.5, Math.min((artworks.length - 1) * SPACING + 1.5, gallery.goal));
@@ -319,7 +332,9 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
           ease: 'expo.out',
         });
       }
-      if (e.key === 'Enter' && !s.revealed) startReveal(s.reducedMotion);
+      if (e.key === 'Enter') {
+        s.revealed ? latchReveal() : startReveal(s.reducedMotion, true);
+      }
     };
     window.addEventListener('wheel', onWheel, { passive: true });
     window.addEventListener('touchstart', onTouchStart, { passive: true });
@@ -359,7 +374,32 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     look.current.x += (px - look.current.x) * k;
     look.current.y += (py - look.current.y) * k;
 
-    camera.position.set(gallery.x + look.current.x * 0.1, 1.86 + look.current.y * -0.05, CAM_Z);
+    /*
+     * Zoom here is a step toward the canvas, not a change of lens: in a room
+     * with one painting in it, getting closer is what you would actually do,
+     * and it keeps the perspective of the moulding honest as you approach.
+     * The floor of 1.55m stops the camera walking through the frame.
+     */
+    view.v = damp(view.v, view.goal, 0.09, delta);
+    const dz = Math.max(1.55, CAM_Z / view.v);
+
+    /*
+     * Step aside for the label.
+     *
+     * The canvas is drawn large enough now that a 380px card at the right of
+     * the screen lands on top of it. Rather than shrink the painting back
+     * down — the thing this iteration set out to fix — the room slides a
+     * little to the left while the label is open, which is what you do in a
+     * gallery anyway: you stand off to one side to read the wall text.
+     */
+    const wantShift = revealed && size.width > 900 ? Math.min(1.35, (dz * 0.3) / view.v) : 0;
+    shift.current = damp(shift.current, wantShift, 0.11, delta);
+
+    camera.position.set(
+      gallery.x + shift.current + look.current.x * 0.1,
+      1.96 + look.current.y * -0.05,
+      dz,
+    );
     camera.rotation.set(
       (-look.current.y * 1.2 * Math.PI) / 180,
       (-look.current.x * 2.0 * Math.PI) / 180,
@@ -514,7 +554,17 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
           onLeave={() => {
             if (i !== index) return;
             useStore.getState().setHoveredRegion(null);
-            if (matchMedia('(pointer: fine)').matches) endReveal(reducedMotion);
+            /*
+             * Not an immediate close.
+             *
+             * Closing on leave made the placard unreadable: the wall label
+             * sits beside the painting, so moving the cursor over to read it
+             * took the cursor off the canvas and dismissed the very thing
+             * being reached for. `releaseReveal` gives the cursor half a
+             * second to arrive — and reaching the label latches the reveal
+             * open, as does clicking the canvas or pressing Enter.
+             */
+            if (matchMedia('(pointer: fine)').matches) releaseReveal(reducedMotion);
           }}
           onMove={(u, v) => {
             if (i !== index) return;
@@ -534,8 +584,10 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
               if (region) s.setPulledRegion(region);
               return;
             }
-            if (matchMedia('(pointer: fine)').matches) return;
-            s.revealed ? endReveal(reducedMotion) : startReveal(reducedMotion);
+            // a click is a decision: open it and keep it open
+            s.revealed && revealAnim.latched
+              ? endReveal(reducedMotion)
+              : startReveal(reducedMotion, true);
           }}
         />
       ))}

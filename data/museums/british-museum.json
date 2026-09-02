@@ -31,7 +31,11 @@
     "light": {
       "key": "#FFF9F0",
       "keyIntensity": 2.3,
-      "keyFrom": [-1, 18, 3],
+      "keyFrom": [
+        -1,
+        18,
+        3
+      ],
       "sky": "#E8F0F8",
       "ground": "#70503E",
       "ambient": 0.5,
@@ -39,7 +43,11 @@
       "lampIntensity": 7,
       "exposure": 1.02,
       "background": "#2C1517",
-      "fog": ["#3C1B1D", 48, 140]
+      "fog": [
+        "#3C1B1D",
+        48,
+        140
+      ]
     },
     "fixtures": {
       "sculpture": "none",
@@ -54,17 +62,127 @@
     "viewBox": "20 20 520 300",
     "level": "Great Court galleries",
     "rooms": [
-      { "id": "r-great-wave", "name": "Great Wave", "svgPath": "M100,30 L200,30 L200,95 L100,95 Z", "centroid": [150, 62], "active": true, "artworkIndex": 0 },
-      { "id": "r-nebamun", "name": "Nebamun", "svgPath": "M210,30 L310,30 L310,95 L210,95 Z", "centroid": [260, 62], "active": true, "artworkIndex": 1 },
-      { "id": "r-admonitions", "name": "Admonitions", "svgPath": "M320,30 L420,30 L420,95 L320,95 Z", "centroid": [370, 62], "active": true, "artworkIndex": 2 },
-      { "id": "r-fayum", "name": "Fayum", "svgPath": "M30,105 L95,105 L95,185 L30,185 Z", "centroid": [62, 145], "active": true, "artworkIndex": 3 },
-      { "id": "r-meidum", "name": "Meidum", "svgPath": "M30,195 L95,195 L95,275 L30,275 Z", "centroid": [62, 235], "active": true, "artworkIndex": 4 },
-      { "id": "r-white", "name": "John White", "svgPath": "M425,105 L490,105 L490,185 L425,185 Z", "centroid": [457, 145], "active": true, "artworkIndex": 5 },
-      { "id": "r-schouman", "name": "Schouman", "svgPath": "M425,195 L490,195 L490,275 L425,275 Z", "centroid": [457, 235], "active": true, "artworkIndex": 6 },
-      { "id": "r-ani", "name": "Book of Ani", "svgPath": "M100,285 L200,285 L200,310 L100,310 Z", "centroid": [150, 298], "active": true, "artworkIndex": 7 },
-      { "id": "r-dunhuang", "name": "Dunhuang", "svgPath": "M210,285 L310,285 L310,310 L210,310 Z", "centroid": [260, 298], "active": true, "artworkIndex": 8 },
-      { "id": "r-codices", "name": "Codices", "svgPath": "M320,285 L420,285 L420,310 L320,310 Z", "centroid": [370, 298], "active": true, "artworkIndex": 9 },
-      { "id": "r-court", "name": "Great Court", "svgPath": "M260,105 m-72,0 a72,72 0 1,0 144,0 a72,72 0 1,0 -144,0", "centroid": [260, 105], "active": false, "artworkIndex": -1 }
+      {
+        "id": "r-great-wave",
+        "name": "Great Wave",
+        "svgPath": "M100,30 L200,30 L200,95 L100,95 Z",
+        "centroid": [
+          150,
+          62
+        ],
+        "active": true,
+        "artworkIndex": 0
+      },
+      {
+        "id": "r-nebamun",
+        "name": "Nebamun",
+        "svgPath": "M210,30 L310,30 L310,95 L210,95 Z",
+        "centroid": [
+          260,
+          62
+        ],
+        "active": true,
+        "artworkIndex": 1
+      },
+      {
+        "id": "r-admonitions",
+        "name": "Admonitions",
+        "svgPath": "M320,30 L420,30 L420,95 L320,95 Z",
+        "centroid": [
+          370,
+          62
+        ],
+        "active": true,
+        "artworkIndex": 2
+      },
+      {
+        "id": "r-fayum",
+        "name": "Fayum",
+        "svgPath": "M30,105 L95,105 L95,185 L30,185 Z",
+        "centroid": [
+          62,
+          145
+        ],
+        "active": true,
+        "artworkIndex": 3
+      },
+      {
+        "id": "r-meidum",
+        "name": "Meidum",
+        "svgPath": "M30,195 L95,195 L95,275 L30,275 Z",
+        "centroid": [
+          62,
+          235
+        ],
+        "active": true,
+        "artworkIndex": 4
+      },
+      {
+        "id": "r-white",
+        "name": "John White",
+        "svgPath": "M425,105 L490,105 L490,185 L425,185 Z",
+        "centroid": [
+          457,
+          145
+        ],
+        "active": true,
+        "artworkIndex": 5
+      },
+      {
+        "id": "r-schouman",
+        "name": "Schouman",
+        "svgPath": "M425,195 L490,195 L490,275 L425,275 Z",
+        "centroid": [
+          457,
+          235
+        ],
+        "active": true,
+        "artworkIndex": 6
+      },
+      {
+        "id": "r-ani",
+        "name": "Book of Ani",
+        "svgPath": "M100,285 L200,285 L200,310 L100,310 Z",
+        "centroid": [
+          150,
+          298
+        ],
+        "active": true,
+        "artworkIndex": 7
+      },
+      {
+        "id": "r-dunhuang",
+        "name": "Dunhuang",
+        "svgPath": "M210,285 L310,285 L310,310 L210,310 Z",
+        "centroid": [
+          260,
+          298
+        ],
+        "active": true,
+        "artworkIndex": 8
+      },
+      {
+        "id": "r-codices",
+        "name": "Codices",
+        "svgPath": "M320,285 L420,285 L420,310 L320,310 Z",
+        "centroid": [
+          370,
+          298
+        ],
+        "active": true,
+        "artworkIndex": 9
+      },
+      {
+        "id": "r-court",
+        "name": "Great Court",
+        "svgPath": "M260,105 m-72,0 a72,72 0 1,0 144,0 a72,72 0 1,0 -144,0",
+        "centroid": [
+          260,
+          105
+        ],
+        "active": false,
+        "artworkIndex": -1
+      }
     ]
   },
   "artworks": [
@@ -75,8 +193,8 @@
     "geese-of-meidum",
     "white-portrait-lady",
     "schouman-birds",
-    "book-of-the-dead-ani",
+    "durer-rhinoceros",
     "dunhuang-cave-17",
-    "aztec-codices"
+    "hiroshige-sudden-shower"
   ]
 }
