@@ -44,6 +44,8 @@ export function holdReveal() {
 export function latchReveal() {
   holdReveal();
   revealAnim.latched = true;
+  // the label is what latching is FOR, so the store has to hear about it
+  if (useStore.getState().revealed) useStore.getState().setRevealed(true, true);
 }
 
 /**
@@ -63,7 +65,7 @@ export function startReveal(reducedMotion: boolean, latched = false) {
   tl?.kill();
   holdReveal();
   revealAnim.latched = latched;
-  useStore.getState().setRevealed(true);
+  useStore.getState().setRevealed(true, latched);
   if (reducedMotion) {
     revealAnim.dissolve = 1;
     revealAnim.spot = 26;

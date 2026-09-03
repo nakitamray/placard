@@ -58,7 +58,16 @@ const wallTextures = new Map<string, THREE.Texture>();
 function loadWallTexture(id: string): THREE.Texture {
   const tex = new THREE.Texture();
   tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 4;
+  /*
+   * Anisotropy matters more here than anywhere else in the exhibition. Every
+   * painting in a corridor is seen at a glancing angle — that is what a
+   * corridor is — and at 4× the far half of each canvas smears into mush that
+   * no amount of source resolution can fix. 16 is free on anything made this
+   * decade and is the difference between a painting and a smudge.
+   */
+  tex.anisotropy = 16;
+  tex.generateMipmaps = true;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
   const attempt = (url: string) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';

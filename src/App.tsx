@@ -54,13 +54,22 @@ export default function App() {
   };
 
   const [sound, setSoundOn] = useState(false);
+  const atlasOpen = useAtlas((s) => s.open);
 
-  // The room tone follows the room. `roomTone` is idempotent per id, so this
-  // can run on every render of the museum without restarting the graph.
+  /*
+   * The room tone follows the room, and the atlas is a different room — no
+   * walls, nothing arriving, just something very large a long way off. Open
+   * the map from inside a gallery and the gallery's murmurs and footsteps
+   * stop, which is most of what makes the map feel like somewhere else.
+   *
+   * `roomTone` is idempotent per id, so this can run on every render without
+   * restarting the graph.
+   */
   useEffect(() => {
     if (!sound) return roomTone(null);
+    if (atlasOpen) return roomTone('atlas', 'atlas');
     roomTone(phase === 'boot' || phase === 'landing' ? null : (museum?.id ?? null));
-  }, [sound, phase, museum]);
+  }, [sound, phase, museum, atlasOpen]);
 
   // the two events worth marking: walking through the end wall, and a
   // painting resolving out of its own text

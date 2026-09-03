@@ -6,22 +6,26 @@
  * deep: choose a museum, walk a corridor, open the index, choose a work, hover
  * a canvas. By then most of them have gone.
  *
- * So the landing background is not a photograph any more. It is one painting,
+ * So the landing background is not a photograph any more. It is a painting,
  * live, drawn out of its own corpus at full bleed behind the headline, with
  * the reading lens under the cursor — move the mouse and the words give way to
- * paint. Nothing to click, nothing to read first.
+ * paint, and the picture leans very slightly toward you as you go.
  *
- * The work is chosen at random per visit from a set that reads well very
- * large, so the front door is different every time you open it.
+ * IT CHANGES. Every fifteen seconds it crossfades to another work, which is
+ * why there are two of everything here: two glyph pre-passes writing into two
+ * render targets, two planes, and an opacity ramp between them. The single
+ * shared render target the gallery uses can only hold one field at a time, so
+ * a crossfade was impossible until the pass learned to publish somewhere of
+ * its own.
  *
- * It reuses the gallery's machinery exactly: the same pre-pass into the same
- * render target, the same shader, the same lens. The only new thing here is a
- * plane sized to cover the viewport.
+ * It reuses the gallery's machinery exactly: the same pass, the same shader,
+ * the same lens. The only new things are a plane sized to cover the viewport
+ * and a second copy of it.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { GlyphPrePass, glyphRT } from '../glyph/GlyphPrePass';
+import { GlyphPrePass } from '../glyph/GlyphPrePass';
 import { loadArtwork, loadReveal, type LoadedArtwork } from '../glyph/artworkLoader';
 import { lens } from '../transitions/lens';
 import { pointer } from '../state/motion';
@@ -43,6 +47,10 @@ const HEROES = [
   'michelangelo-creation-adam',
   'whistler-mother',
 ];
+
+/** how long each work holds, and how long the change takes */
+const HOLD_MS = 15000;
+const FADE_MS = 3200;
 
 const vert = /* glsl */ `
 varying vec2 vUv;
@@ -84,65 +92,57 @@ void main() {
   float d = distance(vec2(vUv.x, 1.0 - vUv.y) * uImageSize, uLens.xy);
   float l = uLensAmt * uHasPaint * (1.0 - smoothstep(uLens.z * 0.5, uLens.z, d));
   vec3 color = mix(field, paint, l);
-  gl_FragColor = vec4(color * uFade, 1.0);
+  gl_FragColor = vec4(color, uFade);
   #include <colorspace_fragment>
 }
 `;
 
-export function LandingScene({ tier }: { tier: DeviceTier }) {
+/** one hero: its own pre-pass, its own target, its own full-bleed plane */
+function Hero({
+  id,
+  tier,
+  rtSize,
+  opacity,
+  live,
+  drift,
+}: {
+  id: string;
+  tier: DeviceTier;
+  rtSize: number;
+  /** 0..1, driven by the crossfade */
+  opacity: number;
+  /** whether this pass should keep rendering; a faded-out one need not */
+  live: boolean;
+  /** a small per-hero offset so the two do not sit exactly on top of each other */
+  drift: number;
+}) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
   const size = useThree((s) => s.size);
   const viewport = useThree((s) => s.viewport);
-  /** scratch, so the frame loop never allocates */
-  const forward = useMemo(() => new THREE.Vector3(), []);
   const reducedMotion = useStore((s) => s.reducedMotion);
   const [art, setArt] = useState<LoadedArtwork | null>(null);
   const meshRef = useRef<THREE.Mesh>(null);
-  const fade = useRef(0);
-
-  /*
-   * The field is drawn at twice the gallery's resolution where the machine can
-   * take it. It is one texture, drawn once per frame, and it is the first
-   * thing anybody sees.
-   */
-  const heroRT = useMemo(() => (tier.name === 'low' ? tier.rtSize : 2048), [tier]);
-
-  // One work per visit, chosen when the component first mounts. `?hero=<id>`
-  // pins it, which is how a particular hero gets looked at twice.
-  const heroId = useMemo(() => {
-    const pinned = new URLSearchParams(window.location.search).get('hero');
-    return pinned ?? HEROES[Math.floor(Math.random() * HEROES.length)];
-  }, []);
-
-  /*
-   * The lens belongs to this page now, so this page has to put it away.
-   *
-   * It is module state shared with the gallery's own shaders, and this scene
-   * drives it open on every frame — so without this it stays open after the
-   * landing unmounts, and the first canvas you walk up to has a circle of
-   * bare reproduction punched through it at whatever coordinates the hero
-   * happened to leave behind.
-   */
-  useEffect(
-    () => () => {
-      lens.want = 0;
-      lens.amt = 0;
-    },
-    [],
-  );
+  const target = useMemo(() => ({ current: null as THREE.WebGLRenderTarget | null }), []);
+  const forward = useMemo(() => new THREE.Vector3(), []);
+  const lean = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     let alive = true;
-    void loadArtwork(heroId, tier).then((a) => {
+    setArt(null);
+    void loadArtwork(id, tier).then((a) => {
       if (!alive) return;
       setArt(a);
-      // the lens has nothing to show until the reproduction is in hand
-      void loadReveal(a, 'view');
+      /*
+       * The full 2000px reproduction, not the 1200px one the gallery asks
+       * for. This is the only place a painting is stretched across an entire
+       * window, so it is the one place that needs every pixel that exists.
+       */
+      void loadReveal(a, 'full');
     });
     return () => {
       alive = false;
     };
-  }, [heroId, tier]);
+  }, [id, tier]);
 
   const uniforms = useMemo(
     () => ({
@@ -164,17 +164,6 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
     const iw = art.glyphs.imageW;
     const ih = art.glyphs.imageH;
 
-    /*
-     * Hold the plane a fixed distance in front of the camera and grow it until
-     * it covers the viewport, cropping rather than letterboxing — the CSS
-     * `background-size: cover` rule, in world units.
-     *
-     * The distance and the plane's centre come from the camera's own world
-     * direction rather than from an assumed `-Z`, and the visible extent comes
-     * from R3F's viewport rather than from tan(fov/2) worked out here: this
-     * has to hold whatever the camera happens to be doing, and computing it by
-     * hand left a strip of empty render target along the bottom of the screen.
-     */
     const dist = 6;
     forward.set(0, 0, -1).applyQuaternion(camera.quaternion);
     mesh.position.copy(camera.position).addScaledVector(forward, dist);
@@ -183,66 +172,60 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
     const vw = vp.width;
     const vh = vp.height;
     const artAspect = iw / ih;
-    const scale = Math.max(vw / artAspect, vh) * 1.06;
+    // a little over-scale, so there is room for the picture to move
+    const scale = Math.max(vw / artAspect, vh) * 1.14;
     mesh.scale.set(scale * artAspect, scale, 1);
 
-    // testing handle, in the manner of __prepass: says whether the hero is
-    // actually covering the viewport without needing a screenshot to guess
-    (window as unknown as Record<string, unknown>).__hero = {
-      id: art.id,
-      vw,
-      vh,
-      artAspect,
-      vpw: vw,
-      vph: vh,
-      planeW: scale * artAspect,
-      planeH: scale,
-      cam: [camera.position.x, camera.position.y, camera.position.z],
-      fov: camera.fov,
-    };
+    /*
+     * The picture leans against the pointer. Not a lot — a couple of per cent
+     * of the frame — but enough that the background is something you are
+     * moving through rather than a still behind the type.
+     */
+    if (!reducedMotion) {
+      const k = 1 - Math.pow(0.001, Math.min(delta, 0.1) / 0.55);
+      lean.current.x += (-pointer.x * vw * 0.035 - lean.current.x) * k;
+      lean.current.y += (pointer.y * vh * 0.035 - lean.current.y) * k;
+      mesh.position.addScaledVector(
+        new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion),
+        lean.current.x + drift,
+      );
+      mesh.position.y += lean.current.y;
+    }
 
     // the cursor, in the artwork's own pixels: undo the cover fit
-    if (!reducedMotion) {
+    if (!reducedMotion && live) {
       const planeW = scale * artAspect;
       const planeH = scale;
-      const wx = (pointer.x * vw) / 2;
-      const wy = (-pointer.y * vh) / 2;
-      const uu = wx / planeW + 0.5;
-      const vv = 0.5 - wy / planeH;
-      lens.x = uu * iw;
-      lens.y = vv * ih;
-      lens.r = Math.min(iw, ih) * 0.3;
+      const wx = (pointer.x * vw) / 2 - lean.current.x - drift;
+      const wy = (-pointer.y * vh) / 2 - lean.current.y;
+      lens.x = (wx / planeW + 0.5) * iw;
+      lens.y = (0.5 - wy / planeH) * ih;
+      lens.r = Math.min(iw, ih) * 0.28;
       lens.want = 1;
     }
 
-    if (glyphRT.current) u.uGlyph.value = glyphRT.current.texture;
+    if (target.current) u.uGlyph.value = target.current.texture;
     u.uPaint.value = art.fullTex ?? art.wallTex;
     u.uImageSize.value.set(iw, ih);
     u.uLens.value.set(lens.x, lens.y, lens.r);
-    u.uLensAmt.value = lens.amt;
+    u.uLensAmt.value = live ? lens.amt : 0;
 
     const k = 1 - Math.pow(0.001, Math.min(delta, 0.1) / 0.4);
     u.uHasPaint.value += ((art.fullTex ? 1 : 0) - u.uHasPaint.value) * k;
-    // the field arrives out of the dark rather than snapping on
-    fade.current += (1 - fade.current) * (1 - Math.pow(0.001, Math.min(delta, 0.1) / 1.1));
-    u.uFade.value = fade.current;
+    u.uFade.value = opacity;
   });
 
   return (
     <group>
-      {/*
-        * A bigger render target than a gallery canvas gets, and a much lighter
-        * cell wash. This field is stretched over the whole window rather than
-        * over a picture frame six metres away, so it is magnified perhaps four
-        * times as much — at the gallery's resolution and opacity it reads as a
-        * grid of coloured squares rather than as writing.
-        */}
       <GlyphPrePass
         artwork={art}
-        rtSize={heroRT}
-        active={!!art}
-        wash={0.34}
-        inkLift={0.85}
+        rtSize={rtSize}
+        active={!!art && (live || opacity > 0.01)}
+        target={target}
+        wash={0.3}
+        inkLift={0.9}
+        /* smaller letters, so more of the painting shows between them */
+        sizeScale={0.68}
         clearAlpha={0}
       />
       <mesh ref={meshRef} frustumCulled={false} renderOrder={-1}>
@@ -252,10 +235,100 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
           fragmentShader={frag}
           uniforms={uniforms}
           toneMapped={false}
+          transparent
           depthWrite={false}
           depthTest={false}
         />
       </mesh>
+    </group>
+  );
+}
+
+export function LandingScene({ tier }: { tier: DeviceTier }) {
+  const reducedMotion = useStore((s) => s.reducedMotion);
+  const heroRT = useMemo(() => (tier.name === 'low' ? tier.rtSize : 2048), [tier]);
+
+  /** the order the heroes are shown in, shuffled once so a visit is its own */
+  const order = useMemo(() => {
+    const pinned = new URLSearchParams(window.location.search).get('hero');
+    if (pinned) return [pinned];
+    const a = [...HEROES];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }, []);
+
+  /*
+   * Which two works are on screen, and how far between them we are. Both move
+   * in one piece of state for the same reason the still slideshow's did: two
+   * values that must agree cannot be kept in two places.
+   */
+  const [pair, setPair] = useState({ from: 0, to: 0 });
+  const [mix, setMix] = useState(1);
+
+  useEffect(() => {
+    if (order.length < 2 || reducedMotion) return;
+    let raf = 0;
+    let timer = 0;
+    const advance = () => {
+      setPair((p) => ({ from: p.to, to: (p.to + 1) % order.length }));
+      setMix(0);
+      const started = performance.now();
+      const step = () => {
+        const t = Math.min(1, (performance.now() - started) / FADE_MS);
+        setMix(t);
+        if (t < 1) raf = requestAnimationFrame(step);
+        else timer = window.setTimeout(advance, HOLD_MS);
+      };
+      raf = requestAnimationFrame(step);
+    };
+    timer = window.setTimeout(advance, HOLD_MS);
+    return () => {
+      window.clearTimeout(timer);
+      cancelAnimationFrame(raf);
+    };
+  }, [order, reducedMotion]);
+
+  /*
+   * The lens belongs to this page, so this page puts it away. It is module
+   * state shared with the gallery's shaders, and this scene drives it open on
+   * every frame — without this the first canvas you walk up to has a circle of
+   * bare reproduction punched through it.
+   */
+  useEffect(
+    () => () => {
+      lens.want = 0;
+      lens.amt = 0;
+    },
+    [],
+  );
+
+  const showOutgoing = mix < 1 && pair.from !== pair.to;
+
+  return (
+    <group>
+      {showOutgoing && (
+        <Hero
+          key={`out-${pair.from}`}
+          id={order[pair.from]}
+          tier={tier}
+          rtSize={heroRT}
+          opacity={1 - mix}
+          live={false}
+          drift={0}
+        />
+      )}
+      <Hero
+        key={`in-${pair.to}`}
+        id={order[pair.to]}
+        tier={tier}
+        rtSize={heroRT}
+        opacity={mix}
+        live
+        drift={0}
+      />
     </group>
   );
 }

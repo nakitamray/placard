@@ -8,8 +8,12 @@
  * everything here is synthesised in WebAudio at run time, which costs no
  * bytes, no decode, and no request.
  *
- *   room tone   a very quiet warm drone — the building — with murmurs and
- *               footfalls scattered over it at unpredictable intervals
+ *   the room    a synthesised convolution reverb — 2.6s of stone — that
+ *               everything else is played through
+ *   room tone   a quiet warm drone plus murmurs built out of formants and
+ *               syllables, and footfalls in irregular pairs
+ *   atlas tone  the same drone an octave and a half down, wet, and nothing
+ *               else: no walls, nothing arriving
  *   rustle      a short band-passed noise burst — paper, or a lot of small
  *               letters moving at once
  *   swell       the warp: a rising tone under a noise sweep
@@ -106,39 +110,79 @@ function seedOf(id: string): number {
 }
 
 /**
- * What a gallery actually sounds like.
+ * The room itself — a convolution reverb, built rather than recorded.
  *
- * The first version of this was a wide band of noise under a low-pass filter,
- * which is not a room — it is a fan. A gallery is much quieter than that and
- * much less even: a long reverberant space with almost nothing in it, and
- * every few seconds a scrap of somebody talking two rooms away, a footstep on
- * stone, the building itself. What makes it read as a room is the gaps.
- *
- * So there is no continuous noise bed at all. There is a very quiet warm drone
- * — the building, air handling three floors down, the note a big stone room
- * gives you for free — and over it a scatter of *events*: murmurs shaped like
- * distant speech, and the occasional footfall, each one arriving at an
- * unpredictable moment, from an unpredictable direction, and softly enough
- * that you would not notice it if you were not listening for it.
- *
- * A murmur is a band of noise around the frequencies speech carries in,
- * swept slightly and given a slow attack and a long tail, which is what
- * happens to a voice by the time it has been round two marble corners. It is
- * deliberately never intelligible — the moment a listener starts trying to
- * make out words, the sound has stopped being a room and started being
- * content.
+ * This is the single thing that decides whether any of the rest sounds like a
+ * museum. A voice or a footstep played dry is a voice or a footstep in your
+ * headphones; the same sound through two and a half seconds of stone tail is
+ * somebody two rooms away. An impulse response is just a burst of noise that
+ * decays, so it can be synthesised: a little silence for the pre-delay, a few
+ * discrete early reflections where the walls are, and then an exponentially
+ * decaying noise tail, rolled off at the top because stone and plaster eat
+ * high frequencies long before they eat low ones.
  */
-export function roomTone(id: string | null) {
+let irBuf: AudioBuffer | null = null;
+function impulse(c: AudioContext): AudioBuffer {
+  if (irBuf) return irBuf;
+  const dur = 2.6;
+  const len = Math.floor(c.sampleRate * dur);
+  const b = c.createBuffer(2, len, c.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = b.getChannelData(ch);
+    const preDelay = Math.floor(c.sampleRate * 0.018);
+    // early reflections: the first few surfaces, at slightly different times
+    // in each ear, which is most of what tells you the room is wide
+    const early = [0.021, 0.029, 0.041, 0.058, 0.073].map((t) => ({
+      i: Math.floor(c.sampleRate * (t + (ch ? 0.004 : 0))),
+      g: 0.5 - t * 3,
+    }));
+    for (const e of early) if (e.i < len) d[e.i] += e.g * (Math.random() * 2 - 1);
+    // the tail
+    let lp = 0;
+    for (let i = preDelay; i < len; i++) {
+      const t = (i - preDelay) / (len - preDelay);
+      const decay = Math.pow(1 - t, 2.6);
+      // a one-pole low-pass, so the tail darkens as it dies, as a real one does
+      lp += ((Math.random() * 2 - 1) - lp) * 0.34;
+      d[i] += lp * decay * 0.55;
+    }
+  }
+  irBuf = b;
+  return b;
+}
+
+/**
+ * What a museum actually sounds like.
+ *
+ * Two earlier attempts were both, in the end, wind: a band of noise held open
+ * for a second and a half is a gust however it is filtered, because what makes
+ * noise into a voice is not its colour but its *rhythm*. Speech is syllables —
+ * bursts of a tenth of a second with gaps between them — and it lives in
+ * formants, two or three narrow resonances stacked in a particular
+ * relationship, not in one swept band.
+ *
+ * So a murmur here is built the way a voice is built: three resonant filters
+ * at formant frequencies, driven by noise, opened and shut by a syllabic
+ * envelope of five to nine short bursts, at a pitch and pace that vary per
+ * utterance — and then thrown into the reverb above, which is what puts it
+ * across the hall instead of inside your head. Footsteps are a click and a
+ * thump through the same reverb, in irregular pairs, because people walk in
+ * pairs of steps and no two are the same length.
+ *
+ * Nothing is ever intelligible, and that is deliberate: the moment a listener
+ * starts making out words, the sound has stopped being a room.
+ */
+export function roomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery') {
   if (!enabled) {
-    // remember nothing: when sound is off there is no graph to keep in step
     room?.stop();
     room = null;
     return;
   }
-  if (room?.id === id) return;
+  const key = id === null ? null : `${kind}:${id}`;
+  if (room?.id === key) return;
   room?.stop();
   room = null;
-  if (!id) return;
+  if (!key || !id) return;
   const c = ensure();
   if (!c || !master) return;
 
@@ -147,79 +191,157 @@ export function roomTone(id: string | null) {
   const out = c.createGain();
   out.gain.value = 0;
   out.connect(master);
-  out.gain.setTargetAtTime(1, now, 2.2);
+  out.gain.setTargetAtTime(1, now, 2.4);
 
-  /* the building: three quiet partials, slightly detuned against each other so
-     they beat very slowly rather than sitting still */
-  const base = 48 + seed * 14;
-  const drone = [
-    { f: base, g: 0.03 },
-    { f: base * 1.5, g: 0.014 },
-    { f: base * 2.02, g: 0.007 },
-  ].map(({ f, g }) => {
+  // everything that happens in the room goes through the room
+  const verb = c.createConvolver();
+  verb.buffer = impulse(c);
+  const wet = c.createGain();
+  wet.gain.value = kind === 'atlas' ? 0.9 : 0.62;
+  verb.connect(wet).connect(out);
+  const dry = c.createGain();
+  dry.gain.value = kind === 'atlas' ? 0.25 : 0.5;
+  dry.connect(out);
+  /** send a node to both the room and the ear */
+  const place = (n: AudioNode) => {
+    n.connect(verb);
+    n.connect(dry);
+  };
+
+  /*
+   * The building. In a gallery this is air handling and the note a big stone
+   * room gives you for free. In the atlas it is the same idea an octave and a
+   * half down and much slower — no walls, no footsteps, nothing arriving:
+   * just something very large, very far away, breathing.
+   */
+  const base = kind === 'atlas' ? 31 + seed * 6 : 48 + seed * 14;
+  const partials = kind === 'atlas'
+    ? [
+        { f: base, g: 0.055 },
+        { f: base * 1.5, g: 0.03 },
+        { f: base * 2.997, g: 0.016 },
+        { f: base * 4.02, g: 0.008 },
+      ]
+    : [
+        { f: base, g: 0.028 },
+        { f: base * 1.5, g: 0.012 },
+        { f: base * 2.01, g: 0.006 },
+      ];
+  const drone = partials.map(({ f, g }) => {
     const o = c.createOscillator();
     o.type = 'sine';
     o.frequency.value = f;
+    // a very slow drift, so no two partials stay in phase and the bed never
+    // settles into a single audible pitch
+    const lfo = c.createOscillator();
+    lfo.frequency.value = 0.03 + Math.random() * 0.05;
+    const amt = c.createGain();
+    amt.gain.value = f * 0.004;
+    lfo.connect(amt).connect(o.frequency);
+    lfo.start();
     const gain = c.createGain();
     gain.gain.value = g;
-    o.connect(gain).connect(out);
+    o.connect(gain);
+    place(gain);
     o.start();
-    return o;
+    return [o, lfo];
   });
 
-  /** one scrap of distant talk */
+  let alive = true;
+  const timers = new Set<number>();
+
+  /** one scrap of talk, built the way a voice is built */
   const murmur = () => {
     const t = c.currentTime;
     const src = c.createBufferSource();
     src.buffer = noise(c);
     src.loop = true;
-    src.playbackRate.value = 0.7 + Math.random() * 0.6;
 
-    // the band a voice survives in once the room has taken the rest away
-    const band = c.createBiquadFilter();
-    band.type = 'bandpass';
-    band.Q.value = 3.2 + Math.random() * 2.5;
-    const centre = 380 + Math.random() * 520;
-    band.frequency.setValueAtTime(centre, t);
-    // a small sweep: speech moves, and a fixed band reads as a whistle
-    band.frequency.linearRampToValueAtTime(centre * (0.82 + Math.random() * 0.4), t + 2.4);
+    // the voice's own pitch region, which is what makes two murmurs sound
+    // like two different people
+    const pitch = 0.78 + Math.random() * 0.55;
+    const formants = [520, 1180, 2500].map((f, i) => {
+      const bp = c.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = f * pitch * (0.92 + Math.random() * 0.16);
+      bp.Q.value = 7 - i * 1.6;
+      const g = c.createGain();
+      g.gain.value = [1, 0.55, 0.28][i];
+      src.connect(bp).connect(g);
+      return g;
+    });
 
-    // and then everything above the room's own ceiling is gone
+    // a museum voice has already lost everything above about 2kHz to the room
     const roll = c.createBiquadFilter();
     roll.type = 'lowpass';
-    roll.frequency.value = 1500;
+    roll.frequency.value = 1900;
+    roll.Q.value = 0.7;
+    formants.forEach((g) => g.connect(roll));
 
-    const g = c.createGain();
-    const dur = 1.4 + Math.random() * 1.9;
-    const peak = 0.014 + Math.random() * 0.016;
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(peak, t + dur * 0.42);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    // the syllables: short bursts with gaps, which is the whole trick
+    const env = c.createGain();
+    env.gain.setValueAtTime(0, t);
+    const peak = 0.02 + Math.random() * 0.02;
+    let at = t + 0.02;
+    const syllables = 4 + Math.floor(Math.random() * 6);
+    for (let i = 0; i < syllables; i++) {
+      const len = 0.07 + Math.random() * 0.1;
+      const loud = peak * (0.45 + Math.random() * 0.55);
+      env.gain.linearRampToValueAtTime(loud, at + len * 0.35);
+      env.gain.linearRampToValueAtTime(loud * 0.25, at + len);
+      at += len + 0.02 + Math.random() * 0.07;
+    }
+    env.gain.linearRampToValueAtTime(0, at + 0.12);
+    roll.connect(env);
 
     const pan = c.createStereoPanner();
-    pan.pan.value = Math.random() * 1.6 - 0.8;
+    pan.pan.value = Math.random() * 1.7 - 0.85;
+    env.connect(pan);
+    place(pan);
 
-    src.connect(band).connect(roll).connect(g).connect(pan).connect(out);
     src.start(t);
-    src.stop(t + dur + 0.1);
+    src.stop(at + 0.4);
   };
 
-  /** somebody crossing a stone floor, a long way off */
-  const footfall = () => {
-    const t = c.currentTime;
-    const src = c.createBufferSource();
-    src.buffer = noise(c);
-    const f = c.createBiquadFilter();
-    f.type = 'lowpass';
-    f.frequency.value = 220 + Math.random() * 120;
-    const g = c.createGain();
-    g.gain.setValueAtTime(0.03 + Math.random() * 0.02, t);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+  /** one footfall on stone: the click of the sole, then the weight behind it */
+  const step = (when: number, gain: number) => {
     const pan = c.createStereoPanner();
-    pan.pan.value = Math.random() * 1.4 - 0.7;
-    src.connect(f).connect(g).connect(pan).connect(out);
-    src.start(t);
-    src.stop(t + 0.3);
+    pan.pan.value = Math.random() * 1.2 - 0.6;
+    place(pan);
+
+    const click = c.createBufferSource();
+    click.buffer = noise(c);
+    const hp = c.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 1400 + Math.random() * 900;
+    const cg = c.createGain();
+    cg.gain.setValueAtTime(gain * 0.5, when);
+    cg.gain.exponentialRampToValueAtTime(0.0001, when + 0.035);
+    click.connect(hp).connect(cg).connect(pan);
+    click.start(when);
+    click.stop(when + 0.06);
+
+    const thump = c.createOscillator();
+    thump.type = 'sine';
+    thump.frequency.setValueAtTime(120 + Math.random() * 40, when);
+    thump.frequency.exponentialRampToValueAtTime(58, when + 0.09);
+    const tg = c.createGain();
+    tg.gain.setValueAtTime(gain, when);
+    tg.gain.exponentialRampToValueAtTime(0.0001, when + 0.13);
+    thump.connect(tg).connect(pan);
+    thump.start(when);
+    thump.stop(when + 0.16);
+  };
+
+  /** people walk in pairs of steps, and no two are the same length */
+  const footfalls = () => {
+    const t = c.currentTime;
+    const n = 2 + Math.floor(Math.random() * 4);
+    const pace = 0.46 + Math.random() * 0.2;
+    const level = 0.02 + Math.random() * 0.025;
+    for (let i = 0; i < n; i++) {
+      step(t + i * pace * (0.92 + Math.random() * 0.16), level * (0.7 + Math.random() * 0.5));
+    }
   };
 
   /*
@@ -228,8 +350,6 @@ export function roomTone(id: string | null) {
    * the loop and then cannot stop hearing it — so each one books the next at a
    * fresh random distance.
    */
-  let alive = true;
-  const timers = new Set<number>();
   const later = (fn: () => void, min: number, max: number) => {
     const t = window.setTimeout(() => {
       if (!alive) return;
@@ -238,25 +358,27 @@ export function roomTone(id: string | null) {
     }, min + Math.random() * (max - min));
     timers.add(t);
   };
-  later(murmur, 2600, 9000);
-  later(footfall, 7000, 26000);
+  if (kind === 'gallery') {
+    later(murmur, 3400, 11000);
+    later(footfalls, 9000, 30000);
+  }
 
   room = {
-    id,
+    id: key,
     stop: () => {
       alive = false;
       timers.forEach(window.clearTimeout);
       const t = c.currentTime;
       out.gain.cancelScheduledValues(t);
-      out.gain.setTargetAtTime(0, t, 0.6);
+      out.gain.setTargetAtTime(0, t, 0.7);
       window.setTimeout(() => {
         try {
-          drone.forEach((o) => o.stop());
+          drone.flat().forEach((o) => o.stop());
           out.disconnect();
         } catch {
           /* already stopped */
         }
-      }, 2600);
+      }, 3000);
     },
   };
 }
@@ -303,15 +425,15 @@ function tone(from: number, to: number, dur: number, gain: number) {
 }
 
 export const sfx = {
-  /** a lot of small letters moving at once */
-  rustle: () => burst(0.65, 2600, 0.7, 0.075, 'bandpass'),
+  /** a lot of small letters moving at once — a whisper, not a page turn */
+  rustle: () => burst(0.5, 3200, 0.9, 0.022, 'bandpass'),
   /** walking through the end wall */
   warp: () => {
     tone(70, 420, 1.3, 0.1);
     burst(1.4, 1200, 0.4, 0.09, 'bandpass');
   },
   /** a painting resolving */
-  chime: () => tone(660, 990, 0.7, 0.035),
+  chime: () => tone(660, 990, 0.7, 0.026),
   /** a connection appearing in the atlas */
-  link: () => tone(520, 780, 0.45, 0.045),
+  link: () => tone(520, 780, 0.45, 0.032),
 };
