@@ -151,29 +151,62 @@ function Starfield({ count = 2600 }: { count?: number }) {
 function Graph({
   graph,
   onPick,
+  focus,
+  onHover,
 }: {
   graph: AtlasGraph;
   onPick: (n: AtlasNode) => void;
+  /** the node whose neighbourhood is lit: the selection, or what is hovered */
+  focus: string | null;
+  onHover: (id: string, leaving: boolean) => void;
 }) {
   const found = useAtlas((s) => s.found);
-  const selected = useAtlas((s) => s.selected);
   const groupRef = useRef<THREE.Group>(null);
-  const linesRef = useRef<THREE.LineSegments>(null);
-  const [hover, setHover] = useState<string | null>(null);
   const { camera, size } = useThree();
 
   const bodies = useMemo(() => seedBodies(graph), [graph]);
   const index = useMemo(() => new Map(bodies.map((b, i) => [b.id, i])), [bodies]);
   const energy = useRef(1);
+  const quietRef = useRef<THREE.LineSegments>(null);
 
-  // one geometry for every edge; only the found ones are given real endpoints
+  /**
+   * Everything the focused node touches: the node itself, its found edges, and
+   * whatever is on the other end of them. Clicking a node and not being able
+   * to see what it connects to was the map's central failure — the whole point
+   * of a graph is the edges, and they were all one colour whether they had
+   * anything to do with what you had just clicked or not.
+   */
+  const near = useMemo(() => {
+    if (!focus) return null;
+    const nodes = new Set<string>([focus]);
+    const links = new Set<string>();
+    for (const l of graph.around.get(focus) ?? []) {
+      if (!found.has(linkKey(l))) continue;
+      links.add(linkKey(l));
+      nodes.add(l.a === focus ? l.b : l.a);
+    }
+    return { nodes, links };
+  }, [focus, graph, found]);
+
+  /*
+   * Two geometries rather than one: the quiet web, and the edges belonging to
+   * whatever is focused. Line width is a lie in WebGL — `linewidth` is ignored
+   * on every desktop driver — so the difference has to be carried by colour
+   * and opacity, which means two materials, which means two draws.
+   */
   const lineGeo = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(graph.links.length * 6), 3));
+    return g;
+  }, [graph]);
+  const hotGeo = useMemo(() => {
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(graph.links.length * 6), 3));
     return g;
   }, [graph]);
 
   useEffect(() => () => lineGeo.dispose(), [lineGeo]);
+  useEffect(() => () => hotGeo.dispose(), [hotGeo]);
 
   // a new discovery wakes the simulation back up
   useEffect(() => {
@@ -194,7 +227,10 @@ function Graph({
           const dy = a.p.y - b.p.y;
           const dz = a.p.z - b.p.z;
           const d2 = dx * dx + dy * dy + dz * dz + 0.6;
-          const f = 26 / d2;
+          // stronger than it was: with a hundred and thirty nodes the old
+          // figure let the middle of the web pack into a ball you could not
+          // read an edge out of
+          const f = 38 / d2;
           const d = Math.sqrt(d2);
           a.v.x += (dx / d) * f * dt;
           a.v.y += (dy / d) * f * dt;
@@ -204,7 +240,7 @@ function Graph({
           b.v.z -= (dz / d) * f * dt;
         }
         // a weak pull to the middle, so nothing drifts to infinity
-        a.v.addScaledVector(a.p, -0.55 * dt);
+        a.v.addScaledVector(a.p, -0.5 * dt);
       }
       // springs
       for (const l of graph.links) {
@@ -217,7 +253,7 @@ function Graph({
         const dy = b.p.y - a.p.y;
         const dz = b.p.z - a.p.z;
         const d = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001;
-        const f = (d - 3.4) * 1.5 * dt;
+        const f = (d - 4.4) * 1.5 * dt;
         a.v.x += (dx / d) * f;
         a.v.y += (dy / d) * f;
         a.v.z += (dz / d) * f;
@@ -233,36 +269,89 @@ function Graph({
       energy.current = moved / bodies.length;
     }
 
-    // edges
+    // edges — the found ones, sorted into the quiet web and the lit
+    // neighbourhood of whatever is focused
     const pos = lineGeo.getAttribute('position') as THREE.BufferAttribute;
+    const hot = hotGeo.getAttribute('position') as THREE.BufferAttribute;
     let n = 0;
+    let h = 0;
     for (const l of graph.links) {
-      if (!found.has(linkKey(l))) continue;
+      const key = linkKey(l);
+      if (!found.has(key)) continue;
       const a = bodies[index.get(l.a)!];
       const b = bodies[index.get(l.b)!];
       if (!a || !b) continue;
-      pos.setXYZ(n * 2, a.p.x, a.p.y, a.p.z);
-      pos.setXYZ(n * 2 + 1, b.p.x, b.p.y, b.p.z);
-      n++;
+      if (near?.links.has(key)) {
+        hot.setXYZ(h * 2, a.p.x, a.p.y, a.p.z);
+        hot.setXYZ(h * 2 + 1, b.p.x, b.p.y, b.p.z);
+        h++;
+      } else {
+        pos.setXYZ(n * 2, a.p.x, a.p.y, a.p.z);
+        pos.setXYZ(n * 2 + 1, b.p.x, b.p.y, b.p.z);
+        n++;
+      }
     }
     pos.needsUpdate = true;
+    hot.needsUpdate = true;
     lineGeo.setDrawRange(0, n * 2);
+    hotGeo.setDrawRange(0, h * 2);
+    if (quietRef.current) {
+      // the unfocused web is a haze the nodes sit in, not a diagram of its own:
+      // at full strength a hundred and eighty edges is all anyone sees
+      (quietRef.current.material as THREE.LineBasicMaterial).opacity = near ? 0.07 : 0.17;
+    }
 
-    // labels, projected — written straight to the DOM, never through React
+    /*
+     * Labels, projected — written straight to the DOM, never through React.
+     *
+     * And de-collided in screen space, which is the single thing that decides
+     * whether this map is readable. Names are laid out most-connected first;
+     * one that would land on top of a name already placed this frame is simply
+     * dropped for the frame. Turn the map and it reappears as soon as it has
+     * room. Without this the middle of the web is a pile of overlapping type
+     * that gets worse the more you discover — the opposite of a reward.
+     */
     const g = groupRef.current;
     if (g) {
-      for (const b of bodies) {
+      placed.length = 0;
+      for (const b of ordered) {
         const el = labelEls.current.get(b.id);
         if (!el) continue;
         w.copy(b.p).applyMatrix4(g.matrixWorld);
         const dist = w.distanceTo(camera.position);
         v.copy(w).project(camera);
+        const x = ((v.x + 1) / 2) * size.width;
+        const y = ((1 - v.y) / 2) * size.height;
+        el.style.transform = `translate(-50%, 0) translate(${x}px, ${y}px)`;
+
+        if (v.z > 1) {
+          el.style.opacity = '0';
+          continue;
+        }
+        // half the label's own width, so the test is against real extents
+        const half = el.offsetWidth / 2 + 8;
+        let clash = false;
+        for (const q of placed) {
+          if (Math.abs(q.y - y) < 15 && Math.abs(q.x - x) < half + q.half) {
+            clash = true;
+            break;
+          }
+        }
+        // whatever is focused always gets its name, collision or not
+        const forced = !!near && near.nodes.has(b.id);
+        if (clash && !forced) {
+          el.style.opacity = '0';
+          continue;
+        }
+        placed.push({ x, y, half });
+
         // Fade by distance from the camera, not by NDC z. Everything here sits
         // at roughly the same clip depth — 0.97 or so — and reading opacity
         // off that left every name in the map at 13%.
-        const near = Math.max(0.3, Math.min(1, 1.5 - dist / 46));
-        el.style.transform = `translate(-50%, 0) translate(${((v.x + 1) / 2) * size.width}px, ${((1 - v.y) / 2) * size.height}px)`;
-        el.style.opacity = v.z > 1 ? '0' : String(near);
+        const byDist = Math.max(0.3, Math.min(1, 1.5 - dist / 52));
+        // a label belonging to nothing you are looking at gets out of the way
+        const dim = near && !near.nodes.has(b.id) ? 0.2 : 1;
+        el.style.opacity = String(byDist * dim);
       }
     }
   });
@@ -270,6 +359,10 @@ function Graph({
   const v = useMemo(() => new THREE.Vector3(), []);
   const w = useMemo(() => new THREE.Vector3(), []);
   const labelEls = useRef(new Map<string, HTMLElement>());
+  /** most-connected first, so the important names win a collision */
+  const ordered = useMemo(() => [...bodies].sort((a, b) => b.degree - a.degree), [bodies]);
+  /** label extents already claimed this frame, reused rather than reallocated */
+  const placed = useMemo<Array<{ x: number; y: number; half: number }>>(() => [], []);
 
   // hand the DOM label layer the elements to move
   useEffect(() => {
@@ -277,37 +370,51 @@ function Graph({
     document.querySelectorAll<HTMLElement>('[data-atlas-label]').forEach((el) => {
       labelEls.current.set(el.dataset.atlasLabel!, el);
     });
-  }, [graph, found, selected]);
+  }, [graph, found, focus]);
 
   return (
     <group ref={groupRef} name="atlas-graph">
-      <lineSegments ref={linesRef} geometry={lineGeo} frustumCulled={false}>
-        <lineBasicMaterial color="#C9A227" transparent opacity={0.32} />
+      {/* the quiet web */}
+      <lineSegments ref={quietRef} geometry={lineGeo} frustumCulled={false}>
+        <lineBasicMaterial color="#C9A227" transparent opacity={0.3} depthWrite={false} />
+      </lineSegments>
+      {/* and the edges of whatever is focused, in bone rather than gilt so
+          they read as lit rather than merely brighter */}
+      <lineSegments geometry={hotGeo} frustumCulled={false}>
+        <lineBasicMaterial color="#F2EBDF" transparent opacity={0.95} depthWrite={false} />
       </lineSegments>
       {bodies.map((b) => {
         const node = graph.byId.get(b.id)!;
         const known = found.has(b.id);
-        const r = known ? 0.15 + Math.min(0.3, b.degree * 0.022) : 0.07;
-        const on = selected === b.id || hover === b.id;
+        const lit = !near || near.nodes.has(b.id);
+        const on = focus === b.id;
+        const r = known ? 0.15 + Math.min(0.3, b.degree * 0.022) : 0.06;
+        // undiscovered motes are the map's background noise, and there are
+        // eighty of them: they should read as "there is more here", not as
+        // eighty things competing with what you have actually found
+        const opacity = known ? (on ? 1 : lit ? 0.92 : 0.24) : near ? 0.08 : 0.18;
         return (
           <mesh
             key={b.id}
             position={b.p}
             onPointerOver={(e) => {
               e.stopPropagation();
-              if (known) setHover(b.id);
+              if (known) onHover(b.id, false);
             }}
-            onPointerOut={() => setHover((h) => (h === b.id ? null : h))}
+            // clear only if this node is still the one being reported: r3f can
+            // deliver the "out" of the node you left after the "over" of the
+            // one you arrived at, which would blank the highlight you just lit
+            onPointerOut={() => onHover(b.id, true)}
             onClick={(e) => {
               e.stopPropagation();
               if (known) onPick(node);
             }}
           >
-            <sphereGeometry args={[r * (on ? 1.5 : 1), 16, 12]} />
+            <sphereGeometry args={[r * (on ? 1.6 : 1), 16, 12]} />
             <meshBasicMaterial
               color={known ? KIND_COLOUR[node.kind] : '#6E5B4A'}
               transparent
-              opacity={known ? (on ? 1 : 0.9) : 0.3}
+              opacity={opacity}
             />
           </mesh>
         );
@@ -337,6 +444,10 @@ export function AtlasView() {
   const drag = useRef<{ x: number; y: number; moved: number } | null>(null);
   /** which connection is opened out to read */
   const [openEdge, setOpenEdge] = useState<string | null>(null);
+  /** what the pointer is over, which lights its edges without committing */
+  const [hover, setHover] = useState<string | null>(null);
+  /** what the map is currently about: the selection, or failing that a hover */
+  const focus = selected ?? hover;
 
   /*
    * Opening the map is the moment the real titles are worth fetching. Five
@@ -421,6 +532,7 @@ export function AtlasView() {
           if (drag.current && drag.current.moved < 5) {
             select(null);
             setOpenEdge(null);
+            setHover(null);
           }
           drag.current = null;
         }}
@@ -429,12 +541,16 @@ export function AtlasView() {
           spin.current.zoom = Math.max(0.45, Math.min(2.4, spin.current.zoom * (1 + e.deltaY * 0.0012)));
         }}
       >
-        <Canvas camera={{ fov: 45, position: [0, 0, 34], near: 0.1, far: 200 }} dpr={[1, 1.75]}>
+        <Canvas camera={{ fov: 45, position: [0, 0, 40], near: 0.1, far: 220 }} dpr={[1, 1.75]}>
           <Rig spin={spin} />
           <Starfield />
           {graph && (
             <Graph
               graph={graph}
+              focus={focus}
+              onHover={(id, leaving) =>
+                setHover((h) => (leaving ? (h === id ? null : h) : id))
+              }
               onPick={(n) => {
                 select(n.id);
                 setOpenEdge(null);
@@ -443,7 +559,7 @@ export function AtlasView() {
             />
           )}
         </Canvas>
-        {graph && <LabelLayer graph={graph} />}
+        {graph && <LabelLayer graph={graph} focus={focus} />}
       </div>
 
       {/* the way out is where the way out always is */}
@@ -457,8 +573,8 @@ export function AtlasView() {
       </header>
 
       <p className="caption atlas-progress">
-        {foundLinks} of {totalLinks} connections found · pull threads out of the paintings to
-        uncover more
+        {foundLinks} of {totalLinks} connections found · click a node to light what it joins ·
+        pull threads out of the paintings to uncover more
       </p>
 
       <div className="atlas-legend caption">
@@ -561,7 +677,7 @@ function Rig({ spin }: { spin: React.MutableRefObject<{ yaw: number; pitch: numb
     cur.current.pitch += (spin.current.pitch - cur.current.pitch) * k;
     cur.current.zoom += (spin.current.zoom - cur.current.zoom) * k;
     if (g) g.rotation.set(cur.current.pitch, cur.current.yaw, 0);
-    camera.position.z = 34 * cur.current.zoom;
+    camera.position.z = 40 * cur.current.zoom;
   });
   return null;
 }
@@ -570,15 +686,49 @@ function Rig({ spin }: { spin: React.MutableRefObject<{ yaw: number; pitch: numb
  * The DOM label layer. One absolutely-positioned span per named node, moved by
  * the frame loop above via `data-atlas-label`.
  */
-function LabelLayer({ graph }: { graph: AtlasGraph }) {
+function LabelLayer({ graph, focus }: { graph: AtlasGraph; focus: string | null }) {
   const found = useAtlas((s) => s.found);
   const selected = useAtlas((s) => s.selected);
   const select = useAtlas((s) => s.select);
+
+  /*
+   * WHICH NAMES ARE WORTH SHOWING AT ONCE
+   *
+   * A hundred and thirty nodes, every found one carrying a name, is a page of
+   * overlapping type with a diagram somewhere underneath it — and it gets
+   * worse the more you discover, which is exactly backwards. So the layer
+   * thins itself:
+   *
+   *   nothing focused   only the hubs — the nodes with three or more found
+   *                     connections — which is the shape of the collection
+   *                     rather than its inventory
+   *   something focused that node and everything it touches, and nothing else
+   *
+   * Painting nodes never carry a standing label: there are fifty of them and
+   * their titles are the longest strings in the graph.
+   */
+  const shown = useMemo(() => {
+    const keep = new Set<string>();
+    if (focus) {
+      keep.add(focus);
+      for (const l of graph.around.get(focus) ?? []) {
+        if (!found.has(linkKey(l))) continue;
+        keep.add(l.a === focus ? l.b : l.a);
+      }
+      return keep;
+    }
+    for (const n of graph.nodes) {
+      if (!found.has(n.id) || n.kind === 'work') continue;
+      const degree = (graph.around.get(n.id) ?? []).filter((l) => found.has(linkKey(l))).length;
+      if (degree >= 4) keep.add(n.id);
+    }
+    return keep;
+  }, [graph, found, focus]);
+
   return (
     <div className="atlas-labels" aria-hidden={false}>
       {graph.nodes.map((n) => {
-        if (!found.has(n.id)) return null;
-        if (n.kind === 'work' && selected !== n.id) return null;
+        if (!found.has(n.id) || !shown.has(n.id)) return null;
         return (
           <button
             key={n.id}

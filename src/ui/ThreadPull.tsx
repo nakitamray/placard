@@ -1,13 +1,17 @@
 /**
  * Thread Pull — pull a thread of text out of the painting and read it.
  *
- * Hold Shift over the canvas and the cursor enters extraction mode. Hovering
- * a semantic region (the sky, the profile, the clown in the foreground) lifts
- * that region's glyphs off the artwork: they stop drifting, fade out of the
- * WebGL layer, and the same characters fly in screen space into a reading
- * panel, where they assemble into legible left-to-right prose. Releasing
- * Shift flies them home. Clicking pins the panel so a long passage can be
- * read at leisure.
+ * Press space (or use the Threads toggle) and the canvas becomes a map of its
+ * own passages. Hovering a semantic region — the sky, the profile, the clown
+ * in the foreground — lifts that region's glyphs off the artwork: they stop
+ * drifting, fade out of the WebGL layer, and the same characters fly in screen
+ * space into a reading panel, where they assemble into legible left-to-right
+ * prose. Leaving the mode flies them home. Pinning holds a long passage still
+ * so it can be read at leisure.
+ *
+ * The mode says so. A gilt pill sits low on the screen for exactly as long as
+ * thread mode is on, because a mode you cannot see is a mode you cannot tell
+ * from a bug.
  *
  * HOW THE SEAM IS HIDDEN
  *   The flying characters are DOM spans set in the *same monospace* as the
@@ -28,7 +32,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { selectArtworks, useStore } from '../state/store';
-import { artworkProjector, threadPullAnim } from '../threadpull/state';
+import { artworkProjector, setThreadMode, threadPullAnim, toggleThreadMode } from '../threadpull/state';
 import { loadArtwork } from '../glyph/artworkLoader';
 import { sfx } from '../lib/audio';
 import { discoverFromText } from '../state/atlas';
@@ -50,7 +54,6 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
   const extractionMode = useStore((s) => s.extractionMode);
   const hoveredRegion = useStore((s) => s.hoveredRegion);
   const pulledRegion = useStore((s) => s.pulledRegion);
-  const setExtractionMode = useStore((s) => s.setExtractionMode);
   const setPulledRegion = useStore((s) => s.setPulledRegion);
 
   const [pinned, setPinned] = useState(false);
@@ -79,33 +82,47 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
    */
   useEffect(() => {
     if (!inGallery) {
-      setExtractionMode(false);
+      setThreadMode(false);
       return;
     }
+    /*
+     * WHY THIS LISTENS IN THE CAPTURE PHASE AND BLURS THE FOCUSED CONTROL
+     *
+     * Space is also how a browser activates the focused button. Anyone who had
+     * clicked the sound toggle, a quality word or the atlas link — which is
+     * most people, since those are the only clickable things in the room —
+     * was pressing Space at a focused <button>, and the keystroke went to that
+     * button instead of here. That is the whole of "sometimes it works and
+     * sometimes it doesn't": it worked when the last click had landed on the
+     * canvas and not when it had landed on a control.
+     *
+     * So: capture, so this runs before anything else can claim the key;
+     * preventDefault, so the browser's own activation never happens; and blur
+     * the offending control, so the NEXT press is not fighting it either.
+     */
     const onDown = (e: KeyboardEvent) => {
       if (e.code !== 'Space' && e.key !== ' ') return;
-      // the browser's own use for Space is scrolling, which this page does not do
+      const el = e.target as HTMLElement | null;
+      // typing in the contact form, or anywhere else text is being entered,
+      // is not a request for thread mode
+      if (el?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+      // nor is scrolling the colophon or turning the atlas: the room is behind
+      // an overlay and the key belongs to whatever is on top of it
+      if (useStore.getState().creditsOpen || document.querySelector('.atlas')) return;
       e.preventDefault();
+      e.stopPropagation();
       if (e.repeat) return;
-      const on = !useStore.getState().extractionMode;
-      setExtractionMode(on);
-      if (!on) {
-        setPinned(false);
-        setPulledRegion(null);
-      }
+      if (el && el !== document.body && typeof el.blur === 'function') el.blur();
+      toggleThreadMode();
     };
-    const onBlur = () => {
-      setExtractionMode(false);
-      setPinned(false);
-      setPulledRegion(null);
-    };
-    window.addEventListener('keydown', onDown);
+    const onBlur = () => setThreadMode(false);
+    window.addEventListener('keydown', onDown, true);
     window.addEventListener('blur', onBlur);
     return () => {
-      window.removeEventListener('keydown', onDown);
+      window.removeEventListener('keydown', onDown, true);
       window.removeEventListener('blur', onBlur);
     };
-  }, [inGallery, setExtractionMode, setPulledRegion]);
+  }, [inGallery]);
 
   // leaving thread mode by any route puts the passage back
   useEffect(() => {
@@ -402,6 +419,21 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
         <p className="tp-prompt caption">
           {hoveredRegion ? hoveredRegion.label : 'Move over the painting to pull a thread'}
         </p>
+      )}
+
+      {/* the standing notice: thread mode is on, and here is the way out */}
+      {extractionMode && (
+        <button
+          className="tp-mode caption"
+          onClick={() => setThreadMode(false)}
+          title="Leave thread mode (space)"
+        >
+          <span className="tp-mode-dot" aria-hidden />
+          Thread mode on
+          <span className="tp-mode-key">
+            <kbd>space</kbd> to leave
+          </span>
+        </button>
       )}
 
       {region && (

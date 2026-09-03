@@ -19,11 +19,28 @@
  *   swell       the warp: a rising tone under a noise sweep
  *   chime       a single soft partial when a painting resolves
  *
+ * WHAT CHANGED
+ *   The ambience is now real music, streamed from YouTube — see lib/music.ts,
+ *   which owns the tracks and the credits. The synthesised room tone below is
+ *   still here and still exact, but it is the FALLBACK: it plays only when the
+ *   player cannot be built (a blocked network, a script blocker, a video
+ *   pulled from YouTube), because the alternative is silence. The one-shots —
+ *   the chime, the warp, the rustle, the link — are unchanged and still
+ *   synthesised, because they have to land on the frame they belong to.
+ *
  * OFF BY DEFAULT, always. Sound that starts by itself is an ambush, and
  * browsers are right to forbid it: the context is not even created until the
  * visitor asks for it, which also means the autoplay policy is never fought,
  * only obeyed.
  */
+
+import {
+  musicUnavailable,
+  onMusicUnavailable,
+  playMusic,
+  resumeMusicOnGesture,
+  stopMusic,
+} from './music';
 
 const KEY = 'placard.sound';
 
@@ -88,6 +105,7 @@ export function setSound(on: boolean) {
     /* private windows are not an error here */
   }
   if (!on) {
+    stopMusic();
     if (master && ctx) {
       master.gain.cancelScheduledValues(ctx.currentTime);
       master.gain.setTargetAtTime(0, ctx.currentTime, 0.25);
@@ -98,6 +116,17 @@ export function setSound(on: boolean) {
   if (!c || !master) return;
   master.gain.cancelScheduledValues(c.currentTime);
   master.gain.setTargetAtTime(1, c.currentTime, 0.4);
+}
+
+/*
+ * A player that came up paused because the gesture had expired is rescued by
+ * the next click anywhere. Cheap, silent when it is not needed, and it turns
+ * the common autoplay failure into a one-click one.
+ */
+if (typeof window !== 'undefined') {
+  window.addEventListener('pointerdown', () => enabled && resumeMusicOnGesture(), {
+    passive: true,
+  });
 }
 
 /* ── the room ───────────────────────────────────────────────────────────── */
@@ -172,7 +201,7 @@ function impulse(c: AudioContext): AudioBuffer {
  * Nothing is ever intelligible, and that is deliberate: the moment a listener
  * starts making out words, the sound has stopped being a room.
  */
-export function roomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery') {
+function synthRoomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery') {
   if (!enabled) {
     room?.stop();
     room = null;
@@ -382,6 +411,45 @@ export function roomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery
     },
   };
 }
+
+/* ── what the room actually plays ───────────────────────────────────────── */
+
+/**
+ * Put the room's ambience on: music first, the synthesised tone only if the
+ * player cannot be built.
+ *
+ * Idempotent per room, so App can call it from an effect on every render
+ * without restarting anything. `id` is the museum being visited (or 'atlas');
+ * null is silence.
+ */
+/** the room last asked for, so a late player failure knows what to fall back to */
+let lastRoom: { id: string; kind: 'gallery' | 'atlas' } | null = null;
+
+export function roomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery') {
+  lastRoom = enabled && id ? { id, kind } : null;
+  if (!enabled || !id) {
+    stopMusic();
+    synthRoomTone(null);
+    return;
+  }
+  if (musicUnavailable()) {
+    synthRoomTone(id, kind);
+    return;
+  }
+  // the synth bed and the music must never run together
+  synthRoomTone(null);
+  playMusic(`${kind}:${id}`, kind);
+}
+
+/*
+ * If the player turns out to be unusable — blocked network, script blocker, a
+ * video pulled from YouTube — the synthesised room comes back rather than the
+ * page going quiet. Registered once, at module scope, because the failure can
+ * arrive seconds after the call that caused it.
+ */
+onMusicUnavailable(() => {
+  if (enabled && lastRoom) synthRoomTone(lastRoom.id, lastRoom.kind);
+});
 
 /* ── one-shots ──────────────────────────────────────────────────────────── */
 

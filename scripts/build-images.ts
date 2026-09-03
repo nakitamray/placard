@@ -27,6 +27,14 @@
  * Only the first is authentic. The other two exist so the whole pipeline runs
  * with no network access and so a half-authored collection still builds; drop
  * a scan in at (1) and rebuild, and nothing else changes.
+ *
+ * STRICT MODE
+ *   `pnpm build:assets:strict` (or `--strict`, or PLACARD_REQUIRE_SCANS=1)
+ *   turns (2) and (3) off entirely: a work with no real scan fails the build
+ *   and says which one and what to run, instead of quietly hanging a
+ *   procedural stand-in that looks like a bug in the renderer. Once a
+ *   collection is fully sourced this is the mode to publish in — and it is
+ *   what the Vercel build runs, so a missing scan can never reach the site.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -37,6 +45,10 @@ import type { ArtworkRecord } from './lib/records.ts';
 
 /** AVIF is the slowest encode in the build; skip it while iterating locally. */
 const SKIP_AVIF = process.env.PLACARD_SKIP_AVIF === '1';
+
+/** refuse to publish a procedural stand-in — see STRICT MODE above */
+const STRICT =
+  process.argv.includes('--strict') || process.env.PLACARD_REQUIRE_SCANS === '1';
 
 interface Rung {
   name: 'wall' | 'view' | 'full';
@@ -96,6 +108,15 @@ async function resolveSource(record: ArtworkRecord): Promise<{ file: string; aut
 
   const scan = path.join(dir, 'source.jpg');
   if (fs.existsSync(scan)) return { file: scan, authentic: true };
+
+  if (STRICT) {
+    throw new Error(
+      `${record.id}: no real scan, and strict mode refuses stand-ins.\n` +
+        `  Fetch it:   pnpm fetch:images --only ${record.id}\n` +
+        `  or place it at data/artworks/${record.id}/source.jpg by hand,\n` +
+        `  then run:   pnpm build:assets:strict`,
+    );
+  }
 
   const generatedDir = path.join(CACHE, 'sources');
   fs.mkdirSync(generatedDir, { recursive: true });

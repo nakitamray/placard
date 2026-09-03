@@ -58,15 +58,33 @@ scrolls and painted papyri rather than gallery canvases. `corridorNote` in
 
 ## Artwork images
 
-Two works ship with real public-domain scans; the other 48 render *procedurally
-generated painterly stand-ins* until you fetch them. **One command fetches the
-rest from Wikimedia Commons:**
+Almost every work ships with a real public-domain scan under
+`data/artworks/{id}/source.jpg`. Anything without one falls back to a
+*procedurally generated painterly stand-in* — which is honest, and obvious, and
+not what you want on a published exhibition. **One command fetches the rest
+from Wikimedia Commons:**
 
 ```bash
 pnpm fetch:images --dry    # resolve everything, download nothing — read this first
 pnpm fetch:images          # fetch every work that has no scan yet
 pnpm build:assets          # rebuild the exhibition around the real paintings
 ```
+
+**With npm rather than pnpm, the flags need `--` in front of them**, because
+npm otherwise reads them as its own config and prints
+`Unknown command: "fetch:images"`:
+
+```bash
+npm run fetch:images -- --dry --only el-greco-view-toledo
+npm run build:assets
+```
+
+**To refuse stand-ins entirely**, build with `pnpm build:assets:strict` (or
+`npm run build:assets:strict`). A work with no real scan then fails the build
+and names itself, instead of quietly publishing a rendered stand-in that reads
+as a bug in the glyph engine. Once every work in your collection has a scan,
+point `vercel.json`'s `buildCommand` at it and a missing picture can never
+reach the site.
 
 `fetch:images` resolves each work, downloads a 2000px render, and writes
 `data/artworks/{id}/source.jpg` plus an `image-credit.json` recording the exact
@@ -166,7 +184,8 @@ Commons states per file rather than assuming.
 
 Save a scan as `data/artworks/{id}/source.jpg` (ids are the `id` fields in
 `data/collections/*.json`) and run `pnpm build:assets`. The build reports how
-many works are still on stand-ins.
+many works are still on stand-ins; `pnpm build:assets:strict` refuses to finish
+while any of them are.
 
 `data/.cache/previews/{id}.png` shows the glyph field for a work and is the
 fastest loop for tuning `data/artworks/{id}/config.json`.
@@ -185,9 +204,9 @@ bottom of the screen, in the corridor, on the floor plan and in the gallery.
 | Corridor | wheel / drag | also moves along the rail |
 | Floor plan | click a room | choose a painter and warp into their room |
 | Gallery | wheel / <kbd>←</kbd> <kbd>→</kbd> | move between paintings, with magnetic snap |
-| Gallery | hover a painting | the text dissolves and the painting is revealed |
-| Gallery | click a painting, or <kbd>Enter</kbd> | the same, but it *stays* revealed so the label can be read |
-| Gallery | hold <kbd>Shift</kbd> + hover | **Thread Pull** — extract a region's text to read it |
+| Gallery | move over a painting | the **reading lens** — a soft circle where the words give way and the paint shows through |
+| Gallery | click a painting, or <kbd>Enter</kbd> | the whole work dissolves out of its text, the wall label arrives, and the room steps aside for it |
+| Gallery | <kbd>space</kbd>, or the **Threads** toggle | **Thread Pull** — the canvas becomes a map of its own passages; hover one to read it |
 | Anywhere | <kbd>+</kbd> <kbd>−</kbd>, ⌘/Ctrl-scroll, pinch | zoom: a longer lens in the corridor, a step toward the canvas in a room |
 | Anywhere | <kbd>0</kbd> | back to the distance the room was composed for |
 | Anywhere | <kbd>Esc</kbd> | step back one level |
@@ -195,13 +214,18 @@ bottom of the screen, in the corridor, on the floor plan and in the gallery.
 `Esc` walks the whole way out: artwork → gallery → floor plan → corridor →
 entrance.
 
-**Revealing is two gestures, not one.** Hovering a canvas reveals the painting
-and moving away puts the text back, because the text field *is* the
-exhibition and brushing past a work should not cost you it. Clicking the
-canvas, pressing <kbd>Enter</kbd>, or simply moving the cursor onto the wall
-label latches the reveal open — so the label can be read, scrolled and expanded
-without the painting closing behind you. Latched, it closes on <kbd>Esc</kbd>,
-on the ✕, or when you move to another work.
+**Hover looks, click decides.** Moving over a canvas opens the reading lens and
+nothing else: inside a soft circle under the cursor the glyphs give way and the
+reproduction shows through, and everywhere else the painting is still made of
+its own words. That is the seam the whole exhibition is about, and it is only
+interesting if you can hold it still and drag it around. Nothing else moves —
+the room does not slide, the wall label does not arrive, and the work does not
+dissolve out from under you.
+
+Clicking the canvas, or pressing <kbd>Enter</kbd>, is the decision: the whole
+work resolves, the spot comes up, the wall label slides in and the room steps
+aside to make space for it. It stays until <kbd>Esc</kbd>, the ✕, a scroll, or
+a move to another work.
 
 **The corridor lights one work at a time.** Bringing the cursor onto a canvas
 drops the room's exposure and brings a narrow warm spot up on that painting,
@@ -400,7 +424,7 @@ Thread Pull `regions`.
 
 | File | Overrides |
 |---|---|
-| `source.jpg` | the generated stand-in — the one file worth adding |
+| `source.jpg` | the real public-domain scan — the one file worth adding |
 | `sources.json` + `corpus/*.txt` | building the glyph corpus from the record's own placard text |
 | `regions.json` | Thread Pull regions (records may also carry them inline) |
 | `config.json` | glyph tuning — cell sizes, variance threshold, palette size, `maxGlyphs` |
@@ -421,7 +445,7 @@ list its id in `data/museums/orsay.json`.
 ## How it works
 
 - **Build time** (`scripts/`): each painting is published as three sizes in
-  three formats — `wall` 512px for the corridor, `view` 1200px for the reveal,
+  three formats — `wall` 1024px for the corridor, `view` 1200px for the reveal,
   `full` 2000px for the upgrade, each as AVIF, WebP and JPEG — and analysed
   once by a quadtree variance subdivision — small glyphs across faces and
   detail, large glyphs across sky and flat fields — and emitted as a compact
@@ -478,10 +502,17 @@ list its id in `data/museums/orsay.json`.
 
 ## Thread Pull
 
-Hold <kbd>Shift</kbd> over a painting and the cursor enters extraction mode.
-Hovering a semantic region — the gap between two hands, the claw of foam, the
-figure on the steps — lifts that region's text out of the artwork and assembles
-it into a reading panel.
+Press <kbd>space</kbd> — or click the **Threads** toggle beside the sound
+control — and the canvas becomes a map of its own passages. Hovering a semantic
+region (the gap between two hands, the claw of foam, the figure on the steps)
+lifts that region's text out of the artwork and assembles it into a reading
+panel.
+
+It is a *mode*, and a mode you cannot see is a mode you cannot tell from a bug,
+so it says so: a gilt pill sits low on the screen for exactly as long as thread
+mode is on, and the corner toggle shows the same state. Entering the mode also
+closes any open reveal — there is nothing to pull out of a painting that has
+already dissolved into one, which is what used to make it look broken.
 
 - **Regions** are authored per artwork in the collection record's `regions`
   array (or `data/artworks/{id}/regions.json`): a normalised box and the
@@ -495,8 +526,37 @@ it into a reading panel.
   their home cells — projected live from the 3D camera — in the same monospace
   as the canvas glyphs. Only once they land does the block cross-fade into the
   reading serif.
-- **Release** <kbd>Shift</kbd> and they fly home; click **Pin this thread** to
-  keep the panel open.
+- **Leave the mode** — <kbd>space</kbd>, <kbd>Esc</kbd>, or the pill — and they
+  fly home; click **Pin this thread** to hold one still while you read it.
+
+## Sculpture
+
+The figures and busts in the corridors are procedural: abstracted marble forms
+built for their silhouette (`src/scenes/corridor/Fixtures.tsx`). They are the
+weakest thing in the rooms and they are honest about it.
+
+Real scans would be better, and the two obvious sources are
+[SMK's 3D models](https://www.smk.dk/en/article/3d-models/) and
+[Scan The World](https://www.myminifactory.com/users/Scan%20The%20World) on
+MyMiniFactory. Neither is a drop-in, for three reasons worth knowing before
+anyone starts:
+
+1. **Format.** Both publish for 3D *printing*: STL or OBJ, tens of millions of
+   untextured triangles, 100–400 MB per figure. A web scene wants a few
+   thousand triangles with a baked normal map, as Draco-compressed glTF. That
+   is a decimate-and-bake step (Blender or `gltf-transform` + `meshopt`), run
+   once offline per model and committed.
+2. **Licence.** SMK's are largely CC0. Scan The World's are per-model and often
+   **CC BY-NC-SA** — the non-commercial and share-alike terms are a real
+   constraint on a published site, and each model has to be checked and
+   credited individually.
+3. **Placement.** A scanned Laocoön is not interchangeable with a scanned bust:
+   scale, up-axis, base and pedestal height all differ per model, so each one
+   needs a hand-written transform rather than a shared `<Figure seed={n}/>`.
+
+The runtime side is the easy half — `useGLTF` from `@react-three/drei` and a
+manifest of `{ file, scale, rotation, plinth }` per model, falling back to the
+present procedural forms wherever a model is missing.
 
 ## Deviations from the spec (and why)
 
@@ -507,7 +567,7 @@ it into a reading panel.
 | Lenis scroll | Small hand-rolled damped scroll | One less dependency; same damping maths as §10B.2 |
 | `@react-three/postprocessing` bloom | Omitted | Keeps the frame budget honest under software rendering; the gilt reads via env reflections |
 | T1 clip-path aperture | Push-through scale/fade layers | A true "hole" clip isn't expressible with a single `clip-path: inset()` |
-| CC0 sculpture scans | Abstracted procedural marble forms | Scan the World / Smithsonian unreachable from the build environment |
+| CC0 sculpture scans | Abstracted procedural marble forms | Scan the World, SMK and the Smithsonian are all unreachable from the build environment, and their downloads are print-oriented STL — tens of millions of untextured triangles per figure. Using them means a real offline pipeline: fetch, decimate to a few thousand triangles, convert to Draco-compressed glTF, and hand-place each one. See "Sculpture" below |
 | One gallery (Orsay), five works | Five museums, ten works each, each corridor modelled on the real room | The exhibition's argument is that architecture carries meaning; one corridor could not make it |
 | §10A.6 brightness guardrail (flat, uniformly light corridor) | Per-museum lighting rigs, including one deliberately dark room (the Met at dusk) | The guardrail's intent — never a murky interior that hides modelling — is kept per museum: each has a brightest large surface and a lit floor |
 
@@ -530,14 +590,50 @@ and of which the British Museum holds nineteenth-century facsimiles, and *The
 Admonitions Scroll*, shown as a section because a handscroll is eleven metres
 long. Both say so on their placards.
 
+## Sound
+
+Off by default, always — sound that starts by itself is an ambush, and the
+audio graph is not even built until the toggle is pressed, which is also how
+the autoplay policy is obeyed rather than fought.
+
+The ambience is four pieces of music streamed from YouTube through a hidden
+IFrame player (`src/lib/music.ts`), not files hosted here: the recordings are
+not ours to copy, an embed is the arrangement the uploaders have agreed to, and
+the bundle stays small. The corridors shuffle all four and start each visit at
+a random point, so walking into a room twice never sounds the same twice; the
+atlas takes one of them at a fraction of the volume, because it is a room with
+no walls in it. Every track is credited in the Colophon under **Sources →
+Music**.
+
+Everything else is still synthesised in WebAudio at run time: the convolution
+reverb, the chime when a work resolves, the swell through the end wall, the
+rustle of a thread coming loose. So is the old room tone — a warm drone,
+formant murmurs and footfalls in irregular pairs — which is now the *fallback*,
+played only when the YouTube player cannot be built (a blocked network, a
+script blocker, a video pulled from the site), because the alternative is
+silence.
+
+## Contact form
+
+The **About** tab of the Colophon carries a three-field contact form. Out of
+the box it composes a `mailto:` to the address in `VITE_CONTACT_EMAIL` (default
+`nakitamray@gmail.com`) and hands it to the visitor's own mail client — no
+account anywhere, works the moment it ships.
+
+To have messages arrive without the visitor needing a mail client, set one
+environment variable to a form endpoint (Formspree, Getform, Basin, or a
+serverless function of your own) and the form POSTs JSON to it instead:
+
+```
+VITE_CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx
+```
+
+On Vercel: **Project → Settings → Environment Variables**, then redeploy.
+Vite inlines `VITE_`-prefixed variables at build time, so a redeploy is
+required for a change to take effect.
+
 ## Credits & references
 
-The in-app **Credits** panel (landing page → "Credits & sources") lists every
-corpus source with licence and attribution, image provenance, and the projects
-that informed this build:
-
-- [chenglou/pretext](https://github.com/chenglou/pretext) — interactive-text experiments
-- [WICG/view-transitions](https://github.com/WICG/view-transitions) — transition choreography patterns
-- [saadeghi/daisyui](https://github.com/saadeghi/daisyui) — UI component/token conventions
-- [GitHub transitions topic](https://github.com/topics/transitions?o=desc&s=stars) — survey of transition libraries
-- three.js, @react-three/fiber, drei, GSAP, Zustand, Vite, sharp
+The in-app **Colophon** (landing page → "Credits & sources") lists every corpus
+source with licence and attribution, image provenance, the music, and the
+stack: three.js, @react-three/fiber, drei, GSAP, Zustand, Vite and sharp.

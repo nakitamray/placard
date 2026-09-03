@@ -13,8 +13,12 @@
  * room you are standing in with your eyes half shut.
  *
  * Horizontal roll: artwork bays along +x, spacing 8, camera x = damped scroll
- * with magnetic snap. Exactly one plane renders live glyphs (the nearest);
- * reveal is hover on desktop / tap on touch, Esc or scroll exits.
+ * with magnetic snap. Exactly one plane renders live glyphs (the nearest).
+ *
+ * HOVER LOOKS, CLICK DECIDES. Moving over a canvas opens the reading lens — a
+ * soft circle of paint dragged across the field of words — and does nothing
+ * else. Clicking dissolves the whole work, brings the wall label and slides
+ * the room aside to make room for it. Esc or scroll closes it again.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
@@ -30,7 +34,8 @@ import { ArtworkPlane } from './ArtworkPlane';
 import { OrnateFrame } from './OrnateFrame';
 import { frameReach } from './frames';
 import { fitWork } from './fit';
-import { startReveal, endReveal, latchReveal, releaseReveal, revealAnim } from '../transitions/reveal';
+import { startReveal, endReveal, revealAnim } from '../transitions/reveal';
+import { closeLens, moveLens } from '../transitions/lens';
 import { discoverWork } from '../state/atlas';
 import { artworkProjector, regionAt } from '../threadpull/state';
 import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
@@ -54,6 +59,15 @@ const MAX_W = 6.2;
 /** height every canvas is centred on */
 export const HANG_Y = 2.15;
 const WALL_H = 6.2;
+
+/**
+ * The reading lens, as a fraction of the canvas's short edge.
+ *
+ * Smaller than the landing hero's, because the canvas here already fills most
+ * of the screen: what wants to read as an aperture held over the picture
+ * would, at the hero's radius, read as the painting simply coming back.
+ */
+const LENS_RADIUS = 0.26;
 
 /** screen-space projection of the active plane for the DOM placard (§10.7) */
 export const placardAnchor = { x: 0, y: 0, edge: 0, visible: false };
@@ -285,6 +299,18 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     return () => window.clearTimeout(upgrade);
   }, [revealed, index, loaded, tier]);
 
+  /*
+   * The lens belongs to the canvas under the cursor and to nothing else.
+   *
+   * Moving along the rail, leaving the room, or switching into thread mode all
+   * have to shut it, or a circle of paint is left hanging over a work the
+   * cursor is no longer on.
+   */
+  useEffect(() => {
+    closeLens();
+    return closeLens;
+  }, [index]);
+
   // rail input: wheel / drag / arrows; scroll exits a reveal (spec §9)
   useEffect(() => {
     gallery.goal = index * SPACING;
@@ -336,8 +362,10 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
           ease: 'expo.out',
         });
       }
+      // Enter is the keyboard's click: it opens the whole painting, and
+      // pressing it again closes it, exactly as clicking the canvas does
       if (e.key === 'Enter') {
-        s.revealed ? latchReveal() : startReveal(s.reducedMotion, true);
+        s.revealed ? endReveal(s.reducedMotion) : startReveal(s.reducedMotion, true);
       }
     };
     window.addEventListener('wheel', onWheel, { passive: true });
@@ -550,45 +578,46 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
           height={fitWork(a.aspect, PLANE_H, MAX_W).height}
           aspect={a.aspect}
           active={i === index}
-          onEnter={() => {
-            if (i !== index) return;
-            // in thread mode the canvas is a map of passages, not a picture
-            if (useStore.getState().extractionMode) return;
-            // Hovering shows the painting. The reading lens belongs to the
-            // entrance, where its job is to explain what the glyphs are; in a
-            // room you have already been told, and what you want is the work.
-            if (matchMedia('(pointer: fine)').matches) startReveal(reducedMotion);
-          }}
           onLeave={() => {
             if (i !== index) return;
             useStore.getState().setHoveredRegion(null);
             /*
-             * Not an immediate close.
-             *
-             * Closing on leave made the placard unreadable: the wall label
-             * sits beside the painting, so moving the cursor over to read it
-             * took the cursor off the canvas and dismissed the very thing
-             * being reached for. `releaseReveal` gives the cursor half a
-             * second to arrive — and reaching the label latches the reveal
-             * open, as does clicking the canvas or pressing Enter.
+             * Hover only ever opened the lens, so leaving only ever shuts it.
+             * The full reveal is now a decision — a click — and a decision is
+             * not undone by the cursor wandering off to read the label it
+             * just asked for.
              */
-            if (matchMedia('(pointer: fine)').matches) releaseReveal(reducedMotion);
+            closeLens();
           }}
           onMove={(u, v) => {
             if (i !== index) return;
             const s = useStore.getState();
             const art = loaded.get(i);
-            if (!s.extractionMode) return;
+            if (s.extractionMode) {
+              /*
+               * Keep reporting what is under the cursor even while a passage
+               * is out. This used to return early once anything was pulled,
+               * which froze `hoveredRegion` — so moving to another part of
+               * the painting changed nothing, and the only way to read a
+               * second passage was to leave thread mode and come back.
+               * Thread mode is meant to be a mode you move around inside.
+               */
+              const region = art ? regionAt(art.meta.regions ?? [], u, v) : null;
+              if (region?.id !== s.hoveredRegion?.id) s.setHoveredRegion(region);
+              return;
+            }
             /*
-             * Keep reporting what is under the cursor even while a passage is
-             * out. This used to return early once anything was pulled, which
-             * froze `hoveredRegion` — so moving to another part of the
-             * painting changed nothing, and the only way to read a second
-             * passage was to leave thread mode and come back. Thread mode is
-             * meant to be a mode you move around inside.
+             * HOVER LOOKS, CLICK DECIDES.
+             *
+             * Moving over the canvas opens the reading lens and nothing else:
+             * a soft circle under the cursor where the glyphs give way and the
+             * painting shows through, everywhere else still made of its own
+             * words. The room does not slide, the wall label does not arrive,
+             * and the picture does not dissolve out from under you — all of
+             * that belongs to the click.
              */
-            const region = art ? regionAt(art.meta.regions ?? [], u, v) : null;
-            if (region?.id !== s.hoveredRegion?.id) s.setHoveredRegion(region);
+            if (!art || !matchMedia('(pointer: fine)').matches) return;
+            moveLens(u, v, art.glyphs.imageW, art.glyphs.imageH, LENS_RADIUS);
           }}
           onTap={(u, v) => {
             if (i !== index) return;

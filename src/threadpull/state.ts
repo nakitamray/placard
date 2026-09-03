@@ -6,6 +6,9 @@
  * at frame rate without re-rendering React on every tick. Zustand carries
  * only the discrete facts (which region is held, is the panel open).
  */
+import { useStore } from '../state/store';
+import { endReveal } from '../transitions/reveal';
+import { closeLens } from '../transitions/lens';
 import type { ArtworkRegion } from '../types';
 
 export const threadPullAnim = {
@@ -75,4 +78,32 @@ export function regionAt(regions: ArtworkRegion[], u: number, v: number): Artwor
     }
   }
   return nearest;
+}
+
+
+/* ── the mode ───────────────────────────────────────────────────────────── */
+
+/**
+ * Turn thread mode on or off.
+ *
+ * One function rather than a bare `setExtractionMode`, because switching in
+ * has a precondition that was being missed everywhere it was called from:
+ * there is nothing to pull out of a painting that has already dissolved into
+ * one. If the work is revealed — clicked open — the glyph field is at full
+ * dissolve and every region is invisible, so thread mode looked broken rather
+ * than empty. Entering the mode therefore puts the words back first.
+ */
+export function setThreadMode(on: boolean) {
+  const s = useStore.getState();
+  if (s.extractionMode === on) return;
+  if (on) {
+    endReveal(s.reducedMotion);
+    closeLens();
+  }
+  s.setExtractionMode(on);
+  if (!on) s.setPulledRegion(null);
+}
+
+export function toggleThreadMode() {
+  setThreadMode(!useStore.getState().extractionMode);
 }

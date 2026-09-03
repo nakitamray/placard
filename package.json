@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "build:assets": "tsx scripts/build-all.ts",
+    "build:assets:strict": "tsx scripts/build-all.ts --strict",
     "fetch:images": "tsx scripts/fetch-images.ts"
   },
   "dependencies": {

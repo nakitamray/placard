@@ -18,52 +18,28 @@ export const revealAnim = {
   /** environment settle multiplier */
   env: 1.0,
   /**
-   * Whether this reveal was asked for, or merely stumbled into.
+   * Whether this reveal was asked for.
    *
-   * Hovering a canvas reveals the painting, and that has to stay reversible —
-   * the text field *is* the exhibition, and a visitor who brushes past a work
-   * should get it back by moving away. But reading the wall label means
-   * moving the cursor off the canvas, which is the same gesture. So the two
-   * are separated: hover reveals loosely, and clicking the canvas, pressing
-   * Enter, or reaching the label itself latches the reveal open until it is
-   * closed deliberately.
+   * It always is, now. Hovering a canvas opens the reading lens and nothing
+   * else (see transitions/lens.ts); the full dissolve is only ever reached by
+   * clicking the canvas or pressing Enter, so it stays open until it is
+   * closed deliberately. The flag is kept because the wall label is keyed to
+   * it, and because the landing hero still reveals without a click.
    */
   latched: false,
 };
 
 let tl: gsap.core.Timeline | null = null;
-let release = 0;
 
-/** cancel a pending close — the visitor came back, or reached the label */
-export function holdReveal() {
-  window.clearTimeout(release);
-  release = 0;
-}
-
-/** the reveal is now deliberate: leaving the canvas will not close it */
+/** the reveal is deliberate: leaving the canvas will not close it */
 export function latchReveal() {
-  holdReveal();
   revealAnim.latched = true;
   // the label is what latching is FOR, so the store has to hear about it
   if (useStore.getState().revealed) useStore.getState().setRevealed(true, true);
 }
 
-/**
- * Leaving the canvas. A latched reveal ignores it; an unlatched one closes,
- * but not instantly — half a second is enough for a cursor to cross the gap
- * between the painting and its label without the label vanishing on the way.
- */
-export function releaseReveal(reducedMotion: boolean) {
-  if (revealAnim.latched || release) return;
-  release = window.setTimeout(() => {
-    release = 0;
-    if (!revealAnim.latched) endReveal(reducedMotion);
-  }, 500);
-}
-
 export function startReveal(reducedMotion: boolean, latched = false) {
   tl?.kill();
-  holdReveal();
   revealAnim.latched = latched;
   useStore.getState().setRevealed(true, latched);
   if (reducedMotion) {
@@ -86,7 +62,6 @@ export function startReveal(reducedMotion: boolean, latched = false) {
 
 export function endReveal(reducedMotion: boolean) {
   tl?.kill();
-  holdReveal();
   revealAnim.latched = false;
   useStore.getState().setRevealed(false);
   if (reducedMotion) {

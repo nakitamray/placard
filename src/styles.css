@@ -387,55 +387,55 @@ button:active { transform: translateY(1px); }
 }
 
 /* ─── credits ────────────────────────────────────────────────────────────
-   A veil, not a card.
+   A LIT ROOM, NOT A DARK ONE.
 
-   This panel has been a bone card on a thin scrim (a lit rectangle in the
-   middle of a night gallery) and then a flat near-black slab (a hole cut in
-   the picture). Both were the same mistake: an opaque object pasted over the
-   room, with a hard edge announcing where it stopped. It is now made of the
-   same frosted glass as the control hints and the wall label — heavily
-   blurred, only partly opaque, taking its colour from whatever painting or
-   corridor is behind it, and dissolving at the top and bottom rather than
-   ending on a line. It reads dark over the corridor and warm over a lit
-   canvas, because it is not painting a colour of its own. */
+   This panel has been a bone card on a thin scrim, then a flat near-black
+   slab, then dark frosted glass — and the last of those was gloomy, which is
+   the one thing a colophon must not be. It is the only part of the site whose
+   whole job is READING: a thousand words of sources, licences and notes, and
+   pale grey type on near-black is where reading goes to die.
+
+   So it follows the wall label and the thread panel instead: dark type on a
+   warm bone ground, over a light wash of the room behind it. It still has no
+   hard edge — the same feathered mask dissolves all four sides — so it reads
+   as a page drawn across the exhibition rather than a window cut out of it. */
 .credits {
   position: fixed; inset: 0; z-index: 55;
   background: radial-gradient(
-    130% 100% at 50% 45%,
-    rgba(18, 15, 12, 0.34) 0%,
-    rgba(10, 8, 7, 0.66) 100%
+    130% 100% at 50% 42%,
+    rgba(242, 235, 223, 0.5) 0%,
+    rgba(36, 31, 26, 0.52) 100%
   );
-  backdrop-filter: blur(9px) saturate(1.04);
-  -webkit-backdrop-filter: blur(9px) saturate(1.04);
+  backdrop-filter: blur(11px) saturate(1.06);
+  -webkit-backdrop-filter: blur(11px) saturate(1.06);
   display: grid; place-items: center; padding: var(--s6);
   animation: credits-in var(--d-base) var(--e-out);
 }
 @keyframes credits-in { from { opacity: 0; } to { opacity: 1; } }
 .credits-inner {
   position: relative;
-  background: rgba(26, 22, 18, 0.62);
-  backdrop-filter: blur(30px) saturate(1.25);
-  -webkit-backdrop-filter: blur(30px) saturate(1.25);
-  color: var(--bone);
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+  background: rgba(246, 241, 232, 0.94);
+  backdrop-filter: blur(30px) saturate(1.1);
+  -webkit-backdrop-filter: blur(30px) saturate(1.1);
+  color: var(--ink);
+  box-shadow: 0 30px 90px rgba(36, 31, 26, 0.4);
   max-width: 700px; width: 100%; max-height: 86vh;
   overflow: hidden;
   /*
-   * No border, no shadow — the panel has no edge at all.
+   * No border — the panel's edge is a fade, not a line.
    *
    * A mask clips the frosted backdrop along with everything drawn on top of
-   * it, so feathering all four sides here dissolves the glass itself, not
-   * just the text on it. That is the whole difference between a card lying on
-   * the picture and a veil drawn across it. The side fades are narrower than
-   * the padding, so no line of type ever sits in one.
+   * it, so feathering all four sides here dissolves the page itself, not just
+   * the text on it. The side fades are narrower than the padding, so no line
+   * of type ever sits in one.
    */
   mask-image:
-    linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 36px), transparent 100%),
-    linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+    linear-gradient(to bottom, transparent 0, #000 34px, #000 calc(100% - 34px), transparent 100%),
+    linear-gradient(to right, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
   mask-composite: intersect;
   -webkit-mask-image:
-    linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 36px), transparent 100%),
-    linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+    linear-gradient(to bottom, transparent 0, #000 34px, #000 calc(100% - 34px), transparent 100%),
+    linear-gradient(to right, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
   -webkit-mask-composite: source-in;
 }
 .credits-scroll {
@@ -449,71 +449,110 @@ button:active { transform: translateY(1px); }
 .credits-tabs {
   display: flex; gap: var(--s5);
   margin: var(--s5) 0 var(--s2);
-  border-bottom: 1px solid rgba(242, 235, 223, 0.12);
+  border-bottom: 1px solid var(--limestone);
 }
 .credits-tabs button {
-  color: rgba(242, 235, 223, 0.45); padding: 0 0 9px;
-  position: relative; transition: color var(--d-fast);
+  color: var(--umber); opacity: 0.62; padding: 0 0 9px;
+  position: relative; transition: color var(--d-fast), opacity var(--d-fast);
 }
-.credits-tabs button:hover { color: rgba(242, 235, 223, 0.8); }
-.credits-tabs button.is-on { color: var(--gilt); }
+.credits-tabs button:hover { opacity: 1; }
+.credits-tabs button.is-on { color: #8a6d12; opacity: 1; }
 .credits-tabs button.is-on::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: -1px;
-  height: 1px; background: var(--gilt);
+  height: 1px; background: #8a6d12;
 }
 
 /* the design rules — a list that reads as a list, not as prose in bullets */
 .credits-rules { list-style: none; margin: 0; padding: 0; }
 .credits-rules li {
   padding: var(--s3) 0;
-  border-bottom: 1px solid rgba(242, 235, 223, 0.07);
-  color: rgba(242, 235, 223, 0.8);
+  border-bottom: 1px solid var(--limestone);
+  color: rgba(36, 31, 26, 0.84);
 }
 .credits-rules li:last-child { border-bottom: 0; }
-.credits-rules strong { color: var(--bone); font-weight: 500; }
+.credits-rules strong { color: var(--ink); font-weight: 600; }
 
 /* the technical table: a label and a value, aligned */
 .credits-spec { list-style: none; margin: 0; padding: 0; }
 .credits-spec li {
   display: grid; grid-template-columns: 118px 1fr; gap: var(--s4);
   align-items: baseline; padding: var(--s2) 0;
-  border-bottom: 1px solid rgba(242, 235, 223, 0.07);
+  border-bottom: 1px solid var(--limestone);
 }
 .credits-spec li:last-child { border-bottom: 0; }
-.credits-spec .caption { color: var(--gilt); opacity: 0.75; }
-.credits-spec .body { color: rgba(242, 235, 223, 0.82); font-size: 15px; }
+.credits-spec .caption { color: #8a6d12; }
+.credits-spec .body { color: rgba(36, 31, 26, 0.86); font-size: 15px; }
 @media (max-width: 560px) {
   .credits-spec li { grid-template-columns: 1fr; gap: 2px; }
 }
 
-.credits-bio { color: rgba(242, 235, 223, 0.68); }
+.credits-bio { color: rgba(36, 31, 26, 0.66); }
 .credits-links { list-style: none; margin: var(--s4) 0 0; padding: 0; }
 .credits-inner code {
   font-family: ui-monospace, Menlo, Consolas, monospace;
-  font-size: 0.86em; color: var(--gilt); opacity: 0.85;
+  font-size: 0.86em; color: #8a6d12;
 }
 .credits-header .display { margin: 0; }
-.credits-close { color: var(--taupe); }
-.credits-close:hover { color: var(--gilt); }
+.credits-close { color: var(--umber); }
+.credits-close:hover { color: #8a6d12; }
 .credits-section {
-  color: var(--gilt); margin: var(--s6) 0 var(--s2); letter-spacing: 0.06em;
+  color: #8a6d12; margin: var(--s6) 0 var(--s2); letter-spacing: 0.06em;
 }
-.credits-note { color: rgba(242, 235, 223, 0.86); margin: 0 0 var(--s4); }
+.credits-note { color: rgba(36, 31, 26, 0.88); margin: 0 0 var(--s4); }
 .credits-artwork {
   margin-bottom: var(--s4); padding-bottom: var(--s3);
-  border-bottom: 1px solid rgba(242, 235, 223, 0.09);
+  border-bottom: 1px solid var(--limestone);
 }
 .credits-artwork:last-child { border-bottom: 0; }
-.credits-title { margin: 0; color: var(--bone); }
+.credits-title { margin: 0; color: var(--ink); }
 .credits-inner ul { margin: var(--s2) 0; padding-left: var(--s4); }
-.credits-inner li::marker { color: rgba(242, 235, 223, 0.3); }
+.credits-inner li::marker { color: var(--taupe); }
 .credits-source {
-  color: rgba(242, 235, 223, 0.7); text-transform: none; letter-spacing: 0.02em;
+  color: rgba(36, 31, 26, 0.72); text-transform: none; letter-spacing: 0.02em;
   margin: var(--s1) 0;
 }
-.credits-source a { color: rgba(242, 235, 223, 0.92); text-decoration-color: var(--gilt); }
-.credits-source a:hover { color: var(--gilt); }
-.credits-imgsrc { color: rgba(242, 235, 223, 0.52); text-transform: none; letter-spacing: 0.02em; }
+.credits-source a { color: rgba(36, 31, 26, 0.92); text-decoration-color: var(--gilt); }
+.credits-source a:hover { color: #8a6d12; }
+.credits-imgsrc { color: rgba(36, 31, 26, 0.55); text-transform: none; letter-spacing: 0.02em; }
+
+/* ─── contact ────────────────────────────────────────────────────────────
+   Three fields on the About tab. It posts to VITE_CONTACT_ENDPOINT when one
+   is configured and otherwise composes a mailto, so it works out of the box
+   with no account anywhere. Inputs are ruled lines rather than boxes: the
+   panel is a page, and a page has lines to write on. */
+.contact { display: flex; flex-direction: column; gap: var(--s4); margin-top: var(--s2); }
+.contact-field { display: flex; flex-direction: column; gap: 5px; }
+.contact-field .caption { color: var(--umber); opacity: 0.75; }
+.contact-field input,
+.contact-field textarea {
+  font: inherit; font-size: 15px; line-height: 24px; color: var(--ink);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--limestone);
+  border-radius: var(--r-sm);
+  padding: 8px 11px;
+  width: 100%;
+  transition: border-color var(--d-fast), background-color var(--d-fast);
+}
+.contact-field textarea { resize: vertical; min-height: 108px; }
+.contact-field input:focus,
+.contact-field textarea:focus {
+  outline: none;
+  border-color: var(--gilt);
+  background: #fff;
+}
+.contact-field input::placeholder,
+.contact-field textarea::placeholder { color: var(--taupe); }
+.contact-foot { display: flex; align-items: center; gap: var(--s4); flex-wrap: wrap; }
+.contact-send {
+  color: var(--bone); background: var(--ink);
+  padding: 9px 22px; border-radius: 999px;
+  transition: background-color var(--d-fast), opacity var(--d-fast);
+}
+.contact-send:hover:not(:disabled) { background: #3b322a; }
+.contact-send:disabled { opacity: 0.35; cursor: default; }
+.contact-error { color: #8f3b2a; text-transform: none; letter-spacing: 0.02em; }
+.contact-again { color: #8a6d12; margin-top: var(--s2); }
+.contact-again:hover { text-decoration: underline; }
 
 /* ─── cursor — spec §10C.7 ───────────────────────────────────────────────
    A thin light ring carrying its own dark contact shadow, so it reads against
@@ -635,26 +674,51 @@ button:active { transform: translateY(1px); }
   stroke: var(--gilt); stroke-width: 1; stroke-dasharray: 3 3;
   opacity: 0; transition: opacity var(--d-fast);
 }
+/* what the cursor is over in thread mode, named just above the mode pill.
+   It had no rule at all and was laying itself out in the document flow —
+   unstyled black type in the top-left corner of a dark gallery. */
+.tp-prompt {
+  position: fixed; bottom: 168px; left: 50%; transform: translateX(-50%);
+  z-index: 34; margin: 0; pointer-events: none;
+  color: var(--bone); opacity: 0.85;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
+}
+
 /* the standing notice that thread mode is on — small, low, and permanent for
    as long as the mode is */
 .tp-mode {
-  position: fixed; bottom: 74px; left: 50%; transform: translateX(-50%);
-  z-index: 35; pointer-events: none;
+  position: fixed; bottom: 136px; left: 50%; transform: translateX(-50%);
+  z-index: 35;
   display: inline-flex; align-items: center; gap: 8px;
-  padding: 5px 14px; border-radius: 999px;
-  background: rgba(28, 24, 20, 0.42);
+  padding: 6px 15px; border-radius: 999px;
+  background: rgba(28, 24, 20, 0.52);
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
-  border: 1px solid rgba(201, 162, 39, 0.3);
+  border: 1px solid rgba(201, 162, 39, 0.42);
   color: var(--gilt); font-size: 10px; letter-spacing: 0.13em;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+  animation: tp-mode-in 260ms var(--e-out) both;
+}
+@keyframes tp-mode-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.tp-mode:hover { border-color: var(--gilt); }
+.tp-mode:active { transform: translateX(-50%) translateY(1px); }
+.tp-mode kbd {
+  font: inherit; font-size: 9px; border: 1px solid rgba(242, 235, 223, 0.28);
+  border-radius: 2px; padding: 0 4px; margin-right: 4px;
 }
 .tp-mode-dot {
   width: 5px; height: 5px; border-radius: 50%; background: var(--gilt);
   animation: tp-pulse 2.4s var(--e-both) infinite;
 }
 @keyframes tp-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-.tp-mode-key { color: rgba(242, 235, 223, 0.45); }
+.tp-mode-key { color: rgba(242, 235, 223, 0.5); display: inline-flex; align-items: center; }
+/* the same switch as a corner control, for anyone who never presses keys —
+   sits beside the sound toggle in .corner-toggles and wears the same veil */
+.thread-toggle.is-on { opacity: 0.95; color: var(--gilt); border-color: rgba(201, 162, 39, 0.42); }
+@media (max-width: 860px) { .thread-toggle { display: none; } }
 
 /* Above the control hints (31) and the corner toggles (30): the panel runs
    the full height of the right-hand side, and anything drawn over its foot
@@ -775,8 +839,11 @@ button:active { transform: translateY(1px); }
    Off until asked for, and the only way in — the audio graph is not even
    built until this is pressed, which is how the autoplay policy is obeyed
    rather than fought. Same veil as everything else in the corners. */
-.sound-toggle {
+.corner-toggles {
   position: fixed; bottom: 20px; left: var(--s5); z-index: 45;
+  display: flex; align-items: center; gap: 10px;
+}
+.sound-toggle {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 6px 13px; border-radius: 999px;
   background: rgba(28, 24, 20, 0.3);
@@ -841,7 +908,7 @@ button:active { transform: translateY(1px); }
 .atlas-progress {
   position: absolute; left: var(--s6); bottom: var(--s5);
   margin: 0; color: rgba(242, 235, 223, 0.5);
-  text-transform: none; letter-spacing: 0.04em; max-width: 46ch;
+  text-transform: none; letter-spacing: 0.04em; max-width: 62ch;
   pointer-events: none;
 }
 .atlas-legend {

@@ -25,6 +25,7 @@ import { Credits } from './ui/Credits';
 import { AtlasView } from './ui/AtlasView';
 import { AtlasToast } from './ui/AtlasToast';
 import { ThreadPull } from './ui/ThreadPull';
+import { setThreadMode, toggleThreadMode } from './threadpull/state';
 import { ControlHints } from './ui/ControlHints';
 import { CursorRing } from './ui/CursorRing';
 import { LoadingBar } from './ui/LoadingBar';
@@ -139,8 +140,16 @@ export default function App() {
       if (e.key !== 'Escape') return;
       const s = useStore.getState();
       if (s.creditsOpen) return s.setCreditsOpen(false);
+      /*
+       * Thread mode goes before the passage it is holding.
+       *
+       * The other way round, Esc cleared the pulled region and the cursor —
+       * still sitting over that part of the canvas — immediately pulled it
+       * again, so Esc looked broken. Leaving the mode is what somebody
+       * pressing Esc in it actually means.
+       */
+      if (s.extractionMode) return setThreadMode(false);
       if (s.pulledRegion) return s.setPulledRegion(null);
-      if (s.extractionMode) return s.setExtractionMode(false);
       if (s.phase === 'gallery' && s.revealed) return endReveal(s.reducedMotion);
       if (s.phase === 'gallery') return s.setPhase('map');
       if (s.phase === 'map') return s.setPhase('corridor');
@@ -233,19 +242,23 @@ export default function App() {
           ✦ The atlas
         </button>
       )}
+      {/* the corner switches, in one row so they can never land on each other */}
       {phase !== 'boot' && (
-        <button
-          className={`caption sound-toggle ${sound ? 'is-on' : ''}`}
-          aria-pressed={sound}
-          title={sound ? 'Sound on' : 'Sound off'}
-          onClick={() => {
-            const next = !soundEnabled();
-            setSound(next);
-            setSoundOn(next);
-          }}
-        >
-          {sound ? '◉' : '○'} <span className="sound-word">Sound</span>
-        </button>
+        <div className="corner-toggles">
+          <button
+            className={`caption sound-toggle ${sound ? 'is-on' : ''}`}
+            aria-pressed={sound}
+            title={sound ? 'Sound on' : 'Sound off'}
+            onClick={() => {
+              const next = !soundEnabled();
+              setSound(next);
+              setSoundOn(next);
+            }}
+          >
+            {sound ? '◉' : '○'} <span className="sound-word">Sound</span>
+          </button>
+          {inGallery && <ThreadToggle />}
+        </div>
       )}
       <Credits />
       <AtlasView />
@@ -256,6 +269,28 @@ export default function App() {
       {/* screen-reader / keyboard proxies for the canvas artworks (spec §15) */}
       {inGallery && <ArtworkProxies />}
     </>
+  );
+}
+
+/**
+ * The thread-mode switch, in the corner beside the sound toggle.
+ *
+ * Space is the fast way in and the hint line has always said so, but a mode
+ * whose only control is a keystroke is a mode most visitors never find and
+ * nobody can confirm the state of. This is the same switch with a face on it:
+ * it says whether thread mode is on, and pressing it changes that.
+ */
+function ThreadToggle() {
+  const on = useStore((s) => s.extractionMode);
+  return (
+    <button
+      className={`caption sound-toggle thread-toggle ${on ? 'is-on' : ''}`}
+      aria-pressed={on}
+      title={on ? 'Thread mode on — click or press space to leave' : 'Pull threads of text out of the painting (space)'}
+      onClick={toggleThreadMode}
+    >
+      {on ? '◉' : '○'} <span className="sound-word">Threads</span>
+    </button>
   );
 }
 

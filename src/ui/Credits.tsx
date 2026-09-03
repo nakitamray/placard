@@ -1,40 +1,19 @@
 /**
  * Credits — spec §15: every corpus source with licence and attribution
- * (required for CC BY-SA compliance), image provenance, plus the projects
- * and references that informed the build.
+ * (required for CC BY-SA compliance), image provenance, the music, and a way
+ * to write to whoever made the thing.
+ *
+ * It used to be a dark panel. It is now a bone one, on a light scrim: the
+ * rooms are dusk and the reading is not, and a colophon set in pale grey on
+ * near-black reads as a lights-out screen however carefully it is composed.
+ * Everything you are supposed to READ on this site — the wall label, the
+ * thread panel, and now this — is dark type on a light ground.
  */
 import { useEffect, useState } from 'react';
 import { selectArtworks, useStore } from '../state/store';
 import { asset } from '../lib/asset';
+import { MUSEUM_TRACKS } from '../lib/music';
 import type { ArtworkMeta } from '../types';
-
-const REFERENCES: Array<{ name: string; url: string; note: string }> = [
-  {
-    name: 'chenglou/pretext',
-    url: 'https://github.com/chenglou/pretext',
-    note: 'Interactive-text experiments that informed the moving-glyph treatment',
-  },
-  {
-    name: 'WICG/view-transitions',
-    url: 'https://github.com/WICG/view-transitions',
-    note: 'Scene-transition choreography patterns',
-  },
-  {
-    name: 'saadeghi/daisyui',
-    url: 'https://github.com/saadeghi/daisyui',
-    note: 'Component and design-token conventions referenced for the UI system',
-  },
-  {
-    name: 'GitHub topic: transitions',
-    url: 'https://github.com/topics/transitions?o=desc&s=stars',
-    note: 'Survey of transition libraries consulted during design',
-  },
-  {
-    name: 'three.js · @react-three/fiber · drei · GSAP · Zustand · Vite · sharp',
-    url: 'https://threejs.org',
-    note: 'The rendering and build stack this exhibition runs on',
-  },
-];
 
 type Tab = 'sources' | 'design' | 'technical' | 'about';
 
@@ -144,6 +123,25 @@ export function Credits() {
                   enough to be in the public domain; the photographs of them are PD-Art.
                 </p>
               </section>
+
+              <section>
+                <h3 className="meta credits-section">Music</h3>
+                <p className="body credits-note">
+                  The rooms are played through these recordings, streamed from YouTube in an
+                  embedded player rather than copied or re-hosted — the corridors shuffle all
+                  four, and the atlas takes the last one, quietly. All credit and all traffic
+                  belong to the uploaders.
+                </p>
+                <ul>
+                  {MUSEUM_TRACKS.map((t) => (
+                    <li key={t.id} className="caption credits-source">
+                      <a href={t.url} target="_blank" rel="noreferrer">
+                        {t.url}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             </>
           )}
 
@@ -230,7 +228,8 @@ export function Credits() {
                   <li>
                     <span className="caption">Sound</span>
                     <span className="body">
-                      WebAudio, synthesised at run time — no audio files at all
+                      Music streamed from a hidden YouTube player; the chimes, the warp and the
+                      fallback room tone synthesised in WebAudio at run time
                     </span>
                   </li>
                   <li>
@@ -308,53 +307,170 @@ export function Credits() {
           )}
 
           {tab === 'about' && (
-            <section>
-              <h3 className="meta credits-section">About</h3>
-              {/*
-                Nakita: replace the two paragraphs below with your own bio and
-                links. Nothing else on this tab needs touching.
-              */}
-              <p className="body credits-note">
-                Placard is made by <strong>Nakita Mray</strong>.
-              </p>
-              <p className="body credits-note credits-bio">
-                [Your bio goes here — a few sentences: what you do, what drew you to putting
-                paintings back together out of the writing about them, and anything you want a
-                visitor to know.]
-              </p>
-              <ul className="credits-links">
-                <li className="caption credits-source">
-                  <a href="https://github.com/nakitamray/placard" target="_blank" rel="noreferrer">
-                    The source on GitHub
-                  </a>
-                </li>
-              </ul>
-            </section>
+            <>
+              <section>
+                <h3 className="meta credits-section">About</h3>
+                {/*
+                  Nakita: replace the paragraph below with your own bio.
+                  Nothing else on this tab needs touching.
+                */}
+                <p className="body credits-note">
+                  Placard is made by <strong>Nakita Mray</strong>.
+                </p>
+                <p className="body credits-note credits-bio">
+                  [Your bio goes here — a few sentences: what you do, what drew you to putting
+                  paintings back together out of the writing about them, and anything you want a
+                  visitor to know.]
+                </p>
+                <ul className="credits-links">
+                  <li className="caption credits-source">
+                    <a
+                      href="https://github.com/nakitamray/placard"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      The source on GitHub
+                    </a>
+                  </li>
+                </ul>
+              </section>
+              <ContactForm />
+            </>
           )}
-
-          <section>
-            <h3 className="meta credits-section">Type</h3>
-            <p className="caption credits-source">
-              Interface: EB Garamond (with serif fallbacks). Glyph canvas: Source Code Pro (with
-              monospace fallbacks).
-            </p>
-          </section>
-
-          <section>
-            <h3 className="meta credits-section">Projects &amp; references</h3>
-            <ul>
-              {REFERENCES.map((r) => (
-                <li key={r.name} className="caption credits-source">
-                  <a href={r.url} target="_blank" rel="noreferrer">
-                    {r.name}
-                  </a>{' '}
-                  — {r.note}
-                </li>
-              ))}
-            </ul>
-          </section>
         </div>
       </div>
     </div>
+  );
+}
+
+/* ── write to me ────────────────────────────────────────────────────────── */
+
+/**
+ * The contact form.
+ *
+ * Two ways it can deliver, and it picks whichever is configured:
+ *
+ *   1. An HTTP endpoint in `VITE_CONTACT_ENDPOINT` — a Formspree / Getform /
+ *      Basin form URL, or a serverless function of your own. The message is
+ *      POSTed as JSON and the visitor never leaves the exhibition.
+ *   2. Nothing configured: the form composes a `mailto:` and hands it to the
+ *      visitor's own mail client, addressed to `VITE_CONTACT_EMAIL`.
+ *
+ * (2) is the default because it works the moment this ships, with no account
+ * anywhere and no third party in the middle. Set the endpoint when you want
+ * messages to arrive without the visitor having a mail client set up.
+ *
+ * The form is deliberately three fields. Every extra one costs replies.
+ */
+const CONTACT_ENDPOINT = (import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined) ?? '';
+const CONTACT_EMAIL =
+  (import.meta.env.VITE_CONTACT_EMAIL as string | undefined) ?? 'nakitamray@gmail.com';
+
+function ContactForm() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle');
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+
+    if (!CONTACT_ENDPOINT) {
+      const subject = `Placard — a note from ${name.trim() || 'a visitor'}`;
+      const body = `${message}\n\n— ${name.trim() || 'anonymous'}${
+        email.trim() ? ` <${email.trim()}>` : ''
+      }`;
+      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+        subject,
+      )}&body=${encodeURIComponent(body)}`;
+      setState('sent');
+      return;
+    }
+
+    setState('sending');
+    try {
+      const res = await fetch(CONTACT_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ name, email, message }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      setState('sent');
+      setName('');
+      setEmail('');
+      setMessage('');
+    } catch {
+      setState('failed');
+    }
+  };
+
+  return (
+    <section>
+      <h3 className="meta credits-section">Contact me</h3>
+      {state === 'sent' ? (
+        <p className="body credits-note">
+          {CONTACT_ENDPOINT
+            ? 'Thank you — it arrived. I read everything.'
+            : 'Your mail client should be opening with the message in it. If it did not, write ' +
+              `to ${CONTACT_EMAIL}.`}
+          <br />
+          <button className="caption contact-again" onClick={() => setState('idle')}>
+            Write another →
+          </button>
+        </p>
+      ) : (
+        <>
+          <p className="body credits-note">
+            Something you liked, something that broke, a painting that should be here — write it
+            down and I will get it.
+          </p>
+          <form className="contact" onSubmit={submit}>
+            <label className="contact-field">
+              <span className="caption">Your name</span>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+              />
+            </label>
+            <label className="contact-field">
+              <span className="caption">Your email</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                placeholder="so I can reply"
+              />
+            </label>
+            <label className="contact-field">
+              <span className="caption">Message</span>
+              <textarea
+                rows={5}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                required
+              />
+            </label>
+            <div className="contact-foot">
+              <button
+                type="submit"
+                className="caption contact-send"
+                disabled={state === 'sending' || !message.trim()}
+              >
+                {state === 'sending' ? 'Sending…' : 'Send'}
+              </button>
+              {state === 'failed' && (
+                <span className="caption contact-error">
+                  That did not go through. Write to {CONTACT_EMAIL} instead?
+                </span>
+              )}
+            </div>
+          </form>
+        </>
+      )}
+    </section>
   );
 }

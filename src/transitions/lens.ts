@@ -27,15 +27,33 @@ export const lens = {
   want: 0,
 };
 
+// testing handle: confirms the lens is open without reading pixels
+if (typeof window !== 'undefined') {
+  (window as unknown as Record<string, unknown>).__lens = lens;
+}
+
 /** the lens is meaningless without a pointer; close it and forget where it was */
 export function closeLens() {
   lens.want = 0;
 }
 
-/** move the lens to a point given in normalised image space, y-down */
-export function moveLens(u: number, v: number, imageW: number, imageH: number) {
+/**
+ * Move the lens to a point given in normalised image space, y-down.
+ *
+ * `radius` is a fraction of the artwork's short edge. The landing hero wants a
+ * generous hole because the field covers the whole viewport; a gallery canvas
+ * fills most of the screen already, so a smaller circle reads as an aperture
+ * you are holding over the picture rather than as the picture coming back.
+ */
+export function moveLens(
+  u: number,
+  v: number,
+  imageW: number,
+  imageH: number,
+  radius = 0.24,
+) {
   lens.x = u * imageW;
   lens.y = v * imageH;
-  lens.r = Math.min(imageW, imageH) * 0.24;
+  lens.r = Math.min(imageW, imageH) * radius;
   lens.want = 1;
 }
