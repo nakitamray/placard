@@ -131,6 +131,7 @@ export default function App() {
       const s = useStore.getState();
       if (s.creditsOpen) return s.setCreditsOpen(false);
       if (s.pulledRegion) return s.setPulledRegion(null);
+      if (s.extractionMode) return s.setExtractionMode(false);
       if (s.phase === 'gallery' && s.revealed) return endReveal(s.reducedMotion);
       if (s.phase === 'gallery') return s.setPhase('map');
       if (s.phase === 'map') return s.setPhase('corridor');

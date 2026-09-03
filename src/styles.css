@@ -228,17 +228,10 @@ button:active { transform: translateY(1px); }
 .map-inner {
   width: min(880px, 90vw);
   display: flex; flex-direction: column;
-  padding: var(--s5) 0 96px; /* clear of the control hints */
+  padding: 84px 0 96px; /* clear of the fixed corner controls and the hints */
   margin: auto 0;
 }
-.map-header {
-  display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4);
-  color: var(--taupe);
-}
-.map-back { color: var(--taupe); transition: color var(--d-fast); }
-.map-back:hover { color: var(--gilt); }
-.map-level { color: var(--umber); text-align: right; }
-.map-title { margin: var(--s6) 0 var(--s2); color: var(--bone); }
+.map-title { margin: 0 0 var(--s2); color: var(--bone); }
 /* the one instruction on this screen, so it is set to be read rather than
    to be quiet: no small caps, and a size above the captions around it */
 .map-lede {
@@ -375,8 +368,9 @@ button:active { transform: translateY(1px); }
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.6); }
 
 /* positioning only — the treatment is with .corridor-title, so both top
-   corners of the screen read as one pair */
-.gallery-back { position: fixed; top: var(--s5); left: var(--s6); z-index: 20; }
+   corners of the screen read as one pair. z-index 32 puts the pair over the
+   map overlay as well, so "back" is in the same place in every phase. */
+.gallery-back { position: fixed; top: var(--s5); left: var(--s6); z-index: 32; }
 
 /* ─── reveal vignette — spec §10.6: 18% opacity, generous radius ─── */
 .reveal-vignette {
@@ -536,7 +530,7 @@ button:active { transform: translateY(1px); }
 
 /* museum name, top right of the corridor */
 .corridor-title {
-  position: fixed; top: var(--s5); right: var(--s6); z-index: 20; margin: 0;
+  position: fixed; top: var(--s5); right: var(--s6); z-index: 32; margin: 0;
   color: var(--bone); text-align: right; font-size: 12px; letter-spacing: 0.11em;
   padding: 6px 14px; border-radius: 999px;
   background: rgba(28, 24, 20, 0.26);
@@ -741,22 +735,23 @@ button:active { transform: translateY(1px); }
 }
 
 /* ─── the atlas ──────────────────────────────────────────────────────────
-   Its own dark room. The graph is a canvas of its own, the labels are DOM on
+   Its own dark sky. The graph is a canvas of its own, the labels are DOM on
    top of it (type drawn into a texture at this size is mush, and the browser
    already has a text renderer), and the panel is the same frosted glass as
    everything else that sits over the exhibition. */
 .atlas {
   position: fixed; inset: 0; z-index: 58;
-  /* Opaque: this is a room of its own, not a veil over the last one. At 94%
-     the landing page's own headline was legible straight through the graph. */
-  background: #0d0b09;
-  background-image: radial-gradient(120% 100% at 50% 38%, #191512 0%, #0b0908 100%);
+  /* opaque: this is a room of its own, not a veil over the last one */
+  background: #080706;
   color: var(--bone);
   animation: credits-in var(--d-base) var(--e-out);
 }
 .atlas-stage { position: absolute; inset: 0; cursor: grab; touch-action: none; }
 .atlas-stage:active { cursor: grabbing; }
 .atlas-stage canvas { display: block; }
+
+/* the back control and the room name, in the corners they live in everywhere */
+.atlas-back, .atlas-level { z-index: 60; }
 
 .atlas-labels { position: absolute; inset: 0; pointer-events: none; }
 .atlas-label {
@@ -767,24 +762,17 @@ button:active { transform: translateY(1px); }
      dot so the name is beside the thing it names rather than on top of it */
   margin-top: 13px;
   font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9), 0 0 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.9);
   transition: none;
 }
 .atlas-label:hover { text-decoration: underline; text-decoration-color: var(--gilt); }
-.atlas-label.is-on {
-  background: rgba(201, 162, 39, 0.16); border-radius: 2px;
-}
+.atlas-label.is-on { background: rgba(201, 162, 39, 0.18); border-radius: 2px; }
 
 .atlas-head {
-  position: absolute; top: 0; left: 0; right: 0;
-  display: flex; justify-content: space-between; align-items: flex-start;
-  padding: var(--s5) var(--s6); pointer-events: none;
+  position: absolute; top: 74px; left: var(--s6); right: var(--s6);
+  pointer-events: none;
 }
-.atlas-head > div { pointer-events: none; }
-.atlas-eyebrow { color: var(--gilt); margin: 0 0 4px; letter-spacing: 0.22em; }
-.atlas-title { margin: 0; color: var(--bone); }
-.atlas-close { color: var(--taupe); pointer-events: auto; }
-.atlas-close:hover { color: var(--gilt); }
+.atlas-title { margin: 0; color: var(--bone); opacity: 0.9; }
 
 .atlas-progress {
   position: absolute; left: var(--s6); bottom: var(--s5);
@@ -801,15 +789,15 @@ button:active { transform: translateY(1px); }
 .atlas-key i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
 
 .atlas-panel {
-  position: absolute; top: 96px; right: var(--s6);
-  width: min(310px, 40vw); max-height: calc(100vh - 190px); overflow-y: auto;
+  position: absolute; top: 74px; right: var(--s6);
+  width: min(340px, 42vw); max-height: calc(100vh - 170px); overflow-y: auto;
   padding: var(--s5);
-  background: rgba(26, 22, 18, 0.55);
+  background: rgba(20, 17, 14, 0.72);
   backdrop-filter: blur(26px) saturate(1.2);
   -webkit-backdrop-filter: blur(26px) saturate(1.2);
-  scrollbar-width: thin;
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
+  border: 1px solid rgba(242, 235, 223, 0.08);
+  border-radius: 3px;
+  scrollbar-width: thin; overscroll-behavior: contain;
   animation: quality-in 260ms var(--e-out) both;
 }
 .atlas-kind { color: var(--gilt); margin: 0 0 var(--s1); }
@@ -820,16 +808,34 @@ button:active { transform: translateY(1px); }
 }
 .atlas-enter { color: var(--gilt); display: block; margin: var(--s2) 0 var(--s4); }
 .atlas-enter:hover { text-decoration: underline; }
+.atlas-edges-head { color: rgba(242, 235, 223, 0.4); margin: var(--s4) 0 var(--s1); }
 .atlas-edges { list-style: none; margin: 0; padding: 0; }
 .atlas-edges li { border-top: 1px solid rgba(242, 235, 223, 0.09); }
+.atlas-edges li.is-open { background: rgba(242, 235, 223, 0.04); }
 .atlas-edge {
   display: flex; flex-direction: column; gap: 1px; width: 100%;
-  text-align: left; padding: var(--s2) 0; color: var(--bone);
+  text-align: left; padding: var(--s2) var(--s2) var(--s2) 0; color: var(--bone);
 }
 .atlas-edge-kind { color: rgba(242, 235, 223, 0.45); text-transform: none; letter-spacing: 0.03em; }
-.atlas-edge-name { font-size: 15px; }
+.atlas-edge-name {
+  font-size: 15px; display: flex; justify-content: space-between;
+  align-items: baseline; gap: var(--s3); width: 100%;
+}
+.atlas-edge-chev { color: var(--gilt); opacity: 0.6; font-size: 13px; }
 .atlas-edge:hover .atlas-edge-name { color: var(--gilt); }
+/* the history behind one connection — the reason the map is worth opening */
+.atlas-edge-body { padding: 0 var(--s2) var(--s4) 0; }
+.atlas-edge-note {
+  color: rgba(242, 235, 223, 0.82); margin: 0 0 var(--s2);
+  font-size: 14px; line-height: 22px;
+}
+.atlas-goto { color: var(--gilt); }
+.atlas-goto:hover { text-decoration: underline; }
 .atlas-empty { color: var(--taupe); text-transform: none; letter-spacing: 0.02em; padding: var(--s3) 0; }
+@media (max-width: 720px) {
+  .atlas-panel { top: auto; bottom: 0; right: 0; left: 0; width: 100%; max-height: 52vh; }
+  .atlas-legend, .atlas-head { display: none; }
+}
 
 /* The way in. Top centre, where nothing else lives in any phase — a control
    that opens a view of the whole collection should not be hiding in a corner

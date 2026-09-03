@@ -217,6 +217,12 @@ function HungWork({
 }
 
 /**
+ * The centre of a work hung inside one of the court's arched openings: above
+ * the sill the arcade stands on, below the springing of the arch.
+ */
+const ARCH_HANG_Y = 1.66;
+
+/**
  * The works on the walls, distributed by the museum's hang pattern.
  *
  * salon       a large work centred on the hanging line with two smaller ones
@@ -306,6 +312,45 @@ function Bays({
                 </group>
               );
             })}
+        </group>,
+      );
+    }
+
+    /*
+     * The Met court hangs one wall per bay, which leaves the arcade opposite
+     * holding nothing but a dark recess — ten of them down the room, reading
+     * as ten doorways to nowhere. A smaller work goes inside each opening.
+     *
+     * They are drawn from further along the running order than the bay's own
+     * work, so walking the court shows you more of the collection than the
+     * five canvases the alternating hang would otherwise give you, and every
+     * one of them opens its room like any other painting.
+     */
+    if (museum.style.wall === 'court-facade' && hang === 'alternating') {
+      const side: 1 | -1 = bay % 2 === 0 ? -1 : 1;
+      const brick = side > 0;
+      const radius = brick ? 1.15 : 0.95;
+      const j = (bay + Math.ceil(artworks.length / 2)) % artworks.length;
+      // inside the opening, clear of the voussoirs and standing on the sill
+      const inArch = fitWork(artworks[j].aspect, 1.42, radius * 1.56);
+      nodes.push(
+        <group
+          key={`arch-${bay}`}
+          position={[side * (d.halfWidth - 0.09), 0, z]}
+          rotation={[0, side > 0 ? -Math.PI / 2 : Math.PI / 2, 0]}
+        >
+          <group position={[0, ARCH_HANG_Y, 0.05]}>
+            <HungWork
+              artwork={artworks[j]}
+              index={j}
+              texture={textures[j]}
+              museum={museum}
+              width={inArch.width}
+              height={inArch.height}
+              showPanel={false}
+              detail="plain"
+            />
+          </group>
         </group>,
       );
     }

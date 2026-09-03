@@ -89,6 +89,65 @@ function seedBodies(graph: AtlasGraph): Body[] {
   });
 }
 
+/**
+ * The sky the graph hangs in.
+ *
+ * A dark rectangle behind a diagram reads as a slide. What makes this read as
+ * a place you are inside is depth you can see past the subject, so there are
+ * a few thousand points scattered right out to the far clip — thin at the
+ * edges of the room and thickening toward the middle, where the web is, so
+ * the graph looks like the dense part of something rather than an object on a
+ * background.
+ *
+ * The distribution is r = R · u^(1/1.4) on a uniform sphere, which piles more
+ * of them toward the centre than a uniform volume would while still leaving
+ * the far corners occupied. Built once and never touched again: it is a
+ * single draw call and it does not move.
+ */
+function Starfield({ count = 2600 }: { count?: number }) {
+  const geo = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    const col = new Float32Array(count * 3);
+    const warm = new THREE.Color('#F2EBDF');
+    const cool = new THREE.Color('#7FA8C9');
+    const gilt = new THREE.Color('#C9A227');
+    for (let i = 0; i < count; i++) {
+      const u = Math.random();
+      const r = 6 + 74 * Math.pow(u, 1 / 1.4);
+      const t = Math.random() * Math.PI * 2;
+      const z = Math.random() * 2 - 1;
+      const s = Math.sqrt(1 - z * z);
+      pos[i * 3] = r * s * Math.cos(t);
+      pos[i * 3 + 1] = r * s * Math.sin(t) * 0.8;
+      pos[i * 3 + 2] = r * z;
+      // a few are warm, a few gilt, most near-white and very dim
+      const pick = Math.random();
+      const c = pick > 0.94 ? gilt : pick > 0.78 ? cool : warm;
+      const b = 0.16 + Math.random() * 0.5;
+      col[i * 3] = c.r * b;
+      col[i * 3 + 1] = c.g * b;
+      col[i * 3 + 2] = c.b * b;
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    return g;
+  }, [count]);
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <points geometry={geo} frustumCulled={false}>
+      <pointsMaterial
+        size={0.13}
+        sizeAttenuation
+        vertexColors
+        transparent
+        opacity={0.9}
+        depthWrite={false}
+      />
+    </points>
+  );
+}
+
 function Graph({
   graph,
   onPick,
@@ -275,7 +334,9 @@ export function AtlasView() {
     pitch: -0.2,
     zoom: 1,
   });
-  const drag = useRef<{ x: number; y: number } | null>(null);
+  const drag = useRef<{ x: number; y: number; moved: number } | null>(null);
+  /** which connection is opened out to read */
+  const [openEdge, setOpenEdge] = useState<string | null>(null);
 
   /*
    * Opening the map is the moment the real titles are worth fetching. Five
@@ -313,6 +374,11 @@ export function AtlasView() {
     node && graph
       ? (graph.around.get(node.id) ?? []).filter((l) => found.has(linkKey(l)))
       : [];
+  const openLink = openEdge && edges.find((l) => linkKey(l) === openEdge);
+  const openOther =
+    openLink && graph
+      ? graph.byId.get(openLink.a === node?.id ? openLink.b : openLink.a)
+      : null;
 
   const totalLinks = graph?.links.length ?? 0;
   const foundLinks = graph ? graph.links.filter((l) => found.has(linkKey(l))).length : 0;
@@ -334,16 +400,30 @@ export function AtlasView() {
       <div
         className="atlas-stage"
         onPointerDown={(e) => {
-          drag.current = { x: e.clientX, y: e.clientY };
+          drag.current = { x: e.clientX, y: e.clientY, moved: 0 };
         }}
         onPointerMove={(e) => {
           if (!drag.current) return;
-          spin.current.yaw += (e.clientX - drag.current.x) * 0.006;
-          spin.current.pitch += (e.clientY - drag.current.y) * 0.006;
+          const dx = e.clientX - drag.current.x;
+          const dy = e.clientY - drag.current.y;
+          spin.current.yaw += dx * 0.006;
+          spin.current.pitch += dy * 0.006;
           spin.current.pitch = Math.max(-1.2, Math.min(1.2, spin.current.pitch));
-          drag.current = { x: e.clientX, y: e.clientY };
+          drag.current = {
+            x: e.clientX,
+            y: e.clientY,
+            moved: drag.current.moved + Math.abs(dx) + Math.abs(dy),
+          };
         }}
-        onPointerUp={() => (drag.current = null)}
+        onPointerUp={() => {
+          // turning the map is not the same gesture as putting it down: only
+          // a press that stayed still counts as "nothing selected"
+          if (drag.current && drag.current.moved < 5) {
+            select(null);
+            setOpenEdge(null);
+          }
+          drag.current = null;
+        }}
         onPointerLeave={() => (drag.current = null)}
         onWheel={(e) => {
           spin.current.zoom = Math.max(0.45, Math.min(2.4, spin.current.zoom * (1 + e.deltaY * 0.0012)));
@@ -351,11 +431,13 @@ export function AtlasView() {
       >
         <Canvas camera={{ fov: 45, position: [0, 0, 34], near: 0.1, far: 200 }} dpr={[1, 1.75]}>
           <Rig spin={spin} />
+          <Starfield />
           {graph && (
             <Graph
               graph={graph}
               onPick={(n) => {
                 select(n.id);
+                setOpenEdge(null);
                 sfx.link();
               }}
             />
@@ -364,14 +446,14 @@ export function AtlasView() {
         {graph && <LabelLayer graph={graph} />}
       </div>
 
+      {/* the way out is where the way out always is */}
+      <button className="caption gallery-back atlas-back" onClick={() => setOpen(false)}>
+        ← Back
+      </button>
+      <p className="caption corridor-title atlas-level">The atlas</p>
+
       <header className="atlas-head">
-        <div>
-          <p className="caption atlas-eyebrow">The atlas</p>
-          <h2 className="display atlas-title">How the fifty are joined</h2>
-        </div>
-        <button className="caption atlas-close" onClick={() => setOpen(false)}>
-          Close ✕
-        </button>
+        <h2 className="display atlas-title">How the fifty are joined</h2>
       </header>
 
       <p className="caption atlas-progress">
@@ -394,32 +476,75 @@ export function AtlasView() {
           <h3 className="title atlas-name">{node.label}</h3>
           {node.note && <p className="caption atlas-note">{node.note}</p>}
           {node.artwork && node.museum && (
-            <button className="caption atlas-enter" onClick={() => void enter(node.artwork!, node.museum!)}>
+            <button
+              className="caption atlas-enter"
+              onClick={() => void enter(node.artwork!, node.museum!)}
+            >
               Walk into this room →
             </button>
           )}
+
+          <p className="caption atlas-edges-head">
+            {edges.length ? `${edges.length} connection${edges.length === 1 ? '' : 's'} found` : ''}
+          </p>
           <ul className="atlas-edges">
             {edges.map((l) => {
               const otherId = l.a === node.id ? l.b : l.a;
               const other = graph?.byId.get(otherId);
               if (!other) return null;
+              const key = linkKey(l);
+              const isOpen = openEdge === key;
               return (
-                <li key={linkKey(l)}>
-                  <button className="atlas-edge" onClick={() => select(otherId)}>
+                <li key={key} className={isOpen ? 'is-open' : ''}>
+                  <button
+                    className="atlas-edge"
+                    onClick={() => setOpenEdge(isOpen ? null : key)}
+                  >
                     <span className="caption atlas-edge-kind">{l.kind}</span>
-                    <span className="atlas-edge-name">{other.label}</span>
+                    <span className="atlas-edge-name">
+                      {other.label}
+                      <span className="atlas-edge-chev" aria-hidden>
+                        {isOpen ? '−' : '+'}
+                      </span>
+                    </span>
                   </button>
+                  {isOpen && (
+                    <div className="atlas-edge-body">
+                      {/* what actually happened between the two of them */}
+                      <p className="body atlas-edge-note">
+                        {l.note ??
+                          `${graph?.byId.get(l.a)?.label} — ${l.kind} — ${graph?.byId.get(l.b)?.label}.`}
+                      </p>
+                      <button
+                        className="caption atlas-goto"
+                        onClick={() => {
+                          setOpenEdge(null);
+                          select(otherId);
+                        }}
+                      >
+                        Go to {other.label} →
+                      </button>
+                    </div>
+                  )}
                 </li>
               );
             })}
             {!edges.length && (
               <li className="caption atlas-empty">
-                Nothing found yet. Pull a thread out of one of their paintings.
+                Nothing found yet. Press space in one of their rooms and read a passage.
               </li>
             )}
           </ul>
         </aside>
       )}
+
+      {/* a connection opened out with nothing selected under it still reads */}
+      {openLink && openOther && !node && (
+        <aside className="atlas-panel">
+          <p className="body atlas-edge-note">{openLink.note}</p>
+        </aside>
+      )}
+
     </div>
   );
 }

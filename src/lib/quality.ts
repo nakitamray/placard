@@ -125,18 +125,26 @@ export function qualityFor(name: QualityName): Quality {
 }
 
 /**
- * The budget to start with: the visitor's choice, else the device's tier —
- * but never `high` automatically.
+ * The budget to start with: the visitor's choice, else the device.
  *
- * Detection reads a renderer string and a core count, which says what the
- * machine is and nothing about what else it is doing. Guessing `high` and
- * being wrong costs a stuttering first impression, and a stuttering room
- * reads as broken where a plainer one just reads as a room. `Rich` is
- * therefore something a visitor turns on, having seen it run.
+ * A desktop that detection has already judged capable starts at `Rich`. The
+ * argument for holding it back was that a stuttering room reads as broken —
+ * but that risk is already covered from the other end: FrameWatchdog measures
+ * real frame times for a few seconds and steps down once if the room is not
+ * keeping up. Between a measurement that can correct itself and a guess that
+ * costs every desktop visitor the mirrored floor, the measurement should win.
+ *
+ * Phones and tablets are still held at their detected tier whatever the GPU
+ * says, because the thing that stops them is the battery, not the hardware.
  */
 export function initialQuality(tier: DeviceTier): Quality {
   const chosen = storedQuality();
   if (chosen) return qualityFor(chosen);
+  const desktop =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(pointer: fine)').matches &&
+    !window.matchMedia('(pointer: coarse)').matches;
+  if (tier.name === 'high' && desktop) return qualityFor('high');
   return qualityFor(tier.name === 'high' ? 'mid' : tier.name);
 }
 

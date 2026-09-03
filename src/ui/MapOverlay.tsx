@@ -93,14 +93,19 @@ export function MapOverlay() {
       role="dialog"
       aria-label={`${museum.name} — choose a painting`}
     >
-      <div className="map-inner">
-        <header className="map-header">
-          <button className="caption map-back" onClick={() => setPhase('corridor')}>
-            ← Back to the corridor
-          </button>
-          <span className="caption map-level">{museum.plan.level}</span>
-        </header>
+      {/*
+       * The back control and the room name sit exactly where they sit in the
+       * corridor and the gallery — fixed to the top corners, not floated in
+       * the column of type. They used to be inside the centred panel, which
+       * put "back" in a different place on every screen and made leaving a
+       * room a small hunt.
+       */}
+      <button className="caption gallery-back" onClick={() => setPhase('corridor')}>
+        ← {museum.name}
+      </button>
+      <p className="caption corridor-title">{museum.plan.level}</p>
 
+      <div className="map-inner">
         <h2 className="display map-title">{museum.name}</h2>
         <p className="meta map-lede">
           Every painting here has a room to itself. Click one below to walk into it.
