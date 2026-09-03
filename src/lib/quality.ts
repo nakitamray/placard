@@ -83,61 +83,16 @@ const PRESETS: Record<QualityName, Omit<Quality, 'name'>> = {
  *
  * Three one-syllable labels in the corner of the screen tell a visitor
  * nothing: pressing them changes the picture in ways that are real but not
- * obvious, so they read as a control that does not work. Naming the trade — a
- * sentence on hover, and a line naming what just turned on or off — is the
- * difference between a setting and a mystery.
+ * obvious, so they read as a control that does not work. One short line is
+ * enough to say which way the trade runs — a full inventory of what each
+ * budget turns on is a specification, and nobody hovering a corner of the
+ * screen asked for one.
  */
-export const QUALITY_INFO: Record<
-  QualityName,
-  { label: string; summary: string; buys: string[] }
-> = {
-  low: {
-    label: 'Smooth',
-    summary: 'Everything optional turned off. For laptops, phones, and anything on battery.',
-    buys: [
-      'no mirrored floor',
-      'no shadows',
-      'plain frames',
-      'still air',
-      'two lamps',
-    ],
-  },
-  mid: {
-    label: 'Balanced',
-    summary: 'The room as intended, without the one feature that costs more than all the rest.',
-    buys: [
-      'carved frames on the nearest bays',
-      'shadows on the floor',
-      'dust and light shafts',
-      'four lamps',
-    ],
-  },
-  high: {
-    label: 'Rich',
-    summary:
-      'Adds the mirrored floor — a second full render of the room — plus sharper shadows and more carving.',
-    buys: [
-      'polished floor reflecting the room',
-      'sharper shadows',
-      'carved frames five bays deep',
-      'six lamps, picture lights cast shadows',
-      'full pixel density',
-    ],
-  },
+export const QUALITY_INFO: Record<QualityName, { label: string; summary: string }> = {
+  low: { label: 'Smooth', summary: 'Easiest on your battery.' },
+  mid: { label: 'Balanced', summary: 'The room as intended.' },
+  high: { label: 'Rich', summary: 'The most detail. Best plugged in.' },
 };
-
-/** what changed, in one line, when moving between two budgets */
-export function qualityDelta(from: QualityName, to: QualityName): string {
-  if (from === to) return QUALITY_INFO[to].summary;
-  const order: QualityName[] = ['low', 'mid', 'high'];
-  const up = order.indexOf(to) > order.indexOf(from);
-  const gained = QUALITY_INFO[to].buys.filter((b) => !QUALITY_INFO[from].buys.includes(b));
-  const head = up ? 'on' : 'off';
-  const list = (up ? gained : QUALITY_INFO[from].buys.filter((b) => !QUALITY_INFO[to].buys.includes(b)))
-    .slice(0, 3)
-    .join(', ');
-  return list ? `${QUALITY_INFO[to].label} — ${head}: ${list}` : QUALITY_INFO[to].summary;
-}
 
 const STORAGE_KEY = 'placard.quality';
 

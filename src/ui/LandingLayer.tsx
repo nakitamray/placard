@@ -13,7 +13,7 @@
  * element's opacity — so the landing page used to pull ten full-bleed
  * paintings before anyone had chosen anything, on the slowest connection in
  * the visit. It now pulls one, in AVIF or WebP where the browser takes them,
- * and the next arrives during the six seconds the first one holds.
+ * and the next arrives during the seconds the first one holds.
  */
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
@@ -22,8 +22,13 @@ import { pointer } from '../state/motion';
 import { asset } from '../lib/asset';
 import { bestFormat } from '../lib/image';
 
-const HOLD_MS = 6000;
-const FADE_MS = 1200;
+const HOLD_MS = 7000;
+/* Long, and linear. A short crossfade between two full-bleed paintings reads
+   as a cut, and easing both layers at once dips the brightness in the middle
+   of it. The outgoing slide is held at full opacity underneath while the
+   incoming one fades in over it at a constant rate, so there is no dip and no
+   moment where the change announces itself. */
+const FADE_MS = 2600;
 
 /** what build-all.ts writes to public/landing/manifest.json */
 interface LandingManifest {
@@ -43,14 +48,27 @@ export function LandingLayer() {
   const setCreditsOpen = useStore((s) => s.setCreditsOpen);
 
   const [images, setImages] = useState<string[]>([]);
-  const [current, setCurrent] = useState(0);
+  /*
+   * The slide showing and the one it came from, moved together in a single
+   * update.
+   *
+   * The outgoing slide used to be remembered in a ref written by an effect
+   * after commit, which meant the very next render — and there is always one,
+   * because changing slides also resets the preload timer — found the ref
+   * already pointing at the new slide and unmounted the old one. The
+   * "crossfade" was therefore a fade up from black every time, which is
+   * exactly what it looked like. Holding both indices in one piece of state
+   * means the pair can never disagree.
+   */
+  const [slide, setSlide] = useState<{ cur: number; prev: number | null }>({
+    cur: 0,
+    prev: null,
+  });
+  const current = slide.cur;
+  const prevIndex = slide.prev;
   const [warm, setWarm] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // the previously shown slide, so the outgoing image stays mounted while it
-  // fades — read during render, written after commit
-  const prevRef = useRef<number | null>(null);
-  const prevIndex = prevRef.current;
   const rootRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -77,11 +95,7 @@ export function LandingLayer() {
     };
   }, []);
 
-  useEffect(() => {
-    prevRef.current = current;
-  }, [current]);
-
-  // Hold the next slide back for a couple of seconds. Each one holds for six,
+  // Hold the next slide back for a couple of seconds. Each one holds for seven,
   // so there is plenty of room to fetch it — and nothing should compete with
   // the first painting anyone sees.
   useEffect(() => {
@@ -95,7 +109,10 @@ export function LandingLayer() {
   // how this page ended up downloading the whole set.
   useEffect(() => {
     if (images.length < 2 || reducedMotion) return;
-    const id = setInterval(() => setCurrent((c) => (c + 1) % images.length), HOLD_MS);
+    const id = setInterval(
+      () => setSlide((s) => ({ cur: (s.cur + 1) % images.length, prev: s.cur })),
+      HOLD_MS,
+    );
     return () => clearInterval(id);
   }, [images, reducedMotion]);
 
@@ -123,9 +140,9 @@ export function LandingLayer() {
     return () => cancelAnimationFrame(raf);
   }, [reducedMotion]);
 
-  // The slide showing; the one it came from, still fading out; and the one it
-  // is about to move to, once there has been a moment to spare for it. On
-  // first paint that is exactly one request instead of ten.
+  // The slide showing; the one it came from, held at full opacity underneath
+  // it; and the one it is about to move to, once there has been a moment to
+  // spare for it. On first paint that is exactly one request instead of ten.
   const mounted = images.length
     ? [
         ...new Set(
@@ -195,7 +212,9 @@ export function LandingLayer() {
         {mounted.map(({ src, i }) => (
           <div
             key={src}
-            className={`landing-img ${i === current ? 'is-active' : ''}`}
+            className={`landing-img ${i === current ? 'is-active' : ''} ${
+              i === prevIndex && i !== current ? 'is-prev' : ''
+            }`}
             style={{
               backgroundImage: `url(${src})`,
               transitionDuration: `${FADE_MS}ms`,
@@ -211,9 +230,9 @@ export function LandingLayer() {
       <div className="landing-content" ref={contentRef}>
         <p className="landing-mark caption">Placard</p>
         <h1 className="hero">
-          Where history paints
+          Paintings drawn
           <br />
-          the masterpiece
+          out of text
         </h1>
         <hr className="hairline" />
         <p className="meta landing-choose">Choose a museum</p>

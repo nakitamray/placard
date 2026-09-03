@@ -455,6 +455,22 @@ function Lamps({
   );
 }
 
+/* ─── how far one press of an arrow key walks you ──────────────────────────
+   A single tap used to hand the visitor a fifth of the corridor, which made
+   the whole rail feel like it was on castors. A tap is now a step: a fixed
+   small nudge on keydown, then — only if the key stays down — a walk that
+   eases up to speed. Distance is measured in rail units, where 1 is the
+   whole corridor. */
+/** one short press */
+const TAP_STEP = 0.012;
+/** grace before a press counts as a hold, in seconds */
+const WALK_DELAY = 0.18;
+/** how long the walk takes to reach full speed, in seconds */
+const WALK_RAMP = 1.6;
+/** rail units per second, at the start of a hold and at full stride */
+const WALK_MIN = 0.12;
+const WALK_MAX = 0.6;
+
 export function CorridorScene({ quality }: { quality: Quality }) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
   const phase = useStore((s) => s.phase);
@@ -463,6 +479,8 @@ export function CorridorScene({ quality }: { quality: Quality }) {
   const setPhase = useStore((s) => s.setPhase);
   const look = useRef({ x: 0, y: 0 });
   const keys = useRef<Set<string>>(new Set());
+  /** when the current arrow-key hold began, so a tap and a hold differ */
+  const heldSince = useRef(0);
   const sprint = useRef<gsap.core.Tween | null>(null);
   const sunRef = useRef<THREE.DirectionalLight>(null);
 
@@ -507,8 +525,17 @@ export function CorridorScene({ quality }: { quality: Quality }) {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
-        keys.current.add(e.key);
         sprint.current?.kill();
+        // A tap is a step, not a lunge. The auto-repeat events the OS sends
+        // while a key is held must not each count as a fresh step, so only
+        // the first keydown moves the goal; from there the frame loop takes
+        // over and eases into a walk.
+        if (!e.repeat) {
+          corridor.goal += e.key === 'ArrowUp' ? TAP_STEP : -TAP_STEP;
+          clamp();
+          heldSince.current = performance.now();
+        }
+        keys.current.add(e.key);
       }
       if (e.key === 'Enter' || e.key === 'Shift') {
         e.preventDefault();
@@ -523,8 +550,14 @@ export function CorridorScene({ quality }: { quality: Quality }) {
         clamp();
       }
     };
-    const onKeyUp = (e: KeyboardEvent) => keys.current.delete(e.key);
-    const onBlur = () => keys.current.clear();
+    const onKeyUp = (e: KeyboardEvent) => {
+      keys.current.delete(e.key);
+      if (!keys.current.size) heldSince.current = 0;
+    };
+    const onBlur = () => {
+      keys.current.clear();
+      heldSince.current = 0;
+    };
 
     window.addEventListener('wheel', onWheel, { passive: true });
     window.addEventListener('touchstart', onTouchStart, { passive: true });
@@ -577,7 +610,13 @@ export function CorridorScene({ quality }: { quality: Quality }) {
   useFrame((_, delta) => {
     if (!d) return;
     if (phase === 'corridor' && keys.current.size) {
-      const speed = 0.16 * Math.min(delta, 0.05) * 60 * 0.35;
+      // Held: ease from a slow walk up to a stride, so the length of the press
+      // is what decides the distance. A short press is the step already taken
+      // on keydown plus a few centimetres of this; a long one crosses the
+      // corridor in a few seconds.
+      const held = heldSince.current ? (performance.now() - heldSince.current) / 1000 : 0;
+      const ramp = Math.min(1, Math.max(0, (held - WALK_DELAY) / WALK_RAMP));
+      const speed = (WALK_MIN + (WALK_MAX - WALK_MIN) * ramp * ramp) * Math.min(delta, 0.05);
       if (keys.current.has('ArrowUp')) corridor.goal += speed;
       if (keys.current.has('ArrowDown')) corridor.goal -= speed;
       corridor.goal = Math.max(0, Math.min(1, corridor.goal));

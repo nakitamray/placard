@@ -1,6 +1,6 @@
 # Placard
 
-*Where History Paints the Masterpiece*
+*Paintings drawn out of text*
 
 A web-based digital art exhibition. Famous paintings are reconstructed entirely
 out of moving text drawn from the artwork's own history. On interaction the

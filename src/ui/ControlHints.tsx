@@ -35,7 +35,7 @@ const GALLERY: Hint[] = [
 ];
 
 const MAP: Hint[] = [
-  { text: 'choose a painter to enter their room' },
+  { text: 'click any painting in the list to walk into its room' },
   { keys: ['esc'], text: 'back to the corridor' },
 ];
 
@@ -66,7 +66,7 @@ export function ControlHints() {
 
   return (
     <div
-      className={`control-hints caption ${settled ? 'is-settled' : ''} ${phase === 'map' ? 'is-on-light' : ''}`}
+      className={`control-hints caption ${settled ? 'is-settled' : ''}`}
       aria-hidden
     >
       {hints.map((h, i) => (

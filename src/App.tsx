@@ -7,7 +7,6 @@ import { detectTier, webgl2Supported } from './lib/deviceTier';
 import {
   QUALITY_INFO,
   initialQuality,
-  qualityDelta,
   qualityFor,
   stepDown,
   storeQuality,
@@ -257,42 +256,29 @@ function QualityToggle({
   const order: QualityName[] = ['low', 'mid', 'high'];
   // what the pointer is over, else what was just chosen, else nothing
   const [peek, setPeek] = useState<QualityName | null>(null);
-  const [note, setNote] = useState<string | null>(null);
+  const [chosen, setChosen] = useState<QualityName | null>(null);
 
   const choose = (name: QualityName) => {
-    if (name !== value) setNote(qualityDelta(value, name));
+    if (name !== value) setChosen(name);
     onChange(name);
   };
 
-  // the confirmation is a receipt, not a panel: it says what changed and goes
+  // the confirmation is a receipt, not a panel: it names the new setting and goes
   useEffect(() => {
-    if (!note) return;
-    const t = window.setTimeout(() => setNote(null), 3600);
+    if (!chosen) return;
+    const t = window.setTimeout(() => setChosen(null), 2400);
     return () => window.clearTimeout(t);
-  }, [note]);
+  }, [chosen]);
 
-  const shown = peek ?? (note ? value : null);
+  const shown = peek ?? chosen;
   const info = shown ? QUALITY_INFO[shown] : null;
 
   return (
     <div className="quality" onPointerLeave={() => setPeek(null)}>
-      {(info || note) && (
+      {info && (
         <div className="quality-card caption" role="status">
-          {note ? (
-            <p className="quality-changed">{note}</p>
-          ) : (
-            info && (
-              <>
-                <p className="quality-name">{info.label}</p>
-                <p className="quality-summary">{info.summary}</p>
-                <ul className="quality-buys">
-                  {info.buys.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              </>
-            )
-          )}
+          <p className="quality-name">{info.label}</p>
+          <p className="quality-summary">{info.summary}</p>
         </div>
       )}
       <div className="quality-toggle caption" role="group" aria-label="Rendering quality">

@@ -104,10 +104,21 @@ button:active { transform: translateY(1px); }
   background-size: cover; background-position: center;
   opacity: 0;
   transition-property: opacity;
-  transition-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  /* linear, not eased: two stacked layers easing in and out together dip the
+     brightness through the middle of the crossfade, and that dip is what
+     makes the change read as a cut */
+  transition-timing-function: linear;
+  will-change: opacity;
 }
+/* The outgoing slide is held at full opacity underneath rather than faded
+   out, so only one layer is ever changing and the join has nothing to give
+   itself away with. It sits first in the DOM, so the incoming slide fades in
+   over it. */
+.landing-img.is-prev { opacity: 1; transition: none; }
 .landing-img.is-active { opacity: 1; animation: kenburns linear forwards; }
-@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.06); } }
+/* gentler than it was: a wide Ken Burns leaves the two slides at visibly
+   different scales for the length of the crossfade */
+@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.035); } }
 @media (prefers-reduced-motion: reduce) { .landing-img.is-active { animation: none; } }
 .landing-vignette {
   position: absolute; inset: 0;
@@ -164,39 +175,91 @@ button:active { transform: translateY(1px); }
 }
 .skip-link:focus { top: var(--s4); }
 
-/* ─── map overlay — spec §10C.4 ─── */
+/* ─── map overlay — spec §10C.4 ──────────────────────────────────────────
+   The wing's index. It used to be a drawn floor plan on a bone scrim: pale,
+   boxy and, next to the corridor it opens over, unfinished-looking — the one
+   screen in the exhibition that switched the lights on. It is now the same
+   dark ground and hairline rules as the landing, so choosing a painting reads
+   as the same act as choosing a museum. */
 .map-overlay {
   position: fixed; inset: 0; z-index: 30;
-  background: rgba(242, 235, 223, 0.82); /* bone scrim */
-  display: flex; flex-direction: column; align-items: center;
-  color: var(--ink);
-  /* entrance is tweened in MapOverlay.tsx — see the note there */
+  background: linear-gradient(180deg, rgba(14, 12, 10, 0.9), rgba(20, 17, 14, 0.94));
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  color: var(--bone);
+  display: flex; justify-content: center;
+  overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.map-inner {
+  width: min(880px, 90vw);
+  display: flex; flex-direction: column;
+  padding: var(--s5) 0 96px; /* clear of the control hints */
+  margin: auto 0;
 }
 .map-header {
-  width: 100%; display: flex; justify-content: space-between;
-  padding: var(--s5) var(--s6); color: var(--umber);
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4);
+  color: var(--taupe);
 }
+.map-back { color: var(--taupe); transition: color var(--d-fast); }
 .map-back:hover { color: var(--gilt); }
-.map-title { margin: var(--s5) 0 var(--s2); }
-.map-lede { color: var(--umber); max-width: 46ch; text-align: center; margin: 0 0 var(--s6); }
-.map-plan { width: min(780px, 92vw); }
-.map-svg { width: 100%; height: auto; overflow: visible; }
-.map-room {
-  fill: var(--stone); stroke: var(--limestone); stroke-width: 1;
-  transition: fill var(--d-fast), stroke var(--d-fast);
+.map-level { color: var(--umber); text-align: right; }
+.map-title { margin: var(--s6) 0 var(--s2); color: var(--bone); }
+/* the one instruction on this screen, so it is set to be read rather than
+   to be quiet: no small caps, and a size above the captions around it */
+.map-lede {
+  color: var(--stone); opacity: 0.82; margin: 0 0 var(--s5);
+  max-width: 56ch; text-transform: none;
+  font-variant-caps: normal; font-size: 15px; line-height: 22px; letter-spacing: 0.01em;
 }
-.map-room.is-active { cursor: pointer; }
-.map-room.is-active:hover, .map-room.is-active:focus-visible { fill: var(--bone); stroke: var(--gilt); }
-.map-room.is-inactive { fill: #e4e0d8; stroke-dasharray: 4 3; cursor: not-allowed; }
-.map-label {
-  fill: var(--umber); text-anchor: middle; dominant-baseline: middle;
-  font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase;
-  pointer-events: none;
+
+/* one row per painting — the same list the landing uses for museums, so the
+   two choices in this exhibition look like the same kind of choice */
+.room-list { list-style: none; margin: 0; padding: 0; }
+/* two columns where there is room for them, so ten works are a guide you can
+   take in at once rather than a list you have to scroll */
+@media (min-width: 900px) and (min-height: 640px) {
+  .room-list { column-count: 2; column-gap: var(--s7); }
+  .room-list li { break-inside: avoid; }
 }
-g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
-.map-label.is-inactive { fill: var(--taupe); }
-.map-footnote { margin-top: var(--s6); color: var(--taupe); }
-.map-footnote-sub { margin-top: var(--s2); color: var(--taupe); opacity: 0.8; }
+/* every row rules off above itself, so the top of each column is closed —
+   `:first-child` alone leaves the second column starting mid-air */
+.room-list li { border-top: 1px solid rgba(216, 205, 186, 0.16); }
+/* the closing rule belongs to the list, so it runs under both columns */
+.room-list { border-bottom: 1px solid rgba(216, 205, 186, 0.16); }
+.room-row {
+  display: flex; align-items: baseline; gap: var(--s4);
+  width: 100%; min-height: 52px; padding: var(--s2) 0;
+  position: relative; text-align: left; color: var(--bone);
+}
+/* gilt, not the painter's own accent: the accent is a wall tone, chosen to
+   be a dark ground for a painting, and on this dark ground it disappears */
+.room-num { color: var(--gilt); opacity: 0.7; width: 2.2em; flex: none; }
+.room-text { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.room-artist { font-size: 19px; line-height: 23px; transition: transform var(--d-fast) var(--e-out); }
+.room-title {
+  color: var(--stone); opacity: 0.6; text-transform: none; letter-spacing: 0.03em;
+  font-style: italic; font-size: 12px;
+}
+.room-cue {
+  flex: none; color: var(--gilt); opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity var(--d-fast) var(--e-out), transform var(--d-fast) var(--e-out);
+}
+.room-row::after {
+  content: ''; position: absolute; left: 0; bottom: -1px; height: 1px; width: 100%;
+  background: var(--gilt); transform: scaleX(0); transform-origin: left center;
+  transition: transform var(--d-fast) var(--e-out);
+}
+.room-row:hover::after, .room-row:focus-visible::after { transform: scaleX(1); }
+.room-row:hover .room-artist, .room-row:focus-visible .room-artist { transform: translateX(4px); }
+.room-row:hover .room-cue, .room-row:focus-visible .room-cue { opacity: 1; transform: translateX(0); }
+
+.map-footnote { margin-top: var(--s5); color: var(--umber); }
+@media (max-width: 640px) {
+  .room-row { min-height: 52px; gap: var(--s4); }
+  .room-artist { font-size: 17px; }
+  .room-cue { display: none; }
+}
 
 /* ─── placard — spec §10C.5 ─── */
 .placard {
@@ -294,27 +357,45 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
   background: #fff8ea; opacity: 0;
 }
 
-/* ─── credits ─── */
+/* ─── credits ────────────────────────────────────────────────────────────
+   Dark, like everything else it opens over. A bone card on a thin scrim put
+   a lit rectangle in the middle of a night gallery, which is the one thing
+   the rest of this interface is careful never to do. */
 .credits {
-  position: fixed; inset: 0; z-index: 55; background: rgba(36, 31, 26, 0.35);
+  position: fixed; inset: 0; z-index: 55;
+  background: rgba(10, 9, 7, 0.72);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   display: grid; place-items: center; padding: var(--s6);
 }
 .credits-inner {
-  background: var(--bone); border: 1px solid var(--limestone);
-  box-shadow: 0 24px 60px rgba(36, 31, 26, 0.25);
+  background: #1b1713;
+  border: 1px solid rgba(242, 235, 223, 0.12);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  color: var(--bone);
   max-width: 640px; width: 100%; max-height: 84vh; overflow-y: auto;
-  padding: var(--s7);
+  padding: var(--s7); scrollbar-width: thin;
 }
 .credits-header { display: flex; justify-content: space-between; align-items: baseline; }
-.credits-close { color: var(--umber); }
+.credits-header .display { margin: 0; }
+.credits-close { color: var(--taupe); }
 .credits-close:hover { color: var(--gilt); }
-.credits-section { color: var(--umber); margin: var(--s6) 0 var(--s2); letter-spacing: 0.06em; }
-.credits-note { color: var(--ink); margin: 0 0 var(--s4); }
-.credits-artwork { margin-bottom: var(--s4); }
-.credits-title { margin: 0; }
+.credits-section {
+  color: var(--gilt); margin: var(--s6) 0 var(--s2); letter-spacing: 0.06em;
+}
+.credits-note { color: rgba(242, 235, 223, 0.8); margin: 0 0 var(--s4); }
+.credits-artwork {
+  margin-bottom: var(--s4); padding-bottom: var(--s3);
+  border-bottom: 1px solid rgba(242, 235, 223, 0.08);
+}
+.credits-artwork:last-child { border-bottom: 0; }
+.credits-title { margin: 0; color: var(--bone); }
 .credits-inner ul { margin: var(--s2) 0; padding-left: var(--s4); }
-.credits-source { color: var(--umber); text-transform: none; letter-spacing: 0.02em; margin: var(--s1) 0; }
-.credits-source a { color: var(--umber); text-decoration-color: var(--gilt); }
+.credits-inner li::marker { color: rgba(242, 235, 223, 0.3); }
+.credits-source {
+  color: rgba(242, 235, 223, 0.62); text-transform: none; letter-spacing: 0.02em;
+  margin: var(--s1) 0;
+}
+.credits-source a { color: rgba(242, 235, 223, 0.86); text-decoration-color: var(--gilt); }
 .credits-source a:hover { color: var(--gilt); }
 .credits-imgsrc { color: var(--taupe); text-transform: none; letter-spacing: 0.02em; }
 
@@ -349,7 +430,7 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
    floor and a black vault alike, and settles rather than disappearing. */
 .control-hints {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  z-index: 20; display: flex; flex-wrap: wrap; justify-content: center;
+  z-index: 31; display: flex; flex-wrap: wrap; justify-content: center;
   align-items: center; gap: var(--s2) var(--s5);
   max-width: min(1000px, 94vw);
   padding: 9px var(--s5);
@@ -370,12 +451,6 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
   pointer-events: none;
 }
 .control-hints.is-settled { opacity: 0.8; background: rgba(28, 24, 20, 0.22); }
-.control-hints.is-on-light {
-  background: rgba(255, 253, 248, 0.55);
-  border-color: rgba(36, 31, 26, 0.1);
-  color: var(--ink);
-  text-shadow: none;
-}
 .control-hint { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .control-hints kbd {
   font: inherit; font-size: 11px;
@@ -519,7 +594,7 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
    otherwise half-hidden behind the placard in the gallery */
 .quality { position: fixed; bottom: 20px; right: var(--s5); z-index: 30; }
 .quality-card {
-  position: absolute; bottom: 34px; right: 0; width: 258px;
+  position: absolute; bottom: 34px; right: 0; width: 210px;
   padding: 12px 14px;
   background: rgba(24, 21, 17, 0.82);
   backdrop-filter: blur(18px) saturate(1.1);
@@ -532,11 +607,11 @@ g:hover > .map-label:not(.is-inactive) { fill: var(--ink); }
 }
 @keyframes quality-in { from { opacity: 0; translate: 0 6px; } to { opacity: 1; translate: 0 0; } }
 .quality-name { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gilt); margin: 0 0 4px; }
-.quality-summary { margin: 0; line-height: 1.5; color: rgba(242, 235, 223, 0.82); }
-.quality-buys { margin: 8px 0 0; padding: 0; list-style: none; }
-.quality-buys li { color: rgba(242, 235, 223, 0.56); padding-left: 12px; position: relative; line-height: 1.65; }
-.quality-buys li::before { content: '·'; position: absolute; left: 2px; }
-.quality-changed { margin: 0; line-height: 1.5; color: var(--gilt); }
+/* a sentence, so it is set as one — the label above it carries the caps */
+.quality-summary {
+  margin: 0; line-height: 1.5; color: rgba(242, 235, 223, 0.82);
+  text-transform: none; letter-spacing: 0.02em; font-size: 12px;
+}
 
 .quality-toggle {
   position: relative; z-index: 21;
