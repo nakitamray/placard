@@ -122,8 +122,21 @@ interface Resolved {
   file: string;
   descriptionUrl: string;
   downloadUrl: string;
+  /** the size of the render being asked for — NOT the size of the file */
   width: number;
   height: number;
+  /**
+   * The size of the original upload.
+   *
+   * `iiurlwidth` is a request, not a promise: MediaWiki reports back the
+   * dimensions you asked for and then declines to upscale, so a 900px file
+   * pinned by hand is reported as 2000×1393 and arrives as 900×627. Judging a
+   * candidate on the thumb size was therefore judging it on our own request —
+   * which is how a file too small to hang got as far as being downloaded and
+   * failed with numbers that flatly contradicted the line above them.
+   */
+  sourceWidth: number;
+  sourceHeight: number;
   license: string;
   author: string;
   credit: string;
@@ -465,8 +478,11 @@ async function resolveFile(
       file: page.title as string,
       descriptionUrl: info.descriptionurl ?? '',
       downloadUrl: info.thumburl ?? info.url,
-      width: info.thumbwidth ?? info.width,
-      height: info.thumbheight ?? info.height,
+      // never larger than the file itself: a thumb is only ever a reduction
+      width: Math.min(info.thumbwidth ?? info.width, info.width),
+      height: Math.min(info.thumbheight ?? info.height, info.height),
+      sourceWidth: info.width,
+      sourceHeight: info.height,
       license: stripHtml(meta.LicenseShortName?.value) || 'see Commons',
       author: stripHtml(meta.Artist?.value) || artist,
       credit: stripHtml(meta.Credit?.value),
@@ -573,6 +589,23 @@ async function download(
   target: Resolved,
   expected: number | null,
 ): Promise<{ width: number; height: number; bytes: number }> {
+  /*
+   * Check the original before spending the request.
+   *
+   * Commons will not upscale, so a file whose original is under the floor
+   * cannot come back over it however wide a render we ask for. Failing here
+   * names the file's real size, which is the number that tells you what to do
+   * about it; failing after the download named the size of what arrived,
+   * which read as a contradiction of the line printed above it.
+   */
+  const sourceLong = Math.max(target.sourceWidth ?? 0, target.sourceHeight ?? 0);
+  if (sourceLong && sourceLong < MIN_LONG_EDGE) {
+    throw new Error(
+      `the file itself is only ${target.sourceWidth}×${target.sourceHeight} — ` +
+        `under the ${MIN_LONG_EDGE}px floor, and Commons will not enlarge it. ` +
+        `Pin a larger upload of the same painting.`,
+    );
+  }
   const res = await paced(() =>
     fetch(target.downloadUrl, { headers: { 'User-Agent': USER_AGENT } }),
   );
@@ -786,7 +819,11 @@ async function one(job: Job, hint: SourceHint): Promise<Outcome> {
 
     const target: Resolved = { ...chosen, id: job.id, museum: job.museum };
     lines.push(`    ${target.file}  (${how})`);
-    lines.push(`    ${target.width}×${target.height} · ${target.license}`);
+    lines.push(
+      `    ${target.sourceWidth}×${target.sourceHeight} on Commons` +
+        (target.width < target.sourceWidth ? `, fetching ${target.width}px` : '') +
+        ` · ${target.license}`,
+    );
 
     const expected = expectedAspect(job.dimensions);
     if (expected) {
@@ -927,7 +964,7 @@ function targetSummary(t: Resolved) {
   return {
     file: t.file,
     url: t.descriptionUrl,
-    size: `${t.width}×${t.height}`,
+    size: `${t.sourceWidth}×${t.sourceHeight}`,
     license: t.license,
     author: t.author,
   };
