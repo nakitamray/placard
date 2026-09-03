@@ -35,7 +35,7 @@ import { fallbackUrl, imageUrl } from '../lib/image';
 import { Ceiling } from './corridor/Ceiling';
 import { Floor, Walls } from './corridor/Surfaces';
 import { Fixtures } from './corridor/Fixtures';
-import { bayZ, dimsFor, hangHeight, type Dims } from './corridor/dims';
+import { bayZ, dimsFor, hangHeight, workMaxHeight, type Dims } from './corridor/dims';
 import { Atmosphere } from './corridor/Atmosphere';
 import type { ArtworkIndexEntry, MuseumData } from '../types';
 import type { Quality } from '../lib/quality';
@@ -250,8 +250,14 @@ function Bays({
       const i = slot % artworks.length;
       const x = side * (d.halfWidth - 0.09);
       const ry = side > 0 ? -Math.PI / 2 : Math.PI / 2;
-      const maxH = hang === 'salon' ? d.wallHeight * 0.3 : Math.min(2.1, d.wallHeight * 0.36);
-      const main = fitWork(artworks[i].aspect, maxH, d.bayDepth * 0.78);
+      const maxH = workMaxHeight(d, museum.style);
+      // The Met court's engaged columns stand on the bay divisions and project
+      // a third of a metre off the wall, so a canvas hung there gets a
+      // narrower bay than one on a flat pilastered wall — otherwise the frame
+      // runs into the shaft that is supposed to be separating it from its
+      // neighbour.
+      const clear = museum.style.wall === 'court-facade' ? 0.6 : 0.78;
+      const main = fitWork(artworks[i].aspect, maxH, d.bayDepth * clear);
       // Carving is only legible close up. Past a few bays the bead course and
       // cartouches cost tens of thousands of triangles to render something
       // smaller than a pixel, so distant frames keep the turned courses only.

@@ -358,21 +358,59 @@ button:active { transform: translateY(1px); }
 }
 
 /* ─── credits ────────────────────────────────────────────────────────────
-   Dark, like everything else it opens over. A bone card on a thin scrim put
-   a lit rectangle in the middle of a night gallery, which is the one thing
-   the rest of this interface is careful never to do. */
+   A veil, not a card.
+
+   This panel has been a bone card on a thin scrim (a lit rectangle in the
+   middle of a night gallery) and then a flat near-black slab (a hole cut in
+   the picture). Both were the same mistake: an opaque object pasted over the
+   room, with a hard edge announcing where it stopped. It is now made of the
+   same frosted glass as the control hints and the wall label — heavily
+   blurred, only partly opaque, taking its colour from whatever painting or
+   corridor is behind it, and dissolving at the top and bottom rather than
+   ending on a line. It reads dark over the corridor and warm over a lit
+   canvas, because it is not painting a colour of its own. */
 .credits {
   position: fixed; inset: 0; z-index: 55;
-  background: rgba(10, 9, 7, 0.72);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  background: radial-gradient(
+    130% 100% at 50% 45%,
+    rgba(18, 15, 12, 0.34) 0%,
+    rgba(10, 8, 7, 0.66) 100%
+  );
+  backdrop-filter: blur(9px) saturate(1.04);
+  -webkit-backdrop-filter: blur(9px) saturate(1.04);
   display: grid; place-items: center; padding: var(--s6);
+  animation: credits-in var(--d-base) var(--e-out);
 }
+@keyframes credits-in { from { opacity: 0; } to { opacity: 1; } }
 .credits-inner {
-  background: #1b1713;
-  border: 1px solid rgba(242, 235, 223, 0.12);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  position: relative;
+  background: rgba(26, 22, 18, 0.5);
+  backdrop-filter: blur(30px) saturate(1.25);
+  -webkit-backdrop-filter: blur(30px) saturate(1.25);
   color: var(--bone);
-  max-width: 640px; width: 100%; max-height: 84vh; overflow-y: auto;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+  max-width: 660px; width: 100%; max-height: 84vh;
+  overflow: hidden;
+  /*
+   * No border, no shadow — the panel has no edge at all.
+   *
+   * A mask clips the frosted backdrop along with everything drawn on top of
+   * it, so feathering all four sides here dissolves the glass itself, not
+   * just the text on it. That is the whole difference between a card lying on
+   * the picture and a veil drawn across it. The side fades are narrower than
+   * the padding, so no line of type ever sits in one.
+   */
+  mask-image:
+    linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 36px), transparent 100%),
+    linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 36px), transparent 100%),
+    linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  -webkit-mask-composite: source-in;
+}
+.credits-scroll {
+  max-height: 84vh; overflow-y: auto; overscroll-behavior: contain;
   padding: var(--s7); scrollbar-width: thin;
 }
 .credits-header { display: flex; justify-content: space-between; align-items: baseline; }
@@ -382,22 +420,22 @@ button:active { transform: translateY(1px); }
 .credits-section {
   color: var(--gilt); margin: var(--s6) 0 var(--s2); letter-spacing: 0.06em;
 }
-.credits-note { color: rgba(242, 235, 223, 0.8); margin: 0 0 var(--s4); }
+.credits-note { color: rgba(242, 235, 223, 0.86); margin: 0 0 var(--s4); }
 .credits-artwork {
   margin-bottom: var(--s4); padding-bottom: var(--s3);
-  border-bottom: 1px solid rgba(242, 235, 223, 0.08);
+  border-bottom: 1px solid rgba(242, 235, 223, 0.09);
 }
 .credits-artwork:last-child { border-bottom: 0; }
 .credits-title { margin: 0; color: var(--bone); }
 .credits-inner ul { margin: var(--s2) 0; padding-left: var(--s4); }
 .credits-inner li::marker { color: rgba(242, 235, 223, 0.3); }
 .credits-source {
-  color: rgba(242, 235, 223, 0.62); text-transform: none; letter-spacing: 0.02em;
+  color: rgba(242, 235, 223, 0.7); text-transform: none; letter-spacing: 0.02em;
   margin: var(--s1) 0;
 }
-.credits-source a { color: rgba(242, 235, 223, 0.86); text-decoration-color: var(--gilt); }
+.credits-source a { color: rgba(242, 235, 223, 0.92); text-decoration-color: var(--gilt); }
 .credits-source a:hover { color: var(--gilt); }
-.credits-imgsrc { color: var(--taupe); text-transform: none; letter-spacing: 0.02em; }
+.credits-imgsrc { color: rgba(242, 235, 223, 0.52); text-transform: none; letter-spacing: 0.02em; }
 
 /* ─── cursor — spec §10C.7 ───────────────────────────────────────────────
    A thin light ring carrying its own dark contact shadow, so it reads against

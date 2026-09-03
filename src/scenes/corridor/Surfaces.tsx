@@ -10,7 +10,7 @@ import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import type { MuseumStyle } from '../../types';
 import type { Quality } from '../../lib/quality';
-import { bayZ, type Dims } from './dims';
+import { bayZ, hangBottom, type Dims } from './dims';
 import { CourtFacade } from './CourtFacade';
 
 interface Props {
@@ -205,14 +205,23 @@ export function Walls({ style, d, quality }: Props) {
     </mesh>
   );
 
-  /** skirting and dado, common to the picture galleries */
+  /**
+   * Skirting and dado, common to the picture galleries.
+   *
+   * The rail is held under the hang. Each treatment asks for the height it
+   * wants, but a rail standing 0.08 off the wall that lands inside the
+   * pictures is a gold moulding running through the bottom edge of every
+   * frame in the room — which is what the crimson room did, and what the eye
+   * goes to first. So the requested height is a ceiling, not a promise.
+   */
+  const railY = Math.max(0.5, hangBottom(d, style) - 0.12);
   const bands = (side: 1 | -1, dado: string, dadoY: number) => (
     <group key={`b${side}`}>
       <mesh position={[side * (d.halfWidth - 0.02), 0.09, mid]} receiveShadow>
         <boxGeometry args={[0.08, 0.18, run]} />
         <meshStandardMaterial color={dado} roughness={0.7} />
       </mesh>
-      <mesh position={[side * (d.halfWidth - 0.03), dadoY, mid]} receiveShadow>
+      <mesh position={[side * (d.halfWidth - 0.03), Math.min(dadoY, railY), mid]} receiveShadow>
         <boxGeometry args={[0.1, 0.1, run]} />
         <meshStandardMaterial color={dado} roughness={0.7} />
       </mesh>

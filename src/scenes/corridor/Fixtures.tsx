@@ -9,7 +9,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type { MuseumStyle } from '../../types';
-import { bayZ, type Dims } from './dims';
+import { bayZ, hangTop, type Dims } from './dims';
 
 interface Props {
   style: MuseumStyle;
@@ -455,7 +455,10 @@ function Terraces({ style, d }: Props) {
   const p = style.palette;
   const mid = -d.length / 2;
   const run = d.length + d.bayDepth * 3;
-  const deck = 3.1;
+  // Above the pictures, always. A deck cantilevered 1.9m off the wall is the
+  // heaviest thing in the room, and at its old fixed height of 3.1 it ran
+  // straight through the top of every canvas in the nave.
+  const deck = Math.max(3.1, hangTop(d, style) + 0.2);
   const inset = d.halfWidth - 1.9;
   return (
     <group>

@@ -113,6 +113,7 @@ function Arch({
   colour,
   reveal,
   depth = 0.22,
+  sill = 0,
 }: {
   x: number;
   springing: number;
@@ -120,16 +121,28 @@ function Arch({
   colour: string;
   reveal: string;
   depth?: number;
+  /** y the opening starts at — it stands on the dado, not on the floor */
+  sill?: number;
 }) {
   const N = 13;
   const stone = (Math.PI / N) * radius * 1.06;
   return (
     <group position={[x, 0, 0]}>
-      {/* the opening: a recessed plane, deliberately dark */}
-      <mesh position={[0, springing / 2, 0.02]}>
-        <planeGeometry args={[radius * 2, springing]} />
+      {/* The opening: a recessed plane, deliberately dark. It starts at the
+          sill rather than at the floor, so the dado moulding — which stands
+          further off the wall than the reveal is recessed — runs under the
+          arcade instead of straight across the mouth of every opening. */}
+      <mesh position={[0, (sill + springing) / 2, 0.02]}>
+        <planeGeometry args={[radius * 2, springing - sill]} />
         <meshStandardMaterial color={reveal} roughness={0.95} />
       </mesh>
+      {/* the sill slab the opening stands on */}
+      {sill > 0 && (
+        <mesh position={[0, sill, depth * 0.5]} castShadow receiveShadow>
+          <boxGeometry args={[radius * 2 + 0.5, 0.1, depth * 1.4]} />
+          <meshStandardMaterial color={colour} roughness={0.58} />
+        </mesh>
+      )}
       <mesh position={[0, springing, 0.02]}>
         <circleGeometry args={[radius, 24, 0, Math.PI]} />
         <meshStandardMaterial color={reveal} roughness={0.95} />
@@ -172,7 +185,17 @@ function Arch({
   );
 }
 
-/** engaged column: base, shaft, necking, capital, abacus */
+/**
+ * Engaged column: plinth, base, shaft, necking, echinus, abacus.
+ *
+ * Every member is stacked on the top of the one below it, with a couple of
+ * centimetres of overlap so no joint can open up. The shaft used to be
+ * positioned by its own centre — `height / 2 + 0.3` — which put its foot at
+ * 0.60 while the base finished at 0.33, and left every column in the court
+ * standing a hand's width clear of its own plinth with daylight under it.
+ * Nothing here is placed by its centre any more: each piece is given the y it
+ * starts at and the y it stops at, so the stack cannot come apart again.
+ */
 function Column({
   x,
   height,
@@ -184,30 +207,42 @@ function Column({
   radius: number;
   colour: string;
 }) {
+  const z = radius * 0.7;
+  const PLINTH_H = 0.2;
+  const BASE_H = 0.14;
+  const baseTop = PLINTH_H + BASE_H - 0.01; // 0.33: the two overlap by a hair
+  const neckY = height - 0.24;
+  // buried at both ends: into the base below and the necking above
+  const shaftFoot = baseTop - 0.04;
+  const shaftHead = neckY + 0.04;
+
   return (
     <group position={[x, 0, 0]}>
-      <mesh position={[0, 0.1, radius * 0.7]} castShadow receiveShadow>
-        <boxGeometry args={[radius * 2.9, 0.2, radius * 1.9]} />
+      {/* plinth, sitting on the floor */}
+      <mesh position={[0, PLINTH_H / 2, z]} castShadow receiveShadow>
+        <boxGeometry args={[radius * 2.9, PLINTH_H, radius * 1.9]} />
         <meshStandardMaterial color={colour} roughness={0.62} />
       </mesh>
-      <mesh position={[0, 0.26, radius * 0.7]} castShadow>
-        <cylinderGeometry args={[radius * 1.22, radius * 1.35, 0.14, 16]} />
+      {/* base, standing on the plinth */}
+      <mesh position={[0, PLINTH_H + BASE_H / 2 - 0.005, z]} castShadow>
+        <cylinderGeometry args={[radius * 1.22, radius * 1.35, BASE_H, 16]} />
         <meshStandardMaterial color={colour} roughness={0.6} />
       </mesh>
-      <mesh position={[0, height / 2 + 0.3, radius * 0.7]} castShadow receiveShadow>
-        <cylinderGeometry args={[radius * 0.92, radius, height - 0.6, 18]} />
+      {/* shaft, running from inside the base to inside the necking */}
+      <mesh position={[0, (shaftFoot + shaftHead) / 2, z]} castShadow receiveShadow>
+        <cylinderGeometry args={[radius * 0.92, radius, shaftHead - shaftFoot, 18]} />
         <meshStandardMaterial color={colour} roughness={0.5} />
       </mesh>
       {/* necking, echinus, abacus */}
-      <mesh position={[0, height - 0.24, radius * 0.7]} castShadow>
+      <mesh position={[0, neckY, z]} castShadow>
         <cylinderGeometry args={[radius, radius * 0.92, 0.08, 16]} />
         <meshStandardMaterial color={colour} roughness={0.55} />
       </mesh>
-      <mesh position={[0, height - 0.13, radius * 0.7]} castShadow>
+      <mesh position={[0, height - 0.13, z]} castShadow>
         <cylinderGeometry args={[radius * 1.32, radius, 0.16, 16]} />
         <meshStandardMaterial color={colour} roughness={0.52} />
       </mesh>
-      <mesh position={[0, height, radius * 0.7]} castShadow>
+      <mesh position={[0, height, z]} castShadow>
         <boxGeometry args={[radius * 3, 0.14, radius * 2.4]} />
         <meshStandardMaterial color={colour} roughness={0.5} />
       </mesh>
@@ -254,6 +289,20 @@ export function CourtFacade({ style, d, quality }: Props) {
         const brick = side > 0;
         // local X runs along the corridor; +Z stands proud of the wall
         const toLocal = (z: number) => (side > 0 ? z : -z);
+
+        /*
+         * Which bays of THIS wall carry a painting.
+         *
+         * The court hangs `alternating`: bay 0 hangs on the +1 wall, bay 1 on
+         * the -1 wall, and so on, so each wall is picture, gap, picture, gap.
+         * The arcade is set into the gaps and the columns onto the divisions
+         * between them, which is the whole rhythm of the room: column,
+         * painting, column, opening, column. Nothing is ever placed on a bay
+         * centre that a canvas is already using.
+         */
+        const hung = (b: number) =>
+          style.hang === 'alternating' ? (b % 2 === 0 ? 1 : -1) === side : true;
+        const openBays = Array.from({ length: d.bays }, (_, b) => b).filter((b) => !hung(b));
 
         return (
           <group
@@ -331,33 +380,40 @@ export function CourtFacade({ style, d, quality }: Props) {
               </group>
             )}
 
-            {/* marble plinth and dado moulding along the base of both walls */}
-            <mesh position={[mid, 0.34, 0.09]} castShadow receiveShadow>
-              <boxGeometry args={[run, 0.68, 0.18]} />
+            {/* Marble plinth and dado along the base of both walls, sitting
+                low enough to pass under the frames. At its old height the
+                fascia — which stands 0.2 off the wall, further out than a
+                frame does — crossed the bottom edge of every canvas. */}
+            <mesh position={[mid, 0.28, 0.09]} castShadow receiveShadow>
+              <boxGeometry args={[run, 0.56, 0.18]} />
               <meshStandardMaterial color={p.molding} roughness={0.5} />
             </mesh>
-            <StringCourse y={0.74} length={run} depth={0.2} height={0.14} colour={p.molding} />
+            <StringCourse y={0.6} length={run} depth={0.2} height={0.14} colour={p.molding} />
 
-            {/* The arcade, set on the bay divisions rather than the bay
-                centres: the paintings hang on the centres, and an arch behind
-                a canvas puts voussoirs and impost blocks through its frame. */}
-            {Array.from({ length: d.bays }, (_, b) => (
+            {/* The arcade, in the bays this wall hangs nothing in. An arch
+                behind a canvas puts voussoirs and impost blocks through its
+                frame, so an opening and a painting never share a bay. */}
+            {openBays.map((b) => (
               <Arch
                 key={b}
-                x={toLocal(-b * d.bayDepth - d.bayDepth)}
+                x={toLocal(bayZ(d, b))}
                 springing={2.5}
                 radius={brick ? 1.15 : 0.95}
                 colour={p.molding}
                 reveal={brick ? '#3A241E' : '#6E6656'}
                 depth={brick ? 0.26 : 0.2}
+                sill={0.72}
               />
             ))}
 
-            {/* engaged columns at every bay division */}
-            {Array.from({ length: d.bays }, (_, b) => (
+            {/* Engaged columns on the bay DIVISIONS — they are what separates
+                one painting from the next. They used to be placed at `bayZ`,
+                the bay centre, which is precisely where the canvas hangs: the
+                shaft came down the middle of every picture in the court. */}
+            {Array.from({ length: d.bays + 1 }, (_, i) => (
               <Column
-                key={b}
-                x={toLocal(bayZ(d, b))}
+                key={i}
+                x={toLocal(-i * d.bayDepth)}
                 height={H - 1.15}
                 radius={0.24}
                 colour={p.molding}
@@ -381,13 +437,14 @@ export function CourtFacade({ style, d, quality }: Props) {
               <meshStandardMaterial color={p.molding} roughness={0.55} />
             </mesh>
 
-            {/* the warm glow: sconces between the arches, and a wash of light
-                that plays against the cool daylight coming through the roof */}
-            {Array.from({ length: d.bays }, (_, b) => (
+            {/* the warm glow: a sconce over each opening — never over a
+                painting, where it would sit on the canvas — playing against
+                the cool daylight coming through the roof */}
+            {openBays.map((b) => (
               <Sconce
                 key={`sc${b}`}
-                x={toLocal(-b * d.bayDepth - d.bayDepth * 1.5)}
-                y={3.5}
+                x={toLocal(bayZ(d, b))}
+                y={2.5 + (brick ? 1.15 : 0.95) + 0.95}
                 colour={glow}
               />
             ))}
@@ -395,15 +452,19 @@ export function CourtFacade({ style, d, quality }: Props) {
         );
       })}
 
-      {/* one warm light per bay, alternating walls, close enough to the
-          masonry to graze it — this is what makes brick look like brick */}
+      {/* One warm light per opening, close enough to the masonry to graze it
+          — this is what makes brick look like brick. They stand where the
+          sconces do, so the glow and the fitting that explains it agree, and
+          each one washes the pictures on the wall opposite. */}
       {Array.from({ length: Math.min(d.bays, quality.maxLamps) }, (_, k) => {
-        const b = Math.round((k * d.bays) / Math.min(d.bays, quality.maxLamps));
-        const side = b % 2 ? 1 : -1;
+        const step = Math.min(d.bays, quality.maxLamps);
+        const b = Math.round((k * d.bays) / step);
+        // the wall this bay leaves open is the one the sconce is on
+        const side = style.hang === 'alternating' ? (b % 2 === 0 ? -1 : 1) : b % 2 ? 1 : -1;
         return (
           <pointLight
             key={k}
-            position={[side * (d.halfWidth - 0.7), 3.4, -b * d.bayDepth - d.bayDepth * 1.5]}
+            position={[side * (d.halfWidth - 0.7), 3.6, bayZ(d, b)]}
             color={glow}
             intensity={style.light.lampIntensity * 2.4}
             distance={d.bayDepth * 2.4}

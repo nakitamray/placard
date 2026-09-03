@@ -56,6 +56,9 @@ export function Credits() {
   return (
     <div className="credits" role="dialog" aria-label="Credits and sources">
       <div className="credits-inner">
+        {/* the scroller is its own element so the panel can keep its frosted
+            backdrop while the content dissolves at the top and bottom edges */}
+        <div className="credits-scroll">
         <header className="credits-header">
           <h2 className="display">Credits</h2>
           <button className="caption credits-close" onClick={() => setOpen(false)}>
@@ -125,6 +128,7 @@ export function Credits() {
             monospace fallbacks).
           </p>
         </section>
+        </div>
       </div>
     </div>
   );
