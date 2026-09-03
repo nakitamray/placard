@@ -14,6 +14,7 @@ import {
   type QualityName,
 } from './lib/quality';
 import { CorridorScene } from './scenes/CorridorScene';
+import { LandingScene } from './scenes/LandingScene';
 import { GalleryScene } from './scenes/GalleryScene';
 import { Environment } from './scenes/Lighting';
 import { LandingLayer } from './ui/LandingLayer';
@@ -21,6 +22,8 @@ import { MapOverlay } from './ui/MapOverlay';
 import { Placard } from './ui/Placard';
 import { RailIndicator } from './ui/RailIndicator';
 import { Credits } from './ui/Credits';
+import { AtlasView } from './ui/AtlasView';
+import { AtlasToast } from './ui/AtlasToast';
 import { ThreadPull } from './ui/ThreadPull';
 import { ControlHints } from './ui/ControlHints';
 import { CursorRing } from './ui/CursorRing';
@@ -28,6 +31,8 @@ import { LoadingBar } from './ui/LoadingBar';
 import { FlashLayer } from './ui/Flash';
 import { endReveal } from './transitions/reveal';
 import { asset } from './lib/asset';
+import { roomTone, setSound, sfx, soundEnabled, soundStored } from './lib/audio';
+import { loadAtlas, useAtlas } from './state/atlas';
 import type { MuseumIndexEntry } from './types';
 
 export default function App() {
@@ -47,6 +52,46 @@ export default function App() {
     storeQuality(name);
     setQualityName(name);
   };
+
+  const [sound, setSoundOn] = useState(false);
+
+  // The room tone follows the room. `roomTone` is idempotent per id, so this
+  // can run on every render of the museum without restarting the graph.
+  useEffect(() => {
+    if (!sound) return roomTone(null);
+    roomTone(phase === 'boot' || phase === 'landing' ? null : (museum?.id ?? null));
+  }, [sound, phase, museum]);
+
+  // the two events worth marking: walking through the end wall, and a
+  // painting resolving out of its own text
+  useEffect(() => {
+    if (phase === 'warp') sfx.warp();
+  }, [phase]);
+  useEffect(() => {
+    if (revealed) sfx.chime();
+  }, [revealed]);
+
+  // a stored preference is honoured, but only once the visitor has clicked
+  // something — the audio graph may not be created before a gesture
+  useEffect(() => {
+    if (!soundStored()) return;
+    const arm = () => {
+      setSound(true);
+      setSoundOn(true);
+    };
+    window.addEventListener('pointerdown', arm, { once: true });
+    window.addEventListener('keydown', arm, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', arm);
+      window.removeEventListener('keydown', arm);
+    };
+  }, []);
+
+  // The atlas graph is in memory from the start: discovery is recorded the
+  // moment somebody walks into a room, which is long before they open the map.
+  useEffect(() => {
+    void loadAtlas();
+  }, []);
 
   useEffect(() => attachPointer(), []);
   useEffect(() => attachZoom(), []);
@@ -135,6 +180,8 @@ export default function App() {
           <fog attach="fog" args={[fog[0], fog[1], fog[2]]} />
           <Suspense fallback={null}>
             <Environment intensity={inGallery ? 0.4 : 0.26} />
+            {/* the landing hero: one painting, live, behind the headline */}
+            {phase === 'landing' && !museum && <LandingScene tier={tier} />}
             {inCorridor && museum && artworks.length > 0 && <CorridorScene quality={quality} />}
             {inGallery && <GalleryScene tier={tier} quality={quality} />}
           </Suspense>
@@ -171,7 +218,28 @@ export default function App() {
       {(phase === 'corridor' || inGallery) && (
         <QualityToggle value={qualityName} onChange={chooseQuality} />
       )}
+      {phase !== 'boot' && (
+        <button className="caption atlas-open" onClick={() => useAtlas.getState().setOpen(true)}>
+          ✦ The atlas
+        </button>
+      )}
+      {phase !== 'boot' && (
+        <button
+          className={`caption sound-toggle ${sound ? 'is-on' : ''}`}
+          aria-pressed={sound}
+          title={sound ? 'Sound on' : 'Sound off'}
+          onClick={() => {
+            const next = !soundEnabled();
+            setSound(next);
+            setSoundOn(next);
+          }}
+        >
+          {sound ? '◉' : '○'} <span className="sound-word">Sound</span>
+        </button>
+      )}
       <Credits />
+      <AtlasView />
+      <AtlasToast />
       <FlashLayer />
       <CursorRing />
 

@@ -28,7 +28,7 @@ const CORRIDOR: Hint[] = [
 
 const GALLERY: Hint[] = [
   { keys: ['←', '→'], text: 'move between paintings' },
-  { text: 'hover or click a canvas to reveal the painting' },
+  { text: 'move over a canvas to dissolve it · click for the whole painting' },
   { keys: ['+', '−'], text: 'lean in' },
   { keys: ['⇧'], text: '+ hover to pull a thread of text' },
   { keys: ['esc'], text: 'close · back' },

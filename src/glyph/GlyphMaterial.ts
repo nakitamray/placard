@@ -38,6 +38,8 @@ uniform vec2  uImageSize;
 uniform float uBreathe;
 uniform vec4  uDetachBox;     // x0,y0,x1,y1 in image px — Thread Pull region
 uniform float uDetachAmt;     // 0 = attached, 1 = fully extracted
+uniform vec3  uLens;          // x,y,radius in image px — the reading lens
+uniform float uLensAmt;       // 0 = closed, 1 = fully open
 
 varying vec2  vQuad;
 varying float vSlot;
@@ -45,6 +47,7 @@ varying float vColorIndex;
 varying float vSeed;
 varying float vBreathe;
 varying float vInBox;
+varying float vLens;
 
 void main() {
   vQuad = aQuad + 0.5;
@@ -52,6 +55,15 @@ void main() {
   vColorIndex = aColorIndex;
   vSeed = fract(sin(aSlot * 12.9898) * 43758.5453);
   vBreathe = 0.88 + 0.12 * sin(uBreathe + aPos.x * 0.004 + vSeed * 6.28);
+
+  /*
+   * The reading lens. Its falloff is computed per glyph rather than per
+   * fragment — a glyph is a single character, so where its centre falls is
+   * the only question, and this way the cost is one distance per instance
+   * instead of one per pixel.
+   */
+  float lensD = distance(aPos, uLens.xy);
+  vLens = uLensAmt * (1.0 - smoothstep(uLens.z * 0.5, uLens.z, lensD));
 
   // Thread Pull: is this glyph inside the extracted region?
   vInBox = step(uDetachBox.x, aPos.x) * step(aPos.x, uDetachBox.z) *
@@ -92,6 +104,7 @@ varying float vColorIndex;
 varying float vSeed;
 varying float vBreathe;
 varying float vInBox;
+varying float vLens;
 
 void main() {
   // --- which character occupies this slot right now (spec §4.3) ---
@@ -126,8 +139,13 @@ void main() {
 
   a *= mix(1.0, vBreathe, 0.6);
 
-  // staggered dissolve — each glyph has its own threshold (spec §8.2)
-  a *= 1.0 - smoothstep(vSeed - 0.12, vSeed + 0.12, uDissolve);
+  /*
+   * Staggered dissolve — each glyph has its own threshold (spec §8.2). The
+   * lens is simply a local dissolve: whichever is asking for more, the
+   * whole-canvas reveal or the circle under the cursor, wins here.
+   */
+  float dis = max(uDissolve, vLens);
+  a *= 1.0 - smoothstep(vSeed - 0.12, vSeed + 0.12, dis);
 
   if (a < 0.004) discard;
   gl_FragColor = vec4(color, a);
@@ -151,6 +169,8 @@ export interface GlyphUniforms {
   uInkLift: { value: number };
   uDetachBox: { value: THREE.Vector4 };
   uDetachAmt: { value: number };
+  uLens: { value: THREE.Vector3 };
+  uLensAmt: { value: number };
 }
 
 export function createGlyphMaterial(
@@ -177,6 +197,8 @@ export function createGlyphMaterial(
       uInkLift: { value: 0.55 },
       uDetachBox: { value: new THREE.Vector4(0, 0, 0, 0) },
       uDetachAmt: { value: 0 },
+      uLens: { value: new THREE.Vector3(0, 0, 1) },
+      uLensAmt: { value: 0 },
     },
     transparent: true,
     depthWrite: false,

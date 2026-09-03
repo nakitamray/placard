@@ -14,6 +14,7 @@ import { createGlyphMaterial } from './GlyphMaterial';
 import type { LoadedArtwork } from './artworkLoader';
 import { useStore } from '../state/store';
 import { threadPullAnim } from '../threadpull/state';
+import { lens } from '../transitions/lens';
 
 export const glyphRT: { current: THREE.WebGLRenderTarget | null } = { current: null };
 
@@ -117,6 +118,14 @@ export function GlyphPrePass({
     // Thread Pull: fade the extracted region out of the canvas while the DOM
     // text assembles, and hold its characters still (spec: the rest of the
     // painting remains intact and moving)
+    // The lens eases open and shut here rather than in a tween: it is written
+    // by every pointer move, and a GSAP tween restarted at pointer rate would
+    // spend more time being created than running.
+    const k = 1 - Math.pow(0.0015, Math.min(delta, 0.1) / 0.22);
+    lens.amt += (lens.want - lens.amt) * k;
+    u.uLens.value.set(lens.x, lens.y, lens.r);
+    u.uLensAmt.value = lens.amt;
+
     const tp = threadPullAnim;
     u.uDetachAmt.value = tp.detach;
     u.uCharOffsetFrozen.value = tp.frozenOffset;

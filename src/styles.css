@@ -95,7 +95,17 @@ button:active { transform: translateY(1px); }
 }
 
 /* ─── landing — spec §10C.3 ─── */
-.landing { position: fixed; inset: 0; z-index: 40; background: var(--ink); overflow: hidden; }
+/* Transparent: the background of this page is the live glyph canvas rendering
+   behind it. Only the reduced-motion fallback paints a ground of its own.
+
+   The layer itself takes no pointer events. It is a full-screen stack of
+   decorative divs — background, vignette, scrim — and while it was catching
+   clicks, every control that lives outside it (the sound switch, the way into
+   the atlas) was unreachable on this page for no visible reason. Only the
+   things that are actually controls take events back. */
+.landing { position: fixed; inset: 0; z-index: 40; overflow: hidden; pointer-events: none; }
+.landing-content, .skip-link { pointer-events: auto; }
+.landing:has(.landing-img) { background: var(--ink); }
 /* once the portal has started, the layer must never intercept a click */
 .landing.is-leaving { pointer-events: none; }
 .landing-bg { position: absolute; inset: -32px; }
@@ -122,7 +132,24 @@ button:active { transform: translateY(1px); }
 @media (prefers-reduced-motion: reduce) { .landing-img.is-active { animation: none; } }
 .landing-vignette {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at center, rgba(36,31,26,0.30) 0%, rgba(36,31,26,0.75) 100%);
+  background: radial-gradient(ellipse at center, rgba(36,31,26,0.22) 0%, rgba(36,31,26,0.62) 100%);
+}
+/* A one-sided scrim under the type. The headline sits on the left over a
+   painting that could be any colour there, and a symmetrical vignette either
+   darkens the whole picture or fails to hold the words — this darkens only the
+   column the words are in, and lets the rest of the canvas be a painting. */
+.landing-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(14, 11, 9, 0.86) 0%,
+    rgba(14, 11, 9, 0.72) 26%,
+    rgba(14, 11, 9, 0.22) 52%,
+    rgba(14, 11, 9, 0.05) 72%
+  );
+}
+@media (max-width: 720px) {
+  .landing-scrim { background: linear-gradient(180deg, rgba(14,11,9,0.5), rgba(14,11,9,0.88) 55%); }
 }
 /* Centred with flex, NOT with translateY(-50%): the pointer-parallax loop
    writes `transform` on this element every frame, which would overwrite a
@@ -165,7 +192,15 @@ button:active { transform: translateY(1px); }
 .landing-error { color: #E2A08A; margin-top: var(--s4); }
 .landing-empty code { font-family: ui-monospace, Menlo, Consolas, monospace; }
 
-.credits-link { margin-top: var(--s5); color: var(--taupe); flex: none; align-self: flex-start; }
+/* the one line that teaches the lens — it leaves as soon as it is obeyed */
+.landing-lenshint {
+  margin: var(--s5) 0 0; flex: none; color: var(--gilt);
+  text-transform: none; letter-spacing: 0.06em; font-size: 12px;
+  opacity: 0.9; transition: opacity 700ms var(--e-both);
+}
+.landing-lenshint.is-gone { opacity: 0; }
+
+.credits-link { margin-top: var(--s4); color: var(--taupe); flex: none; align-self: flex-start; }
 .credits-link:hover { color: var(--gilt); }
 
 .skip-link {
@@ -563,8 +598,11 @@ button:active { transform: translateY(1px); }
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
 }
 
+/* Above the control hints (31) and the corner toggles (30): the panel runs
+   the full height of the right-hand side, and anything drawn over its foot
+   lands on top of the passage being read. */
 .tp-panel {
-  position: fixed; top: 0; right: 0; bottom: 0; z-index: 26;
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 34;
   width: min(430px, 92vw);
   background: var(--bone);
   border-left: 1px solid var(--limestone);
@@ -674,3 +712,162 @@ button:active { transform: translateY(1px); }
   background: rgba(242, 235, 223, 0.12);
 }
 @media (max-width: 860px) { .quality-toggle { display: none; } }
+
+/* ─── sound ──────────────────────────────────────────────────────────────
+   Off until asked for, and the only way in — the audio graph is not even
+   built until this is pressed, which is how the autoplay policy is obeyed
+   rather than fought. Same veil as everything else in the corners. */
+.sound-toggle {
+  position: fixed; bottom: 20px; left: var(--s5); z-index: 45;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 13px; border-radius: 999px;
+  background: rgba(28, 24, 20, 0.3);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(242, 235, 223, 0.09);
+  color: var(--bone); font-size: 10px; letter-spacing: 0.12em;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  opacity: 0.5; transition: opacity var(--d-base) var(--e-out), color var(--d-fast);
+}
+.sound-toggle:hover { opacity: 1; }
+.sound-toggle.is-on { opacity: 0.9; color: var(--gilt); }
+@media (max-width: 860px) { .sound-word { display: none; } }
+
+/* the line under the demonstration that says how to do it yourself */
+.tp-demo { color: var(--gilt); display: inline-flex; align-items: center; gap: 6px; }
+.tp-demo kbd {
+  font: inherit; font-size: 10px; border: 1px solid currentColor;
+  border-radius: 2px; padding: 0 4px;
+}
+
+/* ─── the atlas ──────────────────────────────────────────────────────────
+   Its own dark room. The graph is a canvas of its own, the labels are DOM on
+   top of it (type drawn into a texture at this size is mush, and the browser
+   already has a text renderer), and the panel is the same frosted glass as
+   everything else that sits over the exhibition. */
+.atlas {
+  position: fixed; inset: 0; z-index: 58;
+  /* Opaque: this is a room of its own, not a veil over the last one. At 94%
+     the landing page's own headline was legible straight through the graph. */
+  background: #0d0b09;
+  background-image: radial-gradient(120% 100% at 50% 38%, #191512 0%, #0b0908 100%);
+  color: var(--bone);
+  animation: credits-in var(--d-base) var(--e-out);
+}
+.atlas-stage { position: absolute; inset: 0; cursor: grab; touch-action: none; }
+.atlas-stage:active { cursor: grabbing; }
+.atlas-stage canvas { display: block; }
+
+.atlas-labels { position: absolute; inset: 0; pointer-events: none; }
+.atlas-label {
+  position: absolute; top: 0; left: 0; white-space: nowrap;
+  font-weight: 500;
+  pointer-events: auto; padding: 2px 5px;
+  /* the frame loop centres this on the node; the margin drops it clear of the
+     dot so the name is beside the thing it names rather than on top of it */
+  margin-top: 13px;
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9), 0 0 2px rgba(0, 0, 0, 0.8);
+  transition: none;
+}
+.atlas-label:hover { text-decoration: underline; text-decoration-color: var(--gilt); }
+.atlas-label.is-on {
+  background: rgba(201, 162, 39, 0.16); border-radius: 2px;
+}
+
+.atlas-head {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: var(--s5) var(--s6); pointer-events: none;
+}
+.atlas-head > div { pointer-events: none; }
+.atlas-eyebrow { color: var(--gilt); margin: 0 0 4px; letter-spacing: 0.22em; }
+.atlas-title { margin: 0; color: var(--bone); }
+.atlas-close { color: var(--taupe); pointer-events: auto; }
+.atlas-close:hover { color: var(--gilt); }
+
+.atlas-progress {
+  position: absolute; left: var(--s6); bottom: var(--s5);
+  margin: 0; color: rgba(242, 235, 223, 0.5);
+  text-transform: none; letter-spacing: 0.04em; max-width: 46ch;
+  pointer-events: none;
+}
+.atlas-legend {
+  position: absolute; right: var(--s6); bottom: var(--s5);
+  display: flex; gap: var(--s4); color: rgba(242, 235, 223, 0.55);
+  pointer-events: none;
+}
+.atlas-key { display: inline-flex; align-items: center; gap: 6px; }
+.atlas-key i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+
+.atlas-panel {
+  position: absolute; top: 96px; right: var(--s6);
+  width: min(310px, 40vw); max-height: calc(100vh - 190px); overflow-y: auto;
+  padding: var(--s5);
+  background: rgba(26, 22, 18, 0.55);
+  backdrop-filter: blur(26px) saturate(1.2);
+  -webkit-backdrop-filter: blur(26px) saturate(1.2);
+  scrollbar-width: thin;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
+  animation: quality-in 260ms var(--e-out) both;
+}
+.atlas-kind { color: var(--gilt); margin: 0 0 var(--s1); }
+.atlas-name { margin: 0 0 var(--s1); color: var(--bone); }
+.atlas-note {
+  color: rgba(242, 235, 223, 0.55); text-transform: none; letter-spacing: 0.02em;
+  margin: 0 0 var(--s3);
+}
+.atlas-enter { color: var(--gilt); display: block; margin: var(--s2) 0 var(--s4); }
+.atlas-enter:hover { text-decoration: underline; }
+.atlas-edges { list-style: none; margin: 0; padding: 0; }
+.atlas-edges li { border-top: 1px solid rgba(242, 235, 223, 0.09); }
+.atlas-edge {
+  display: flex; flex-direction: column; gap: 1px; width: 100%;
+  text-align: left; padding: var(--s2) 0; color: var(--bone);
+}
+.atlas-edge-kind { color: rgba(242, 235, 223, 0.45); text-transform: none; letter-spacing: 0.03em; }
+.atlas-edge-name { font-size: 15px; }
+.atlas-edge:hover .atlas-edge-name { color: var(--gilt); }
+.atlas-empty { color: var(--taupe); text-transform: none; letter-spacing: 0.02em; padding: var(--s3) 0; }
+
+/* The way in. Top centre, where nothing else lives in any phase — a control
+   that opens a view of the whole collection should not be hiding in a corner
+   with the render-quality switch. */
+.atlas-open {
+  position: fixed; top: var(--s5); left: 50%; transform: translateX(-50%);
+  /* above the landing scrim, so it stays crisp over the hero */
+  z-index: 45;
+  padding: 6px 15px; border-radius: 999px;
+  background: rgba(28, 24, 20, 0.3);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(242, 235, 223, 0.09);
+  color: var(--bone); font-size: 10px; letter-spacing: 0.14em;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  opacity: 0.55; transition: opacity var(--d-base) var(--e-out), color var(--d-fast);
+}
+.atlas-open:hover { opacity: 1; color: var(--gilt); }
+@media (max-width: 640px) { .atlas-open { font-size: 9px; padding: 5px 11px; } }
+
+/* the quiet notice that the map grew while you were reading */
+.atlas-toast {
+  position: fixed; left: var(--s6); bottom: 74px; z-index: 32;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  max-width: 300px; text-align: left;
+  padding: 10px 16px 11px;
+  background: rgba(28, 24, 20, 0.36);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  border: 1px solid rgba(201, 162, 39, 0.24);
+  border-radius: 3px;
+  color: var(--bone);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  animation: label-in 320ms var(--e-out) both;
+}
+.atlas-toast-eyebrow { color: var(--gilt); font-size: 9.5px; letter-spacing: 0.16em; }
+.atlas-toast-body { font-size: 15px; line-height: 20px; }
+.atlas-toast-body em { font-style: italic; }
+.atlas-toast-cue { color: var(--taupe); font-size: 9.5px; margin-top: 3px; }
+.atlas-toast:hover { border-color: var(--gilt); }
+@media (max-width: 640px) { .atlas-toast { display: none; } }

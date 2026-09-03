@@ -1,8 +1,15 @@
 /**
  * Landing — spec §10.1 / §10C.3.
  *
- * Full-bleed painting backgrounds with a slow Ken Burns crossfade, dark
- * vignette, left-aligned museum selector. Choosing a museum fetches its
+ * The background is the exhibition's own trick, running live: one painting
+ * drawn out of its corpus at full bleed (see LandingScene), with the reading
+ * lens under the cursor. This layer is the type over the top of it — headline,
+ * museum list, and a scrim dark enough to read against.
+ *
+ * The still-photograph slideshow this page used to carry is still here, and is
+ * what `prefers-reduced-motion` gets: a field of several thousand drifting
+ * characters is precisely the thing that setting is asking us not to render.
+ * Everything below that touches `images`, `current` or `warm` is that path. Choosing a museum fetches its
  * manifest — corridor style, floor plan and works — and then plays T1: the
  * landing layers push outward while the corridor, already rendering behind,
  * dollies in from the mouth (spec §11.1).
@@ -47,6 +54,12 @@ export function LandingLayer() {
   const setMuseumLoading = useStore((s) => s.setMuseumLoading);
   const setCreditsOpen = useStore((s) => s.setCreditsOpen);
 
+  /*
+   * The photographic fallback. Only ever fetched, mounted or animated when
+   * the live hero is not running, so an ordinary visit does not pull ten
+   * full-bleed JPEGs it will never show.
+   */
+  const stills = reducedMotion;
   const [images, setImages] = useState<string[]>([]);
   /*
    * The slide showing and the one it came from, moved together in a single
@@ -69,11 +82,14 @@ export function LandingLayer() {
   const [warm, setWarm] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** the one line that explains the lens — it goes as soon as it is obeyed */
+  const [moved, setMoved] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!stills) return;
     let alive = true;
     void (async () => {
       try {
@@ -93,16 +109,17 @@ export function LandingLayer() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [stills]);
 
   // Hold the next slide back for a couple of seconds. Each one holds for seven,
   // so there is plenty of room to fetch it — and nothing should compete with
   // the first painting anyone sees.
   useEffect(() => {
+    if (!stills) return;
     setWarm(false);
     const t = window.setTimeout(() => setWarm(true), 2000);
     return () => window.clearTimeout(t);
-  }, [current, images]);
+  }, [current, images, stills]);
 
   // slideshow (spec §10.1). No explicit preload of the one after next: the
   // next slide is already mounted and fetching, and reaching further ahead is
@@ -115,6 +132,18 @@ export function LandingLayer() {
     );
     return () => clearInterval(id);
   }, [images, reducedMotion]);
+
+  // The hero says what to do only until it has been done. One deliberate
+  // pointer move across the painting and the line is never seen again.
+  useEffect(() => {
+    if (stills || moved) return;
+    let n = 0;
+    const onMove = () => {
+      if (++n > 6) setMoved(true);
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => window.removeEventListener('pointermove', onMove);
+  }, [stills, moved]);
 
   // pointer parallax: background inverse 24px, title direct 6px (spec §10B.3)
   useEffect(() => {
@@ -143,7 +172,7 @@ export function LandingLayer() {
   // The slide showing; the one it came from, held at full opacity underneath
   // it; and the one it is about to move to, once there has been a moment to
   // spare for it. On first paint that is exactly one request instead of ten.
-  const mounted = images.length
+  const mounted = stills && images.length
     ? [
         ...new Set(
           [prevIndex, current, warm ? (current + 1) % images.length : null].filter(
@@ -224,6 +253,7 @@ export function LandingLayer() {
         ))}
       </div>
       <div className="landing-vignette" aria-hidden />
+      <div className="landing-scrim" aria-hidden />
       <a className="skip-link" href="#museum-list">
         Skip to the list of museums
       </a>
@@ -263,6 +293,11 @@ export function LandingLayer() {
           )}
         </ul>
         {error && <p className="caption landing-error">{error}</p>}
+        {!stills && (
+          <p className={`caption landing-lenshint ${moved ? 'is-gone' : ''}`} aria-hidden>
+            Every stroke here is a letter. Move the cursor over the painting.
+          </p>
+        )}
         <button className="caption credits-link" onClick={() => setCreditsOpen(true)}>
           Credits &amp; sources
         </button>

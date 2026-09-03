@@ -18,6 +18,7 @@ import { selectArtworks, useStore } from '../state/store';
 import { placardAnchor } from '../scenes/GalleryScene';
 import { loadMeta } from '../glyph/artworkLoader';
 import { endReveal, latchReveal } from '../transitions/reveal';
+import { discoverWork } from '../state/atlas';
 import type { ArtworkMeta } from '../types';
 
 export function Placard() {
@@ -41,10 +42,13 @@ export function Placard() {
     loadMeta(entry.id).then((m) => {
       if (alive) setMeta(m);
     });
+    // standing in front of a painting is enough to put it, and whoever made
+    // it, on the atlas
+    if (phase === 'gallery') discoverWork(entry.id);
     return () => {
       alive = false;
     };
-  }, [artworks, index]);
+  }, [artworks, index, phase]);
 
   // track the projected plane edge (spec §10.7: offset 40px right of frame,
   // clamped 24px from the viewport edge)

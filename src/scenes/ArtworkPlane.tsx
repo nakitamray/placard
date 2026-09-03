@@ -19,6 +19,7 @@ import * as THREE from 'three';
 import { glyphRT } from '../glyph/GlyphPrePass';
 import type { LoadedArtwork } from '../glyph/artworkLoader';
 import { revealAnim } from '../transitions/reveal';
+import { lens } from '../transitions/lens';
 
 const vert = /* glsl */ `
 varying vec2 vUv;
@@ -36,13 +37,22 @@ uniform float uUseGlyph;
 uniform float uHasPaint;
 uniform float uMix;
 uniform float uDim;
+uniform vec3  uLens;      // x, y, radius — the artwork's own image pixels
+uniform float uLensAmt;
+uniform vec2  uImageSize;
 varying vec2 vUv;
 void main() {
   vec3 live = texture2D(uGlyph, vUv).rgb;
   vec3 wall = texture2D(uWall, vUv).rgb;
   vec3 base = mix(wall, live, uUseGlyph);
   vec3 paint = mix(wall, texture2D(uPaint, vUv).rgb, uHasPaint);
-  vec3 color = mix(base, paint, uMix) * uDim;
+  // The reading lens: the reproduction shows through a soft circle under the
+  // cursor. Measured in image pixels, exactly as the glyph shader measures it
+  // — in uv the circle would go oval on any canvas that is not square, and
+  // the two edges would part company.
+  float d = distance(vec2(vUv.x, 1.0 - vUv.y) * uImageSize, uLens.xy);
+  float lens = uLensAmt * (1.0 - smoothstep(uLens.z * 0.5, uLens.z, d));
+  vec3 color = mix(base, paint, max(uMix, lens)) * uDim;
   gl_FragColor = vec4(color, 1.0);
   #include <colorspace_fragment>
 }
@@ -82,6 +92,9 @@ export function ArtworkPlane({
       uHasPaint: { value: 0 },
       uMix: { value: 0 },
       uDim: { value: 1 },
+      uLens: { value: new THREE.Vector3(0, 0, 1) },
+      uLensAmt: { value: 0 },
+      uImageSize: { value: new THREE.Vector2(1, 1) },
     }),
     [],
   );
@@ -100,9 +113,13 @@ export function ArtworkPlane({
       u.uUseGlyph.value = 1;
       u.uMix.value = revealAnim.dissolve;
       u.uDim.value = 1;
+      u.uImageSize.value.set(artwork?.glyphs.imageW ?? 1, artwork?.glyphs.imageH ?? 1);
+      u.uLens.value.set(lens.x, lens.y, lens.r);
+      u.uLensAmt.value = lens.amt;
     } else {
       u.uUseGlyph.value = 0;
       u.uMix.value = 0;
+      u.uLensAmt.value = 0;
       u.uDim.value = 0.62; // neighbours read dimmed but legible (spec §10.6)
     }
   });

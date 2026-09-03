@@ -30,10 +30,17 @@ import gsap from 'gsap';
 import { selectArtworks, useStore } from '../state/store';
 import { artworkProjector, threadPullAnim } from '../threadpull/state';
 import { loadArtwork } from '../glyph/artworkLoader';
+import { sfx } from '../lib/audio';
+import { discoverFromText } from '../state/atlas';
 import type { ArtworkRegion, DeviceTier } from '../types';
 
 /** characters that fly individually; the rest of the passage fades in */
 const FLIGHT_CHARS = 320;
+
+/** the one unprompted demonstration: when it starts, and how long it holds */
+const DEMO_KEY = 'placard.seenThread';
+const DEMO_DELAY_MS = 2200;
+const DEMO_HOLD_MS = 5200;
 
 export function ThreadPull({ tier }: { tier: DeviceTier }) {
   const phase = useStore((s) => s.phase);
@@ -47,6 +54,8 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
   const setPulledRegion = useStore((s) => s.setPulledRegion);
 
   const [pinned, setPinned] = useState(false);
+  /** true while the one unprompted demonstration is on screen */
+  const [demo, setDemo] = useState(false);
   /** the region still on screen while its text flies home */
   const [leaving, setLeaving] = useState<ArtworkRegion | null>(null);
 
@@ -86,6 +95,18 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
     };
   }, [inGallery, pinned, setExtractionMode, setPulledRegion]);
 
+  /*
+   * A pulled thread is read for the connections it gives away. This is the
+   * only way the atlas grows, so it runs on every extraction — the visitor's
+   * own and the one demonstration alike.
+   */
+  useEffect(() => {
+    if (!pulledRegion) return;
+    const art = artworks[index];
+    if (!art) return;
+    if (discoverFromText(art.id, pulledRegion.text)) sfx.link();
+  }, [pulledRegion, artworks, index]);
+
   // hovering a region while Shift is held pulls it (spec: hold + hover)
   useEffect(() => {
     if (!extractionMode || pinned) return;
@@ -97,6 +118,64 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
     setPulledRegion(null);
     setPinned(false);
   }, [index, phase, setPulledRegion]);
+
+  /*
+   * Show the trick once, unasked.
+   *
+   * Thread Pull is the most distinctive thing in this exhibition and it is
+   * behind a held modifier key on a target you cannot see, which means almost
+   * nobody finds it. No hint line fixes that — a sentence about holding Shift
+   * is a sentence, and watching a paragraph lift itself off a painting and
+   * assemble into prose is the thing itself. So the first room anyone enters
+   * pulls one thread on its own, holds it long enough to be read as an event
+   * rather than a glitch, and puts it back.
+   *
+   * Once per session, never under reduced motion, and cancelled the instant
+   * the visitor does anything — being demonstrated to while you are already
+   * doing it yourself is worse than not being shown at all.
+   */
+  useEffect(() => {
+    if (!inGallery || reducedMotion) return;
+    if (sessionStorage.getItem(DEMO_KEY) === '1') return;
+    const art = artworks[index];
+    if (!art) return;
+
+    let cancelled = false;
+    const timers: number[] = [];
+    const stop = () => {
+      cancelled = true;
+      timers.forEach(window.clearTimeout);
+    };
+    window.addEventListener('keydown', stop, { once: true });
+    window.addEventListener('pointerdown', stop, { once: true });
+
+    timers.push(
+      window.setTimeout(() => {
+        if (cancelled) return;
+        void loadArtwork(art.id, tier).then((a) => {
+          const region = a.meta.regions?.[0];
+          if (cancelled || !region) return;
+          sessionStorage.setItem(DEMO_KEY, '1');
+          setDemo(true);
+          setPulledRegion(region);
+          sfx.rustle();
+          timers.push(
+            window.setTimeout(() => {
+              setPulledRegion(null);
+              setDemo(false);
+            }, DEMO_HOLD_MS),
+          );
+        });
+      }, DEMO_DELAY_MS),
+    );
+
+    return () => {
+      stop();
+      window.removeEventListener('keydown', stop);
+      window.removeEventListener('pointerdown', stop);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inGallery, index, reducedMotion, tier]);
 
   // extraction-mode cursor
   useEffect(() => {
@@ -343,7 +422,11 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
           </div>
 
           <footer className="tp-foot">
-            {pinned ? (
+            {demo ? (
+              <span className="caption tp-hint tp-demo">
+                Hold <kbd>⇧</kbd> and move over the painting to pull your own
+              </span>
+            ) : pinned ? (
               <span className="caption tp-hint">Pinned · Esc to release</span>
             ) : (
               <button className="caption tp-pin" onClick={() => setPinned(true)}>

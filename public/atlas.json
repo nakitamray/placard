@@ -1,0 +1,1366 @@
+{
+ "entities": [
+  {
+   "id": "leonardo",
+   "kind": "painter",
+   "label": "Leonardo da Vinci",
+   "note": "1452–1519"
+  },
+  {
+   "id": "michelangelo",
+   "kind": "painter",
+   "label": "Michelangelo",
+   "note": "1475–1564"
+  },
+  {
+   "id": "raphael",
+   "kind": "painter",
+   "label": "Raphael",
+   "note": "1483–1520"
+  },
+  {
+   "id": "giotto",
+   "kind": "painter",
+   "label": "Giotto",
+   "note": "c.1267–1337"
+  },
+  {
+   "id": "caravaggio",
+   "kind": "painter",
+   "label": "Caravaggio",
+   "note": "1571–1610"
+  },
+  {
+   "id": "veronese",
+   "kind": "painter",
+   "label": "Veronese",
+   "note": "1528–1588"
+  },
+  {
+   "id": "velazquez",
+   "kind": "painter",
+   "label": "Diego Velázquez",
+   "note": "1599–1660"
+  },
+  {
+   "id": "el-greco",
+   "kind": "painter",
+   "label": "El Greco",
+   "note": "1541–1614"
+  },
+  {
+   "id": "rembrandt",
+   "kind": "painter",
+   "label": "Rembrandt",
+   "note": "1606–1669"
+  },
+  {
+   "id": "vermeer",
+   "kind": "painter",
+   "label": "Johannes Vermeer",
+   "note": "1632–1675"
+  },
+  {
+   "id": "schouman",
+   "kind": "painter",
+   "label": "Aert Schouman",
+   "note": "1710–1792"
+  },
+  {
+   "id": "durer",
+   "kind": "painter",
+   "label": "Albrecht Dürer",
+   "note": "1471–1528"
+  },
+  {
+   "id": "david",
+   "kind": "painter",
+   "label": "Jacques-Louis David",
+   "note": "1748–1825"
+  },
+  {
+   "id": "ingres",
+   "kind": "painter",
+   "label": "J.-A.-D. Ingres",
+   "note": "1780–1867"
+  },
+  {
+   "id": "gericault",
+   "kind": "painter",
+   "label": "Théodore Géricault",
+   "note": "1791–1824"
+  },
+  {
+   "id": "delacroix",
+   "kind": "painter",
+   "label": "Eugène Delacroix",
+   "note": "1798–1863"
+  },
+  {
+   "id": "millet",
+   "kind": "painter",
+   "label": "Jean-François Millet",
+   "note": "1814–1875"
+  },
+  {
+   "id": "manet",
+   "kind": "painter",
+   "label": "Édouard Manet",
+   "note": "1832–1883"
+  },
+  {
+   "id": "degas",
+   "kind": "painter",
+   "label": "Edgar Degas",
+   "note": "1834–1917"
+  },
+  {
+   "id": "whistler",
+   "kind": "painter",
+   "label": "James McNeill Whistler",
+   "note": "1834–1903"
+  },
+  {
+   "id": "cezanne",
+   "kind": "painter",
+   "label": "Paul Cézanne",
+   "note": "1839–1906"
+  },
+  {
+   "id": "monet",
+   "kind": "painter",
+   "label": "Claude Monet",
+   "note": "1840–1926"
+  },
+  {
+   "id": "renoir",
+   "kind": "painter",
+   "label": "Pierre-Auguste Renoir",
+   "note": "1841–1919"
+  },
+  {
+   "id": "caillebotte",
+   "kind": "painter",
+   "label": "Gustave Caillebotte",
+   "note": "1848–1894"
+  },
+  {
+   "id": "vangogh",
+   "kind": "painter",
+   "label": "Vincent van Gogh",
+   "note": "1853–1890"
+  },
+  {
+   "id": "sargent",
+   "kind": "painter",
+   "label": "John Singer Sargent",
+   "note": "1856–1925"
+  },
+  {
+   "id": "leutze",
+   "kind": "painter",
+   "label": "Emanuel Leutze",
+   "note": "1816–1868"
+  },
+  {
+   "id": "hokusai",
+   "kind": "painter",
+   "label": "Katsushika Hokusai",
+   "note": "1760–1849"
+  },
+  {
+   "id": "hiroshige",
+   "kind": "painter",
+   "label": "Utagawa Hiroshige",
+   "note": "1797–1858"
+  },
+  {
+   "id": "gu-kaizhi",
+   "kind": "painter",
+   "label": "Gu Kaizhi",
+   "note": "c.344–406"
+  },
+  {
+   "id": "john-white",
+   "kind": "painter",
+   "label": "John White",
+   "note": "c.1540–1593"
+  },
+  {
+   "id": "nebamun-workshop",
+   "kind": "painter",
+   "label": "The Nebamun painters",
+   "note": "Thebes, c.1350 BC"
+  },
+  {
+   "id": "meidum-workshop",
+   "kind": "painter",
+   "label": "The Meidum painters",
+   "note": "Egypt, c.2600 BC"
+  },
+  {
+   "id": "fayum-painters",
+   "kind": "painter",
+   "label": "The Fayum painters",
+   "note": "Roman Egypt, 1st–3rd c."
+  },
+  {
+   "id": "dunhuang-painters",
+   "kind": "painter",
+   "label": "The Dunhuang painters",
+   "note": "Cave 17, 8th–10th c."
+  },
+  {
+   "id": "paris",
+   "kind": "place",
+   "label": "Paris",
+   "note": ""
+  },
+  {
+   "id": "arles",
+   "kind": "place",
+   "label": "Arles",
+   "note": ""
+  },
+  {
+   "id": "argenteuil",
+   "kind": "place",
+   "label": "Argenteuil",
+   "note": ""
+  },
+  {
+   "id": "giverny",
+   "kind": "place",
+   "label": "Giverny",
+   "note": ""
+  },
+  {
+   "id": "aix",
+   "kind": "place",
+   "label": "Aix-en-Provence",
+   "note": ""
+  },
+  {
+   "id": "montmartre",
+   "kind": "place",
+   "label": "Montmartre",
+   "note": ""
+  },
+  {
+   "id": "barbizon",
+   "kind": "place",
+   "label": "Barbizon",
+   "note": ""
+  },
+  {
+   "id": "delft",
+   "kind": "place",
+   "label": "Delft",
+   "note": ""
+  },
+  {
+   "id": "amsterdam",
+   "kind": "place",
+   "label": "Amsterdam",
+   "note": ""
+  },
+  {
+   "id": "toledo",
+   "kind": "place",
+   "label": "Toledo",
+   "note": ""
+  },
+  {
+   "id": "venice",
+   "kind": "place",
+   "label": "Venice",
+   "note": ""
+  },
+  {
+   "id": "rome",
+   "kind": "place",
+   "label": "Rome",
+   "note": ""
+  },
+  {
+   "id": "florence",
+   "kind": "place",
+   "label": "Florence",
+   "note": ""
+  },
+  {
+   "id": "madrid",
+   "kind": "place",
+   "label": "Madrid",
+   "note": ""
+  },
+  {
+   "id": "london",
+   "kind": "place",
+   "label": "London",
+   "note": ""
+  },
+  {
+   "id": "nuremberg",
+   "kind": "place",
+   "label": "Nuremberg",
+   "note": ""
+  },
+  {
+   "id": "edo",
+   "kind": "place",
+   "label": "Edo",
+   "note": ""
+  },
+  {
+   "id": "mount-fuji",
+   "kind": "place",
+   "label": "Mount Fuji",
+   "note": ""
+  },
+  {
+   "id": "thebes",
+   "kind": "place",
+   "label": "Thebes",
+   "note": ""
+  },
+  {
+   "id": "dunhuang",
+   "kind": "place",
+   "label": "Dunhuang",
+   "note": ""
+  },
+  {
+   "id": "roanoke",
+   "kind": "place",
+   "label": "Roanoke",
+   "note": ""
+  },
+  {
+   "id": "vatican-city",
+   "kind": "place",
+   "label": "The Vatican",
+   "note": ""
+  },
+  {
+   "id": "impressionism",
+   "kind": "movement",
+   "label": "Impressionism",
+   "note": ""
+  },
+  {
+   "id": "post-impressionism",
+   "kind": "movement",
+   "label": "Post-Impressionism",
+   "note": ""
+  },
+  {
+   "id": "neoclassicism",
+   "kind": "movement",
+   "label": "Neoclassicism",
+   "note": ""
+  },
+  {
+   "id": "romanticism",
+   "kind": "movement",
+   "label": "Romanticism",
+   "note": ""
+  },
+  {
+   "id": "realism",
+   "kind": "movement",
+   "label": "Realism",
+   "note": ""
+  },
+  {
+   "id": "high-renaissance",
+   "kind": "movement",
+   "label": "High Renaissance",
+   "note": ""
+  },
+  {
+   "id": "venetian-school",
+   "kind": "movement",
+   "label": "The Venetian school",
+   "note": ""
+  },
+  {
+   "id": "baroque",
+   "kind": "movement",
+   "label": "Baroque",
+   "note": ""
+  },
+  {
+   "id": "ukiyo-e",
+   "kind": "movement",
+   "label": "Ukiyo-e",
+   "note": ""
+  },
+  {
+   "id": "dutch-golden-age",
+   "kind": "movement",
+   "label": "The Dutch Golden Age",
+   "note": ""
+  },
+  {
+   "id": "japonisme",
+   "kind": "movement",
+   "label": "Japonisme",
+   "note": ""
+  },
+  {
+   "id": "salon",
+   "kind": "event",
+   "label": "The Paris Salon",
+   "note": "The official exhibition everything was measured against"
+  },
+  {
+   "id": "salon-refuses",
+   "kind": "event",
+   "label": "Salon des Refusés, 1863",
+   "note": "Where the rejected hung, by imperial decree"
+  },
+  {
+   "id": "first-impressionist",
+   "kind": "event",
+   "label": "First Impressionist exhibition, 1874",
+   "note": "Nadar's old studio, boulevard des Capucines"
+  },
+  {
+   "id": "cafe-guerbois",
+   "kind": "event",
+   "label": "Café Guerbois",
+   "note": "Where the Batignolles group argued, from 1866"
+  },
+  {
+   "id": "prix-de-rome",
+   "kind": "event",
+   "label": "The Prix de Rome",
+   "note": "The Academy's road to Italy"
+  },
+  {
+   "id": "french-revolution",
+   "kind": "event",
+   "label": "The French Revolution",
+   "note": ""
+  },
+  {
+   "id": "napoleon",
+   "kind": "event",
+   "label": "Napoleon",
+   "note": "Emperor, patron, and the largest art thief in Europe"
+  },
+  {
+   "id": "sistine",
+   "kind": "event",
+   "label": "The Sistine Chapel",
+   "note": ""
+  },
+  {
+   "id": "stanze",
+   "kind": "event",
+   "label": "The Raphael Rooms",
+   "note": ""
+  },
+  {
+   "id": "woodblock",
+   "kind": "event",
+   "label": "Woodblock printing",
+   "note": ""
+  },
+  {
+   "id": "caillebotte-bequest",
+   "kind": "event",
+   "label": "The Caillebotte bequest, 1894",
+   "note": "The collection that put the Impressionists in a French museum"
+  }
+ ],
+ "works": {
+  "leonardo-mona-lisa": "leonardo",
+  "leonardo-st-john-baptist": "leonardo",
+  "leonardo-st-jerome": "leonardo",
+  "delacroix-liberty": "delacroix",
+  "delacroix-death-sardanapalus": "delacroix",
+  "david-coronation-napoleon": "david",
+  "david-oath-horatii": "david",
+  "david-death-socrates": "david",
+  "gericault-raft-medusa": "gericault",
+  "veronese-wedding-cana": "veronese",
+  "vermeer-lacemaker": "vermeer",
+  "vermeer-water-pitcher": "vermeer",
+  "ingres-grande-odalisque": "ingres",
+  "hokusai-great-wave": "hokusai",
+  "hiroshige-sudden-shower": "hiroshige",
+  "nebamun-marshes": "nebamun-workshop",
+  "geese-of-meidum": "meidum-workshop",
+  "fayum-mummy-portraits": "fayum-painters",
+  "gu-kaizhi-admonitions": "gu-kaizhi",
+  "white-portrait-lady": "john-white",
+  "schouman-birds": "schouman",
+  "durer-rhinoceros": "durer",
+  "dunhuang-cave-17": "dunhuang-painters",
+  "leutze-washington-delaware": "leutze",
+  "monet-water-lilies-bridge": "monet",
+  "sargent-madame-x": "sargent",
+  "el-greco-view-toledo": "el-greco",
+  "rembrandt-aristotle-homer": "rembrandt",
+  "vangogh-straw-hat": "vangogh",
+  "degas-dance-class": "degas",
+  "velazquez-juan-de-pareja": "velazquez",
+  "vangogh-starry-night-rhone": "vangogh",
+  "vangogh-self-portrait": "vangogh",
+  "renoir-moulin-galette": "renoir",
+  "manet-olympia": "manet",
+  "manet-dejeuner-sur-lherbe": "manet",
+  "millet-gleaners": "millet",
+  "cezanne-apples-oranges": "cezanne",
+  "cezanne-card-players": "cezanne",
+  "whistler-mother": "whistler",
+  "caillebotte-floor-scrapers": "caillebotte",
+  "michelangelo-creation-adam": "michelangelo",
+  "michelangelo-last-judgment": "michelangelo",
+  "raphael-school-athens": "raphael",
+  "raphael-transfiguration": "raphael",
+  "raphael-deliverance-peter": "raphael",
+  "raphael-madonna-foligno": "raphael",
+  "raphael-coronation-virgin": "raphael",
+  "caravaggio-entombment": "caravaggio",
+  "giotto-stefaneschi-triptych": "giotto"
+ },
+ "links": [
+  {
+   "a": "leonardo",
+   "b": "florence",
+   "kind": "worked in",
+   "word": "Florence"
+  },
+  {
+   "a": "leonardo",
+   "b": "rome",
+   "kind": "worked in",
+   "word": "Rome"
+  },
+  {
+   "a": "leonardo",
+   "b": "high-renaissance",
+   "kind": "of",
+   "word": "Renaissance"
+  },
+  {
+   "a": "michelangelo",
+   "b": "florence",
+   "kind": "worked in",
+   "word": "Florence"
+  },
+  {
+   "a": "michelangelo",
+   "b": "rome",
+   "kind": "worked in",
+   "word": "Rome"
+  },
+  {
+   "a": "michelangelo",
+   "b": "sistine",
+   "kind": "painted",
+   "word": "Sistine"
+  },
+  {
+   "a": "michelangelo",
+   "b": "high-renaissance",
+   "kind": "of",
+   "word": "Renaissance"
+  },
+  {
+   "a": "raphael",
+   "b": "rome",
+   "kind": "worked in",
+   "word": "Rome"
+  },
+  {
+   "a": "raphael",
+   "b": "florence",
+   "kind": "worked in",
+   "word": "Florence"
+  },
+  {
+   "a": "raphael",
+   "b": "stanze",
+   "kind": "painted",
+   "word": "Stanze"
+  },
+  {
+   "a": "raphael",
+   "b": "high-renaissance",
+   "kind": "of",
+   "word": "Renaissance"
+  },
+  {
+   "a": "raphael",
+   "b": "vatican-city",
+   "kind": "worked at",
+   "word": "Vatican"
+  },
+  {
+   "a": "michelangelo",
+   "b": "vatican-city",
+   "kind": "worked at",
+   "word": "Vatican"
+  },
+  {
+   "a": "giotto",
+   "b": "florence",
+   "kind": "worked in",
+   "word": "Florence"
+  },
+  {
+   "a": "giotto",
+   "b": "rome",
+   "kind": "worked in",
+   "word": "Rome"
+  },
+  {
+   "a": "caravaggio",
+   "b": "rome",
+   "kind": "worked in",
+   "word": "Rome"
+  },
+  {
+   "a": "caravaggio",
+   "b": "baroque",
+   "kind": "of",
+   "word": "Baroque"
+  },
+  {
+   "a": "veronese",
+   "b": "venice",
+   "kind": "worked in",
+   "word": "Venice"
+  },
+  {
+   "a": "veronese",
+   "b": "venetian-school",
+   "kind": "of",
+   "word": "Venetian"
+  },
+  {
+   "a": "el-greco",
+   "b": "venice",
+   "kind": "trained in",
+   "word": "Venice"
+  },
+  {
+   "a": "el-greco",
+   "b": "toledo",
+   "kind": "worked in",
+   "word": "Toledo"
+  },
+  {
+   "a": "el-greco",
+   "b": "venetian-school",
+   "kind": "out of",
+   "word": "Titian"
+  },
+  {
+   "a": "velazquez",
+   "b": "madrid",
+   "kind": "worked in",
+   "word": "Madrid"
+  },
+  {
+   "a": "velazquez",
+   "b": "rome",
+   "kind": "worked in",
+   "word": "Rome"
+  },
+  {
+   "a": "velazquez",
+   "b": "baroque",
+   "kind": "of",
+   "word": "Baroque"
+  },
+  {
+   "a": "rembrandt",
+   "b": "amsterdam",
+   "kind": "worked in",
+   "word": "Amsterdam"
+  },
+  {
+   "a": "rembrandt",
+   "b": "dutch-golden-age",
+   "kind": "of",
+   "word": "Dutch"
+  },
+  {
+   "a": "vermeer",
+   "b": "delft",
+   "kind": "worked in",
+   "word": "Delft"
+  },
+  {
+   "a": "vermeer",
+   "b": "dutch-golden-age",
+   "kind": "of",
+   "word": "Dutch"
+  },
+  {
+   "a": "schouman",
+   "b": "dutch-golden-age",
+   "kind": "after",
+   "word": "Dutch"
+  },
+  {
+   "a": "durer",
+   "b": "nuremberg",
+   "kind": "worked in",
+   "word": "Nuremberg"
+  },
+  {
+   "a": "durer",
+   "b": "woodblock",
+   "kind": "printed in",
+   "word": "woodcut"
+  },
+  {
+   "a": "hokusai",
+   "b": "edo",
+   "kind": "worked in",
+   "word": "Edo"
+  },
+  {
+   "a": "hokusai",
+   "b": "ukiyo-e",
+   "kind": "of",
+   "word": "ukiyo"
+  },
+  {
+   "a": "hokusai",
+   "b": "mount-fuji",
+   "kind": "painted",
+   "word": "Fuji"
+  },
+  {
+   "a": "hokusai",
+   "b": "woodblock",
+   "kind": "printed in",
+   "word": "woodblock"
+  },
+  {
+   "a": "hiroshige",
+   "b": "edo",
+   "kind": "worked in",
+   "word": "Edo"
+  },
+  {
+   "a": "hiroshige",
+   "b": "ukiyo-e",
+   "kind": "of",
+   "word": "ukiyo"
+  },
+  {
+   "a": "hiroshige",
+   "b": "woodblock",
+   "kind": "printed in",
+   "word": "woodblock"
+  },
+  {
+   "a": "david",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "david",
+   "b": "neoclassicism",
+   "kind": "of",
+   "word": "Neoclassic"
+  },
+  {
+   "a": "david",
+   "b": "french-revolution",
+   "kind": "served",
+   "word": "Revolution"
+  },
+  {
+   "a": "david",
+   "b": "napoleon",
+   "kind": "painted",
+   "word": "Napoleon"
+  },
+  {
+   "a": "david",
+   "b": "rome",
+   "kind": "studied in",
+   "word": "Rome"
+  },
+  {
+   "a": "david",
+   "b": "prix-de-rome",
+   "kind": "won",
+   "word": "Prix de Rome"
+  },
+  {
+   "a": "ingres",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "ingres",
+   "b": "rome",
+   "kind": "worked in",
+   "word": "Rome"
+  },
+  {
+   "a": "ingres",
+   "b": "neoclassicism",
+   "kind": "of",
+   "word": "Neoclassic"
+  },
+  {
+   "a": "ingres",
+   "b": "prix-de-rome",
+   "kind": "won",
+   "word": "Prix de Rome"
+  },
+  {
+   "a": "ingres",
+   "b": "salon",
+   "kind": "showed at",
+   "word": "Salon"
+  },
+  {
+   "a": "gericault",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "gericault",
+   "b": "romanticism",
+   "kind": "of",
+   "word": "Romantic"
+  },
+  {
+   "a": "gericault",
+   "b": "salon",
+   "kind": "showed at",
+   "word": "Salon"
+  },
+  {
+   "a": "delacroix",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "delacroix",
+   "b": "romanticism",
+   "kind": "of",
+   "word": "Romantic"
+  },
+  {
+   "a": "delacroix",
+   "b": "salon",
+   "kind": "showed at",
+   "word": "Salon"
+  },
+  {
+   "a": "millet",
+   "b": "barbizon",
+   "kind": "worked at",
+   "word": "Barbizon"
+  },
+  {
+   "a": "millet",
+   "b": "realism",
+   "kind": "of",
+   "word": "Realism"
+  },
+  {
+   "a": "millet",
+   "b": "salon",
+   "kind": "showed at",
+   "word": "Salon"
+  },
+  {
+   "a": "manet",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "manet",
+   "b": "salon-refuses",
+   "kind": "hung in",
+   "word": "Refusés"
+  },
+  {
+   "a": "manet",
+   "b": "cafe-guerbois",
+   "kind": "argued at",
+   "word": "Guerbois"
+  },
+  {
+   "a": "manet",
+   "b": "realism",
+   "kind": "of",
+   "word": "Realism"
+  },
+  {
+   "a": "manet",
+   "b": "madrid",
+   "kind": "travelled to",
+   "word": "Madrid"
+  },
+  {
+   "a": "manet",
+   "b": "salon",
+   "kind": "showed at",
+   "word": "Salon"
+  },
+  {
+   "a": "degas",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "degas",
+   "b": "impressionism",
+   "kind": "of",
+   "word": "Impressionist"
+  },
+  {
+   "a": "degas",
+   "b": "first-impressionist",
+   "kind": "showed at",
+   "word": "1874"
+  },
+  {
+   "a": "degas",
+   "b": "cafe-guerbois",
+   "kind": "argued at",
+   "word": "Guerbois"
+  },
+  {
+   "a": "monet",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "monet",
+   "b": "argenteuil",
+   "kind": "worked at",
+   "word": "Argenteuil"
+  },
+  {
+   "a": "monet",
+   "b": "giverny",
+   "kind": "worked at",
+   "word": "Giverny"
+  },
+  {
+   "a": "monet",
+   "b": "impressionism",
+   "kind": "named",
+   "word": "Impression"
+  },
+  {
+   "a": "monet",
+   "b": "first-impressionist",
+   "kind": "showed at",
+   "word": "1874"
+  },
+  {
+   "a": "monet",
+   "b": "cafe-guerbois",
+   "kind": "argued at",
+   "word": "Guerbois"
+  },
+  {
+   "a": "renoir",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "renoir",
+   "b": "montmartre",
+   "kind": "painted",
+   "word": "Montmartre"
+  },
+  {
+   "a": "renoir",
+   "b": "impressionism",
+   "kind": "of",
+   "word": "Impressionist"
+  },
+  {
+   "a": "renoir",
+   "b": "first-impressionist",
+   "kind": "showed at",
+   "word": "1874"
+  },
+  {
+   "a": "cezanne",
+   "b": "aix",
+   "kind": "worked at",
+   "word": "Aix"
+  },
+  {
+   "a": "cezanne",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "cezanne",
+   "b": "post-impressionism",
+   "kind": "of",
+   "word": "Post-Impressionist"
+  },
+  {
+   "a": "cezanne",
+   "b": "first-impressionist",
+   "kind": "showed at",
+   "word": "1874"
+  },
+  {
+   "a": "caillebotte",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "caillebotte",
+   "b": "impressionism",
+   "kind": "of",
+   "word": "Impressionist"
+  },
+  {
+   "a": "caillebotte",
+   "b": "caillebotte-bequest",
+   "kind": "left",
+   "word": "bequest"
+  },
+  {
+   "a": "caillebotte",
+   "b": "realism",
+   "kind": "of",
+   "word": "Realism"
+  },
+  {
+   "a": "vangogh",
+   "b": "arles",
+   "kind": "worked at",
+   "word": "Arles"
+  },
+  {
+   "a": "vangogh",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "vangogh",
+   "b": "post-impressionism",
+   "kind": "of",
+   "word": "Post-Impressionist"
+  },
+  {
+   "a": "vangogh",
+   "b": "japonisme",
+   "kind": "copied",
+   "word": "Japan"
+  },
+  {
+   "a": "whistler",
+   "b": "london",
+   "kind": "worked in",
+   "word": "London"
+  },
+  {
+   "a": "whistler",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "whistler",
+   "b": "japonisme",
+   "kind": "of",
+   "word": "Japan"
+  },
+  {
+   "a": "whistler",
+   "b": "salon",
+   "kind": "showed at",
+   "word": "Salon"
+  },
+  {
+   "a": "sargent",
+   "b": "paris",
+   "kind": "worked in",
+   "word": "Paris"
+  },
+  {
+   "a": "sargent",
+   "b": "london",
+   "kind": "worked in",
+   "word": "London"
+  },
+  {
+   "a": "sargent",
+   "b": "salon",
+   "kind": "showed at",
+   "word": "Salon"
+  },
+  {
+   "a": "sargent",
+   "b": "madrid",
+   "kind": "travelled to",
+   "word": "Madrid"
+  },
+  {
+   "a": "leutze",
+   "b": "london",
+   "kind": "exhibited in",
+   "word": "London"
+  },
+  {
+   "a": "nebamun-workshop",
+   "b": "thebes",
+   "kind": "painted at",
+   "word": "Thebes"
+  },
+  {
+   "a": "meidum-workshop",
+   "b": "thebes",
+   "kind": "painted at",
+   "word": "Egypt"
+  },
+  {
+   "a": "fayum-painters",
+   "b": "rome",
+   "kind": "under",
+   "word": "Roman"
+  },
+  {
+   "a": "dunhuang-painters",
+   "b": "dunhuang",
+   "kind": "painted at",
+   "word": "Dunhuang"
+  },
+  {
+   "a": "gu-kaizhi",
+   "b": "dunhuang",
+   "kind": "tradition of",
+   "word": "China"
+  },
+  {
+   "a": "john-white",
+   "b": "roanoke",
+   "kind": "drew at",
+   "word": "Roanoke"
+  },
+  {
+   "a": "john-white",
+   "b": "london",
+   "kind": "worked in",
+   "word": "London"
+  },
+  {
+   "a": "japonisme",
+   "b": "ukiyo-e",
+   "kind": "took from",
+   "word": "ukiyo"
+  },
+  {
+   "a": "veronese",
+   "b": "napoleon",
+   "kind": "looted by",
+   "word": "Napoleon"
+  },
+  {
+   "a": "impressionism",
+   "b": "first-impressionist",
+   "kind": "launched at",
+   "word": "1874"
+  },
+  {
+   "a": "impressionism",
+   "b": "caillebotte-bequest",
+   "kind": "entered France by",
+   "word": "bequest"
+  },
+  {
+   "a": "leonardo",
+   "b": "michelangelo",
+   "kind": "rivals in Florence, 1504",
+   "word": "Florence"
+  },
+  {
+   "a": "raphael",
+   "b": "leonardo",
+   "kind": "learned sfumato from",
+   "word": "Leonardo"
+  },
+  {
+   "a": "raphael",
+   "b": "michelangelo",
+   "kind": "worked down the corridor from",
+   "word": "Michelangelo"
+  },
+  {
+   "a": "michelangelo",
+   "b": "giotto",
+   "kind": "drew after",
+   "word": "Giotto"
+  },
+  {
+   "a": "caravaggio",
+   "b": "rembrandt",
+   "kind": "the light that reached",
+   "word": "light"
+  },
+  {
+   "a": "veronese",
+   "b": "el-greco",
+   "kind": "Venice-trained alongside",
+   "word": "Venice"
+  },
+  {
+   "a": "velazquez",
+   "b": "manet",
+   "kind": "\"the painter of painters\", to",
+   "word": "Velázquez"
+  },
+  {
+   "a": "velazquez",
+   "b": "sargent",
+   "kind": "copied in Madrid by",
+   "word": "Velázquez"
+  },
+  {
+   "a": "david",
+   "b": "ingres",
+   "kind": "taught",
+   "word": "David"
+  },
+  {
+   "a": "gericault",
+   "b": "delacroix",
+   "kind": "who posed for the Raft",
+   "word": "Géricault"
+  },
+  {
+   "a": "millet",
+   "b": "vangogh",
+   "kind": "copied, again and again, by",
+   "word": "Millet"
+  },
+  {
+   "a": "manet",
+   "b": "monet",
+   "kind": "friends, and forever confused",
+   "word": "Manet"
+  },
+  {
+   "a": "manet",
+   "b": "degas",
+   "kind": "friends and antagonists",
+   "word": "Degas"
+  },
+  {
+   "a": "manet",
+   "b": "cezanne",
+   "kind": "answered by a Modern Olympia",
+   "word": "Olympia"
+  },
+  {
+   "a": "monet",
+   "b": "renoir",
+   "kind": "painted side by side at La Grenouillère",
+   "word": "Renoir"
+  },
+  {
+   "a": "caillebotte",
+   "b": "renoir",
+   "kind": "collected and left to France",
+   "word": "Caillebotte"
+  },
+  {
+   "a": "caillebotte",
+   "b": "monet",
+   "kind": "collected and left to France",
+   "word": "Caillebotte"
+  },
+  {
+   "a": "caillebotte",
+   "b": "degas",
+   "kind": "collected and left to France",
+   "word": "Caillebotte"
+  },
+  {
+   "a": "hokusai",
+   "b": "hiroshige",
+   "kind": "the two great names of",
+   "word": "Hiroshige"
+  },
+  {
+   "a": "hokusai",
+   "b": "vangogh",
+   "kind": "copied in Arles by",
+   "word": "Japanese"
+  },
+  {
+   "a": "hiroshige",
+   "b": "vangogh",
+   "kind": "copied, in oil, by",
+   "word": "Hiroshige"
+  },
+  {
+   "a": "whistler",
+   "b": "degas",
+   "kind": "Japanese prints in common with",
+   "word": "Japanese"
+  },
+  {
+   "a": "durer",
+   "b": "hokusai",
+   "kind": "three centuries apart, the same block",
+   "word": "woodcut"
+  },
+  {
+   "a": "rembrandt",
+   "b": "vermeer",
+   "kind": "the two poles of the Dutch century",
+   "word": "Dutch"
+  },
+  {
+   "a": "david",
+   "b": "napoleon",
+   "kind": "court painter to",
+   "word": "Napoleon"
+  },
+  {
+   "a": "ingres",
+   "b": "raphael",
+   "kind": "venerated",
+   "word": "Raphael"
+  },
+  {
+   "a": "whistler",
+   "b": "sargent",
+   "kind": "Americans abroad, with",
+   "word": "Whistler"
+  },
+  {
+   "a": "leutze",
+   "b": "sargent",
+   "kind": "Americans abroad, with",
+   "word": "American"
+  }
+ ]
+}

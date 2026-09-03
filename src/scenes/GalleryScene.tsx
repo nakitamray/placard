@@ -31,6 +31,8 @@ import { OrnateFrame } from './OrnateFrame';
 import { frameReach } from './frames';
 import { fitWork } from './fit';
 import { startReveal, endReveal, latchReveal, releaseReveal, revealAnim } from '../transitions/reveal';
+import { closeLens, moveLens } from '../transitions/lens';
+import { discoverWork } from '../state/atlas';
 import { artworkProjector, regionAt } from '../threadpull/state';
 import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
 import type { Quality } from '../lib/quality';
@@ -548,11 +550,19 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
           active={i === index}
           onEnter={() => {
             if (i !== index) return;
-            if (useStore.getState().extractionMode) return; // Shift = extract, not reveal
-            if (matchMedia('(pointer: fine)').matches) startReveal(reducedMotion);
+            if (useStore.getState().extractionMode) return; // Shift = extract, not look
+            /*
+             * Hovering opens the reading lens rather than dissolving the whole
+             * canvas. Under reduced motion there is no lens — a circle chasing
+             * the cursor is exactly the kind of movement that setting asks us
+             * not to make — so hover keeps its old behaviour there.
+             */
+            if (!matchMedia('(pointer: fine)').matches) return;
+            if (reducedMotion) startReveal(reducedMotion);
           }}
           onLeave={() => {
             if (i !== index) return;
+            closeLens();
             useStore.getState().setHoveredRegion(null);
             /*
              * Not an immediate close.
@@ -569,8 +579,18 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
           onMove={(u, v) => {
             if (i !== index) return;
             const s = useStore.getState();
-            if (!s.extractionMode || s.pulledRegion) return;
             const art = loaded.get(i);
+            if (!s.extractionMode) {
+              // the lens follows the cursor until the whole work is revealed,
+              // at which point there is nothing left for it to uncover
+              if (!s.reducedMotion && !s.revealed && art) {
+                moveLens(u, v, art.glyphs.imageW, art.glyphs.imageH);
+                // the reproduction has to be in hand for the lens to show it
+                void loadReveal(art, 'view');
+              }
+              return;
+            }
+            if (s.pulledRegion) return;
             const region = art ? regionAt(art.meta.regions ?? [], u, v) : null;
             if (region?.id !== s.hoveredRegion?.id) s.setHoveredRegion(region);
           }}
