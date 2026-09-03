@@ -46,9 +46,11 @@
     "search": "Jacques-Louis David Oath of the Horatii Serment des Horaces"
   },
   "vermeer-lacemaker": {
+    "commonsFile": "File:Johannes Vermeer - The Lacemaker - WGA24689.jpg",
     "search": "Johannes Vermeer The Lacemaker Louvre"
   },
   "ingres-grande-odalisque": {
+    "commonsFile": "File:France-003335 - Grande Odalisque (16051027150).jpg",
     "search": "Ingres Grande Odalisque 1814 Louvre"
   },
   "delacroix-death-sardanapalus": {
@@ -98,9 +100,11 @@
     "search": "Michelangelo Creation of Adam Sistine Chapel"
   },
   "michelangelo-last-judgment": {
+    "commonsFile": "File:Last Judgement (Michelangelo).jpg",
     "search": "Michelangelo Last Judgment Sistine Chapel fresco"
   },
   "raphael-school-athens": {
+    "commonsFile": "File:The School of Athens by Raffaello Sanzio da Urbino in Vatican.jpg",
     "search": "Raphael School of Athens Scuola di Atene Stanza"
   },
   "raphael-transfiguration": {
@@ -153,7 +157,7 @@
     "search": "Whistler Arrangement in Grey and Black Portrait of the Artist's Mother"
   },
   "caillebotte-floor-scrapers": {
-    "commonsFile": "File:Caillebotteraboteurs.jpg",
+    "commonsFile": "File:Gustave Caillebotte - The Floor Planers - Google Art Project.jpg",
     "search": "Caillebotte Les raboteurs de parquet Floor Scrapers 1875"
   },
   "leutze-washington-delaware": {
@@ -170,6 +174,7 @@
     "search": "John Singer Sargent Madame X Madame Pierre Gautreau"
   },
   "el-greco-view-toledo": {
+    "commonsFile": "File:El Greco - View of Toledo - Google Art Project.jpg",
     "search": "El Greco View of Toledo Vista de Toledo"
   },
   "rembrandt-aristotle-homer": {
