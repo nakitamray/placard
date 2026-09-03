@@ -413,12 +413,12 @@ button:active { transform: translateY(1px); }
 @keyframes credits-in { from { opacity: 0; } to { opacity: 1; } }
 .credits-inner {
   position: relative;
-  background: rgba(26, 22, 18, 0.5);
+  background: rgba(26, 22, 18, 0.62);
   backdrop-filter: blur(30px) saturate(1.25);
   -webkit-backdrop-filter: blur(30px) saturate(1.25);
   color: var(--bone);
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
-  max-width: 660px; width: 100%; max-height: 84vh;
+  max-width: 700px; width: 100%; max-height: 86vh;
   overflow: hidden;
   /*
    * No border, no shadow — the panel has no edge at all.
@@ -439,10 +439,59 @@ button:active { transform: translateY(1px); }
   -webkit-mask-composite: source-in;
 }
 .credits-scroll {
-  max-height: 84vh; overflow-y: auto; overscroll-behavior: contain;
+  max-height: 86vh; overflow-y: auto; overscroll-behavior: contain;
   padding: var(--s7); scrollbar-width: thin;
 }
 .credits-header { display: flex; justify-content: space-between; align-items: baseline; }
+
+/* four ways into the same colophon: what it is made of, why it looks like
+   this, how it is built, and who built it */
+.credits-tabs {
+  display: flex; gap: var(--s5);
+  margin: var(--s5) 0 var(--s2);
+  border-bottom: 1px solid rgba(242, 235, 223, 0.12);
+}
+.credits-tabs button {
+  color: rgba(242, 235, 223, 0.45); padding: 0 0 9px;
+  position: relative; transition: color var(--d-fast);
+}
+.credits-tabs button:hover { color: rgba(242, 235, 223, 0.8); }
+.credits-tabs button.is-on { color: var(--gilt); }
+.credits-tabs button.is-on::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 1px; background: var(--gilt);
+}
+
+/* the design rules — a list that reads as a list, not as prose in bullets */
+.credits-rules { list-style: none; margin: 0; padding: 0; }
+.credits-rules li {
+  padding: var(--s3) 0;
+  border-bottom: 1px solid rgba(242, 235, 223, 0.07);
+  color: rgba(242, 235, 223, 0.8);
+}
+.credits-rules li:last-child { border-bottom: 0; }
+.credits-rules strong { color: var(--bone); font-weight: 500; }
+
+/* the technical table: a label and a value, aligned */
+.credits-spec { list-style: none; margin: 0; padding: 0; }
+.credits-spec li {
+  display: grid; grid-template-columns: 118px 1fr; gap: var(--s4);
+  align-items: baseline; padding: var(--s2) 0;
+  border-bottom: 1px solid rgba(242, 235, 223, 0.07);
+}
+.credits-spec li:last-child { border-bottom: 0; }
+.credits-spec .caption { color: var(--gilt); opacity: 0.75; }
+.credits-spec .body { color: rgba(242, 235, 223, 0.82); font-size: 15px; }
+@media (max-width: 560px) {
+  .credits-spec li { grid-template-columns: 1fr; gap: 2px; }
+}
+
+.credits-bio { color: rgba(242, 235, 223, 0.68); }
+.credits-links { list-style: none; margin: var(--s4) 0 0; padding: 0; }
+.credits-inner code {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.86em; color: var(--gilt); opacity: 0.85;
+}
 .credits-header .display { margin: 0; }
 .credits-close { color: var(--taupe); }
 .credits-close:hover { color: var(--gilt); }
@@ -586,11 +635,26 @@ button:active { transform: translateY(1px); }
   stroke: var(--gilt); stroke-width: 1; stroke-dasharray: 3 3;
   opacity: 0; transition: opacity var(--d-fast);
 }
-.tp-prompt {
-  position: fixed; top: var(--s5); left: 50%; transform: translateX(-50%);
-  z-index: 24; color: var(--gilt); pointer-events: none;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+/* the standing notice that thread mode is on — small, low, and permanent for
+   as long as the mode is */
+.tp-mode {
+  position: fixed; bottom: 74px; left: 50%; transform: translateX(-50%);
+  z-index: 35; pointer-events: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 14px; border-radius: 999px;
+  background: rgba(28, 24, 20, 0.42);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  color: var(--gilt); font-size: 10px; letter-spacing: 0.13em;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
+.tp-mode-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--gilt);
+  animation: tp-pulse 2.4s var(--e-both) infinite;
+}
+@keyframes tp-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.tp-mode-key { color: rgba(242, 235, 223, 0.45); }
 
 /* Above the control hints (31) and the corner toggles (30): the panel runs
    the full height of the right-hand side, and anything drawn over its foot

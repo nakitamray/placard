@@ -4,7 +4,7 @@
  * Publishes each painting as a ladder of three sizes in three formats, so the
  * browser only ever pays for the picture it is actually about to show:
  *
- *   wall  512px   the corridor thumbnail — ten of these hang in every room
+ *   wall 1024px   the corridor texture — ten of these hang in every room
  *   view 1200px   the reveal, at the size the canvas actually occupies
  *   full 2000px   the upgrade, fetched only while a visitor holds on one work
  *   lqip   24px   blurred, for the instant before anything else has landed
@@ -55,7 +55,13 @@ interface Rung {
  * three formats a loss rather than a gain.
  */
 const LADDER: Rung[] = [
-  { name: 'wall', long: 512, jpeg: 78, webp: 70, avif: 48 },
+  // 1024, not 512. The corridor is where a visit actually spends its time —
+  // ten canvases, each a couple of metres wide, filling a good part of the
+  // screen and seen at an angle — and a 512px texture across that is visibly
+  // soft. Four times the pixels costs well under four times the bytes at
+  // these quality settings, and it is the difference between a gallery and a
+  // gallery seen through frosted glass.
+  { name: 'wall', long: 1024, jpeg: 80, webp: 74, avif: 50 },
   { name: 'view', long: 1200, jpeg: 82, webp: 76, avif: 50 },
   { name: 'full', long: 2000, jpeg: 84, webp: 76, avif: 50 },
 ];

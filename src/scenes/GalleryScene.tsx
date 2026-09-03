@@ -276,9 +276,12 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     if (!revealed) return;
     const art = loaded.get(index);
     if (!art) return;
+    // `view` first because it lands sooner, then the full reproduction close
+    // behind it: the canvas fills most of the screen here, and 1200px across
+    // a 1400px picture is exactly the softness this was being blamed for.
     void loadReveal(art, 'view');
     if (tier.name !== 'high') return;
-    const upgrade = window.setTimeout(() => void loadReveal(art, 'full'), 900);
+    const upgrade = window.setTimeout(() => void loadReveal(art, 'full'), 250);
     return () => window.clearTimeout(upgrade);
   }, [revealed, index, loaded, tier]);
 
@@ -576,7 +579,14 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
             const s = useStore.getState();
             const art = loaded.get(i);
             if (!s.extractionMode) return;
-            if (s.pulledRegion) return;
+            /*
+             * Keep reporting what is under the cursor even while a passage is
+             * out. This used to return early once anything was pulled, which
+             * froze `hoveredRegion` — so moving to another part of the
+             * painting changed nothing, and the only way to read a second
+             * passage was to leave thread mode and come back. Thread mode is
+             * meant to be a mode you move around inside.
+             */
             const region = art ? regionAt(art.meta.regions ?? [], u, v) : null;
             if (region?.id !== s.hoveredRegion?.id) s.setHoveredRegion(region);
           }}

@@ -126,7 +126,8 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
     if (discoverFromText(art.id, pulledRegion.text)) sfx.link();
   }, [pulledRegion, artworks, index]);
 
-  // in thread mode, moving over a passage pulls it — no second gesture
+  // In thread mode, moving over a passage pulls it — no second gesture, and
+  // moving to another passage swaps to it without leaving the mode first.
   useEffect(() => {
     if (!extractionMode || pinned) return;
     if (hoveredRegion && hoveredRegion.id !== pulledRegion?.id) setPulledRegion(hoveredRegion);

@@ -44,7 +44,9 @@ export function GlyphPrePass({
   active,
   wash,
   inkLift,
+  sizeScale,
   clearAlpha = 1,
+  target,
 }: {
   artwork: LoadedArtwork | null;
   rtSize: number;
@@ -52,8 +54,17 @@ export function GlyphPrePass({
   /** cell fill opacity — lower lets whatever is behind the field show through */
   wash?: number;
   inkLift?: number;
+  /** below 1, the letters are drawn smaller and more of the picture shows */
+  sizeScale?: number;
   /** 0 renders the field on transparency, so it can be composited over paint */
   clearAlpha?: number;
+  /**
+   * Somewhere to publish this pass's render target other than the shared
+   * `glyphRT`. Two fields can then be on screen at once — which is what a
+   * crossfade between two heroes needs, and what the single global target
+   * made impossible.
+   */
+  target?: { current: THREE.WebGLRenderTarget | null };
 }) {
   const gl = useThree((s) => s.gl);
   const reducedMotion = useStore((s) => s.reducedMotion);
@@ -71,15 +82,22 @@ export function GlyphPrePass({
   }, [rtSize]);
 
   useEffect(() => {
-    glyphRT.current = rt;
+    const slot = target ?? glyphRT;
+    slot.current = rt;
     return () => {
-      if (glyphRT.current === rt) glyphRT.current = null;
+      if (slot.current === rt) slot.current = null;
       rt.dispose();
     };
-  }, [rt]);
+  }, [rt, target]);
 
   const scene = useMemo(() => new THREE.Scene(), []);
   const camera = useMemo(() => new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), []);
+  /*
+   * A material per pass, not one shared module-wide. Two passes running at
+   * once during a crossfade would otherwise write each other's uniforms —
+   * corpus texture, image size, glyph scale — and both fields would render as
+   * whichever one wrote last.
+   */
   const material = useMemo(() => {
     const { atlas, metrics } = getGlyphAtlas();
     return createGlyphMaterial(atlas, metrics);
@@ -124,6 +142,7 @@ export function GlyphPrePass({
     u.uDissolve.value = useStore.getState().dissolve;
     if (wash !== undefined) u.uWash.value = wash;
     if (inkLift !== undefined) u.uInkLift.value = inkLift;
+    u.uSizeScale.value = sizeScale ?? 1;
 
     // Thread Pull: fade the extracted region out of the canvas while the DOM
     // text assembles, and hold its characters still (spec: the rest of the

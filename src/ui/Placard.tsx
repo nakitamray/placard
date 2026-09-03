@@ -25,6 +25,8 @@ export function Placard() {
   const phase = useStore((s) => s.phase);
   const index = useStore((s) => s.index);
   const revealed = useStore((s) => s.revealed);
+  // the label answers a click, never a passing cursor
+  const latched = useStore((s) => s.revealLatched);
   const expanded = useStore((s) => s.placardExpanded);
   const setExpanded = useStore((s) => s.setPlacardExpanded);
   const artworks = useStore(selectArtworks);
@@ -53,7 +55,7 @@ export function Placard() {
   // track the projected plane edge (spec §10.7: offset 40px right of frame,
   // clamped 24px from the viewport edge)
   useEffect(() => {
-    if (phase !== 'gallery' || !revealed) return;
+    if (phase !== 'gallery' || !revealed || !latched) return;
     let raf = 0;
     const tick = () => {
       const el = cardRef.current;
@@ -83,11 +85,11 @@ export function Placard() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [phase, revealed]);
+  }, [phase, revealed, latched]);
 
   if (phase !== 'gallery' || !meta) return null;
 
-  const visible = revealed;
+  const visible = revealed && latched;
 
   return (
     <aside

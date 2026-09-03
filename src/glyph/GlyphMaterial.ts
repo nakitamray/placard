@@ -40,6 +40,7 @@ uniform vec4  uDetachBox;     // x0,y0,x1,y1 in image px — Thread Pull region
 uniform float uDetachAmt;     // 0 = attached, 1 = fully extracted
 uniform vec3  uLens;          // x,y,radius in image px — the reading lens
 uniform float uLensAmt;       // 0 = closed, 1 = fully open
+uniform float uSizeScale;     // 1 = as built; below that, more painting shows
 
 varying vec2  vQuad;
 varying float vSlot;
@@ -72,7 +73,7 @@ void main() {
   float c = cos(aRot), s = sin(aRot);
   // extracted glyphs lift slightly off the surface before they fly
   float lift = 1.0 + 0.35 * vInBox * uDetachAmt;
-  vec2 local = mat2(c, -s, s, c) * (aQuad * aSize * lift);
+  vec2 local = mat2(c, -s, s, c) * (aQuad * aSize * uSizeScale * lift);
   vec2 world = aPos + local;
 
   // image space is y-down; NDC is y-up (hence the winding note on side:)
@@ -171,6 +172,7 @@ export interface GlyphUniforms {
   uDetachAmt: { value: number };
   uLens: { value: THREE.Vector3 };
   uLensAmt: { value: number };
+  uSizeScale: { value: number };
 }
 
 export function createGlyphMaterial(
@@ -199,6 +201,7 @@ export function createGlyphMaterial(
       uDetachAmt: { value: 0 },
       uLens: { value: new THREE.Vector3(0, 0, 1) },
       uLensAmt: { value: 0 },
+      uSizeScale: { value: 1 },
     },
     transparent: true,
     depthWrite: false,

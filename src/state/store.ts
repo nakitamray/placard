@@ -19,6 +19,15 @@ interface AppStore {
   index: number;
   /** artwork sub-state of GALLERY (spec §9 — not a route change) */
   revealed: boolean;
+  /**
+   * Whether the reveal was ASKED for.
+   *
+   * Hovering a canvas dissolves it to the painting; clicking keeps it open
+   * and brings the wall label. Those are two different intentions and the
+   * label belongs only to the second — a card sliding in every time the
+   * cursor crossed a picture made the room feel like it was interrupting.
+   */
+  revealLatched: boolean;
   /** 0 = full text, 1 = fully dissolved (drives uDissolve) */
   dissolve: number;
   placardExpanded: boolean;
@@ -43,7 +52,7 @@ interface AppStore {
   setPhase: (p: Phase) => void;
   setCorridorT: (t: number) => void;
   setIndex: (i: number) => void;
-  setRevealed: (r: boolean) => void;
+  setRevealed: (r: boolean, latched?: boolean) => void;
   setDissolve: (d: number) => void;
   setPlacardExpanded: (e: boolean) => void;
   setCreditsOpen: (o: boolean) => void;
@@ -65,6 +74,7 @@ export const useStore = create<AppStore>()(
     corridorT: 0,
     index: 0,
     revealed: false,
+    revealLatched: false,
     dissolve: 0,
     placardExpanded: false,
     creditsOpen: false,
@@ -97,15 +107,26 @@ export const useStore = create<AppStore>()(
         ...(p !== 'corridor' ? { hoveredWork: null } : {}),
         ...(p === 'corridor' && from === 'map' ? { corridorT: 0.8 } : {}),
         ...(p === 'landing' ? { corridorT: 0, museum: null, index: 0 } : {}),
-        ...(p !== 'gallery' ? { revealed: false, dissolve: 0, placardExpanded: false } : {}),
+        ...(p !== 'gallery'
+          ? { revealed: false, revealLatched: false, dissolve: 0, placardExpanded: false }
+          : {}),
       });
     },
     setCorridorT: (t) => set({ corridorT: Math.max(0, Math.min(1, t)) }),
     setIndex: (i) => {
       const n = selectArtworks(get()).length;
-      set({ index: Math.max(0, Math.min(n - 1, i)), revealed: false, placardExpanded: false });
+      set({
+        index: Math.max(0, Math.min(n - 1, i)),
+        revealed: false,
+        revealLatched: false,
+        placardExpanded: false,
+      });
     },
-    setRevealed: (r) => set({ revealed: r, ...(r ? {} : { placardExpanded: false }) }),
+    setRevealed: (r, latched = false) =>
+      set({
+        revealed: r,
+        ...(r ? { revealLatched: latched } : { revealLatched: false, placardExpanded: false }),
+      }),
     setDissolve: (d) => set({ dissolve: d }),
     setPlacardExpanded: (e) => set({ placardExpanded: e }),
     setCreditsOpen: (o) => set({ creditsOpen: o }),
