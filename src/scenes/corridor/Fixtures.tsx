@@ -6,7 +6,7 @@
  * meant to be walked through by people. Each museum's style record picks its
  * own set.
  */
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { MuseumStyle } from '../../types';
 import { bayZ, hangTop, type Dims } from './dims';
@@ -16,7 +16,18 @@ interface Props {
   d: Dims;
 }
 
-const MARBLE = '#E9E3D6';
+/**
+ * Marble, not plastic.
+ *
+ * A bright flat diffuse at 0.44 roughness is a plastic toy under gallery
+ * lighting: the highlight is a broad dull smear and the shadowed side goes
+ * dead. Real statuary marble is slightly warm, noticeably glossier than that,
+ * and — the thing that actually gives it away — it carries light *into* the
+ * surface, so the shadowed side of a limb never goes as dark as its geometry
+ * says it should. The environment map does the second job here; a lower
+ * roughness and a high environment intensity do the first.
+ */
+const MARBLE = '#EDE7DA';
 
 /**
  * An abstracted classical figure. Real museum sculpture is scanned, and the
@@ -24,45 +35,169 @@ const MARBLE = '#E9E3D6';
  * abstractions: a mass, a torso, a head, drapery, at the right scale and with
  * the right silhouette at corridor distance.
  */
-const marble = (rough = 0.44) => (
-  <meshStandardMaterial color={MARBLE} roughness={rough} />
+const marble = (rough = 0.34) => (
+  <meshStandardMaterial
+    color={MARBLE}
+    roughness={rough}
+    metalness={0}
+    envMapIntensity={1.5}
+  />
 );
 
-/** limb, torso, drapery fold — everything on these figures is a capsule */
+/**
+ * A limb.
+ *
+ * Capsules, but rounder than they were — a five-segment cap on a thigh is a
+ * visible faceted dome from three metres, and these are the closest things in
+ * the room to the camera after the frames. `taper` narrows the far end, which
+ * is what stops an arm reading as a length of pipe: every limb on a body is
+ * thicker at the joint it hangs from than at the one it ends in.
+ */
 function Limb({
   p,
   r,
   len,
   rot,
-  rough = 0.44,
+  rough = 0.34,
+  taper = 1,
 }: {
   p: [number, number, number];
   r: number;
   len: number;
   rot?: [number, number, number];
   rough?: number;
+  /** radius multiplier at the lower end */
+  taper?: number;
 }) {
   return (
-    <mesh position={p} rotation={rot} castShadow>
-      <capsuleGeometry args={[r, len, 5, 10]} />
-      {marble(rough)}
+    <group position={p} rotation={rot}>
+      <mesh castShadow scale={[1, 1, 1]}>
+        <capsuleGeometry args={[r, len, 8, 18]} />
+        {marble(rough)}
+      </mesh>
+      {taper !== 1 && (
+        // a second, narrower capsule sunk into the lower half does the taper
+        // without needing a lathe for every limb in the room
+        <mesh position={[0, -len * 0.3, 0]} castShadow>
+          <capsuleGeometry args={[r * taper, len * 0.5, 8, 16]} />
+          {marble(rough)}
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+/**
+ * The head.
+ *
+ * A sphere is a ball on a stick. A skull is longer than it is wide, flat at
+ * the temples, heavier at the back than the front, and carries a mass of
+ * carved hair that is bigger than the cranium under it — and it sits forward
+ * of the neck, not on top of it. All four of those are silhouette facts, and
+ * silhouette is all you get at gallery distance.
+ */
+function Head({ p, r = 0.115, turn = 0 }: { p: [number, number, number]; r?: number; turn?: number }) {
+  return (
+    <group position={p} rotation={[0, turn, 0]}>
+      {/* cranium: longer front-to-back than side-to-side, narrow at the temples */}
+      <mesh scale={[0.9, 1.06, 1.04]} castShadow>
+        <sphereGeometry args={[r, 24, 18]} />
+        {marble(0.3)}
+      </mesh>
+      {/* the jaw and chin, forward and below */}
+      <mesh position={[0, -r * 0.5, r * 0.16]} scale={[0.72, 0.62, 0.8]} castShadow>
+        <sphereGeometry args={[r, 18, 14]} />
+        {marble(0.32)}
+      </mesh>
+      {/* the nose — one of the two things that make a marble head read as a
+          face in silhouette; the other is the hair behind it */}
+      <mesh position={[0, -r * 0.1, r * 0.86]} rotation={[0.5, 0, 0]} castShadow>
+        <coneGeometry args={[r * 0.2, r * 0.5, 8]} />
+        {marble(0.3)}
+      </mesh>
+      {/* carved hair: a bigger, rougher mass sitting back off the brow */}
+      <mesh position={[0, r * 0.34, -r * 0.3]} scale={[1.2, 0.98, 1.16]} castShadow>
+        <sphereGeometry args={[r, 20, 16]} />
+        {marble(0.62)}
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * The torso, turned as one piece.
+ *
+ * Three spheres for pelvis, ribcage and shoulders is a snowman: at gallery
+ * distance the eye reads the gaps between them, not the body they are meant
+ * to add up to. A body is one continuous surface that swells at the hips,
+ * pulls in hard at the waist and opens out again across the chest, and the
+ * only way to get that is to give the profile to a lathe and turn it.
+ *
+ * Squashed in Z, because a person is a good deal wider than they are deep and
+ * a turned solid is neither until you say so.
+ */
+function Torso({
+  h = 0.46,
+  r = 0.17,
+  depth = 0.62,
+  lean = 0,
+}: {
+  h?: number;
+  r?: number;
+  depth?: number;
+  lean?: number;
+}) {
+  const profile = useMemo(() => {
+    // [height fraction, radius fraction] from the hips up to the neck
+    const shape: Array<[number, number]> = [
+      [0, 0.6],
+      [0.12, 0.68],
+      [0.34, 0.5],
+      [0.55, 0.62],
+      [0.76, 0.7],
+      [0.9, 0.66],
+      [1, 0.4],
+    ];
+    return shape.map(([t, w]) => new THREE.Vector2(r * w, t * h));
+  }, [h, r]);
+  return (
+    <mesh rotation={[lean, 0, 0]} scale={[1, 1, depth]} castShadow receiveShadow>
+      <latheGeometry args={[profile, 28]} />
+      {marble(0.32)}
     </mesh>
   );
 }
 
-/** the head, with the mass of hair that reads at ten metres */
-function Head({ p, r = 0.115 }: { p: [number, number, number]; r?: number }) {
+/**
+ * Drapery, as a lathe rather than a stack of capsules.
+ *
+ * A profile turned about the vertical is exactly how a draped standing figure
+ * reads from any angle in a gallery: a column that swells at the hips, pulls
+ * in at the waist, and flares to the floor. The vertical folds are added on
+ * top as narrow capsules, which is what breaks the turned silhouette and
+ * stops it looking like a vase.
+ */
+function Drapery({ h = 0.9, r = 0.26 }: { h?: number; r?: number }) {
+  const profile = useMemo(() => {
+    const pts: THREE.Vector2[] = [];
+    // y from the hem up to the waist, as a fraction of h
+    const shape: Array<[number, number]> = [
+      [0, 1.0],
+      [0.12, 0.94],
+      [0.3, 0.86],
+      [0.5, 0.8],
+      [0.7, 0.76],
+      [0.86, 0.72],
+      [1, 0.66],
+    ];
+    for (const [t, w] of shape) pts.push(new THREE.Vector2(r * w, t * h));
+    return pts;
+  }, [h, r]);
   return (
-    <group position={p}>
-      <mesh castShadow>
-        <sphereGeometry args={[r, 16, 12]} />
-        {marble(0.42)}
-      </mesh>
-      <mesh position={[0, r * 0.42, -r * 0.28]} scale={[1.12, 0.86, 1.1]} castShadow>
-        <sphereGeometry args={[r, 14, 10]} />
-        {marble(0.55)}
-      </mesh>
-    </group>
+    <mesh castShadow receiveShadow>
+      <latheGeometry args={[profile, 26]} />
+      {marble(0.5)}
+    </mesh>
   );
 }
 
@@ -87,112 +222,176 @@ function Figure({ seed, scale = 1 }: { seed: number; scale?: number }) {
 
   return (
     <group rotation={[0, turn, 0]} scale={scale}>
-      {/* plinth block every type stands on */}
+      {/* the round plinth block every type stands on */}
       <mesh position={[0, 0.05, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.26, 0.29, 0.1, 16]} />
+        <cylinderGeometry args={[0.27, 0.3, 0.1, 24]} />
         {marble(0.55)}
       </mesh>
 
       {variant === 0 && (
+        /* the peplophoros: a column of drapery with a body inside it */
         <group>
-          {/* drapery to the ankles — a fluted column with a body inside it */}
-          <mesh position={[0, 0.52, 0]} castShadow>
-            <cylinderGeometry args={[0.19, 0.27, 0.86, 14]} />
-            {marble(0.52)}
-          </mesh>
-          {/* folds */}
-          {[-0.11, 0.02, 0.13].map((x, i) => (
-            <Limb key={i} p={[x, 0.5, 0.15 - i * 0.03]} r={0.035} len={0.72} rough={0.6} />
+          <group position={[0, 0.1, 0]}>
+            <Drapery h={0.88} r={0.27} />
+          </group>
+          {/* the folds that break the turned silhouette */}
+          {[-0.14, -0.05, 0.05, 0.15].map((x, i) => (
+            <Limb
+              key={i}
+              p={[x, 0.55, 0.14 + Math.abs(x) * -0.2]}
+              r={0.028}
+              len={0.66}
+              rough={0.66}
+            />
           ))}
-          <Limb p={[0, 1.06, 0]} r={0.145} len={0.24} />
-          {/* arms: one down inside the drapery, one across the waist */}
-          <Limb p={[-0.19, 0.98, 0.02]} r={0.05} len={0.34} rot={[0, 0, 0.08]} />
-          <Limb p={[0.17, 0.96, 0.1]} r={0.05} len={0.3} rot={[0.3, 0, -0.5]} />
-          <Head p={[0, 1.32, 0.01]} />
+          {/* the shawl over the shoulders, and the mass of the torso above it */}
+          <mesh position={[0, 1.03, 0]} scale={[1, 1.2, 0.72]} castShadow>
+            <sphereGeometry args={[0.155, 20, 16]} />
+            {marble(0.4)}
+          </mesh>
+          <mesh position={[0, 1.11, -0.01]} scale={[1.5, 0.44, 0.95]} castShadow>
+            <sphereGeometry args={[0.15, 20, 14]} />
+            {marble(0.5)}
+          </mesh>
+          {/* one arm down inside the drapery, one folded across the waist */}
+          <Limb p={[-0.19, 0.96, 0.02]} r={0.048} len={0.34} rot={[0, 0, 0.09]} taper={0.78} />
+          <Limb p={[0.16, 0.99, 0.11]} r={0.048} len={0.26} rot={[0.35, 0, -0.55]} taper={0.78} />
+          <Limb p={[0.02, 0.9, 0.17]} r={0.036} len={0.16} rot={[0.2, 0, -1.2]} taper={0.8} />
+          {/* neck, then head */}
+          <mesh position={[0, 1.21, 0.005]} castShadow>
+            <cylinderGeometry args={[0.045, 0.055, 0.09, 14]} />
+            {marble(0.34)}
+          </mesh>
+          <Head p={[0, 1.31, 0.02]} r={0.096} turn={0.2} />
         </group>
       )}
 
       {variant === 1 && (
+        /* contrapposto male nude — the weight is the whole point of the type */
         <group>
-          {/* weight leg straight, free leg bent and trailing */}
-          <Limb p={[-0.09, 0.38, 0]} r={0.075} len={0.52} />
-          <Limb p={[0.1, 0.36, -0.06]} r={0.07} len={0.46} rot={[0.16, 0, -0.1]} />
-          {/* hips shifted over the weight leg — the whole point of the type */}
-          <mesh position={[-0.03, 0.74, 0]} castShadow>
-            <sphereGeometry args={[0.16, 14, 12]} />
-            {marble()}
+          {/* weight leg: straight, under the shifted hip */}
+          <Limb p={[-0.075, 0.34, 0]} r={0.068} len={0.4} taper={0.66} />
+          <mesh position={[-0.08, 0.085, 0.035]} scale={[1, 0.55, 1.8]} castShadow>
+            <sphereGeometry args={[0.058, 14, 10]} />
+            {marble(0.4)}
           </mesh>
-          <mesh position={[-0.01, 0.98, 0]} scale={[1, 1.15, 0.72]} castShadow>
-            <sphereGeometry args={[0.19, 16, 12]} />
-            {marble()}
+          {/* free leg: bent, trailing, and carrying nothing */}
+          <Limb p={[0.095, 0.38, -0.03]} r={0.062} len={0.28} rot={[0.1, 0, -0.11]} taper={0.7} />
+          <Limb p={[0.125, 0.16, -0.09]} r={0.046} len={0.2} rot={[-0.25, 0, -0.05]} taper={0.72} />
+          <mesh position={[0.14, 0.05, -0.03]} scale={[1, 0.55, 1.7]} castShadow>
+            <sphereGeometry args={[0.054, 14, 10]} />
+            {marble(0.4)}
           </mesh>
-          {/* one arm hanging, one bent across */}
-          <Limb p={[-0.24, 0.92, 0.02]} r={0.048} len={0.44} rot={[0, 0, 0.12]} />
-          <Limb p={[0.23, 0.95, 0.06]} r={0.048} len={0.36} rot={[0.4, 0, -0.35]} />
-          <Head p={[0.02, 1.28, 0.02]} />
+          {/* one body from hips to neck, tipped over the weight leg */}
+          <group position={[-0.03, 0.6, 0]} rotation={[0, 0, 0.05]}>
+            <Torso h={0.47} r={0.165} />
+          </group>
+          {/* the shoulder line, counter-tipped against the hips */}
+          <mesh position={[0.005, 1.03, 0]} rotation={[0, 0, 0.12]} scale={[1.62, 0.38, 0.82]} castShadow>
+            <sphereGeometry args={[0.14, 22, 14]} />
+            {marble(0.33)}
+          </mesh>
+          {/* arms: upper, fore, hand — one hanging, one bent across */}
+          <Limb p={[-0.215, 0.93, 0.01]} r={0.043} len={0.22} rot={[0, 0, 0.13]} taper={0.8} />
+          <Limb p={[-0.232, 0.73, 0.03]} r={0.035} len={0.2} rot={[0.1, 0, 0.05]} taper={0.78} />
+          <mesh position={[-0.238, 0.605, 0.045]} scale={[0.8, 1.3, 0.5]} castShadow>
+            <sphereGeometry args={[0.038, 12, 10]} />
+            {marble(0.36)}
+          </mesh>
+          <Limb p={[0.222, 0.94, 0.02]} r={0.043} len={0.2} rot={[0, 0, -0.17]} taper={0.8} />
+          <Limb p={[0.246, 0.79, 0.13]} r={0.035} len={0.19} rot={[0.75, 0, -0.1]} taper={0.78} />
+          {/* neck and head, forward of the shoulders */}
+          <mesh position={[0.012, 1.11, 0.014]} rotation={[0.07, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.038, 0.05, 0.1, 14]} />
+            {marble(0.32)}
+          </mesh>
+          <Head p={[0.018, 1.21, 0.032]} r={0.093} turn={-0.3} />
         </group>
       )}
 
       {variant === 2 && (
+        /* the seated philosopher, knees forward, drapery over the lap */
         <group>
-          {/* the seat */}
-          <mesh position={[0, 0.28, -0.08]} castShadow receiveShadow>
+          <mesh position={[0, 0.28, -0.09]} castShadow receiveShadow>
             <boxGeometry args={[0.46, 0.36, 0.4]} />
             {marble(0.6)}
           </mesh>
-          {/* thighs forward, shins down */}
-          <Limb p={[-0.11, 0.5, 0.12]} r={0.075} len={0.3} rot={[1.42, 0, 0]} />
-          <Limb p={[0.11, 0.5, 0.14]} r={0.075} len={0.32} rot={[1.3, 0, 0]} />
-          <Limb p={[-0.11, 0.24, 0.28]} r={0.06} len={0.3} />
-          <Limb p={[0.11, 0.24, 0.3]} r={0.06} len={0.28} />
-          {/* torso leaning back, drapery over the lap */}
-          <mesh position={[0, 0.8, -0.02]} rotation={[-0.16, 0, 0]} castShadow>
-            <capsuleGeometry args={[0.15, 0.3, 6, 12]} />
-            {marble()}
+          {/* thighs forward, shins down, feet on the ground */}
+          <Limb p={[-0.11, 0.5, 0.12]} r={0.075} len={0.28} rot={[1.42, 0, 0]} taper={0.8} />
+          <Limb p={[0.11, 0.5, 0.14]} r={0.075} len={0.3} rot={[1.3, 0, 0]} taper={0.8} />
+          <Limb p={[-0.11, 0.24, 0.28]} r={0.056} len={0.28} taper={0.72} />
+          <Limb p={[0.11, 0.24, 0.3]} r={0.056} len={0.26} taper={0.72} />
+          {[-0.11, 0.11].map((x, i) => (
+            <mesh key={i} position={[x, 0.055, 0.34]} scale={[1, 0.55, 1.7]} castShadow>
+              <sphereGeometry args={[0.058, 14, 10]} />
+              {marble(0.4)}
+            </mesh>
+          ))}
+          {/* the mass of cloth across the knees */}
+          <mesh position={[0, 0.62, 0.17]} rotation={[1.35, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.2, 0.23, 0.36, 20]} />
+            {marble(0.6)}
           </mesh>
-          {/* shoulders and neck, so the head is not sitting on the chest */}
-          <mesh position={[0, 0.97, -0.03]} scale={[1.4, 0.6, 0.85]} castShadow>
-            <sphereGeometry args={[0.14, 14, 10]} />
-            {marble()}
+          {/* torso leaning back, shoulders, neck */}
+          <group position={[0, 0.6, -0.01]}>
+            <Torso h={0.44} r={0.16} lean={-0.16} />
+          </group>
+          <mesh position={[0, 0.99, -0.045]} rotation={[-0.12, 0, 0]} scale={[1.55, 0.45, 0.88]} castShadow>
+            <sphereGeometry args={[0.135, 20, 14]} />
+            {marble(0.34)}
           </mesh>
-          <mesh position={[0, 1.06, -0.02]} castShadow>
-            <cylinderGeometry args={[0.045, 0.055, 0.09, 10]} />
-            {marble()}
+          <mesh position={[0, 1.08, -0.03]} rotation={[0.1, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.042, 0.052, 0.09, 14]} />
+            {marble(0.32)}
           </mesh>
-          <mesh position={[0, 0.62, 0.16]} rotation={[1.35, 0, 0]} castShadow>
-            <cylinderGeometry args={[0.2, 0.22, 0.34, 12]} />
-            {marble(0.58)}
-          </mesh>
-          {/* one arm propping, one resting on the knee */}
-          <Limb p={[-0.25, 0.72, -0.06]} r={0.05} len={0.36} rot={[0, 0, 0.22]} />
-          <Limb p={[0.2, 0.74, 0.16]} r={0.05} len={0.3} rot={[0.9, 0, -0.2]} />
-          <Head p={[0, 1.18, 0]} r={0.1} />
+          {/* one arm propping on the seat, one resting on the knee */}
+          <Limb p={[-0.24, 0.82, -0.07]} r={0.045} len={0.2} rot={[0, 0, 0.2]} taper={0.8} />
+          <Limb p={[-0.27, 0.6, -0.06]} r={0.038} len={0.22} taper={0.78} />
+          <Limb p={[0.2, 0.83, 0.06]} r={0.045} len={0.2} rot={[0.5, 0, -0.2]} taper={0.8} />
+          <Limb p={[0.22, 0.66, 0.22]} r={0.038} len={0.2} rot={[1.2, 0, -0.05]} taper={0.78} />
+          <Head p={[0, 1.17, 0.02]} r={0.092} turn={0.35} />
         </group>
       )}
 
       {variant === 3 && (
+        /* the orator — the one dynamic silhouette in the set */
         <group>
-          <Limb p={[-0.1, 0.36, 0.02]} r={0.072} len={0.48} rot={[0, 0, 0.06]} />
-          <Limb p={[0.12, 0.34, -0.1]} r={0.068} len={0.42} rot={[-0.22, 0, -0.14]} />
-          <mesh position={[0, 0.72, 0]} castShadow>
-            <sphereGeometry args={[0.155, 14, 12]} />
-            {marble()}
+          <Limb p={[-0.085, 0.33, 0.02]} r={0.066} len={0.38} rot={[0, 0, 0.06]} taper={0.68} />
+          <Limb p={[0.11, 0.34, -0.1]} r={0.062} len={0.28} rot={[-0.26, 0, -0.15]} taper={0.7} />
+          <Limb p={[0.15, 0.14, -0.2]} r={0.046} len={0.18} rot={[-0.12, 0, -0.06]} taper={0.72} />
+          {[[-0.09, 0.06], [0.16, -0.24]].map(([x, z], i) => (
+            <mesh key={i} position={[x, 0.05, z]} scale={[1, 0.55, 1.7]} castShadow>
+              <sphereGeometry args={[0.054, 14, 10]} />
+              {marble(0.4)}
+            </mesh>
+          ))}
+          {/* the body, turned toward the raised arm */}
+          <group position={[-0.02, 0.58, 0]} rotation={[0, 0.3, -0.03]}>
+            <Torso h={0.48} r={0.168} />
+          </group>
+          <mesh position={[0, 1.03, 0]} rotation={[0, 0.3, -0.09]} scale={[1.62, 0.38, 0.84]} castShadow>
+            <sphereGeometry args={[0.14, 22, 14]} />
+            {marble(0.33)}
           </mesh>
-          {/* torso twisted toward the raised arm */}
-          <mesh position={[-0.02, 0.96, 0]} rotation={[0, 0.3, 0.06]} scale={[1, 1.12, 0.74]} castShadow>
-            <sphereGeometry args={[0.185, 16, 12]} />
-            {marble()}
+          {/* the raised arm: upper out, forearm up, hand open */}
+          <Limb p={[-0.225, 1.04, 0.03]} r={0.042} len={0.2} rot={[0, 0, 0.95]} taper={0.82} />
+          <Limb p={[-0.35, 1.23, 0.05]} r={0.037} len={0.21} rot={[0, 0, 0.3]} taper={0.8} />
+          <mesh position={[-0.4, 1.36, 0.06]} scale={[0.9, 1.2, 0.55]} castShadow>
+            <sphereGeometry args={[0.041, 12, 10]} />
+            {marble(0.36)}
           </mesh>
-          {/* the raised arm — upper arm out, forearm up */}
-          <Limb p={[-0.26, 1.06, 0.04]} r={0.048} len={0.3} rot={[0, 0, 0.95]} />
-          <Limb p={[-0.4, 1.3, 0.06]} r={0.043} len={0.28} rot={[0, 0, 0.28]} />
-          {/* the other holds a fold of cloak that falls behind */}
-          <Limb p={[0.24, 0.92, 0.04]} r={0.048} len={0.38} rot={[0, 0, -0.1]} />
-          <mesh position={[0.28, 0.74, -0.1]} rotation={[0.1, 0, -0.16]} castShadow>
-            <capsuleGeometry args={[0.1, 0.52, 5, 10]} />
-            {marble(0.58)}
+          {/* the other holds a fold of cloak that falls behind the figure */}
+          <Limb p={[0.215, 0.92, 0.03]} r={0.042} len={0.22} rot={[0, 0, -0.11]} taper={0.8} />
+          <Limb p={[0.24, 0.71, 0.06]} r={0.035} len={0.19} rot={[0.2, 0, -0.05]} taper={0.78} />
+          <mesh position={[0.285, 0.72, -0.08]} rotation={[0.1, 0, -0.22]} scale={[0.85, 1, 0.42]} castShadow>
+            <capsuleGeometry args={[0.1, 0.58, 8, 16]} />
+            {marble(0.62)}
           </mesh>
-          <Head p={[-0.04, 1.28, 0.03]} />
+          <mesh position={[0.008, 1.11, 0.014]} rotation={[0.05, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.038, 0.05, 0.1, 14]} />
+            {marble(0.32)}
+          </mesh>
+          <Head p={[0.012, 1.21, 0.036]} r={0.093} turn={-0.5} />
         </group>
       )}
     </group>

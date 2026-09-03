@@ -42,10 +42,18 @@ export function GlyphPrePass({
   artwork,
   rtSize,
   active,
+  wash,
+  inkLift,
+  clearAlpha = 1,
 }: {
   artwork: LoadedArtwork | null;
   rtSize: number;
   active: boolean;
+  /** cell fill opacity — lower lets whatever is behind the field show through */
+  wash?: number;
+  inkLift?: number;
+  /** 0 renders the field on transparency, so it can be composited over paint */
+  clearAlpha?: number;
 }) {
   const gl = useThree((s) => s.gl);
   const reducedMotion = useStore((s) => s.reducedMotion);
@@ -114,6 +122,8 @@ export function GlyphPrePass({
     u.uCharOffset.value = Math.floor(timeRef.current * CHAR_RATE);
     u.uBreathe.value = timeRef.current * 1.4;
     u.uDissolve.value = useStore.getState().dissolve;
+    if (wash !== undefined) u.uWash.value = wash;
+    if (inkLift !== undefined) u.uInkLift.value = inkLift;
 
     // Thread Pull: fade the extracted region out of the canvas while the DOM
     // text assembles, and hold its characters still (spec: the rest of the
@@ -133,7 +143,7 @@ export function GlyphPrePass({
 
     const prev = gl.getRenderTarget();
     gl.setRenderTarget(rt);
-    gl.setClearColor('#241f1a', 1);
+    gl.setClearColor('#241f1a', clearAlpha);
     gl.clear();
     gl.render(scene, camera);
     gl.setRenderTarget(prev);

@@ -67,33 +67,52 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
   const inGallery = phase === 'gallery';
   const region = pulledRegion ?? leaving;
 
-  // --- Shift enters extraction mode; releasing it sends the text home ---
+  /*
+   * Space turns thread mode on, and leaves it on.
+   *
+   * It used to be Shift, held down for as long as you wanted to read — which
+   * meant holding a key with one hand and steering with the other for as long
+   * as the passage took, and losing the passage the moment you let go to
+   * scroll or to think. It is a mode, so it is now a switch: press Space and
+   * the canvas becomes a map of its own passages, hover them to read, press
+   * Space (or Esc) to have the painting back.
+   */
   useEffect(() => {
     if (!inGallery) {
       setExtractionMode(false);
       return;
     }
     const onDown = (e: KeyboardEvent) => {
-      if (e.key === 'Shift') setExtractionMode(true);
-    };
-    const onUp = (e: KeyboardEvent) => {
-      if (e.key !== 'Shift') return;
-      setExtractionMode(false);
-      if (!pinned) setPulledRegion(null);
+      if (e.code !== 'Space' && e.key !== ' ') return;
+      // the browser's own use for Space is scrolling, which this page does not do
+      e.preventDefault();
+      if (e.repeat) return;
+      const on = !useStore.getState().extractionMode;
+      setExtractionMode(on);
+      if (!on) {
+        setPinned(false);
+        setPulledRegion(null);
+      }
     };
     const onBlur = () => {
       setExtractionMode(false);
-      if (!pinned) setPulledRegion(null);
+      setPinned(false);
+      setPulledRegion(null);
     };
     window.addEventListener('keydown', onDown);
-    window.addEventListener('keyup', onUp);
     window.addEventListener('blur', onBlur);
     return () => {
       window.removeEventListener('keydown', onDown);
-      window.removeEventListener('keyup', onUp);
       window.removeEventListener('blur', onBlur);
     };
-  }, [inGallery, pinned, setExtractionMode, setPulledRegion]);
+  }, [inGallery, setExtractionMode, setPulledRegion]);
+
+  // leaving thread mode by any route puts the passage back
+  useEffect(() => {
+    if (extractionMode) return;
+    setPinned(false);
+    setPulledRegion(null);
+  }, [extractionMode, setPulledRegion]);
 
   /*
    * A pulled thread is read for the connections it gives away. This is the
@@ -107,7 +126,7 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
     if (discoverFromText(art.id, pulledRegion.text)) sfx.link();
   }, [pulledRegion, artworks, index]);
 
-  // hovering a region while Shift is held pulls it (spec: hold + hover)
+  // in thread mode, moving over a passage pulls it — no second gesture
   useEffect(() => {
     if (!extractionMode || pinned) return;
     if (hoveredRegion && hoveredRegion.id !== pulledRegion?.id) setPulledRegion(hoveredRegion);
@@ -424,7 +443,7 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
           <footer className="tp-foot">
             {demo ? (
               <span className="caption tp-hint tp-demo">
-                Hold <kbd>⇧</kbd> and move over the painting to pull your own
+                Press <kbd>space</kbd>, then move over the painting to pull your own
               </span>
             ) : pinned ? (
               <span className="caption tp-hint">Pinned · Esc to release</span>

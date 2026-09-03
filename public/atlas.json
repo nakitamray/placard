@@ -562,7 +562,8 @@
    "a": "michelangelo",
    "b": "sistine",
    "kind": "painted",
-   "word": "Sistine"
+   "word": "Sistine",
+   "note": "Four years on a scaffold, 1508 to 1512, painting a ceiling he had told the Pope he did not want to paint because he was a sculptor."
   },
   {
    "a": "michelangelo",
@@ -586,7 +587,8 @@
    "a": "raphael",
    "b": "stanze",
    "kind": "painted",
-   "word": "Stanze"
+   "word": "Stanze",
+   "note": "The Pope’s private apartments, painted from 1508. The School of Athens puts every philosopher of antiquity into one imaginary building — and gives several of them the faces of Raphael’s own contemporaries."
   },
   {
    "a": "raphael",
@@ -652,7 +654,8 @@
    "a": "el-greco",
    "b": "toledo",
    "kind": "worked in",
-   "word": "Toledo"
+   "word": "Toledo",
+   "note": "He arrived in Toledo about 1577 and never left. The View of Toledo rearranges the city — buildings moved, the sky turned to storm — into a portrait of the place rather than a record of it."
   },
   {
    "a": "el-greco",
@@ -670,7 +673,8 @@
    "a": "velazquez",
    "b": "rome",
    "kind": "worked in",
-   "word": "Rome"
+   "word": "Rome",
+   "note": "Velázquez was in Rome in 1650 and painted his assistant Juan de Pareja — an enslaved man in his own household, whom he freed later that year — to show the Roman painters what he could do. It hung in the Pantheon, and one witness said everything else there looked like painting while this looked like truth."
   },
   {
    "a": "velazquez",
@@ -736,7 +740,8 @@
    "a": "hokusai",
    "b": "mount-fuji",
    "kind": "painted",
-   "word": "Fuji"
+   "word": "Fuji",
+   "note": "Thirty-six Views of Mount Fuji — which ran to forty-six — put the mountain in every print, sometimes enormous, sometimes a small white triangle behind a wave."
   },
   {
    "a": "hokusai",
@@ -784,7 +789,8 @@
    "a": "david",
    "b": "napoleon",
    "kind": "painted",
-   "word": "Napoleon"
+   "word": "Napoleon",
+   "note": "David painted the coronation in Notre-Dame — twenty feet by thirty — and put Napoleon’s mother in the gallery watching, though she had refused to attend. He became First Painter to the Emperor and followed him into exile."
   },
   {
    "a": "david",
@@ -868,7 +874,8 @@
    "a": "millet",
    "b": "barbizon",
    "kind": "worked at",
-   "word": "Barbizon"
+   "word": "Barbizon",
+   "note": "Millet moved to Barbizon on the edge of the Fontainebleau forest in 1849 and painted peasants at work for the rest of his life, which was read at the time as politics."
   },
   {
    "a": "millet",
@@ -892,7 +899,8 @@
    "a": "manet",
    "b": "salon-refuses",
    "kind": "hung in",
-   "word": "Refusés"
+   "word": "Refusés",
+   "note": "The Salon of 1863 rejected so many pictures that the Emperor ordered a second exhibition of the refused. Manet’s Déjeuner sur l’herbe was the scandal of it."
   },
   {
    "a": "manet",
@@ -928,7 +936,8 @@
    "a": "degas",
    "b": "impressionism",
    "kind": "of",
-   "word": "Impressionist"
+   "word": "Impressionist",
+   "note": "Degas showed in seven of the eight Impressionist exhibitions and objected to the name throughout. He worked indoors, from memory, and drew first."
   },
   {
    "a": "degas",
@@ -952,7 +961,8 @@
    "a": "monet",
    "b": "argenteuil",
    "kind": "worked at",
-   "word": "Argenteuil"
+   "word": "Argenteuil",
+   "note": "Monet lived at Argenteuil on the Seine from 1871 to 1878 — the years the movement’s whole method was worked out, on the river, in a boat fitted up as a studio."
   },
   {
    "a": "monet",
@@ -964,7 +974,8 @@
    "a": "monet",
    "b": "impressionism",
    "kind": "named",
-   "word": "Impression"
+   "word": "Impression",
+   "note": "A critic at the 1874 exhibition took the title of Monet’s Impression, Sunrise and used it as an insult for the whole group. They kept the word."
   },
   {
    "a": "monet",
@@ -988,7 +999,8 @@
    "a": "renoir",
    "b": "montmartre",
    "kind": "painted",
-   "word": "Montmartre"
+   "word": "Montmartre",
+   "note": "The Moulin de la Galette was a Sunday dance in a garden on the Butte. Renoir carried the canvas up the hill and back every day for months, and painted his friends into it."
   },
   {
    "a": "renoir",
@@ -1006,7 +1018,8 @@
    "a": "cezanne",
    "b": "aix",
    "kind": "worked at",
-   "word": "Aix"
+   "word": "Aix",
+   "note": "Cézanne went home to Aix and stayed, painting the same mountain more than thirty times, out of reach of Paris and largely out of its sight until he was old."
   },
   {
    "a": "cezanne",
@@ -1042,7 +1055,8 @@
    "a": "caillebotte",
    "b": "caillebotte-bequest",
    "kind": "left",
-   "word": "bequest"
+   "word": "bequest",
+   "note": "He died at forty-five and left sixty-eight Impressionist paintings to the French state. The Académie fought the gift for years and accepted only part of it, which is why some of the best of them are now in Washington rather than Paris."
   },
   {
    "a": "caillebotte",
@@ -1054,7 +1068,8 @@
    "a": "vangogh",
    "b": "arles",
    "kind": "worked at",
-   "word": "Arles"
+   "word": "Arles",
+   "note": "Fifteen months in Arles from February 1888 — the yellow house, the sunflowers, the night café, the starry night over the Rhône, and the collapse at the end of it."
   },
   {
    "a": "vangogh",
@@ -1072,7 +1087,8 @@
    "a": "vangogh",
    "b": "japonisme",
    "kind": "copied",
-   "word": "Japan"
+   "word": "Japan",
+   "note": "“All my work is founded on Japanese art,” Van Gogh wrote from Arles. He had gone south partly because he believed the light there would be the light of the prints."
   },
   {
    "a": "whistler",
@@ -1174,19 +1190,22 @@
    "a": "japonisme",
    "b": "ukiyo-e",
    "kind": "took from",
-   "word": "ukiyo"
+   "word": "ukiyo",
+   "note": "Japanese prints reached Paris in quantity after 1858 — some, famously, as packing material — and within a decade had changed how European painters composed a picture."
   },
   {
    "a": "veronese",
    "b": "napoleon",
    "kind": "looted by",
-   "word": "Napoleon"
+   "word": "Napoleon",
+   "note": "Napoleon’s army took the Wedding at Cana out of its refectory in Venice in 1797. It was cut in half to be carried to Paris, and it is still there — the largest painting in the Louvre, hanging opposite the most famous small one."
   },
   {
    "a": "impressionism",
    "b": "first-impressionist",
    "kind": "launched at",
-   "word": "1874"
+   "word": "1874",
+   "note": "Thirty artists, in Nadar’s old photographic studio on the boulevard des Capucines, April 1874, because the Salon would not have them."
   },
   {
    "a": "impressionism",
@@ -1198,169 +1217,197 @@
    "a": "leonardo",
    "b": "michelangelo",
    "kind": "rivals in Florence, 1504",
-   "word": "Florence"
+   "word": "Florence",
+   "note": "In 1504 Florence commissioned battle scenes for the same room of the Palazzo Vecchio from both of them at once. Leonardo was fifty-two and famous; Michelangelo was twenty-nine and had just finished the David. Neither fresco was finished, and the cartoons — copied by every young painter in Italy, Raphael among them — became the most influential drawings of the century."
   },
   {
    "a": "raphael",
    "b": "leonardo",
    "kind": "learned sfumato from",
-   "word": "Leonardo"
+   "word": "Leonardo",
+   "note": "Raphael reached Florence around 1504 and rebuilt his art on what he found there. The pyramid composition of his Madonnas and the soft smoke-edged modelling of his faces are Leonardo’s, absorbed in about two years by a painter thirty years younger."
   },
   {
    "a": "raphael",
    "b": "michelangelo",
    "kind": "worked down the corridor from",
-   "word": "Michelangelo"
+   "word": "Michelangelo",
+   "note": "From 1508 they worked a few hundred metres apart in the same palace — Michelangelo on the Sistine ceiling, Raphael on the Stanze — and did not get on. Raphael saw the half-finished ceiling and promptly painted Michelangelo into the School of Athens as brooding Heraclitus, sitting alone on the steps."
   },
   {
    "a": "michelangelo",
    "b": "giotto",
    "kind": "drew after",
-   "word": "Giotto"
+   "word": "Giotto",
+   "note": "Michelangelo’s earliest surviving drawings are copies after Giotto’s frescoes in Santa Croce. Two centuries separate them; the weight and solidity of the bodies passed straight across."
   },
   {
    "a": "caravaggio",
    "b": "rembrandt",
    "kind": "the light that reached",
-   "word": "light"
+   "word": "light",
+   "note": "Caravaggio never went north, but his followers did. By the 1620s the Utrecht painters had carried the single raking light and the hard black shadow back to Holland, where the young Rembrandt took it and made it his own."
   },
   {
    "a": "veronese",
    "b": "el-greco",
    "kind": "Venice-trained alongside",
-   "word": "Venice"
+   "word": "Venice",
+   "note": "Both learned to paint in Venice in the shadow of Titian — Veronese from Verona, El Greco from Crete — and both took the Venetian habit of building a figure out of colour rather than drawing it first."
   },
   {
    "a": "velazquez",
    "b": "manet",
    "kind": "\"the painter of painters\", to",
-   "word": "Velázquez"
+   "word": "Velázquez",
+   "note": "Manet went to Madrid in 1865 and stood in front of the Velázquezes. “The painter of painters,” he wrote home. The flat black, the refusal to model with shadow and the frank grey ground of Olympia all came back from that trip."
   },
   {
    "a": "velazquez",
    "b": "sargent",
    "kind": "copied in Madrid by",
-   "word": "Velázquez"
+   "word": "Velázquez",
+   "note": "Sargent copied Velázquez in the Prado at twenty-three. Madame X’s silhouette against a bare ground — the whole figure carried by one contour — is what he took away from it."
   },
   {
    "a": "david",
    "b": "ingres",
    "kind": "taught",
-   "word": "David"
+   "word": "David",
+   "note": "Ingres entered David’s studio at seventeen and stayed four years. He inherited the line and abandoned the politics, and spent his life being called the last classicist by people who could not see how strange his drawing had become."
   },
   {
    "a": "gericault",
    "b": "delacroix",
    "kind": "who posed for the Raft",
-   "word": "Géricault"
+   "word": "Géricault",
+   "note": "They were friends, and Delacroix posed for the Raft of the Medusa — he is the figure lying face down with one arm outstretched in the foreground. Géricault died at thirty-two; Delacroix carried Romanticism for another forty years."
   },
   {
    "a": "millet",
    "b": "vangogh",
    "kind": "copied, again and again, by",
-   "word": "Millet"
+   "word": "Millet",
+   "note": "Van Gogh copied Millet all his life, from the drawings he made as a beginner to the canvases he painted in the asylum at Saint-Rémy. “Millet is father Millet,” he wrote, “counsellor and mentor in everything.”"
   },
   {
    "a": "manet",
    "b": "monet",
    "kind": "friends, and forever confused",
-   "word": "Manet"
+   "word": "Manet",
+   "note": "The two names were confused from the start — Manet complained when a Monet was praised as his at the Salon of 1865 — and they became friends anyway. Manet painted Monet at work in his floating studio at Argenteuil."
   },
   {
    "a": "manet",
    "b": "degas",
    "kind": "friends and antagonists",
-   "word": "Degas"
+   "word": "Degas",
+   "note": "Friends, and combative about it. Degas gave Manet a portrait of Manet and his wife; Manet, disliking how his wife had been painted, cut her out of it with a knife. Degas took the picture back, and they did not speak for a while."
   },
   {
    "a": "manet",
    "b": "cezanne",
    "kind": "answered by a Modern Olympia",
-   "word": "Olympia"
+   "word": "Olympia",
+   "note": "Cézanne answered Olympia in 1873 with A Modern Olympia — the same scene painted as a violent sketch, with himself sitting in the picture watching. It hung in the first Impressionist exhibition and was the most mocked object there."
   },
   {
    "a": "monet",
    "b": "renoir",
    "kind": "painted side by side at La Grenouillère",
-   "word": "Renoir"
+   "word": "Renoir",
+   "note": "In the summer of 1869 they set up their easels side by side at La Grenouillère on the Seine and painted the same bathers, the same boats, the same broken light on the water. Impressionism is roughly what they worked out that summer."
   },
   {
    "a": "caillebotte",
    "b": "renoir",
    "kind": "collected and left to France",
-   "word": "Caillebotte"
+   "word": "Caillebotte",
+   "note": "Caillebotte painted with them and, being rich, bought from them. His will left the collection to the French state, and Renoir was his executor."
   },
   {
    "a": "caillebotte",
    "b": "monet",
    "kind": "collected and left to France",
-   "word": "Caillebotte"
+   "word": "Caillebotte",
+   "note": "Caillebotte bought Monet’s work when almost nobody would, paid his rent more than once, and left the pictures to France. Much of what hangs in the Orsay today came in through that bequest."
   },
   {
    "a": "caillebotte",
    "b": "degas",
    "kind": "collected and left to France",
-   "word": "Caillebotte"
+   "word": "Caillebotte",
+   "note": "Caillebotte collected Degas as he collected the rest of them, and organised and hung several of the Impressionist exhibitions himself."
   },
   {
    "a": "hokusai",
    "b": "hiroshige",
    "kind": "the two great names of",
-   "word": "Hiroshige"
+   "word": "Hiroshige",
+   "note": "The two great landscape names of ukiyo-e, a generation apart. Hokusai’s Thirty-six Views of Mount Fuji made landscape a subject in its own right; Hiroshige’s Fifty-three Stations of the Tōkaidō made it weather."
   },
   {
    "a": "hokusai",
    "b": "vangogh",
    "kind": "copied in Arles by",
-   "word": "Japanese"
+   "word": "Japanese",
+   "note": "Van Gogh collected Japanese prints in Paris by the hundred, hung them in his room, and said he wanted to see with a Japanese eye. The flat colour and high hard horizon of the Arles pictures are the result."
   },
   {
    "a": "hiroshige",
    "b": "vangogh",
    "kind": "copied, in oil, by",
-   "word": "Hiroshige"
+   "word": "Hiroshige",
+   "note": "Van Gogh copied two Hiroshige prints in oil in 1887, framing them with borders of invented Japanese characters. He was not quoting them; he was trying to work out how they were made."
   },
   {
    "a": "whistler",
    "b": "degas",
    "kind": "Japanese prints in common with",
-   "word": "Japanese"
+   "word": "Japanese",
+   "note": "Both were collecting and studying Japanese prints in the 1860s, and both took the same lesson: the off-centre subject, the cropped edge, the flat interval of empty ground."
   },
   {
    "a": "durer",
    "b": "hokusai",
    "kind": "three centuries apart, the same block",
-   "word": "woodcut"
+   "word": "woodcut",
+   "note": "Three centuries and half a world apart, both worked in the same medium — a design cut into a block of wood and printed in editions — and both used it to put pictures into the hands of people who could never have owned a painting."
   },
   {
    "a": "rembrandt",
    "b": "vermeer",
    "kind": "the two poles of the Dutch century",
-   "word": "Dutch"
+   "word": "Dutch",
+   "note": "The two poles of the Dutch century: Rembrandt made some three hundred paintings, Vermeer perhaps thirty-five. One painted the whole world in brown light; the other painted one corner of one room and got everything into it."
   },
   {
    "a": "david",
    "b": "napoleon",
    "kind": "court painter to",
-   "word": "Napoleon"
+   "word": "Napoleon",
+   "note": "David painted the coronation in Notre-Dame — twenty feet by thirty — and put Napoleon’s mother in the gallery watching, though she had refused to attend. He became First Painter to the Emperor and followed him into exile."
   },
   {
    "a": "ingres",
    "b": "raphael",
    "kind": "venerated",
-   "word": "Raphael"
+   "word": "Raphael",
+   "note": "Ingres venerated Raphael to the point of quotation: engravings after him on the studio wall, and the instruction to his students that Raphael was not a man to be surpassed but a language to be learned."
   },
   {
    "a": "whistler",
    "b": "sargent",
    "kind": "Americans abroad, with",
-   "word": "Whistler"
+   "word": "Whistler",
+   "note": "Two Americans who barely lived in America — Whistler in London, Sargent between Paris and London — both making their name at the Salon, and both notorious there."
   },
   {
    "a": "leutze",
    "b": "sargent",
    "kind": "Americans abroad, with",
-   "word": "American"
+   "word": "American",
+   "note": "Leutze painted Washington Crossing the Delaware in Düsseldorf, not America; Sargent painted his Americans in Paris. The national picture, in both cases, was made abroad."
   }
  ]
 }

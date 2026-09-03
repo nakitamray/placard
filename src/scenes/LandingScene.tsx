@@ -62,11 +62,28 @@ uniform vec2  uImageSize;
 uniform float uFade;
 varying vec2 vUv;
 void main() {
-  vec3 text  = texture2D(uGlyph, vUv).rgb;
+  /*
+   * The glyph field is rendered onto transparency here rather than onto a
+   * flat brown, so the painting can sit UNDER the letters instead of being
+   * replaced by them. That is the difference between a mosaic of coloured
+   * blocks and a painting you can read: at full bleed the cells are the size
+   * of a thumbnail each, and an opaque one is just a pixel.
+   *
+   * Three.js blends into the target with (SRC_ALPHA, ONE_MINUS_SRC_ALPHA) on
+   * the colour channel as well as the alpha, so what comes back is premultiplied
+   * — dividing by alpha recovers the letter's own colour.
+   */
+  vec4 t = texture2D(uGlyph, vUv);
+  vec3 text = t.a > 0.004 ? t.rgb / t.a : vec3(0.0);
   vec3 paint = texture2D(uPaint, vUv).rgb;
+
+  // the painting, dimmed, with the text over it
+  vec3 under = mix(vec3(0.09, 0.075, 0.062), paint * 0.62, uHasPaint);
+  vec3 field = mix(under, text, t.a);
+
   float d = distance(vec2(vUv.x, 1.0 - vUv.y) * uImageSize, uLens.xy);
   float l = uLensAmt * uHasPaint * (1.0 - smoothstep(uLens.z * 0.5, uLens.z, d));
-  vec3 color = mix(text, paint, l);
+  vec3 color = mix(field, paint, l);
   gl_FragColor = vec4(color * uFade, 1.0);
   #include <colorspace_fragment>
 }
@@ -83,12 +100,36 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const fade = useRef(0);
 
+  /*
+   * The field is drawn at twice the gallery's resolution where the machine can
+   * take it. It is one texture, drawn once per frame, and it is the first
+   * thing anybody sees.
+   */
+  const heroRT = useMemo(() => (tier.name === 'low' ? tier.rtSize : 2048), [tier]);
+
   // One work per visit, chosen when the component first mounts. `?hero=<id>`
   // pins it, which is how a particular hero gets looked at twice.
   const heroId = useMemo(() => {
     const pinned = new URLSearchParams(window.location.search).get('hero');
     return pinned ?? HEROES[Math.floor(Math.random() * HEROES.length)];
   }, []);
+
+  /*
+   * The lens belongs to this page now, so this page has to put it away.
+   *
+   * It is module state shared with the gallery's own shaders, and this scene
+   * drives it open on every frame — so without this it stays open after the
+   * landing unmounts, and the first canvas you walk up to has a circle of
+   * bare reproduction punched through it at whatever coordinates the hero
+   * happened to leave behind.
+   */
+  useEffect(
+    () => () => {
+      lens.want = 0;
+      lens.amt = 0;
+    },
+    [],
+  );
 
   useEffect(() => {
     let alive = true;
@@ -189,7 +230,21 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
 
   return (
     <group>
-      <GlyphPrePass artwork={art} rtSize={tier.rtSize} active={!!art} />
+      {/*
+        * A bigger render target than a gallery canvas gets, and a much lighter
+        * cell wash. This field is stretched over the whole window rather than
+        * over a picture frame six metres away, so it is magnified perhaps four
+        * times as much — at the gallery's resolution and opacity it reads as a
+        * grid of coloured squares rather than as writing.
+        */}
+      <GlyphPrePass
+        artwork={art}
+        rtSize={heroRT}
+        active={!!art}
+        wash={0.34}
+        inkLift={0.85}
+        clearAlpha={0}
+      />
       <mesh ref={meshRef} frustumCulled={false} renderOrder={-1}>
         <planeGeometry args={[1, 1]} />
         <shaderMaterial

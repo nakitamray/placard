@@ -44,6 +44,8 @@ export interface AtlasLink {
   kind: string;
   /** the word in a corpus that gives this connection away */
   word?: string;
+  /** what actually happened between these two — the point of the whole map */
+  note?: string;
 }
 
 export interface AtlasFile {
