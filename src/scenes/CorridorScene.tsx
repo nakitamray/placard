@@ -25,17 +25,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { useStore } from '../state/store';
-import {
-  ZOOM_MAX,
-  ZOOM_MIN,
-  corridor,
-  nudgeZoom,
-  pointer,
-  resetCorridor,
-  resetZoom,
-  view,
-  warp,
-} from '../state/motion';
+import { corridor, warp, pointer, resetCorridor } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
 import { flash } from '../ui/Flash';
 import { OrnateFrame } from './OrnateFrame';
@@ -63,20 +53,6 @@ import type { Quality } from '../lib/quality';
  * where the browser can take them, which is most of a megabyte saved on the
  * way into a room, and stepped down to JPEG where it cannot.
  */
-/**
- * Where the picture light is pointing, and how hard.
- *
- * A museum does not light a corridor evenly and then hope you find the
- * paintings; it drops the room and puts a light on each work. That is what
- * this is: when the cursor finds a canvas, the ambient light in the corridor
- * eases down and a narrow warm spot comes up on that one work.
- *
- * Kept as a plain mutable object rather than state because it is written on
- * pointer events and read every frame — routing it through React would
- * re-render the whole corridor to move a light.
- */
-const picture = { on: false, x: 0, y: 0, z: 0 };
-
 const wallTextures = new Map<string, THREE.Texture>();
 
 function loadWallTexture(id: string): THREE.Texture {
@@ -170,13 +146,6 @@ function HungWork({
 
   const enter = () => {
     lift(true);
-    if (group.current) {
-      const p = group.current.getWorldPosition(new THREE.Vector3());
-      picture.on = true;
-      picture.x = p.x;
-      picture.y = p.y;
-      picture.z = p.z;
-    }
     useStore.getState().setHoveredWork({
       index,
       artist: artwork.artist,
@@ -185,14 +154,12 @@ function HungWork({
   };
   const leave = () => {
     lift(false);
-    picture.on = false;
     const s = useStore.getState();
     if (s.hoveredWork?.index === index) s.setHoveredWork(null);
   };
   const open = () => {
     const s = useStore.getState();
     if (s.phase !== 'corridor') return;
-    picture.on = false;
     document.body.style.cursor = '';
     s.setHoveredWork(null);
     s.setIndex(index);
@@ -283,11 +250,8 @@ function Bays({
       const i = slot % artworks.length;
       const x = side * (d.halfWidth - 0.09);
       const ry = side > 0 ? -Math.PI / 2 : Math.PI / 2;
-      // Hung larger than a real salon would: the corridor is walked past at
-      // speed and the canvases are what it is for, so they take as much of
-      // each bay as the moulding and the neighbours allow.
-      const maxH = hang === 'salon' ? d.wallHeight * 0.34 : Math.min(2.45, d.wallHeight * 0.42);
-      const main = fitWork(artworks[i].aspect, maxH, d.bayDepth * 0.86);
+      const maxH = hang === 'salon' ? d.wallHeight * 0.3 : Math.min(2.1, d.wallHeight * 0.36);
+      const main = fitWork(artworks[i].aspect, maxH, d.bayDepth * 0.78);
       // Carving is only legible close up. Past a few bays the bead course and
       // cartouches cost tens of thousands of triangles to render something
       // smaller than a pixel, so distant frames keep the turned courses only.
@@ -356,7 +320,7 @@ function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
   const textures = useArtworkTextures(artworks);
   const a = artworks[1] ?? artworks[0];
   if (!a) return null;
-  const { width: aw, height: h } = fitWork(a.aspect, Math.min(3.0, d.wallHeight * 0.48), d.halfWidth * 1.35);
+  const { width: aw, height: h } = fitWork(a.aspect, Math.min(2.6, d.wallHeight * 0.42), d.halfWidth * 1.2);
 
   return (
     <group>
@@ -486,79 +450,6 @@ function Lamps({
         intensity={l.lampIntensity * 2.6 + 8}
         distance={d.bayDepth * 3}
         decay={1.7}
-      />
-    </>
-  );
-}
-
-/**
- * The picture light.
- *
- * One spotlight for the whole corridor, moved to whichever work the cursor is
- * on. Fifty static spots would be fifty per-fragment light evaluations; one
- * that follows costs a single light and reads better, because it arrives with
- * the visitor's attention rather than sitting there all along.
- *
- * The room dims with it. Museums light this way — a dark gallery with lit
- * pictures — and the drop is small (twelve percent) because the corridor still
- * has to be walkable while a work is lit.
- */
-function PictureLight({ museum, quality }: { museum: MuseumData; quality: Quality }) {
-  const spot = useRef<THREE.SpotLight>(null);
-  const target = useRef(new THREE.Object3D());
-  const gl = useThree((s) => s.gl);
-  const at = useRef(new THREE.Vector3(0, 2, 0));
-  const level = useRef(0);
-  const base = museum.style.light.exposure;
-
-  useFrame((_, delta) => {
-    const k = dampK(0.08, delta);
-    level.current += ((picture.on ? 1 : 0) - level.current) * k;
-
-    if (picture.on) {
-      at.current.x += (picture.x - at.current.x) * k;
-      at.current.y += (picture.y - at.current.y) * k;
-      at.current.z += (picture.z - at.current.z) * k;
-    }
-
-    const s = spot.current;
-    if (s) {
-      // stand the lamp off the wall, on the room side of the work
-      const side = at.current.x >= 0 ? 1 : -1;
-      s.position.set(at.current.x - side * 1.15, at.current.y + 1.5, at.current.z + 0.2);
-      target.current.position.copy(at.current);
-      target.current.updateMatrixWorld();
-      s.intensity = level.current * 34;
-      s.visible = level.current > 0.01;
-    }
-
-    // the room steps back so the lit work steps forward
-    gl.toneMappingExposure = base * (1 - 0.12 * level.current);
-  });
-
-  // this writes the exposure every frame, so it owns restoring it: leaving the
-  // corridor with a work still lit would otherwise carry the dim into the
-  // gallery, where nothing would ever put it back
-  useEffect(() => () => {
-    gl.toneMappingExposure = base;
-  }, [gl, base]);
-
-  return (
-    <>
-      <primitive object={target.current} />
-      <spotLight
-        ref={spot}
-        target={target.current}
-        color={museum.style.light.lamp}
-        angle={0.42}
-        penumbra={0.75}
-        distance={7}
-        decay={1.5}
-        intensity={0}
-        // a shadow-casting spot is a whole extra scene pass per frame; the
-        // light reads perfectly well without one below the top budget
-        castShadow={quality.name === 'high'}
-        shadow-mapSize={[512, 512]}
       />
     </>
   );
@@ -695,20 +586,9 @@ export function CorridorScene({ quality }: { quality: Quality }) {
 
     if (phase === 'corridor' && corridor.t >= 0.95) setPhase('map');
 
-    view.v = damp(view.v, view.goal, 0.09, delta);
-
     const railZ = corridor.mouth + -d.length * corridor.t;
     let z = railZ;
-    /*
-     * Zoom is a change of lens, not a step forward.
-     *
-     * Walking the camera down the corridor to get closer would put the visitor
-     * *inside* the row of paintings and past the one they were looking at.
-     * Narrowing the field of view instead does what leaning in and squinting
-     * does: the far end of the enfilade comes to you, the geometry stays put,
-     * and a canvas four bays away becomes readable.
-     */
-    let fov = 48 / Math.max(0.5, view.v);
+    let fov = 48;
     if (phase === 'warp') {
       z = THREE.MathUtils.lerp(railZ, d.apseZ + 1.6, warp.p);
       fov = 48 + 30 * warp.p * warp.p;
@@ -760,7 +640,6 @@ export function CorridorScene({ quality }: { quality: Quality }) {
       )}
       <Apse museum={museum} d={d} />
       <Lamps museum={museum} d={d} quality={quality} />
-      <PictureLight museum={museum} quality={quality} />
 
       {/* the key light — skylight, window or dusk, per museum, and the only
           shadow caster in the room */}
