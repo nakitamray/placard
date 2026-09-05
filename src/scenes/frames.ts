@@ -400,12 +400,13 @@ export function buildArchedFrame(
   const spring = height / 2 - r0;
   const parts: Record<Role, THREE.BufferGeometry[]> = { gilt: [], dark: [] };
   const mat = new THREE.Matrix4();
+  const NARROW = 0.6;
 
   for (const c of spec.courses) {
-    const off = c.offset * s;
-    const band = c.width * s;
+    const off = c.offset * s * NARROW;
+    const band = c.width * s * NARROW;
     const depth = c.depth * s;
-    const bevel = c.bevel * s;
+    const bevel = c.bevel * s * NARROW;
 
     /*
      * One closed outline round the whole opening, holed by the opening

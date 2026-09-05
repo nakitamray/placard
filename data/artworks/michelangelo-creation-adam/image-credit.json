@@ -1,10 +1,10 @@
 {
-  "commonsFile": "File:Michelangelo Buonarroti - The Creation of Adam, ceiling (unrestored).jpg",
-  "descriptionUrl": "https://commons.wikimedia.org/wiki/File:Michelangelo_Buonarroti_-_The_Creation_of_Adam,_ceiling_(unrestored).jpg",
+  "commonsFile": "File:The Creation of Adam perspective fix.jpg",
+  "descriptionUrl": "https://commons.wikimedia.org/wiki/File:The_Creation_of_Adam_perspective_fix.jpg",
   "license": "Public domain",
   "author": "Michelangelo",
-  "credit": "The Yorck Project (2002) 10.000 Meisterwerke der Malerei (DVD-ROM), distributed by DIRECTMEDIA Publishing GmbH. ISBN : 3936122202 .",
-  "width": 2560,
-  "height": 1755,
-  "fetchedAt": "2026-09-02T21:57:38.219Z"
+  "credit": "Michelangelo. This edit attempts to adjust the perspective caused by the camera lens and the ceiling gradient. The original photo is not perfectly parallel to the depth of the ceiling, which is why the bottom left could not be cropped. This edit tries to simulate what the painting would show if laid on a flat surface. Adam's head is notably more accurate after these changes. Without a laser mapping of the surface, a truly accurate reproduction is impossible.",
+  "width": 3572,
+  "height": 1663,
+  "fetchedAt": "2026-09-05T06:04:30.904Z"
 }
