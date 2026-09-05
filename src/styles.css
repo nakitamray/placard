@@ -192,11 +192,23 @@ button:active { transform: translateY(1px); }
 .museum-row:hover .museum-name { transform: translateX(4px); }
 .museum-row:disabled { cursor: progress; }
 .museum-row.is-loading .museum-name { opacity: 0.55; }
+@media (max-width: 720px) {
+  /* The column is inset from the left on a wide screen so the painting has
+     somewhere to be. On a phone there is no room for that, and the inset
+     pushes the right-hand half of every museum row off the screen. */
+  .landing-content { left: 0; right: 0; width: auto; max-width: none; padding: 4vh var(--s5) 88px; }
+  /* and the row stacks: a name and its meta side by side need width neither
+     of them has here */
+  .museum-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .museum-meta { flex-direction: row; align-items: baseline; gap: var(--s2); flex-wrap: wrap; }
+}
 .landing-empty, .landing-error { color: var(--taupe); text-transform: none; letter-spacing: 0.02em; }
 .landing-error { color: #E2A08A; margin-top: var(--s4); }
 .landing-empty code { font-family: ui-monospace, Menlo, Consolas, monospace; }
 
-/* the one line that teaches the lens — it leaves as soon as it is obeyed */
+/* the one line that teaches the lens — it leaves as soon as it is obeyed, and
+   it is never shown to a visitor who has no cursor to move */
+@media (pointer: coarse) { .landing-lenshint { display: none; } }
 .landing-lenshint {
   margin: var(--s5) 0 0; flex: none; color: var(--gilt);
   text-transform: none; letter-spacing: 0.06em; font-size: 12px;
@@ -615,7 +627,12 @@ button:active { transform: translateY(1px); }
 @media (max-width: 560px) {
   .credits-spec li { grid-template-columns: 1fr; gap: 2px; }
   .credits-work { grid-template-columns: 1fr; }
-  .credits-work-thumb { width: 100%; height: 120px; }
+  /* the whole work, not a band across the middle of it: a full-width strip
+     cropped to cover shows the Mona Lisa's collarbone and nothing else */
+  .credits-work-thumb {
+    width: 100%; height: 150px; object-fit: contain;
+    background: rgba(36, 31, 26, 0.06); box-shadow: none;
+  }
   .credits-tracks li { grid-template-columns: 1fr; }
 }
 

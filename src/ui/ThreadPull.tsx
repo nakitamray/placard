@@ -177,10 +177,25 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
     if (!art) return;
 
     let cancelled = false;
+    let showing = false;
     const timers: number[] = [];
+    /*
+     * Cancel the demonstration, and retract it if it is already on screen.
+     *
+     * Clearing only the pending timers leaves a demonstration that has just
+     * started running its full five seconds over whatever the visitor did
+     * next — and clicking a canvas during it opens the wall label *behind*
+     * the thread panel, which is two panels at once and neither of them
+     * asked for.
+     */
     const stop = () => {
       cancelled = true;
       timers.forEach(window.clearTimeout);
+      if (showing) {
+        showing = false;
+        setDemo(false);
+        setPulledRegion(null);
+      }
     };
     window.addEventListener('keydown', stop, { once: true });
     window.addEventListener('pointerdown', stop, { once: true });
@@ -192,11 +207,13 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
           const region = a.meta.regions?.[0];
           if (cancelled || !region) return;
           sessionStorage.setItem(DEMO_KEY, '1');
+          showing = true;
           setDemo(true);
           setPulledRegion(region);
           sfx.rustle();
           timers.push(
             window.setTimeout(() => {
+              showing = false;
               setPulledRegion(null);
               setDemo(false);
             }, DEMO_HOLD_MS),

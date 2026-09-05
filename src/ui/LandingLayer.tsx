@@ -23,7 +23,7 @@ import gsap from 'gsap';
 import { loadMuseum, useStore } from '../state/store';
 import { pointer } from '../state/motion';
 import { imageUrl } from '../lib/image';
-import { exhibitionWorks, shuffled, type ExhibitionWork } from '../state/works';
+import { exhibitionWorks, heroWorks, shuffled, type ExhibitionWork } from '../state/works';
 
 const HOLD_MS = 7000;
 /* Long, and linear. A short crossfade between two full-bleed paintings reads
@@ -78,7 +78,7 @@ export function LandingLayer() {
     if (!stills) return;
     let alive = true;
     void exhibitionWorks().then((all) => {
-      if (alive) setImages(shuffled(all));
+      if (alive) setImages(shuffled(heroWorks(all)));
     });
     return () => {
       alive = false;
@@ -95,17 +95,24 @@ export function LandingLayer() {
     return () => window.clearTimeout(t);
   }, [current, images, stills]);
 
-  // slideshow. No explicit preload of the one after next: the
-  // next slide is already mounted and fetching, and reaching further ahead is
-  // how this page ended up downloading the whole set.
+  /*
+   * The slideshow.
+   *
+   * It runs under reduced motion, because this path only exists under reduced
+   * motion — and a cross-dissolve between two stills is not the thing that
+   * setting is protecting anyone from. The Ken Burns creep is what is, and the
+   * stylesheet turns that off. No explicit preload of the one after next: the
+   * next slide is already mounted and fetching, and reaching further ahead is
+   * how this page ends up downloading the whole set.
+   */
   useEffect(() => {
-    if (images.length < 2 || reducedMotion) return;
+    if (images.length < 2) return;
     const id = setInterval(
       () => setSlide((s) => ({ cur: (s.cur + 1) % images.length, prev: s.cur })),
       HOLD_MS,
     );
     return () => clearInterval(id);
-  }, [images, reducedMotion]);
+  }, [images]);
 
   // The hero says what to do only until it has been done. One deliberate
   // pointer move across the painting and the line is never seen again.

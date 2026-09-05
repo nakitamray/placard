@@ -16,6 +16,8 @@
  *
  * Adding a museum = two files in data/ and a line in order.json.
  * Adding a work   = one record in data/collections/{museum}.json.
+ *
+ * `--strict` fails the run if any work is still on a procedural stand-in.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -65,10 +67,22 @@ const exhibition: Array<{
   title: string;
   aspect: number;
   focus: [number, number];
+  /** whether a real scan is published for it, or a procedural stand-in */
+  authentic: boolean;
 }> = [];
+
+/**
+ * `--strict` refuses to finish while any work is still on a procedural
+ * stand-in. Worth pointing a deploy at once every work has a real scan: a
+ * missing picture then fails the build and names itself, rather than quietly
+ * publishing a rendering that reads as a bug in the glyph engine.
+ */
+const STRICT = process.argv.includes('--strict');
 
 let generatedCount = 0;
 let authenticCount = 0;
+/** the works still on stand-ins, so `--strict` can name them */
+const generated: string[] = [];
 /** running totals, so the build says out loud what it is asking a visitor to download */
 let publishedBytes = 0;
 let glyphBytes = 0;
@@ -88,7 +102,11 @@ for (const museumId of museums) {
   for (const record of works) {
     console.log(`\n▸ ${record.id}`);
     const images = await buildImages(record);
-    images.authentic ? authenticCount++ : generatedCount++;
+    if (images.authentic) authenticCount++;
+    else {
+      generatedCount++;
+      generated.push(record.id);
+    }
     publishedBytes += Object.values(images.bytes).reduce((a, b) => a + b, 0);
 
     const corpus = buildCorpus(record);
@@ -124,6 +142,7 @@ for (const museumId of museums) {
       title: record.title,
       aspect,
       focus: record.heroFocus ?? defaultFocus(aspect),
+      authentic: images.authentic,
     });
   }
 
@@ -177,10 +196,15 @@ console.log(
 );
 if (generatedCount) {
   console.log(
-    `\n⚠ ${generatedCount}/${total} works are rendering procedural stand-ins.\n` +
-      `  Drop a public-domain scan at data/artworks/{id}/source.jpg and rebuild\n` +
-      `  to replace one — see the README, "Authentic scans".`,
+    `\n⚠ ${generatedCount}/${total} works are rendering procedural stand-ins:\n` +
+      generated.map((id) => `    ${id}`).join('\n') +
+      `\n  Run \`pnpm fetch:images\`, or drop a public-domain scan at\n` +
+      `  data/artworks/{id}/source.jpg and rebuild — see the README, "Pictures".`,
   );
+  if (STRICT) {
+    console.log('\n--strict: refusing to publish an exhibition with stand-ins on the wall.\n');
+    process.exit(1);
+  }
 }
 console.log('\ndone.');
 

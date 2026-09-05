@@ -31,7 +31,7 @@ import { loadArtwork, loadReveal, type LoadedArtwork } from '../glyph/artworkLoa
 import { lens } from '../transitions/lens';
 import { pointer } from '../state/motion';
 import { useStore } from '../state/store';
-import { exhibitionWorks, shuffled, type ExhibitionWork } from '../state/works';
+import { exhibitionWorks, heroWorks, shuffled, type ExhibitionWork } from '../state/works';
 import type { DeviceTier } from '../types';
 
 /** how long each work holds, and how long the change takes */
@@ -270,7 +270,7 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
       if (!alive || !all.length) return;
       const pinned = new URLSearchParams(window.location.search).get('hero');
       const one = pinned && all.find((w) => w.id === pinned);
-      setOrder(one ? [one] : shuffled(all));
+      setOrder(one ? [one] : shuffled(heroWorks(all)));
     });
     return () => {
       alive = false;
