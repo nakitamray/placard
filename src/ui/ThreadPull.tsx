@@ -33,6 +33,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { selectArtworks, useStore } from '../state/store';
 import { artworkProjector, setThreadMode, threadPullAnim, toggleThreadMode } from '../threadpull/state';
+import { prepass } from '../glyph/GlyphPrePass';
 import { loadArtwork } from '../glyph/artworkLoader';
 import { sfx } from '../lib/audio';
 import { discoverFromText } from '../state/atlas';
@@ -209,8 +210,7 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
         x1 * a.glyphs.imageW,
         y1 * a.glyphs.imageH,
       ];
-      threadPullAnim.frozenOffset =
-        ((window as unknown as { __prepass?: { charOffset: number } }).__prepass?.charOffset ?? 0);
+      threadPullAnim.frozenOffset = prepass.charOffset;
     });
 
     if (reducedMotion) {

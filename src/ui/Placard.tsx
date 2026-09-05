@@ -55,16 +55,36 @@ export function Placard() {
   useEffect(() => {
     if (phase !== 'gallery' || !revealed || !latched) return;
     let raf = 0;
+    /*
+     * The card's size, measured when it changes rather than when it is
+     * drawn.
+     *
+     * `offsetWidth` and `offsetHeight` are synchronous layout: asking for
+     * them inside a frame callback makes the browser lay out the whole page
+     * before it can answer, and this was asking twice a frame for a card
+     * whose size only changes when the window does. Cleared on resize, and
+     * on the first frame after the card's own content changes.
+     */
+    let w = 0;
+    let h = 0;
+    const remeasure = () => {
+      w = 0;
+      h = 0;
+    };
+    window.addEventListener('resize', remeasure);
+    const coarse = matchMedia('(pointer: coarse) and (min-height: 560px)');
+    let last = '';
     const tick = () => {
       const el = cardRef.current;
       if (el && placardAnchor.visible) {
-        const w = el.offsetWidth;
-        const h = el.offsetHeight;
+        if (!w) {
+          w = el.offsetWidth;
+          h = el.offsetHeight;
+        }
         // must agree with the media query in styles.css that turns the label
         // into a bottom sheet, or the two lay it out in different places
         const sheet =
-          matchMedia('(pointer: coarse) and (min-height: 560px)').matches ||
-          (window.innerWidth <= 720 && window.innerHeight >= 560);
+          coarse.matches || (window.innerWidth <= 720 && window.innerHeight >= 560);
         if (!sheet) {
           /*
            * Pinned to the right margin, not to the frame.
@@ -78,15 +98,25 @@ export function Placard() {
            */
           const x = Math.max(24, window.innerWidth - w - 24);
           const y = Math.max(24, Math.min(placardAnchor.y - h / 2, window.innerHeight - h - 24));
-          el.style.transform = `translate(${x}px, ${y}px)`;
-        } else {
+          // only touch the style when the answer has actually changed: an
+          // identical write still costs a composited layer update
+          const next = `translate(${x}px, ${y}px)`;
+          if (next !== last) {
+            el.style.transform = next;
+            last = next;
+          }
+        } else if (last !== '') {
           el.style.transform = '';
+          last = '';
         }
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      window.removeEventListener('resize', remeasure);
+      cancelAnimationFrame(raf);
+    };
   }, [phase, revealed, latched]);
 
   if (phase !== 'gallery' || !meta) return null;

@@ -25,25 +25,58 @@ export function CursorRing() {
     let down = false;
     let raf = 0;
 
+    /*
+     * The loop runs while the ring has ground to make up, and stops when it
+     * has arrived.
+     *
+     * It used to run for the whole life of the page, writing the same
+     * transform and toggling the same two classes sixty times a second at a
+     * cursor that had not moved in ten minutes — and every one of those writes
+     * is a composited layer update, on top of everything else this page is
+     * asking the compositor for. Any of the three things the ring reflects —
+     * where the pointer is, what it is over, whether it is down — wakes it
+     * again, so nothing about how it behaves has changed.
+     */
+    const draw = () => {
+      const el = ref.current;
+      if (!el) return;
+      el.style.transform = `translate(${cur.x}px, ${cur.y}px)`;
+      el.classList.toggle('is-interactive', interactive);
+      el.classList.toggle('is-down', down);
+    };
+
+    const tick = () => {
+      // within a third of a pixel of the pointer is arrived
+      const arrived = Math.abs(target.x - cur.x) + Math.abs(target.y - cur.y) < 0.3;
+      if (arrived) {
+        cur.x = target.x;
+        cur.y = target.y;
+      } else {
+        cur.x += (target.x - cur.x) * 0.35;
+        cur.y += (target.y - cur.y) * 0.35;
+      }
+      draw();
+      raf = arrived ? 0 : requestAnimationFrame(tick);
+    };
+
+    const wake = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
     const onMove = (e: PointerEvent) => {
       target.x = e.clientX;
       target.y = e.clientY;
       const t = e.target as HTMLElement | null;
       interactive = !!t?.closest('button, a, [role="button"], .map-room.is-active');
+      wake();
     };
-    const onDown = () => (down = true);
-    const onUp = () => (down = false);
-
-    const tick = () => {
-      cur.x += (target.x - cur.x) * 0.35;
-      cur.y += (target.y - cur.y) * 0.35;
-      const el = ref.current;
-      if (el) {
-        el.style.transform = `translate(${cur.x}px, ${cur.y}px)`;
-        el.classList.toggle('is-interactive', interactive);
-        el.classList.toggle('is-down', down);
-      }
-      raf = requestAnimationFrame(tick);
+    const onDown = () => {
+      down = true;
+      wake();
+    };
+    const onUp = () => {
+      down = false;
+      wake();
     };
 
     window.addEventListener('pointermove', onMove, { passive: true });
@@ -55,7 +88,7 @@ export function CursorRing() {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointerup', onUp);
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, [fine]);
 

@@ -246,7 +246,11 @@ button:active { transform: translateY(1px); }
 .map-overlay {
   position: fixed; inset: 0; z-index: 30;
   background: linear-gradient(180deg, rgba(14, 12, 10, 0.9), rgba(20, 17, 14, 0.94));
-  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  /* No backdrop blur here. The canvas underneath is already carrying
+     blur(14px) from .is-blurred, and this sits on it under a gradient that is
+     ninety per cent opaque — three more pixels of blur are invisible through
+     that, and a full-screen backdrop filter is one of the most expensive
+     things a compositor can be asked for. */
   color: var(--bone);
   display: flex; justify-content: center;
   overflow-y: auto; overscroll-behavior: contain;

@@ -40,6 +40,31 @@ export interface Quality {
   /** warm wall lamps; each one costs every lit fragment in the room */
   maxLamps: number;
   dprCap: number;
+  /**
+   * The ceiling on how often the room is drawn at all.
+   *
+   * Nothing in this exhibition moves fast enough to need a frame every
+   * refresh: the camera drifts, the letters breathe, the dust falls. On a
+   * 120Hz laptop panel an uncapped loop draws the whole room twice for every
+   * one of those a visitor could tell apart, and the fan is the only thing
+   * that reports it. This is the single largest saving here and the only one
+   * with no visible cost at all.
+   */
+  maxFps: number;
+  /**
+   * Multisampling. Real, and expensive at 2× device pixel ratio — the
+   * resolve pass runs over every pixel of a full-screen canvas — so the
+   * budget that exists to save a battery does without it.
+   */
+  antialias: boolean;
+  /**
+   * Which GPU to ask for. A laptop with two of them reads
+   * `high-performance` as an instruction to spin up the discrete one, which
+   * is most of the heat and most of the battery; `low-power` keeps the room
+   * on the integrated chip, where a scene this size belongs when the visitor
+   * has asked for smooth.
+   */
+  powerPreference: WebGLPowerPreference;
 }
 
 const PRESETS: Record<QualityName, Omit<Quality, 'name'>> = {
@@ -53,6 +78,9 @@ const PRESETS: Record<QualityName, Omit<Quality, 'name'>> = {
     detailBays: 2,
     maxLamps: 2,
     dprCap: 1,
+    maxFps: 30,
+    antialias: false,
+    powerPreference: 'low-power',
   },
   mid: {
     reflections: false,
@@ -64,6 +92,9 @@ const PRESETS: Record<QualityName, Omit<Quality, 'name'>> = {
     detailBays: 3,
     maxLamps: 4,
     dprCap: 1.5,
+    maxFps: 60,
+    antialias: true,
+    powerPreference: 'default',
   },
   high: {
     reflections: true,
@@ -75,6 +106,9 @@ const PRESETS: Record<QualityName, Omit<Quality, 'name'>> = {
     detailBays: 5,
     maxLamps: 6,
     dprCap: 2,
+    maxFps: 60,
+    antialias: true,
+    powerPreference: 'high-performance',
   },
 };
 
