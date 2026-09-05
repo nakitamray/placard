@@ -83,6 +83,11 @@ export interface ArtworkRecord {
    */
   reproduction?: string;
   /**
+   * A label and a URL shown on the placard, for a work reproduced as a
+   * fragment of itself: "The whole scroll, at the British Museum".
+   */
+  link?: { label: string; url: string };
+  /**
    * How this work is framed, where a rectangle is the wrong answer: 'round'
    * for a tondo, 'divided' for a pair of panels hung as one object with a
    * moulded divider between them. Omitted, the museum's own frame is used.

@@ -278,6 +278,7 @@ function buildMeta(
     },
     labelText: record.labelText,
     extendedNote: record.extendedNote,
+    ...(record.link ? { link: record.link } : {}),
     textProvenance: {
       type: 'placard_original',
       attribution:

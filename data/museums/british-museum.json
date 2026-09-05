@@ -100,8 +100,8 @@
         "artworkIndex": 2
       },
       {
-        "id": "r-fayum",
-        "name": "Fayum",
+        "id": "r-ani",
+        "name": "Papyrus of Ani",
         "svgPath": "M30,105 L95,105 L95,185 L30,185 Z",
         "centroid": [
           62,
@@ -111,8 +111,8 @@
         "artworkIndex": 3
       },
       {
-        "id": "r-meidum",
-        "name": "Meidum",
+        "id": "r-rubens",
+        "name": "Rubens",
         "svgPath": "M30,195 L95,195 L95,275 L30,275 Z",
         "centroid": [
           62,
@@ -144,8 +144,8 @@
         "artworkIndex": 6
       },
       {
-        "id": "r-ani",
-        "name": "Book of Ani",
+        "id": "r-durer",
+        "name": "Dürer",
         "svgPath": "M100,285 L200,285 L200,310 L100,310 Z",
         "centroid": [
           150,
@@ -193,8 +193,8 @@
     "hokusai-great-wave",
     "nebamun-marshes",
     "gu-kaizhi-admonitions",
-    "fayum-mummy-portraits",
-    "geese-of-meidum",
+    "ani-book-of-the-dead",
+    "rubens-isabella-brant",
     "white-the-flyer",
     "schouman-birds",
     "durer-rhinoceros",

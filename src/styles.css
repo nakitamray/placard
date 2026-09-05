@@ -358,6 +358,17 @@ button:active { transform: translateY(1px); }
 .placard-housing { font-weight: 500; }
 .placard-room { color: var(--taupe) !important; }
 .placard-label { margin-top: var(--s2) !important; }
+/* the way out to the whole object, for a work shown as a fragment. Set as a
+   line of its own under the wall text: it is not a control, it is a citation */
+.placard-link {
+  display: block; margin-top: var(--s3);
+  color: var(--gilt); text-decoration: none;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.35);
+  padding-bottom: 2px; width: fit-content;
+  transition: border-color var(--d-fast), color var(--d-fast);
+}
+.placard-link:hover { color: #ddb734; border-color: #ddb734; }
+
 .placard-more { color: var(--gilt) !important; margin-top: var(--s4); display: inline-flex; gap: 6px; }
 .placard-more .chev { display: inline-block; transition: rotate var(--d-base) var(--e-both); }
 .placard.is-expanded .placard-more .chev { rotate: 180deg; }

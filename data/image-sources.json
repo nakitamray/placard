@@ -68,16 +68,9 @@
     "note": "Search may return the whole tomb-chapel group; pin the marsh-hunting fragment."
   },
   "gu-kaizhi-admonitions": {
-    "search": "Admonitions Scroll Gu Kaizhi British Museum",
-    "note": "A handscroll: pick a section, not the full 3.4m strip, or it hangs as a sliver."
-  },
-  "fayum-mummy-portraits": {
-    "search": "British Museum mummy portrait Hawara Roman Egypt encaustic limewood panel",
-    "note": "The British Museum's own Fayum portraits, from Petrie's Hawara excavations — not the Berlin, Louvre or Metropolitan panels, which search reaches for first because they are better photographed."
-  },
-  "geese-of-meidum": {
-    "search": "Meidum geese facsimile painting Nefermaat Itet",
-    "note": "The original panel is in Cairo and every museum outside it shows a facsimile, so a facsimile is what this hangs — see the record's \"reproduction\" line."
+    "commonsFile": "File:Admonitions Scroll Scene 4.jpg",
+    "search": "Admonitions Scroll Gu Kaizhi British Museum scene",
+    "note": "Scene Four of nine, the toilette scene. The scroll is reproduced on Commons scene by scene; the whole-scroll files are three metres of silk at a hundred pixels high and unusable on a wall."
   },
   "white-the-flyer": {
     "search": "John White The Flyer Secotan conjuror Roanoke watercolour British Museum",
@@ -132,8 +125,9 @@
     "search": "Van Gogh Starry Night Over the Rhone 1888"
   },
   "renoir-moulin-galette": {
-    "search": "Renoir Bal du moulin de la Galette Musee d'Orsay Google Art Project",
-    "note": "The flat reproduction, not a photograph taken in the gallery: a 3:2 file is a camera's shape, not a canvas's."
+    "commonsFile": "File:Renoir, Pierre-Auguste - Dance at Le Moulin de la Galette, 1876.jpg",
+    "search": "Renoir Bal du moulin de la Galette Musee d'Orsay",
+    "note": "The Musée d'Orsay's canvas, flat: a 3:2 file is a camera's shape, not this painting's."
   },
   "manet-olympia": {
     "search": "Édouard Manet Olympia 1863 Orsay"
@@ -285,5 +279,15 @@
   "caravaggio-supper-emmaus": {
     "commonsFile": "File:1602-3 Caravaggio,Supper at Emmaus National Gallery, London.jpg",
     "search": "Caravaggio Supper at Emmaus National Gallery London"
+  },
+  "ani-book-of-the-dead": {
+    "commonsFile": "File:BD Weighing of the Heart.jpg",
+    "search": "Papyrus of Ani Book of the Dead weighing of the heart British Museum",
+    "note": "The judgement scene from the Papyrus of Ani, one sheet of a scroll cut into thirty-seven for mounting."
+  },
+  "rubens-isabella-brant": {
+    "commonsFile": "File:Peter Paul Rubens - Portrait of Isabella Brant (British Museum 1482535001).jpg",
+    "search": "Rubens Portrait of Isabella Brant drawing British Museum",
+    "note": "The chalk drawing in the British Museum's Department of Prints and Drawings — not the painted portraits of the same sitter in Florence and Cleveland."
   }
 }

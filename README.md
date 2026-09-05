@@ -316,12 +316,12 @@ Changing a pin is enough on its own — a scan that came from a different file i
 treated as stale and re-fetched without `--force`. `pnpm fetch:images --check`
 lists every work in that state.
 
-A few entries need judgement rather than search: the Fayum portrait and John
-White's album are whole classes of object rather than one work, the Dunhuang
-banners come in two shapes depending on whether the streamers are attached, the
-Admonitions Scroll is long enough that you want a specific section, and several
-Van Gogh and Monet subjects exist in many versions. Each of those carries a
-`note` in `data/image-sources.json` saying what to look for.
+A few entries need judgement rather than search: John White's album is a whole
+class of object rather than one work, the Dunhuang banners come in two shapes
+depending on whether the streamers are attached, the Admonitions Scroll and the
+Papyrus of Ani are both reproduced one scene at a time, and several Van Gogh and
+Monet subjects exist in many versions. Each of those carries a `note` in
+`data/image-sources.json` saying what to look for.
 
 ### When a scan disagrees with its catalogue
 
@@ -352,12 +352,21 @@ is shown as a section; the Geese of Meidum is in Cairo and what every other
 museum hangs is a facsimile. Where that is the case, say so in the record:
 
 ```json
-"reproduction": "The original painted plaster is in the Egyptian Museum, Cairo …"
+"reproduction": "The scroll is three and a half metres long … what is reproduced
+                 here is the fourth of its nine surviving scenes"
 ```
 
-That sentence is printed on the colophon beside the image credit, and the
-proportions check stops asking. It is a statement, not a silencer — a visitor
-looking at a facsimile is owed the same sentence the check was owed.
+That sentence is printed on the colophon beside the image credit, and both the
+proportions check and the fetcher's own gate stop applying the whole object's
+shape to a picture of part of it. It is a statement, not a silencer — a visitor
+looking at one scene of nine is owed the same sentence the check was owed. A
+work in that position can also carry a `link`, which the placard shows under
+the wall text:
+
+```json
+"link": { "label": "The whole scroll, at the British Museum",
+          "url": "https://www.britishmuseum.org/collection/object/A_1903-0408-0-1" }
+```
 
 To supply a scan by hand instead, save it as `data/artworks/{id}/source.jpg`
 and run `pnpm build:assets`. `data/.cache/previews/{id}.png` shows the glyph
