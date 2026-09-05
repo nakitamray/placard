@@ -1,13 +1,19 @@
 {
-  "buildCommand": "pnpm build:assets && pnpm build",
+  "buildCommand": "pnpm check && pnpm build:assets && pnpm build",
   "outputDirectory": "dist",
   "framework": "vite",
   "headers": [
     {
       "source": "/artworks/(.*)\\.bin",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
-        { "key": "Content-Type", "value": "application/octet-stream" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/octet-stream"
+        }
       ]
     }
   ]

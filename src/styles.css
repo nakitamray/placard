@@ -1,4 +1,4 @@
-/* ─── Placard UI system — spec §10C ───────────────────────────────────────
+/* ─── Placard UI system ───────────────────────────────────────
    The interface is the quiet frame around a loud idea. */
 
 :root {
@@ -36,7 +36,7 @@ body { margin: 0; overflow: hidden; background: var(--ink); }
 
 .no-native-cursor, .no-native-cursor * { cursor: none !important; }
 
-/* ─── type scale — spec §10C.2 ─── */
+/* ─── type scale ─── */
 .caption { font-size: 11px; line-height: 16px; letter-spacing: 0.09em; text-transform: uppercase; }
 .meta    { font-size: 13px; line-height: 20px; letter-spacing: 0.02em; font-variant-caps: small-caps; text-transform: none; }
 .body    { font-size: 16px; line-height: 26px; letter-spacing: 0; text-transform: none; }
@@ -60,7 +60,7 @@ button {
   cursor: pointer;
 }
 button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
-  outline: 2px solid var(--gilt); /* never outline: none — spec §10C.10 */
+  outline: 2px solid var(--gilt); /* never outline: none */
   outline-offset: 3px;
 }
 button:active { transform: translateY(1px); }
@@ -73,10 +73,10 @@ button:active { transform: translateY(1px); }
 }
 .canvas-wrap.is-blurred {
   filter: blur(14px) saturate(0.92);
-  transform: scale(1.02); /* map backdrop breathes 1.00 → 1.02 (spec §10B.3) */
+  transform: scale(1.02); /* map backdrop breathes 1.00 → 1.02 */
 }
 
-/* ─── loading — spec §10C.8 ─── */
+/* ─── loading ─── */
 .loading { position: fixed; inset: 0; background: var(--ink); z-index: 60; }
 .loading-word {
   position: absolute; bottom: 28px; left: 0; right: 0;
@@ -94,7 +94,7 @@ button:active { transform: translateY(1px); }
   background: var(--bone); color: var(--ink); padding: var(--s6); text-align: center;
 }
 
-/* ─── landing — spec §10C.3 ─── */
+/* ─── landing ─── */
 /* Transparent: the background of this page is the live glyph canvas rendering
    behind it. Only the reduced-motion fallback paints a ground of its own.
 
@@ -214,12 +214,11 @@ button:active { transform: translateY(1px); }
 }
 .skip-link:focus { top: var(--s4); }
 
-/* ─── map overlay — spec §10C.4 ──────────────────────────────────────────
-   The wing's index. It used to be a drawn floor plan on a bone scrim: pale,
-   boxy and, next to the corridor it opens over, unfinished-looking — the one
-   screen in the exhibition that switched the lights on. It is now the same
-   dark ground and hairline rules as the landing, so choosing a painting reads
-   as the same act as choosing a museum. */
+/* ─── map overlay ────────────────────────────────────────────────────────
+   The wing's index: the same dark ground and hairline rules as the entrance,
+   so choosing a painting reads as the same act as choosing a museum. A pale
+   scrim here would be the one screen in the exhibition that switches the
+   lights on. */
 .map-overlay {
   position: fixed; inset: 0; z-index: 30;
   background: linear-gradient(180deg, rgba(14, 12, 10, 0.9), rgba(20, 17, 14, 0.94));
@@ -293,7 +292,7 @@ button:active { transform: translateY(1px); }
   .room-cue { display: none; }
 }
 
-/* ─── placard — spec §10C.5 ─── */
+/* ─── placard ─── */
 .placard {
   position: fixed; top: 0; left: 0; z-index: 25;
   width: 380px; background: var(--bone);
@@ -307,7 +306,7 @@ button:active { transform: translateY(1px); }
 }
 .placard.is-visible {
   opacity: 1; visibility: visible; translate: 0 0;
-  transition-delay: 400ms, 400ms, 0s; /* placard slides in late (spec §10.6) */
+  transition-delay: 400ms, 400ms, 0s; /* placard slides in late */
 }
 /* The label stays up while it is read, so it needs a way out of its own. */
 .placard-close {
@@ -342,7 +341,7 @@ button:active { transform: translateY(1px); }
 .placard-provenance { font-style: italic; color: var(--taupe) !important; margin-top: var(--s5) !important; }
 
 @media (pointer: coarse), (max-width: 720px) {
-  /* bottom sheet (spec §10C.5 mobile) */
+  /* bottom sheet */
   .placard {
     top: auto; bottom: 0; left: 0; right: 0; width: 100%;
     translate: 0 40px; max-height: 55vh;
@@ -356,7 +355,7 @@ button:active { transform: translateY(1px); }
   }
 }
 
-/* ─── rail indicator — spec §10C.6 ─── */
+/* ─── rail indicator ─── */
 .rail {
   position: fixed; bottom: 92px; left: 50%; transform: translateX(-50%);
   z-index: 20; text-align: center;
@@ -376,7 +375,7 @@ button:active { transform: translateY(1px); }
    map overlay as well, so "back" is in the same place in every phase. */
 .gallery-back { position: fixed; top: var(--s5); left: var(--s6); z-index: 32; }
 
-/* ─── reveal vignette — spec §10.6: 18% opacity, generous radius ─── */
+/* ─── reveal vignette: 18% opacity, generous radius ─── */
 .reveal-vignette {
   position: fixed; inset: 0; z-index: 15; pointer-events: none;
   background: radial-gradient(ellipse 130% 130% at center, transparent 55%, rgba(36, 31, 26, 0.18) 100%);
@@ -659,7 +658,7 @@ button:active { transform: translateY(1px); }
 .contact-again { color: #8a6d12; margin-top: var(--s2); }
 .contact-again:hover { text-decoration: underline; }
 
-/* ─── cursor — spec §10C.7 ───────────────────────────────────────────────
+/* ─── cursor ───────────────────────────────────────────────
    A thin light ring carrying its own dark contact shadow, so it reads against
    the black corridor AND the bone map scrim without changing colour. */
 .cursor-ring {

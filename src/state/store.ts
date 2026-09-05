@@ -17,7 +17,7 @@ interface AppStore {
   corridorT: number;
   /** current artwork index on the gallery rail */
   index: number;
-  /** artwork sub-state of GALLERY (spec §9 — not a route change) */
+  /** artwork sub-state of GALLERY */
   revealed: boolean;
   /**
    * Whether the reveal was ASKED for.

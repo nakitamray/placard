@@ -1,5 +1,5 @@
 /**
- * CorridorScene — spec §10.2 / §10A.
+ * CorridorScene
  *
  * One procedural machine, five museums. The architecture (ceiling, floor, wall
  * treatment, fixtures, frames), the palette and the entire lighting rig come
@@ -516,11 +516,10 @@ function Lamps({
 }
 
 /* ─── how far one press of an arrow key walks you ──────────────────────────
-   A single tap used to hand the visitor a fifth of the corridor, which made
-   the whole rail feel like it was on castors. A tap is now a step: a fixed
-   small nudge on keydown, then — only if the key stays down — a walk that
-   eases up to speed. Distance is measured in rail units, where 1 is the
-   whole corridor. */
+   A tap is a step and a hold is a walk: a fixed small nudge on keydown, then —
+   only if the key stays down — a stride that eases up to speed. A tap that
+   hands over a fifth of the corridor makes the whole rail feel like it is on
+   castors. Distance is in rail units, where 1 is the whole corridor. */
 /** one short press */
 const TAP_STEP = 0.012;
 /** grace before a press counts as a hold, in seconds */
@@ -648,7 +647,7 @@ export function CorridorScene({ quality }: { quality: Quality }) {
     }
   }, [phase, reducedMotion]);
 
-  // T3 warp: map → gallery, straight through the end wall (spec §11)
+  // T3 warp: map → gallery, straight through the end wall
   useEffect(() => {
     if (phase !== 'warp') return;
     warp.p = 0;

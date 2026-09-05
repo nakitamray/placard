@@ -192,12 +192,11 @@ function impulse(c: AudioContext): AudioBuffer {
 /**
  * What a museum actually sounds like.
  *
- * Two earlier attempts were both, in the end, wind: a band of noise held open
- * for a second and a half is a gust however it is filtered, because what makes
- * noise into a voice is not its colour but its *rhythm*. Speech is syllables —
- * bursts of a tenth of a second with gaps between them — and it lives in
- * formants, two or three narrow resonances stacked in a particular
- * relationship, not in one swept band.
+ * What makes noise into a voice is not its colour but its *rhythm*: a band of
+ * noise held open for a second and a half is wind however it is filtered.
+ * Speech is syllables — bursts of a tenth of a second with gaps between them —
+ * and it lives in formants, two or three narrow resonances stacked in a
+ * particular relationship, not in one swept band.
  *
  * So a murmur here is built the way a voice is built: three resonant filters
  * at formant frequencies, driven by noise, opened and shut by a syllabic

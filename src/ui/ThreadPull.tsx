@@ -73,12 +73,11 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
   /*
    * Space turns thread mode on, and leaves it on.
    *
-   * It used to be Shift, held down for as long as you wanted to read — which
-   * meant holding a key with one hand and steering with the other for as long
-   * as the passage took, and losing the passage the moment you let go to
-   * scroll or to think. It is a mode, so it is now a switch: press Space and
-   * the canvas becomes a map of its own passages, hover them to read, press
-   * Space (or Esc) to have the painting back.
+   * Reading a passage takes both hands and a minute, so a held modifier is the
+   * wrong control: it costs a hand for the whole time and drops the passage
+   * the moment you let go to scroll or to think. This is a mode, so it gets a
+   * switch — press Space and the canvas becomes a map of its own passages,
+   * hover them to read, press Space (or Esc) to have the painting back.
    */
   useEffect(() => {
     if (!inGallery) {
@@ -86,7 +85,7 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
       return;
     }
     /*
-     * WHY THIS LISTENS IN THE CAPTURE PHASE AND BLURS THE FOCUSED CONTROL
+     * Listens in the capture phase, and blurs the focused control first.
      *
      * Space is also how a browser activates the focused button. Anyone who had
      * clicked the sound toggle, a quality word or the atlas link — which is

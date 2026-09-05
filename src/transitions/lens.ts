@@ -1,16 +1,13 @@
 /**
  * The reading lens — a hole of paint dragged across a field of words.
  *
- * The reveal used to be a switch: hover the canvas and the whole painting
- * resolved, leave it and the whole painting dissolved. That is one bit of
- * information, and it hides the thing the exhibition is actually about — the
- * seam between the text and the picture, which is only interesting when you
- * can hold it still and look at it.
- *
- * So hovering now opens a lens instead. Inside a soft circle under the cursor
- * the glyphs give way and the reproduction shows through; everywhere else the
- * painting is still made of its own words. Clicking is still the whole
- * reveal — the lens is for looking, the click is for reading the label.
+ * Hovering a canvas opens a soft circle under the cursor: inside it the glyphs
+ * give way and the reproduction shows through, and everywhere else the
+ * painting is still made of its own words. The seam between the two is the
+ * thing this exhibition is about, and a lens is what lets you hold it still
+ * and look at it. A whole-canvas dissolve carries one bit of information and
+ * hides the seam entirely, so that is what clicking is for: the lens is for
+ * looking, the click is for reading the label.
  *
  * Lives outside React for the same reason `revealAnim` does: it is written on
  * every pointer move and read in `useFrame`, and neither should cost a render.

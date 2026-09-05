@@ -1,5 +1,5 @@
 /**
- * GalleryScene — spec §10.4 / §10.6 / M6.
+ * GalleryScene
  *
  * The room you are in when you are looking at one painting.
  *
@@ -46,10 +46,10 @@ const SPACING = 8;
  * How far back the camera stands, and how big the canvas is drawn.
  *
  * These four numbers are one decision: how much of the screen the painting
- * gets. The room used to win — a 2.2m canvas at 5.6m through a 45° lens fills
- * about three fifths of the frame, and once a salon moulding is wrapped round
- * it the picture itself is barely half. A visitor who has walked down a
- * corridor and chosen this painting should be looking at the painting.
+ * gets against how much of it the room gets. A visitor who has walked down a
+ * corridor and chosen this painting should be looking at the painting, so the
+ * canvas wins — a moulding wrapped round a work that only fills three fifths
+ * of the frame leaves the picture itself at barely half.
  */
 const CAM_Z = 5.2;
 /** the height a work is hung at unless it is too wide to allow it */
@@ -69,7 +69,7 @@ const WALL_H = 6.2;
  */
 const LENS_RADIUS = 0.26;
 
-/** screen-space projection of the active plane for the DOM placard (§10.7) */
+/** screen-space projection of the active plane for the DOM placard */
 export const placardAnchor = { x: 0, y: 0, edge: 0, visible: false };
 
 /* ── the moulded bay around one painting ────────────────────────────────── */
@@ -265,7 +265,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
   const touch = useRef({ x: 0, active: false });
   const roomTone = useRef(new THREE.Color('#3A3630'));
 
-  // load current + warm zone (spec §7.5). The work in front of the visitor
+  // load current + warm zone. The work in front of the visitor
   // loads immediately; its neighbours wait for an idle moment, so a prefetch
   // never delays the only painting on screen.
   useEffect(() => {
@@ -303,15 +303,15 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
    * The lens belongs to the canvas under the cursor and to nothing else.
    *
    * Moving along the rail, leaving the room, or switching into thread mode all
-   * have to shut it, or a circle of paint is left hanging over a work the
-   * cursor is no longer on.
+   * have to shut it, or a circle of paint hangs over a work the cursor has
+   * left.
    */
   useEffect(() => {
     closeLens();
     return closeLens;
   }, [index]);
 
-  // rail input: wheel / drag / arrows; scroll exits a reveal (spec §9)
+  // rail input: wheel / drag / arrows; scroll exits a reveal
   useEffect(() => {
     gallery.goal = index * SPACING;
     gallery.x = index * SPACING;
@@ -324,7 +324,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
       gallery.goal += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * 0.01;
       gallery.goal = Math.max(-1.5, Math.min((artworks.length - 1) * SPACING + 1.5, gallery.goal));
       wheelEnd.t = performance.now();
-      // magnetic snap after the wheel settles (spec §10.4)
+      // magnetic snap after the wheel settles
       setTimeout(() => {
         if (performance.now() - wheelEnd.t < 140) return;
         const i = Math.round(gallery.goal / SPACING);
@@ -399,7 +399,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
   useFrame((state, delta) => {
     gallery.x = damp(gallery.x, gallery.goal, 0.09, delta);
 
-    // pointer parallax, damped (spec §10B)
+    // pointer parallax, damped
     const k = dampK(0.06, delta);
     const px = reducedMotion ? 0 : pointer.x;
     const py = reducedMotion ? 0 : pointer.y;
@@ -458,7 +458,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
       }
     }
 
-    // spotlight follows + intensifies on reveal (spec §10.6)
+    // spotlight follows + intensifies on reveal
     if (spotRef.current) {
       spotRef.current.position.set(index * SPACING, 4.6, 2.4);
       spotTarget.current.position.set(index * SPACING, HANG_Y, 0);
@@ -467,7 +467,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     }
     scene.environmentIntensity = 0.45 * revealAnim.env;
 
-    // project the active plane edge for the DOM placard (spec §10.7)
+    // project the active plane edge for the DOM placard
     const activeEntry = artworks[index];
     if (activeEntry) {
       const { width: w, height: h } = fitWork(activeEntry.aspect, PLANE_H, MAX_W);
@@ -514,7 +514,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
         <planeGeometry args={[railW, 14]} />
         <meshStandardMaterial color={p.ceiling} roughness={0.9} />
       </mesh>
-      {/* opposite wall, far behind the camera (true-3D parallax layer, §10B.3) */}
+      {/* opposite wall, far behind the camera — the true-3D parallax layer */}
       <mesh position={[centreX, WALL_H / 2, 10.5]} rotation={[0, Math.PI, 0]}>
         <planeGeometry args={[railW, WALL_H + 2]} />
         <meshStandardMaterial color={p.wallDeep} roughness={0.9} />
@@ -596,11 +596,10 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
             if (s.extractionMode) {
               /*
                * Keep reporting what is under the cursor even while a passage
-               * is out. This used to return early once anything was pulled,
-               * which froze `hoveredRegion` — so moving to another part of
-               * the painting changed nothing, and the only way to read a
-               * second passage was to leave thread mode and come back.
-               * Thread mode is meant to be a mode you move around inside.
+               * is out. Thread mode is a mode you move around inside: stop
+               * updating `hoveredRegion` once something is pulled and the only
+               * way to reach a second passage is to leave the mode and come
+               * back.
                */
               const region = art ? regionAt(art.meta.regions ?? [], u, v) : null;
               if (region?.id !== s.hoveredRegion?.id) s.setHoveredRegion(region);

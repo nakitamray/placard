@@ -2,14 +2,14 @@
  * ArtworkPlane — the painting surface in the gallery.
  *
  * Active plane samples the shared glyph render target; inactive planes show
- * their 512px corridor texture, dimmed (spec §7.4 LOD). The reveal crossfades
+ * their 512px corridor texture, dimmed. The reveal crossfades
  * to the authentic painting. Fidelity path: tone mapping is skipped so the
  * reproduction stays faithful.
  *
  * The reproduction is fetched only once a reveal asks for it, so for the first
  * moment of a reveal there is nothing to cross-fade to yet. `uHasPaint` is
  * that moment: it holds at 0 while the only picture in hand is the 512px
- * texture — which is exactly the blur-up the spec wants, at no extra request —
+ * texture — which is the blur-up, at no extra request —
  * and eases to 1 over a third of a second when the reproduction lands. Without
  * it the painting snaps into focus mid-dissolve on a slow connection.
  */
@@ -120,12 +120,12 @@ export function ArtworkPlane({
       u.uUseGlyph.value = 0;
       u.uMix.value = 0;
       u.uLensAmt.value = 0;
-      u.uDim.value = 0.62; // neighbours read dimmed but legible (spec §10.6)
+      u.uDim.value = 0.62; // neighbours read dimmed but legible
     }
   });
 
-  // The frame is no longer drawn here: the surrounding scene mounts an
-  // OrnateFrame around this position, so the plane is only ever the canvas.
+  // The plane is only ever the canvas — the surrounding scene mounts an
+  // OrnateFrame around this position.
   return (
     <group position={position}>
       <mesh

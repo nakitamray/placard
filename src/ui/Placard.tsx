@@ -1,17 +1,16 @@
 /**
- * Placard — spec §10.7 / §10C.5.
+ * The wall label.
  *
- * DOM element positioned by projecting the plane's world position; two tiers
- * (wall label shown immediately, extended note on expand). Provenance gets
- * two treatments: housing prominent and plain; text origin in small italics
- * where a real credit line sits.
+ * A DOM card positioned by projecting the canvas's world position, in two
+ * tiers: the label everyone reads, and the extended note behind "Read more".
+ * Provenance gets two treatments — the housing plain and prominent, because it
+ * is the load-bearing fact, and the text's own origin in small italics where a
+ * credit line sits on a real placard.
  *
- * The card stays up once a work is revealed. It used to be tied to the
- * cursor being over the canvas, which meant reading it required holding the
- * mouse somewhere other than where you were reading — and scrolling to reach
- * the end of the note dismissed it outright. It now behaves like a wall
- * label: it appears when you look at the work, it stays while you read it,
- * and it goes when you say so.
+ * It behaves like a wall label and not like a tooltip: it arrives when you
+ * click a work, it stays while you read it, and it goes when you say so.
+ * Anything tied to the cursor being over the canvas would mean holding the
+ * mouse somewhere other than where you are reading.
  */
 import { useEffect, useRef, useState } from 'react';
 import { selectArtworks, useStore } from '../state/store';
@@ -52,8 +51,7 @@ export function Placard() {
     };
   }, [artworks, index, phase]);
 
-  // track the projected plane edge (spec §10.7: offset 40px right of frame,
-  // clamped 24px from the viewport edge)
+  // track the projected plane edge, clamped 24px from the viewport edge
   useEffect(() => {
     if (phase !== 'gallery' || !revealed || !latched) return;
     let raf = 0;

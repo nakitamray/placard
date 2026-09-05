@@ -1,5 +1,5 @@
 /**
- * Application state machine — spec §9.
+ * Application state machine
  *
  * BOOT → LANDING →(T1 portal)→ CORRIDOR →(T2)→ MAP →(T3 warp)→ GALLERY
  * ARTWORK is a sub-state of GALLERY (the camera does not move), so it is

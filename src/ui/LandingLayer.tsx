@@ -52,16 +52,12 @@ export function LandingLayer() {
   const stills = reducedMotion;
   const [images, setImages] = useState<ExhibitionWork[]>([]);
   /*
-   * The slide showing and the one it came from, moved together in a single
-   * update.
+   * The slide showing and the one it came from, in one piece of state.
    *
-   * The outgoing slide used to be remembered in a ref written by an effect
-   * after commit, which meant the very next render — and there is always one,
-   * because changing slides also resets the preload timer — found the ref
-   * already pointing at the new slide and unmounted the old one. The
-   * "crossfade" was therefore a fade up from black every time, which is
-   * exactly what it looked like. Holding both indices in one piece of state
-   * means the pair can never disagree.
+   * A crossfade needs both indices to be true at the same instant, and there
+   * is always a render between changing the slide and any effect that could
+   * record the old one — changing slides also resets the preload timer. Two
+   * values that must agree cannot be kept in two places.
    */
   const [slide, setSlide] = useState<{ cur: number; prev: number | null }>({
     cur: 0,
@@ -99,7 +95,7 @@ export function LandingLayer() {
     return () => window.clearTimeout(t);
   }, [current, images, stills]);
 
-  // slideshow (spec §10.1). No explicit preload of the one after next: the
+  // slideshow. No explicit preload of the one after next: the
   // next slide is already mounted and fetching, and reaching further ahead is
   // how this page ended up downloading the whole set.
   useEffect(() => {
@@ -123,7 +119,7 @@ export function LandingLayer() {
     return () => window.removeEventListener('pointermove', onMove);
   }, [stills, moved]);
 
-  // pointer parallax: background inverse 24px, title direct 6px (spec §10B.3)
+  // pointer parallax: background inverse 24px, title direct 6px
   useEffect(() => {
     if (reducedMotion) return;
     let raf = 0;
@@ -192,7 +188,7 @@ export function LandingLayer() {
     }
 
     // T1 push-through: landing layers scale outward at differing rates
-    // (foreground fastest) while the corridor dollies in behind (spec §11.1)
+    // (foreground fastest) while the corridor dollies in behind
     el.classList.add('is-chosen');
     const finish = () => {
       setLeaving(false);

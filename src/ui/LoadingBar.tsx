@@ -1,4 +1,4 @@
-/** Loading — spec §10C.8. No spinners: a 1px gilt rule fills across the bottom. */
+/** Loading No spinners: a 1px gilt rule fills across the bottom. */
 export function LoadingBar({ progress }: { progress: number }) {
   return (
     <div className="loading" role="status" aria-label="Preparing the gallery">

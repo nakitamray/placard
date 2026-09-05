@@ -1,23 +1,19 @@
 /**
- * Lazy artwork asset loading with a warm-zone prefetch (spec §7.5):
+ * Lazy artwork asset loading with a warm-zone prefetch:
  * glyphs.bin + corpus.bin + meta.json + textures, cached per artwork.
  *
- * What a visit actually costs is decided here.
+ * What a visit actually costs is decided here, and the rule is that nothing is
+ * fetched before somebody has asked for it.
  *
- * Two things used to make walking into a gallery expensive. The first is that
- * loading an artwork also kicked off its 2000px reproduction in the
- * background — every time, for every work, revealed or not. The second is that
- * the warm zone loads four artworks at once, so arriving at a rail fetched
- * four reproductions and four glyph binaries before the visitor had done
- * anything at all.
+ * A reproduction is pulled only when a reveal asks for one, at the size the
+ * canvas is actually drawn (1200px), and upgraded to the full 2000px rung only
+ * if the visitor stays with the painting. Until then the 512px corridor
+ * texture already in memory stands in, which is a blur-up at no extra request.
  *
- * So: the reproduction is now fetched only when a reveal asks for it, at the
- * size the canvas is actually drawn (1200px), and upgraded to the full 2000px
- * one rung only if the visitor stays with the painting. Until then the 512px
- * corridor texture already loaded stands in — which is exactly the blur-up the
- * spec asks for, at no extra request. And the warm zone loads the work you are
- * standing in front of immediately and its neighbours when the browser is
- * next idle, so a prefetch never competes with the thing on screen.
+ * The warm zone loads the work you are standing in front of immediately and
+ * its neighbours when the browser is next idle. Four artworks at once on
+ * arrival — four reproductions and four glyph binaries — is what an eager
+ * prefetch costs, and it competes with the only thing on screen.
  */
 import * as THREE from 'three';
 import { loadGlyphs, type GlyphSet } from './loadGlyphs';
@@ -103,7 +99,7 @@ export function loadArtwork(id: string, tier: DeviceTier): Promise<LoadedArtwork
 
     const glyphs = loadGlyphs(glyphBuf);
 
-    // corpus → R8 texture, width 2048 (spec §5.2)
+    // corpus → R8 texture, width 2048
     const corpus = new Uint8Array(corpusBuf);
     const cw = 2048;
     const chRows = Math.max(1, Math.ceil(corpus.length / cw));
@@ -204,7 +200,7 @@ function whenIdle(fn: () => void) {
 }
 
 /**
- * Prefetch artworks in the warm zone around the rail position (spec §7.5).
+ * Prefetch artworks in the warm zone around the rail position.
  *
  * The work in front of the visitor is loaded now; its neighbours wait for an
  * idle moment. Same four artworks either way — but the one that matters is no

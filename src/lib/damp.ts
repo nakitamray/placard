@@ -1,5 +1,5 @@
 /**
- * Universal damping rule — spec §10B.2. Never bind a layer directly to raw
+ * Universal damping rule Never bind a layer directly to raw
  * pointer position; always ease toward a target, frame-rate normalised.
  */
 export function dampK(base: number, delta: number): number {

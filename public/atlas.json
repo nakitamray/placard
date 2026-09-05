@@ -1,1413 +1,1463 @@
 {
- "entities": [
-  {
-   "id": "leonardo",
-   "kind": "painter",
-   "label": "Leonardo da Vinci",
-   "note": "1452–1519"
-  },
-  {
-   "id": "michelangelo",
-   "kind": "painter",
-   "label": "Michelangelo",
-   "note": "1475–1564"
-  },
-  {
-   "id": "raphael",
-   "kind": "painter",
-   "label": "Raphael",
-   "note": "1483–1520"
-  },
-  {
-   "id": "giotto",
-   "kind": "painter",
-   "label": "Giotto",
-   "note": "c.1267–1337"
-  },
-  {
-   "id": "caravaggio",
-   "kind": "painter",
-   "label": "Caravaggio",
-   "note": "1571–1610"
-  },
-  {
-   "id": "veronese",
-   "kind": "painter",
-   "label": "Veronese",
-   "note": "1528–1588"
-  },
-  {
-   "id": "velazquez",
-   "kind": "painter",
-   "label": "Diego Velázquez",
-   "note": "1599–1660"
-  },
-  {
-   "id": "el-greco",
-   "kind": "painter",
-   "label": "El Greco",
-   "note": "1541–1614"
-  },
-  {
-   "id": "rembrandt",
-   "kind": "painter",
-   "label": "Rembrandt",
-   "note": "1606–1669"
-  },
-  {
-   "id": "vermeer",
-   "kind": "painter",
-   "label": "Johannes Vermeer",
-   "note": "1632–1675"
-  },
-  {
-   "id": "schouman",
-   "kind": "painter",
-   "label": "Aert Schouman",
-   "note": "1710–1792"
-  },
-  {
-   "id": "durer",
-   "kind": "painter",
-   "label": "Albrecht Dürer",
-   "note": "1471–1528"
-  },
-  {
-   "id": "david",
-   "kind": "painter",
-   "label": "Jacques-Louis David",
-   "note": "1748–1825"
-  },
-  {
-   "id": "ingres",
-   "kind": "painter",
-   "label": "J.-A.-D. Ingres",
-   "note": "1780–1867"
-  },
-  {
-   "id": "gericault",
-   "kind": "painter",
-   "label": "Théodore Géricault",
-   "note": "1791–1824"
-  },
-  {
-   "id": "delacroix",
-   "kind": "painter",
-   "label": "Eugène Delacroix",
-   "note": "1798–1863"
-  },
-  {
-   "id": "millet",
-   "kind": "painter",
-   "label": "Jean-François Millet",
-   "note": "1814–1875"
-  },
-  {
-   "id": "manet",
-   "kind": "painter",
-   "label": "Édouard Manet",
-   "note": "1832–1883"
-  },
-  {
-   "id": "degas",
-   "kind": "painter",
-   "label": "Edgar Degas",
-   "note": "1834–1917"
-  },
-  {
-   "id": "whistler",
-   "kind": "painter",
-   "label": "James McNeill Whistler",
-   "note": "1834–1903"
-  },
-  {
-   "id": "cezanne",
-   "kind": "painter",
-   "label": "Paul Cézanne",
-   "note": "1839–1906"
-  },
-  {
-   "id": "monet",
-   "kind": "painter",
-   "label": "Claude Monet",
-   "note": "1840–1926"
-  },
-  {
-   "id": "renoir",
-   "kind": "painter",
-   "label": "Pierre-Auguste Renoir",
-   "note": "1841–1919"
-  },
-  {
-   "id": "caillebotte",
-   "kind": "painter",
-   "label": "Gustave Caillebotte",
-   "note": "1848–1894"
-  },
-  {
-   "id": "vangogh",
-   "kind": "painter",
-   "label": "Vincent van Gogh",
-   "note": "1853–1890"
-  },
-  {
-   "id": "sargent",
-   "kind": "painter",
-   "label": "John Singer Sargent",
-   "note": "1856–1925"
-  },
-  {
-   "id": "leutze",
-   "kind": "painter",
-   "label": "Emanuel Leutze",
-   "note": "1816–1868"
-  },
-  {
-   "id": "hokusai",
-   "kind": "painter",
-   "label": "Katsushika Hokusai",
-   "note": "1760–1849"
-  },
-  {
-   "id": "hiroshige",
-   "kind": "painter",
-   "label": "Utagawa Hiroshige",
-   "note": "1797–1858"
-  },
-  {
-   "id": "gu-kaizhi",
-   "kind": "painter",
-   "label": "Gu Kaizhi",
-   "note": "c.344–406"
-  },
-  {
-   "id": "john-white",
-   "kind": "painter",
-   "label": "John White",
-   "note": "c.1540–1593"
-  },
-  {
-   "id": "nebamun-workshop",
-   "kind": "painter",
-   "label": "The Nebamun painters",
-   "note": "Thebes, c.1350 BC"
-  },
-  {
-   "id": "meidum-workshop",
-   "kind": "painter",
-   "label": "The Meidum painters",
-   "note": "Egypt, c.2600 BC"
-  },
-  {
-   "id": "fayum-painters",
-   "kind": "painter",
-   "label": "The Fayum painters",
-   "note": "Roman Egypt, 1st–3rd c."
-  },
-  {
-   "id": "dunhuang-painters",
-   "kind": "painter",
-   "label": "The Dunhuang painters",
-   "note": "Cave 17, 8th–10th c."
-  },
-  {
-   "id": "paris",
-   "kind": "place",
-   "label": "Paris",
-   "note": ""
-  },
-  {
-   "id": "arles",
-   "kind": "place",
-   "label": "Arles",
-   "note": ""
-  },
-  {
-   "id": "argenteuil",
-   "kind": "place",
-   "label": "Argenteuil",
-   "note": ""
-  },
-  {
-   "id": "giverny",
-   "kind": "place",
-   "label": "Giverny",
-   "note": ""
-  },
-  {
-   "id": "aix",
-   "kind": "place",
-   "label": "Aix-en-Provence",
-   "note": ""
-  },
-  {
-   "id": "montmartre",
-   "kind": "place",
-   "label": "Montmartre",
-   "note": ""
-  },
-  {
-   "id": "barbizon",
-   "kind": "place",
-   "label": "Barbizon",
-   "note": ""
-  },
-  {
-   "id": "delft",
-   "kind": "place",
-   "label": "Delft",
-   "note": ""
-  },
-  {
-   "id": "amsterdam",
-   "kind": "place",
-   "label": "Amsterdam",
-   "note": ""
-  },
-  {
-   "id": "toledo",
-   "kind": "place",
-   "label": "Toledo",
-   "note": ""
-  },
-  {
-   "id": "venice",
-   "kind": "place",
-   "label": "Venice",
-   "note": ""
-  },
-  {
-   "id": "rome",
-   "kind": "place",
-   "label": "Rome",
-   "note": ""
-  },
-  {
-   "id": "florence",
-   "kind": "place",
-   "label": "Florence",
-   "note": ""
-  },
-  {
-   "id": "madrid",
-   "kind": "place",
-   "label": "Madrid",
-   "note": ""
-  },
-  {
-   "id": "london",
-   "kind": "place",
-   "label": "London",
-   "note": ""
-  },
-  {
-   "id": "nuremberg",
-   "kind": "place",
-   "label": "Nuremberg",
-   "note": ""
-  },
-  {
-   "id": "edo",
-   "kind": "place",
-   "label": "Edo",
-   "note": ""
-  },
-  {
-   "id": "mount-fuji",
-   "kind": "place",
-   "label": "Mount Fuji",
-   "note": ""
-  },
-  {
-   "id": "thebes",
-   "kind": "place",
-   "label": "Thebes",
-   "note": ""
-  },
-  {
-   "id": "dunhuang",
-   "kind": "place",
-   "label": "Dunhuang",
-   "note": ""
-  },
-  {
-   "id": "roanoke",
-   "kind": "place",
-   "label": "Roanoke",
-   "note": ""
-  },
-  {
-   "id": "vatican-city",
-   "kind": "place",
-   "label": "The Vatican",
-   "note": ""
-  },
-  {
-   "id": "impressionism",
-   "kind": "movement",
-   "label": "Impressionism",
-   "note": ""
-  },
-  {
-   "id": "post-impressionism",
-   "kind": "movement",
-   "label": "Post-Impressionism",
-   "note": ""
-  },
-  {
-   "id": "neoclassicism",
-   "kind": "movement",
-   "label": "Neoclassicism",
-   "note": ""
-  },
-  {
-   "id": "romanticism",
-   "kind": "movement",
-   "label": "Romanticism",
-   "note": ""
-  },
-  {
-   "id": "realism",
-   "kind": "movement",
-   "label": "Realism",
-   "note": ""
-  },
-  {
-   "id": "high-renaissance",
-   "kind": "movement",
-   "label": "High Renaissance",
-   "note": ""
-  },
-  {
-   "id": "venetian-school",
-   "kind": "movement",
-   "label": "The Venetian school",
-   "note": ""
-  },
-  {
-   "id": "baroque",
-   "kind": "movement",
-   "label": "Baroque",
-   "note": ""
-  },
-  {
-   "id": "ukiyo-e",
-   "kind": "movement",
-   "label": "Ukiyo-e",
-   "note": ""
-  },
-  {
-   "id": "dutch-golden-age",
-   "kind": "movement",
-   "label": "The Dutch Golden Age",
-   "note": ""
-  },
-  {
-   "id": "japonisme",
-   "kind": "movement",
-   "label": "Japonisme",
-   "note": ""
-  },
-  {
-   "id": "salon",
-   "kind": "event",
-   "label": "The Paris Salon",
-   "note": "The official exhibition everything was measured against"
-  },
-  {
-   "id": "salon-refuses",
-   "kind": "event",
-   "label": "Salon des Refusés, 1863",
-   "note": "Where the rejected hung, by imperial decree"
-  },
-  {
-   "id": "first-impressionist",
-   "kind": "event",
-   "label": "First Impressionist exhibition, 1874",
-   "note": "Nadar's old studio, boulevard des Capucines"
-  },
-  {
-   "id": "cafe-guerbois",
-   "kind": "event",
-   "label": "Café Guerbois",
-   "note": "Where the Batignolles group argued, from 1866"
-  },
-  {
-   "id": "prix-de-rome",
-   "kind": "event",
-   "label": "The Prix de Rome",
-   "note": "The Academy's road to Italy"
-  },
-  {
-   "id": "french-revolution",
-   "kind": "event",
-   "label": "The French Revolution",
-   "note": ""
-  },
-  {
-   "id": "napoleon",
-   "kind": "event",
-   "label": "Napoleon",
-   "note": "Emperor, patron, and the largest art thief in Europe"
-  },
-  {
-   "id": "sistine",
-   "kind": "event",
-   "label": "The Sistine Chapel",
-   "note": ""
-  },
-  {
-   "id": "stanze",
-   "kind": "event",
-   "label": "The Raphael Rooms",
-   "note": ""
-  },
-  {
-   "id": "woodblock",
-   "kind": "event",
-   "label": "Woodblock printing",
-   "note": ""
-  },
-  {
-   "id": "caillebotte-bequest",
-   "kind": "event",
-   "label": "The Caillebotte bequest, 1894",
-   "note": "The collection that put the Impressionists in a French museum"
-  }
- ],
- "works": {
-  "leonardo-mona-lisa": "leonardo",
-  "leonardo-st-john-baptist": "leonardo",
-  "leonardo-st-jerome": "leonardo",
-  "delacroix-liberty": "delacroix",
-  "delacroix-death-sardanapalus": "delacroix",
-  "david-coronation-napoleon": "david",
-  "david-oath-horatii": "david",
-  "david-death-socrates": "david",
-  "gericault-raft-medusa": "gericault",
-  "veronese-wedding-cana": "veronese",
-  "vermeer-lacemaker": "vermeer",
-  "vermeer-water-pitcher": "vermeer",
-  "ingres-grande-odalisque": "ingres",
-  "hokusai-great-wave": "hokusai",
-  "hiroshige-sudden-shower": "hiroshige",
-  "nebamun-marshes": "nebamun-workshop",
-  "geese-of-meidum": "meidum-workshop",
-  "fayum-mummy-portraits": "fayum-painters",
-  "gu-kaizhi-admonitions": "gu-kaizhi",
-  "white-portrait-lady": "john-white",
-  "schouman-birds": "schouman",
-  "durer-rhinoceros": "durer",
-  "dunhuang-cave-17": "dunhuang-painters",
-  "leutze-washington-delaware": "leutze",
-  "monet-water-lilies-bridge": "monet",
-  "sargent-madame-x": "sargent",
-  "el-greco-view-toledo": "el-greco",
-  "rembrandt-aristotle-homer": "rembrandt",
-  "vangogh-straw-hat": "vangogh",
-  "degas-dance-class": "degas",
-  "velazquez-juan-de-pareja": "velazquez",
-  "vangogh-starry-night-rhone": "vangogh",
-  "vangogh-self-portrait": "vangogh",
-  "renoir-moulin-galette": "renoir",
-  "manet-olympia": "manet",
-  "manet-dejeuner-sur-lherbe": "manet",
-  "millet-gleaners": "millet",
-  "cezanne-apples-oranges": "cezanne",
-  "cezanne-card-players": "cezanne",
-  "whistler-mother": "whistler",
-  "caillebotte-floor-scrapers": "caillebotte",
-  "michelangelo-creation-adam": "michelangelo",
-  "michelangelo-last-judgment": "michelangelo",
-  "raphael-school-athens": "raphael",
-  "raphael-transfiguration": "raphael",
-  "raphael-deliverance-peter": "raphael",
-  "raphael-madonna-foligno": "raphael",
-  "raphael-coronation-virgin": "raphael",
-  "caravaggio-entombment": "caravaggio",
-  "giotto-stefaneschi-triptych": "giotto"
- },
- "links": [
-  {
-   "a": "leonardo",
-   "b": "florence",
-   "kind": "worked in",
-   "word": "Florence"
-  },
-  {
-   "a": "leonardo",
-   "b": "rome",
-   "kind": "worked in",
-   "word": "Rome"
-  },
-  {
-   "a": "leonardo",
-   "b": "high-renaissance",
-   "kind": "of",
-   "word": "Renaissance"
-  },
-  {
-   "a": "michelangelo",
-   "b": "florence",
-   "kind": "worked in",
-   "word": "Florence"
-  },
-  {
-   "a": "michelangelo",
-   "b": "rome",
-   "kind": "worked in",
-   "word": "Rome"
-  },
-  {
-   "a": "michelangelo",
-   "b": "sistine",
-   "kind": "painted",
-   "word": "Sistine",
-   "note": "Four years on a scaffold, 1508 to 1512, painting a ceiling he had told the Pope he did not want to paint because he was a sculptor."
-  },
-  {
-   "a": "michelangelo",
-   "b": "high-renaissance",
-   "kind": "of",
-   "word": "Renaissance"
-  },
-  {
-   "a": "raphael",
-   "b": "rome",
-   "kind": "worked in",
-   "word": "Rome"
-  },
-  {
-   "a": "raphael",
-   "b": "florence",
-   "kind": "worked in",
-   "word": "Florence"
-  },
-  {
-   "a": "raphael",
-   "b": "stanze",
-   "kind": "painted",
-   "word": "Stanze",
-   "note": "The Pope’s private apartments, painted from 1508. The School of Athens puts every philosopher of antiquity into one imaginary building — and gives several of them the faces of Raphael’s own contemporaries."
-  },
-  {
-   "a": "raphael",
-   "b": "high-renaissance",
-   "kind": "of",
-   "word": "Renaissance"
-  },
-  {
-   "a": "raphael",
-   "b": "vatican-city",
-   "kind": "worked at",
-   "word": "Vatican"
-  },
-  {
-   "a": "michelangelo",
-   "b": "vatican-city",
-   "kind": "worked at",
-   "word": "Vatican"
-  },
-  {
-   "a": "giotto",
-   "b": "florence",
-   "kind": "worked in",
-   "word": "Florence"
-  },
-  {
-   "a": "giotto",
-   "b": "rome",
-   "kind": "worked in",
-   "word": "Rome"
-  },
-  {
-   "a": "caravaggio",
-   "b": "rome",
-   "kind": "worked in",
-   "word": "Rome"
-  },
-  {
-   "a": "caravaggio",
-   "b": "baroque",
-   "kind": "of",
-   "word": "Baroque"
-  },
-  {
-   "a": "veronese",
-   "b": "venice",
-   "kind": "worked in",
-   "word": "Venice"
-  },
-  {
-   "a": "veronese",
-   "b": "venetian-school",
-   "kind": "of",
-   "word": "Venetian"
-  },
-  {
-   "a": "el-greco",
-   "b": "venice",
-   "kind": "trained in",
-   "word": "Venice"
-  },
-  {
-   "a": "el-greco",
-   "b": "toledo",
-   "kind": "worked in",
-   "word": "Toledo",
-   "note": "He arrived in Toledo about 1577 and never left. The View of Toledo rearranges the city — buildings moved, the sky turned to storm — into a portrait of the place rather than a record of it."
-  },
-  {
-   "a": "el-greco",
-   "b": "venetian-school",
-   "kind": "out of",
-   "word": "Titian"
-  },
-  {
-   "a": "velazquez",
-   "b": "madrid",
-   "kind": "worked in",
-   "word": "Madrid"
-  },
-  {
-   "a": "velazquez",
-   "b": "rome",
-   "kind": "worked in",
-   "word": "Rome",
-   "note": "Velázquez was in Rome in 1650 and painted his assistant Juan de Pareja — an enslaved man in his own household, whom he freed later that year — to show the Roman painters what he could do. It hung in the Pantheon, and one witness said everything else there looked like painting while this looked like truth."
-  },
-  {
-   "a": "velazquez",
-   "b": "baroque",
-   "kind": "of",
-   "word": "Baroque"
-  },
-  {
-   "a": "rembrandt",
-   "b": "amsterdam",
-   "kind": "worked in",
-   "word": "Amsterdam"
-  },
-  {
-   "a": "rembrandt",
-   "b": "dutch-golden-age",
-   "kind": "of",
-   "word": "Dutch"
-  },
-  {
-   "a": "vermeer",
-   "b": "delft",
-   "kind": "worked in",
-   "word": "Delft"
-  },
-  {
-   "a": "vermeer",
-   "b": "dutch-golden-age",
-   "kind": "of",
-   "word": "Dutch"
-  },
-  {
-   "a": "schouman",
-   "b": "dutch-golden-age",
-   "kind": "after",
-   "word": "Dutch"
-  },
-  {
-   "a": "durer",
-   "b": "nuremberg",
-   "kind": "worked in",
-   "word": "Nuremberg"
-  },
-  {
-   "a": "durer",
-   "b": "woodblock",
-   "kind": "printed in",
-   "word": "woodcut"
-  },
-  {
-   "a": "hokusai",
-   "b": "edo",
-   "kind": "worked in",
-   "word": "Edo"
-  },
-  {
-   "a": "hokusai",
-   "b": "ukiyo-e",
-   "kind": "of",
-   "word": "ukiyo"
-  },
-  {
-   "a": "hokusai",
-   "b": "mount-fuji",
-   "kind": "painted",
-   "word": "Fuji",
-   "note": "Thirty-six Views of Mount Fuji — which ran to forty-six — put the mountain in every print, sometimes enormous, sometimes a small white triangle behind a wave."
-  },
-  {
-   "a": "hokusai",
-   "b": "woodblock",
-   "kind": "printed in",
-   "word": "woodblock"
-  },
-  {
-   "a": "hiroshige",
-   "b": "edo",
-   "kind": "worked in",
-   "word": "Edo"
-  },
-  {
-   "a": "hiroshige",
-   "b": "ukiyo-e",
-   "kind": "of",
-   "word": "ukiyo"
-  },
-  {
-   "a": "hiroshige",
-   "b": "woodblock",
-   "kind": "printed in",
-   "word": "woodblock"
-  },
-  {
-   "a": "david",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "david",
-   "b": "neoclassicism",
-   "kind": "of",
-   "word": "Neoclassic"
-  },
-  {
-   "a": "david",
-   "b": "french-revolution",
-   "kind": "served",
-   "word": "Revolution"
-  },
-  {
-   "a": "david",
-   "b": "napoleon",
-   "kind": "painted",
-   "word": "Napoleon",
-   "note": "David painted the coronation in Notre-Dame — twenty feet by thirty — and put Napoleon’s mother in the gallery watching, though she had refused to attend. He became First Painter to the Emperor and followed him into exile."
-  },
-  {
-   "a": "david",
-   "b": "rome",
-   "kind": "studied in",
-   "word": "Rome"
-  },
-  {
-   "a": "david",
-   "b": "prix-de-rome",
-   "kind": "won",
-   "word": "Prix de Rome"
-  },
-  {
-   "a": "ingres",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "ingres",
-   "b": "rome",
-   "kind": "worked in",
-   "word": "Rome"
-  },
-  {
-   "a": "ingres",
-   "b": "neoclassicism",
-   "kind": "of",
-   "word": "Neoclassic"
-  },
-  {
-   "a": "ingres",
-   "b": "prix-de-rome",
-   "kind": "won",
-   "word": "Prix de Rome"
-  },
-  {
-   "a": "ingres",
-   "b": "salon",
-   "kind": "showed at",
-   "word": "Salon"
-  },
-  {
-   "a": "gericault",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "gericault",
-   "b": "romanticism",
-   "kind": "of",
-   "word": "Romantic"
-  },
-  {
-   "a": "gericault",
-   "b": "salon",
-   "kind": "showed at",
-   "word": "Salon"
-  },
-  {
-   "a": "delacroix",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "delacroix",
-   "b": "romanticism",
-   "kind": "of",
-   "word": "Romantic"
-  },
-  {
-   "a": "delacroix",
-   "b": "salon",
-   "kind": "showed at",
-   "word": "Salon"
-  },
-  {
-   "a": "millet",
-   "b": "barbizon",
-   "kind": "worked at",
-   "word": "Barbizon",
-   "note": "Millet moved to Barbizon on the edge of the Fontainebleau forest in 1849 and painted peasants at work for the rest of his life, which was read at the time as politics."
-  },
-  {
-   "a": "millet",
-   "b": "realism",
-   "kind": "of",
-   "word": "Realism"
-  },
-  {
-   "a": "millet",
-   "b": "salon",
-   "kind": "showed at",
-   "word": "Salon"
-  },
-  {
-   "a": "manet",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "manet",
-   "b": "salon-refuses",
-   "kind": "hung in",
-   "word": "Refusés",
-   "note": "The Salon of 1863 rejected so many pictures that the Emperor ordered a second exhibition of the refused. Manet’s Déjeuner sur l’herbe was the scandal of it."
-  },
-  {
-   "a": "manet",
-   "b": "cafe-guerbois",
-   "kind": "argued at",
-   "word": "Guerbois"
-  },
-  {
-   "a": "manet",
-   "b": "realism",
-   "kind": "of",
-   "word": "Realism"
-  },
-  {
-   "a": "manet",
-   "b": "madrid",
-   "kind": "travelled to",
-   "word": "Madrid"
-  },
-  {
-   "a": "manet",
-   "b": "salon",
-   "kind": "showed at",
-   "word": "Salon"
-  },
-  {
-   "a": "degas",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "degas",
-   "b": "impressionism",
-   "kind": "of",
-   "word": "Impressionist",
-   "note": "Degas showed in seven of the eight Impressionist exhibitions and objected to the name throughout. He worked indoors, from memory, and drew first."
-  },
-  {
-   "a": "degas",
-   "b": "first-impressionist",
-   "kind": "showed at",
-   "word": "1874"
-  },
-  {
-   "a": "degas",
-   "b": "cafe-guerbois",
-   "kind": "argued at",
-   "word": "Guerbois"
-  },
-  {
-   "a": "monet",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "monet",
-   "b": "argenteuil",
-   "kind": "worked at",
-   "word": "Argenteuil",
-   "note": "Monet lived at Argenteuil on the Seine from 1871 to 1878 — the years the movement’s whole method was worked out, on the river, in a boat fitted up as a studio."
-  },
-  {
-   "a": "monet",
-   "b": "giverny",
-   "kind": "worked at",
-   "word": "Giverny"
-  },
-  {
-   "a": "monet",
-   "b": "impressionism",
-   "kind": "named",
-   "word": "Impression",
-   "note": "A critic at the 1874 exhibition took the title of Monet’s Impression, Sunrise and used it as an insult for the whole group. They kept the word."
-  },
-  {
-   "a": "monet",
-   "b": "first-impressionist",
-   "kind": "showed at",
-   "word": "1874"
-  },
-  {
-   "a": "monet",
-   "b": "cafe-guerbois",
-   "kind": "argued at",
-   "word": "Guerbois"
-  },
-  {
-   "a": "renoir",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "renoir",
-   "b": "montmartre",
-   "kind": "painted",
-   "word": "Montmartre",
-   "note": "The Moulin de la Galette was a Sunday dance in a garden on the Butte. Renoir carried the canvas up the hill and back every day for months, and painted his friends into it."
-  },
-  {
-   "a": "renoir",
-   "b": "impressionism",
-   "kind": "of",
-   "word": "Impressionist"
-  },
-  {
-   "a": "renoir",
-   "b": "first-impressionist",
-   "kind": "showed at",
-   "word": "1874"
-  },
-  {
-   "a": "cezanne",
-   "b": "aix",
-   "kind": "worked at",
-   "word": "Aix",
-   "note": "Cézanne went home to Aix and stayed, painting the same mountain more than thirty times, out of reach of Paris and largely out of its sight until he was old."
-  },
-  {
-   "a": "cezanne",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "cezanne",
-   "b": "post-impressionism",
-   "kind": "of",
-   "word": "Post-Impressionist"
-  },
-  {
-   "a": "cezanne",
-   "b": "first-impressionist",
-   "kind": "showed at",
-   "word": "1874"
-  },
-  {
-   "a": "caillebotte",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "caillebotte",
-   "b": "impressionism",
-   "kind": "of",
-   "word": "Impressionist"
-  },
-  {
-   "a": "caillebotte",
-   "b": "caillebotte-bequest",
-   "kind": "left",
-   "word": "bequest",
-   "note": "He died at forty-five and left sixty-eight Impressionist paintings to the French state. The Académie fought the gift for years and accepted only part of it, which is why some of the best of them are now in Washington rather than Paris."
-  },
-  {
-   "a": "caillebotte",
-   "b": "realism",
-   "kind": "of",
-   "word": "Realism"
-  },
-  {
-   "a": "vangogh",
-   "b": "arles",
-   "kind": "worked at",
-   "word": "Arles",
-   "note": "Fifteen months in Arles from February 1888 — the yellow house, the sunflowers, the night café, the starry night over the Rhône, and the collapse at the end of it."
-  },
-  {
-   "a": "vangogh",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "vangogh",
-   "b": "post-impressionism",
-   "kind": "of",
-   "word": "Post-Impressionist"
-  },
-  {
-   "a": "vangogh",
-   "b": "japonisme",
-   "kind": "copied",
-   "word": "Japan",
-   "note": "“All my work is founded on Japanese art,” Van Gogh wrote from Arles. He had gone south partly because he believed the light there would be the light of the prints."
-  },
-  {
-   "a": "whistler",
-   "b": "london",
-   "kind": "worked in",
-   "word": "London"
-  },
-  {
-   "a": "whistler",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "whistler",
-   "b": "japonisme",
-   "kind": "of",
-   "word": "Japan"
-  },
-  {
-   "a": "whistler",
-   "b": "salon",
-   "kind": "showed at",
-   "word": "Salon"
-  },
-  {
-   "a": "sargent",
-   "b": "paris",
-   "kind": "worked in",
-   "word": "Paris"
-  },
-  {
-   "a": "sargent",
-   "b": "london",
-   "kind": "worked in",
-   "word": "London"
-  },
-  {
-   "a": "sargent",
-   "b": "salon",
-   "kind": "showed at",
-   "word": "Salon"
-  },
-  {
-   "a": "sargent",
-   "b": "madrid",
-   "kind": "travelled to",
-   "word": "Madrid"
-  },
-  {
-   "a": "leutze",
-   "b": "london",
-   "kind": "exhibited in",
-   "word": "London"
-  },
-  {
-   "a": "nebamun-workshop",
-   "b": "thebes",
-   "kind": "painted at",
-   "word": "Thebes"
-  },
-  {
-   "a": "meidum-workshop",
-   "b": "thebes",
-   "kind": "painted at",
-   "word": "Egypt"
-  },
-  {
-   "a": "fayum-painters",
-   "b": "rome",
-   "kind": "under",
-   "word": "Roman"
-  },
-  {
-   "a": "dunhuang-painters",
-   "b": "dunhuang",
-   "kind": "painted at",
-   "word": "Dunhuang"
-  },
-  {
-   "a": "gu-kaizhi",
-   "b": "dunhuang",
-   "kind": "tradition of",
-   "word": "China"
-  },
-  {
-   "a": "john-white",
-   "b": "roanoke",
-   "kind": "drew at",
-   "word": "Roanoke"
-  },
-  {
-   "a": "john-white",
-   "b": "london",
-   "kind": "worked in",
-   "word": "London"
-  },
-  {
-   "a": "japonisme",
-   "b": "ukiyo-e",
-   "kind": "took from",
-   "word": "ukiyo",
-   "note": "Japanese prints reached Paris in quantity after 1858 — some, famously, as packing material — and within a decade had changed how European painters composed a picture."
-  },
-  {
-   "a": "veronese",
-   "b": "napoleon",
-   "kind": "looted by",
-   "word": "Napoleon",
-   "note": "Napoleon’s army took the Wedding at Cana out of its refectory in Venice in 1797. It was cut in half to be carried to Paris, and it is still there — the largest painting in the Louvre, hanging opposite the most famous small one."
-  },
-  {
-   "a": "impressionism",
-   "b": "first-impressionist",
-   "kind": "launched at",
-   "word": "1874",
-   "note": "Thirty artists, in Nadar’s old photographic studio on the boulevard des Capucines, April 1874, because the Salon would not have them."
-  },
-  {
-   "a": "impressionism",
-   "b": "caillebotte-bequest",
-   "kind": "entered France by",
-   "word": "bequest"
-  },
-  {
-   "a": "leonardo",
-   "b": "michelangelo",
-   "kind": "rivals in Florence, 1504",
-   "word": "Florence",
-   "note": "In 1504 Florence commissioned battle scenes for the same room of the Palazzo Vecchio from both of them at once. Leonardo was fifty-two and famous; Michelangelo was twenty-nine and had just finished the David. Neither fresco was finished, and the cartoons — copied by every young painter in Italy, Raphael among them — became the most influential drawings of the century."
-  },
-  {
-   "a": "raphael",
-   "b": "leonardo",
-   "kind": "learned sfumato from",
-   "word": "Leonardo",
-   "note": "Raphael reached Florence around 1504 and rebuilt his art on what he found there. The pyramid composition of his Madonnas and the soft smoke-edged modelling of his faces are Leonardo’s, absorbed in about two years by a painter thirty years younger."
-  },
-  {
-   "a": "raphael",
-   "b": "michelangelo",
-   "kind": "worked down the corridor from",
-   "word": "Michelangelo",
-   "note": "From 1508 they worked a few hundred metres apart in the same palace — Michelangelo on the Sistine ceiling, Raphael on the Stanze — and did not get on. Raphael saw the half-finished ceiling and promptly painted Michelangelo into the School of Athens as brooding Heraclitus, sitting alone on the steps."
-  },
-  {
-   "a": "michelangelo",
-   "b": "giotto",
-   "kind": "drew after",
-   "word": "Giotto",
-   "note": "Michelangelo’s earliest surviving drawings are copies after Giotto’s frescoes in Santa Croce. Two centuries separate them; the weight and solidity of the bodies passed straight across."
-  },
-  {
-   "a": "caravaggio",
-   "b": "rembrandt",
-   "kind": "the light that reached",
-   "word": "light",
-   "note": "Caravaggio never went north, but his followers did. By the 1620s the Utrecht painters had carried the single raking light and the hard black shadow back to Holland, where the young Rembrandt took it and made it his own."
-  },
-  {
-   "a": "veronese",
-   "b": "el-greco",
-   "kind": "Venice-trained alongside",
-   "word": "Venice",
-   "note": "Both learned to paint in Venice in the shadow of Titian — Veronese from Verona, El Greco from Crete — and both took the Venetian habit of building a figure out of colour rather than drawing it first."
-  },
-  {
-   "a": "velazquez",
-   "b": "manet",
-   "kind": "\"the painter of painters\", to",
-   "word": "Velázquez",
-   "note": "Manet went to Madrid in 1865 and stood in front of the Velázquezes. “The painter of painters,” he wrote home. The flat black, the refusal to model with shadow and the frank grey ground of Olympia all came back from that trip."
-  },
-  {
-   "a": "velazquez",
-   "b": "sargent",
-   "kind": "copied in Madrid by",
-   "word": "Velázquez",
-   "note": "Sargent copied Velázquez in the Prado at twenty-three. Madame X’s silhouette against a bare ground — the whole figure carried by one contour — is what he took away from it."
-  },
-  {
-   "a": "david",
-   "b": "ingres",
-   "kind": "taught",
-   "word": "David",
-   "note": "Ingres entered David’s studio at seventeen and stayed four years. He inherited the line and abandoned the politics, and spent his life being called the last classicist by people who could not see how strange his drawing had become."
-  },
-  {
-   "a": "gericault",
-   "b": "delacroix",
-   "kind": "who posed for the Raft",
-   "word": "Géricault",
-   "note": "They were friends, and Delacroix posed for the Raft of the Medusa — he is the figure lying face down with one arm outstretched in the foreground. Géricault died at thirty-two; Delacroix carried Romanticism for another forty years."
-  },
-  {
-   "a": "millet",
-   "b": "vangogh",
-   "kind": "copied, again and again, by",
-   "word": "Millet",
-   "note": "Van Gogh copied Millet all his life, from the drawings he made as a beginner to the canvases he painted in the asylum at Saint-Rémy. “Millet is father Millet,” he wrote, “counsellor and mentor in everything.”"
-  },
-  {
-   "a": "manet",
-   "b": "monet",
-   "kind": "friends, and forever confused",
-   "word": "Manet",
-   "note": "The two names were confused from the start — Manet complained when a Monet was praised as his at the Salon of 1865 — and they became friends anyway. Manet painted Monet at work in his floating studio at Argenteuil."
-  },
-  {
-   "a": "manet",
-   "b": "degas",
-   "kind": "friends and antagonists",
-   "word": "Degas",
-   "note": "Friends, and combative about it. Degas gave Manet a portrait of Manet and his wife; Manet, disliking how his wife had been painted, cut her out of it with a knife. Degas took the picture back, and they did not speak for a while."
-  },
-  {
-   "a": "manet",
-   "b": "cezanne",
-   "kind": "answered by a Modern Olympia",
-   "word": "Olympia",
-   "note": "Cézanne answered Olympia in 1873 with A Modern Olympia — the same scene painted as a violent sketch, with himself sitting in the picture watching. It hung in the first Impressionist exhibition and was the most mocked object there."
-  },
-  {
-   "a": "monet",
-   "b": "renoir",
-   "kind": "painted side by side at La Grenouillère",
-   "word": "Renoir",
-   "note": "In the summer of 1869 they set up their easels side by side at La Grenouillère on the Seine and painted the same bathers, the same boats, the same broken light on the water. Impressionism is roughly what they worked out that summer."
-  },
-  {
-   "a": "caillebotte",
-   "b": "renoir",
-   "kind": "collected and left to France",
-   "word": "Caillebotte",
-   "note": "Caillebotte painted with them and, being rich, bought from them. His will left the collection to the French state, and Renoir was his executor."
-  },
-  {
-   "a": "caillebotte",
-   "b": "monet",
-   "kind": "collected and left to France",
-   "word": "Caillebotte",
-   "note": "Caillebotte bought Monet’s work when almost nobody would, paid his rent more than once, and left the pictures to France. Much of what hangs in the Orsay today came in through that bequest."
-  },
-  {
-   "a": "caillebotte",
-   "b": "degas",
-   "kind": "collected and left to France",
-   "word": "Caillebotte",
-   "note": "Caillebotte collected Degas as he collected the rest of them, and organised and hung several of the Impressionist exhibitions himself."
-  },
-  {
-   "a": "hokusai",
-   "b": "hiroshige",
-   "kind": "the two great names of",
-   "word": "Hiroshige",
-   "note": "The two great landscape names of ukiyo-e, a generation apart. Hokusai’s Thirty-six Views of Mount Fuji made landscape a subject in its own right; Hiroshige’s Fifty-three Stations of the Tōkaidō made it weather."
-  },
-  {
-   "a": "hokusai",
-   "b": "vangogh",
-   "kind": "copied in Arles by",
-   "word": "Japanese",
-   "note": "Van Gogh collected Japanese prints in Paris by the hundred, hung them in his room, and said he wanted to see with a Japanese eye. The flat colour and high hard horizon of the Arles pictures are the result."
-  },
-  {
-   "a": "hiroshige",
-   "b": "vangogh",
-   "kind": "copied, in oil, by",
-   "word": "Hiroshige",
-   "note": "Van Gogh copied two Hiroshige prints in oil in 1887, framing them with borders of invented Japanese characters. He was not quoting them; he was trying to work out how they were made."
-  },
-  {
-   "a": "whistler",
-   "b": "degas",
-   "kind": "Japanese prints in common with",
-   "word": "Japanese",
-   "note": "Both were collecting and studying Japanese prints in the 1860s, and both took the same lesson: the off-centre subject, the cropped edge, the flat interval of empty ground."
-  },
-  {
-   "a": "durer",
-   "b": "hokusai",
-   "kind": "three centuries apart, the same block",
-   "word": "woodcut",
-   "note": "Three centuries and half a world apart, both worked in the same medium — a design cut into a block of wood and printed in editions — and both used it to put pictures into the hands of people who could never have owned a painting."
-  },
-  {
-   "a": "rembrandt",
-   "b": "vermeer",
-   "kind": "the two poles of the Dutch century",
-   "word": "Dutch",
-   "note": "The two poles of the Dutch century: Rembrandt made some three hundred paintings, Vermeer perhaps thirty-five. One painted the whole world in brown light; the other painted one corner of one room and got everything into it."
-  },
-  {
-   "a": "david",
-   "b": "napoleon",
-   "kind": "court painter to",
-   "word": "Napoleon",
-   "note": "David painted the coronation in Notre-Dame — twenty feet by thirty — and put Napoleon’s mother in the gallery watching, though she had refused to attend. He became First Painter to the Emperor and followed him into exile."
-  },
-  {
-   "a": "ingres",
-   "b": "raphael",
-   "kind": "venerated",
-   "word": "Raphael",
-   "note": "Ingres venerated Raphael to the point of quotation: engravings after him on the studio wall, and the instruction to his students that Raphael was not a man to be surpassed but a language to be learned."
-  },
-  {
-   "a": "whistler",
-   "b": "sargent",
-   "kind": "Americans abroad, with",
-   "word": "Whistler",
-   "note": "Two Americans who barely lived in America — Whistler in London, Sargent between Paris and London — both making their name at the Salon, and both notorious there."
-  },
-  {
-   "a": "leutze",
-   "b": "sargent",
-   "kind": "Americans abroad, with",
-   "word": "American",
-   "note": "Leutze painted Washington Crossing the Delaware in Düsseldorf, not America; Sargent painted his Americans in Paris. The national picture, in both cases, was made abroad."
-  }
- ]
+  "entities": [
+    {
+      "id": "leonardo",
+      "kind": "painter",
+      "label": "Leonardo da Vinci",
+      "note": "1452–1519"
+    },
+    {
+      "id": "michelangelo",
+      "kind": "painter",
+      "label": "Michelangelo",
+      "note": "1475–1564"
+    },
+    {
+      "id": "raphael",
+      "kind": "painter",
+      "label": "Raphael",
+      "note": "1483–1520"
+    },
+    {
+      "id": "giotto",
+      "kind": "painter",
+      "label": "Giotto",
+      "note": "c.1267–1337"
+    },
+    {
+      "id": "caravaggio",
+      "kind": "painter",
+      "label": "Caravaggio",
+      "note": "1571–1610"
+    },
+    {
+      "id": "veronese",
+      "kind": "painter",
+      "label": "Veronese",
+      "note": "1528–1588"
+    },
+    {
+      "id": "velazquez",
+      "kind": "painter",
+      "label": "Diego Velázquez",
+      "note": "1599–1660"
+    },
+    {
+      "id": "el-greco",
+      "kind": "painter",
+      "label": "El Greco",
+      "note": "1541–1614"
+    },
+    {
+      "id": "rembrandt",
+      "kind": "painter",
+      "label": "Rembrandt",
+      "note": "1606–1669"
+    },
+    {
+      "id": "vermeer",
+      "kind": "painter",
+      "label": "Johannes Vermeer",
+      "note": "1632–1675"
+    },
+    {
+      "id": "schouman",
+      "kind": "painter",
+      "label": "Aert Schouman",
+      "note": "1710–1792"
+    },
+    {
+      "id": "durer",
+      "kind": "painter",
+      "label": "Albrecht Dürer",
+      "note": "1471–1528"
+    },
+    {
+      "id": "david",
+      "kind": "painter",
+      "label": "Jacques-Louis David",
+      "note": "1748–1825"
+    },
+    {
+      "id": "ingres",
+      "kind": "painter",
+      "label": "J.-A.-D. Ingres",
+      "note": "1780–1867"
+    },
+    {
+      "id": "gericault",
+      "kind": "painter",
+      "label": "Théodore Géricault",
+      "note": "1791–1824"
+    },
+    {
+      "id": "delacroix",
+      "kind": "painter",
+      "label": "Eugène Delacroix",
+      "note": "1798–1863"
+    },
+    {
+      "id": "millet",
+      "kind": "painter",
+      "label": "Jean-François Millet",
+      "note": "1814–1875"
+    },
+    {
+      "id": "manet",
+      "kind": "painter",
+      "label": "Édouard Manet",
+      "note": "1832–1883"
+    },
+    {
+      "id": "degas",
+      "kind": "painter",
+      "label": "Edgar Degas",
+      "note": "1834–1917"
+    },
+    {
+      "id": "whistler",
+      "kind": "painter",
+      "label": "James McNeill Whistler",
+      "note": "1834–1903"
+    },
+    {
+      "id": "cezanne",
+      "kind": "painter",
+      "label": "Paul Cézanne",
+      "note": "1839–1906"
+    },
+    {
+      "id": "monet",
+      "kind": "painter",
+      "label": "Claude Monet",
+      "note": "1840–1926"
+    },
+    {
+      "id": "renoir",
+      "kind": "painter",
+      "label": "Pierre-Auguste Renoir",
+      "note": "1841–1919"
+    },
+    {
+      "id": "caillebotte",
+      "kind": "painter",
+      "label": "Gustave Caillebotte",
+      "note": "1848–1894"
+    },
+    {
+      "id": "vangogh",
+      "kind": "painter",
+      "label": "Vincent van Gogh",
+      "note": "1853–1890"
+    },
+    {
+      "id": "sargent",
+      "kind": "painter",
+      "label": "John Singer Sargent",
+      "note": "1856–1925"
+    },
+    {
+      "id": "leutze",
+      "kind": "painter",
+      "label": "Emanuel Leutze",
+      "note": "1816–1868"
+    },
+    {
+      "id": "hokusai",
+      "kind": "painter",
+      "label": "Katsushika Hokusai",
+      "note": "1760–1849"
+    },
+    {
+      "id": "hiroshige",
+      "kind": "painter",
+      "label": "Utagawa Hiroshige",
+      "note": "1797–1858"
+    },
+    {
+      "id": "gu-kaizhi",
+      "kind": "painter",
+      "label": "Gu Kaizhi",
+      "note": "c.344–406"
+    },
+    {
+      "id": "john-white",
+      "kind": "painter",
+      "label": "John White",
+      "note": "c.1540–1593"
+    },
+    {
+      "id": "nebamun-workshop",
+      "kind": "painter",
+      "label": "The Nebamun painters",
+      "note": "Thebes, c.1350 BC"
+    },
+    {
+      "id": "meidum-workshop",
+      "kind": "painter",
+      "label": "The Meidum painters",
+      "note": "Egypt, c.2600 BC"
+    },
+    {
+      "id": "fayum-painters",
+      "kind": "painter",
+      "label": "The Fayum painters",
+      "note": "Roman Egypt, 1st–3rd c."
+    },
+    {
+      "id": "dunhuang-painters",
+      "kind": "painter",
+      "label": "The Dunhuang painters",
+      "note": "Cave 17, 8th–10th c."
+    },
+    {
+      "id": "paris",
+      "kind": "place",
+      "label": "Paris",
+      "note": ""
+    },
+    {
+      "id": "arles",
+      "kind": "place",
+      "label": "Arles",
+      "note": ""
+    },
+    {
+      "id": "argenteuil",
+      "kind": "place",
+      "label": "Argenteuil",
+      "note": ""
+    },
+    {
+      "id": "giverny",
+      "kind": "place",
+      "label": "Giverny",
+      "note": ""
+    },
+    {
+      "id": "aix",
+      "kind": "place",
+      "label": "Aix-en-Provence",
+      "note": ""
+    },
+    {
+      "id": "montmartre",
+      "kind": "place",
+      "label": "Montmartre",
+      "note": ""
+    },
+    {
+      "id": "barbizon",
+      "kind": "place",
+      "label": "Barbizon",
+      "note": ""
+    },
+    {
+      "id": "delft",
+      "kind": "place",
+      "label": "Delft",
+      "note": ""
+    },
+    {
+      "id": "amsterdam",
+      "kind": "place",
+      "label": "Amsterdam",
+      "note": ""
+    },
+    {
+      "id": "toledo",
+      "kind": "place",
+      "label": "Toledo",
+      "note": ""
+    },
+    {
+      "id": "venice",
+      "kind": "place",
+      "label": "Venice",
+      "note": ""
+    },
+    {
+      "id": "rome",
+      "kind": "place",
+      "label": "Rome",
+      "note": ""
+    },
+    {
+      "id": "florence",
+      "kind": "place",
+      "label": "Florence",
+      "note": ""
+    },
+    {
+      "id": "madrid",
+      "kind": "place",
+      "label": "Madrid",
+      "note": ""
+    },
+    {
+      "id": "london",
+      "kind": "place",
+      "label": "London",
+      "note": ""
+    },
+    {
+      "id": "nuremberg",
+      "kind": "place",
+      "label": "Nuremberg",
+      "note": ""
+    },
+    {
+      "id": "edo",
+      "kind": "place",
+      "label": "Edo",
+      "note": ""
+    },
+    {
+      "id": "mount-fuji",
+      "kind": "place",
+      "label": "Mount Fuji",
+      "note": ""
+    },
+    {
+      "id": "thebes",
+      "kind": "place",
+      "label": "Thebes",
+      "note": ""
+    },
+    {
+      "id": "dunhuang",
+      "kind": "place",
+      "label": "Dunhuang",
+      "note": ""
+    },
+    {
+      "id": "roanoke",
+      "kind": "place",
+      "label": "Roanoke",
+      "note": ""
+    },
+    {
+      "id": "vatican-city",
+      "kind": "place",
+      "label": "The Vatican",
+      "note": ""
+    },
+    {
+      "id": "impressionism",
+      "kind": "movement",
+      "label": "Impressionism",
+      "note": ""
+    },
+    {
+      "id": "post-impressionism",
+      "kind": "movement",
+      "label": "Post-Impressionism",
+      "note": ""
+    },
+    {
+      "id": "neoclassicism",
+      "kind": "movement",
+      "label": "Neoclassicism",
+      "note": ""
+    },
+    {
+      "id": "romanticism",
+      "kind": "movement",
+      "label": "Romanticism",
+      "note": ""
+    },
+    {
+      "id": "realism",
+      "kind": "movement",
+      "label": "Realism",
+      "note": ""
+    },
+    {
+      "id": "high-renaissance",
+      "kind": "movement",
+      "label": "High Renaissance",
+      "note": ""
+    },
+    {
+      "id": "venetian-school",
+      "kind": "movement",
+      "label": "The Venetian school",
+      "note": ""
+    },
+    {
+      "id": "baroque",
+      "kind": "movement",
+      "label": "Baroque",
+      "note": ""
+    },
+    {
+      "id": "ukiyo-e",
+      "kind": "movement",
+      "label": "Ukiyo-e",
+      "note": ""
+    },
+    {
+      "id": "dutch-golden-age",
+      "kind": "movement",
+      "label": "The Dutch Golden Age",
+      "note": ""
+    },
+    {
+      "id": "japonisme",
+      "kind": "movement",
+      "label": "Japonisme",
+      "note": ""
+    },
+    {
+      "id": "salon",
+      "kind": "event",
+      "label": "The Paris Salon",
+      "note": "The official exhibition everything was measured against"
+    },
+    {
+      "id": "salon-refuses",
+      "kind": "event",
+      "label": "Salon des Refusés, 1863",
+      "note": "Where the rejected hung, by imperial decree"
+    },
+    {
+      "id": "first-impressionist",
+      "kind": "event",
+      "label": "First Impressionist exhibition, 1874",
+      "note": "Nadar's old studio, boulevard des Capucines"
+    },
+    {
+      "id": "cafe-guerbois",
+      "kind": "event",
+      "label": "Café Guerbois",
+      "note": "Where the Batignolles group argued, from 1866"
+    },
+    {
+      "id": "prix-de-rome",
+      "kind": "event",
+      "label": "The Prix de Rome",
+      "note": "The Academy's road to Italy"
+    },
+    {
+      "id": "french-revolution",
+      "kind": "event",
+      "label": "The French Revolution",
+      "note": ""
+    },
+    {
+      "id": "napoleon",
+      "kind": "event",
+      "label": "Napoleon",
+      "note": "Emperor, patron, and the largest art thief in Europe"
+    },
+    {
+      "id": "sistine",
+      "kind": "event",
+      "label": "The Sistine Chapel",
+      "note": ""
+    },
+    {
+      "id": "stanze",
+      "kind": "event",
+      "label": "The Raphael Rooms",
+      "note": ""
+    },
+    {
+      "id": "woodblock",
+      "kind": "event",
+      "label": "Woodblock printing",
+      "note": ""
+    },
+    {
+      "id": "caillebotte-bequest",
+      "kind": "event",
+      "label": "The Caillebotte bequest, 1894",
+      "note": "The collection that put the Impressionists in a French museum"
+    },
+    {
+      "id": "bellini",
+      "kind": "painter",
+      "label": "Giovanni Bellini",
+      "note": "c.1430–1516"
+    },
+    {
+      "id": "domenichino",
+      "kind": "painter",
+      "label": "Domenichino",
+      "note": "1581–1641"
+    }
+  ],
+  "works": {
+    "leonardo-mona-lisa": "leonardo",
+    "leonardo-st-john-baptist": "leonardo",
+    "leonardo-st-jerome": "leonardo",
+    "delacroix-liberty": "delacroix",
+    "delacroix-death-sardanapalus": "delacroix",
+    "david-coronation-napoleon": "david",
+    "david-oath-horatii": "david",
+    "david-death-socrates": "david",
+    "gericault-raft-medusa": "gericault",
+    "veronese-wedding-cana": "veronese",
+    "vermeer-lacemaker": "vermeer",
+    "vermeer-water-pitcher": "vermeer",
+    "ingres-grande-odalisque": "ingres",
+    "hokusai-great-wave": "hokusai",
+    "hiroshige-sudden-shower": "hiroshige",
+    "nebamun-marshes": "nebamun-workshop",
+    "geese-of-meidum": "meidum-workshop",
+    "fayum-mummy-portraits": "fayum-painters",
+    "gu-kaizhi-admonitions": "gu-kaizhi",
+    "white-the-flyer": "john-white",
+    "schouman-birds": "schouman",
+    "durer-rhinoceros": "durer",
+    "dunhuang-cave-17": "dunhuang-painters",
+    "leutze-washington-delaware": "leutze",
+    "monet-water-lilies-bridge": "monet",
+    "sargent-madame-x": "sargent",
+    "el-greco-view-toledo": "el-greco",
+    "rembrandt-aristotle-homer": "rembrandt",
+    "vangogh-straw-hat": "vangogh",
+    "degas-dance-class": "degas",
+    "velazquez-juan-de-pareja": "velazquez",
+    "vangogh-starry-night-rhone": "vangogh",
+    "vangogh-self-portrait": "vangogh",
+    "renoir-moulin-galette": "renoir",
+    "manet-olympia": "manet",
+    "manet-dejeuner-sur-lherbe": "manet",
+    "millet-gleaners": "millet",
+    "cezanne-apples-oranges": "cezanne",
+    "cezanne-card-players": "cezanne",
+    "whistler-mother": "whistler",
+    "michelangelo-creation-adam": "michelangelo",
+    "michelangelo-last-judgment": "michelangelo",
+    "raphael-school-athens": "raphael",
+    "raphael-transfiguration": "raphael",
+    "raphael-madonna-foligno": "raphael",
+    "raphael-coronation-virgin": "raphael",
+    "caravaggio-entombment": "caravaggio",
+    "degas-letoile": "degas",
+    "bellini-pieta": "bellini",
+    "domenichino-last-communion-jerome": "domenichino"
+  },
+  "links": [
+    {
+      "a": "leonardo",
+      "b": "florence",
+      "kind": "worked in",
+      "word": "Florence"
+    },
+    {
+      "a": "leonardo",
+      "b": "rome",
+      "kind": "worked in",
+      "word": "Rome"
+    },
+    {
+      "a": "leonardo",
+      "b": "high-renaissance",
+      "kind": "of",
+      "word": "Renaissance"
+    },
+    {
+      "a": "michelangelo",
+      "b": "florence",
+      "kind": "worked in",
+      "word": "Florence"
+    },
+    {
+      "a": "michelangelo",
+      "b": "rome",
+      "kind": "worked in",
+      "word": "Rome"
+    },
+    {
+      "a": "michelangelo",
+      "b": "sistine",
+      "kind": "painted",
+      "word": "Sistine",
+      "note": "Four years on a scaffold, 1508 to 1512, painting a ceiling he had told the Pope he did not want to paint because he was a sculptor."
+    },
+    {
+      "a": "michelangelo",
+      "b": "high-renaissance",
+      "kind": "of",
+      "word": "Renaissance"
+    },
+    {
+      "a": "raphael",
+      "b": "rome",
+      "kind": "worked in",
+      "word": "Rome"
+    },
+    {
+      "a": "raphael",
+      "b": "florence",
+      "kind": "worked in",
+      "word": "Florence"
+    },
+    {
+      "a": "raphael",
+      "b": "stanze",
+      "kind": "painted",
+      "word": "Stanze",
+      "note": "The Pope’s private apartments, painted from 1508. The School of Athens puts every philosopher of antiquity into one imaginary building — and gives several of them the faces of Raphael’s own contemporaries."
+    },
+    {
+      "a": "raphael",
+      "b": "high-renaissance",
+      "kind": "of",
+      "word": "Renaissance"
+    },
+    {
+      "a": "raphael",
+      "b": "vatican-city",
+      "kind": "worked at",
+      "word": "Vatican"
+    },
+    {
+      "a": "michelangelo",
+      "b": "vatican-city",
+      "kind": "worked at",
+      "word": "Vatican"
+    },
+    {
+      "a": "giotto",
+      "b": "florence",
+      "kind": "worked in",
+      "word": "Florence"
+    },
+    {
+      "a": "giotto",
+      "b": "rome",
+      "kind": "worked in",
+      "word": "Rome"
+    },
+    {
+      "a": "caravaggio",
+      "b": "rome",
+      "kind": "worked in",
+      "word": "Rome"
+    },
+    {
+      "a": "caravaggio",
+      "b": "baroque",
+      "kind": "of",
+      "word": "Baroque"
+    },
+    {
+      "a": "veronese",
+      "b": "venice",
+      "kind": "worked in",
+      "word": "Venice"
+    },
+    {
+      "a": "veronese",
+      "b": "venetian-school",
+      "kind": "of",
+      "word": "Venetian"
+    },
+    {
+      "a": "el-greco",
+      "b": "venice",
+      "kind": "trained in",
+      "word": "Venice"
+    },
+    {
+      "a": "el-greco",
+      "b": "toledo",
+      "kind": "worked in",
+      "word": "Toledo",
+      "note": "He arrived in Toledo about 1577 and never left. The View of Toledo rearranges the city — buildings moved, the sky turned to storm — into a portrait of the place rather than a record of it."
+    },
+    {
+      "a": "el-greco",
+      "b": "venetian-school",
+      "kind": "out of",
+      "word": "Titian"
+    },
+    {
+      "a": "velazquez",
+      "b": "madrid",
+      "kind": "worked in",
+      "word": "Madrid"
+    },
+    {
+      "a": "velazquez",
+      "b": "rome",
+      "kind": "worked in",
+      "word": "Rome",
+      "note": "Velázquez was in Rome in 1650 and painted his assistant Juan de Pareja — an enslaved man in his own household, whom he freed later that year — to show the Roman painters what he could do. It hung in the Pantheon, and one witness said everything else there looked like painting while this looked like truth."
+    },
+    {
+      "a": "velazquez",
+      "b": "baroque",
+      "kind": "of",
+      "word": "Baroque"
+    },
+    {
+      "a": "rembrandt",
+      "b": "amsterdam",
+      "kind": "worked in",
+      "word": "Amsterdam"
+    },
+    {
+      "a": "rembrandt",
+      "b": "dutch-golden-age",
+      "kind": "of",
+      "word": "Dutch"
+    },
+    {
+      "a": "vermeer",
+      "b": "delft",
+      "kind": "worked in",
+      "word": "Delft"
+    },
+    {
+      "a": "vermeer",
+      "b": "dutch-golden-age",
+      "kind": "of",
+      "word": "Dutch"
+    },
+    {
+      "a": "schouman",
+      "b": "dutch-golden-age",
+      "kind": "after",
+      "word": "Dutch"
+    },
+    {
+      "a": "durer",
+      "b": "nuremberg",
+      "kind": "worked in",
+      "word": "Nuremberg"
+    },
+    {
+      "a": "durer",
+      "b": "woodblock",
+      "kind": "printed in",
+      "word": "woodcut"
+    },
+    {
+      "a": "hokusai",
+      "b": "edo",
+      "kind": "worked in",
+      "word": "Edo"
+    },
+    {
+      "a": "hokusai",
+      "b": "ukiyo-e",
+      "kind": "of",
+      "word": "ukiyo"
+    },
+    {
+      "a": "hokusai",
+      "b": "mount-fuji",
+      "kind": "painted",
+      "word": "Fuji",
+      "note": "Thirty-six Views of Mount Fuji — which ran to forty-six — put the mountain in every print, sometimes enormous, sometimes a small white triangle behind a wave."
+    },
+    {
+      "a": "hokusai",
+      "b": "woodblock",
+      "kind": "printed in",
+      "word": "woodblock"
+    },
+    {
+      "a": "hiroshige",
+      "b": "edo",
+      "kind": "worked in",
+      "word": "Edo"
+    },
+    {
+      "a": "hiroshige",
+      "b": "ukiyo-e",
+      "kind": "of",
+      "word": "ukiyo"
+    },
+    {
+      "a": "hiroshige",
+      "b": "woodblock",
+      "kind": "printed in",
+      "word": "woodblock"
+    },
+    {
+      "a": "david",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "david",
+      "b": "neoclassicism",
+      "kind": "of",
+      "word": "Neoclassic"
+    },
+    {
+      "a": "david",
+      "b": "french-revolution",
+      "kind": "served",
+      "word": "Revolution"
+    },
+    {
+      "a": "david",
+      "b": "napoleon",
+      "kind": "painted",
+      "word": "Napoleon",
+      "note": "David painted the coronation in Notre-Dame — twenty feet by thirty — and put Napoleon’s mother in the gallery watching, though she had refused to attend. He became First Painter to the Emperor and followed him into exile."
+    },
+    {
+      "a": "david",
+      "b": "rome",
+      "kind": "studied in",
+      "word": "Rome"
+    },
+    {
+      "a": "david",
+      "b": "prix-de-rome",
+      "kind": "won",
+      "word": "Prix de Rome"
+    },
+    {
+      "a": "ingres",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "ingres",
+      "b": "rome",
+      "kind": "worked in",
+      "word": "Rome"
+    },
+    {
+      "a": "ingres",
+      "b": "neoclassicism",
+      "kind": "of",
+      "word": "Neoclassic"
+    },
+    {
+      "a": "ingres",
+      "b": "prix-de-rome",
+      "kind": "won",
+      "word": "Prix de Rome"
+    },
+    {
+      "a": "ingres",
+      "b": "salon",
+      "kind": "showed at",
+      "word": "Salon"
+    },
+    {
+      "a": "gericault",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "gericault",
+      "b": "romanticism",
+      "kind": "of",
+      "word": "Romantic"
+    },
+    {
+      "a": "gericault",
+      "b": "salon",
+      "kind": "showed at",
+      "word": "Salon"
+    },
+    {
+      "a": "delacroix",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "delacroix",
+      "b": "romanticism",
+      "kind": "of",
+      "word": "Romantic"
+    },
+    {
+      "a": "delacroix",
+      "b": "salon",
+      "kind": "showed at",
+      "word": "Salon"
+    },
+    {
+      "a": "millet",
+      "b": "barbizon",
+      "kind": "worked at",
+      "word": "Barbizon",
+      "note": "Millet moved to Barbizon on the edge of the Fontainebleau forest in 1849 and painted peasants at work for the rest of his life, which was read at the time as politics."
+    },
+    {
+      "a": "millet",
+      "b": "realism",
+      "kind": "of",
+      "word": "Realism"
+    },
+    {
+      "a": "millet",
+      "b": "salon",
+      "kind": "showed at",
+      "word": "Salon"
+    },
+    {
+      "a": "manet",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "manet",
+      "b": "salon-refuses",
+      "kind": "hung in",
+      "word": "Refusés",
+      "note": "The Salon of 1863 rejected so many pictures that the Emperor ordered a second exhibition of the refused. Manet’s Déjeuner sur l’herbe was the scandal of it."
+    },
+    {
+      "a": "manet",
+      "b": "cafe-guerbois",
+      "kind": "argued at",
+      "word": "Guerbois"
+    },
+    {
+      "a": "manet",
+      "b": "realism",
+      "kind": "of",
+      "word": "Realism"
+    },
+    {
+      "a": "manet",
+      "b": "madrid",
+      "kind": "travelled to",
+      "word": "Madrid"
+    },
+    {
+      "a": "manet",
+      "b": "salon",
+      "kind": "showed at",
+      "word": "Salon"
+    },
+    {
+      "a": "degas",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "degas",
+      "b": "impressionism",
+      "kind": "of",
+      "word": "Impressionist",
+      "note": "Degas showed in seven of the eight Impressionist exhibitions and objected to the name throughout. He worked indoors, from memory, and drew first."
+    },
+    {
+      "a": "degas",
+      "b": "first-impressionist",
+      "kind": "showed at",
+      "word": "1874"
+    },
+    {
+      "a": "degas",
+      "b": "cafe-guerbois",
+      "kind": "argued at",
+      "word": "Guerbois"
+    },
+    {
+      "a": "monet",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "monet",
+      "b": "argenteuil",
+      "kind": "worked at",
+      "word": "Argenteuil",
+      "note": "Monet lived at Argenteuil on the Seine from 1871 to 1878 — the years the movement’s whole method was worked out, on the river, in a boat fitted up as a studio."
+    },
+    {
+      "a": "monet",
+      "b": "giverny",
+      "kind": "worked at",
+      "word": "Giverny"
+    },
+    {
+      "a": "monet",
+      "b": "impressionism",
+      "kind": "named",
+      "word": "Impression",
+      "note": "A critic at the 1874 exhibition took the title of Monet’s Impression, Sunrise and used it as an insult for the whole group. They kept the word."
+    },
+    {
+      "a": "monet",
+      "b": "first-impressionist",
+      "kind": "showed at",
+      "word": "1874"
+    },
+    {
+      "a": "monet",
+      "b": "cafe-guerbois",
+      "kind": "argued at",
+      "word": "Guerbois"
+    },
+    {
+      "a": "renoir",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "renoir",
+      "b": "montmartre",
+      "kind": "painted",
+      "word": "Montmartre",
+      "note": "The Moulin de la Galette was a Sunday dance in a garden on the Butte. Renoir carried the canvas up the hill and back every day for months, and painted his friends into it."
+    },
+    {
+      "a": "renoir",
+      "b": "impressionism",
+      "kind": "of",
+      "word": "Impressionist"
+    },
+    {
+      "a": "renoir",
+      "b": "first-impressionist",
+      "kind": "showed at",
+      "word": "1874"
+    },
+    {
+      "a": "cezanne",
+      "b": "aix",
+      "kind": "worked at",
+      "word": "Aix",
+      "note": "Cézanne went home to Aix and stayed, painting the same mountain more than thirty times, out of reach of Paris and largely out of its sight until he was old."
+    },
+    {
+      "a": "cezanne",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "cezanne",
+      "b": "post-impressionism",
+      "kind": "of",
+      "word": "Post-Impressionist"
+    },
+    {
+      "a": "cezanne",
+      "b": "first-impressionist",
+      "kind": "showed at",
+      "word": "1874"
+    },
+    {
+      "a": "caillebotte",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "caillebotte",
+      "b": "impressionism",
+      "kind": "of",
+      "word": "Impressionist"
+    },
+    {
+      "a": "caillebotte",
+      "b": "caillebotte-bequest",
+      "kind": "left",
+      "word": "bequest",
+      "note": "He died at forty-five and left sixty-eight Impressionist paintings to the French state. The Académie fought the gift for years and accepted only part of it, which is why some of the best of them are now in Washington rather than Paris."
+    },
+    {
+      "a": "caillebotte",
+      "b": "realism",
+      "kind": "of",
+      "word": "Realism"
+    },
+    {
+      "a": "vangogh",
+      "b": "arles",
+      "kind": "worked at",
+      "word": "Arles",
+      "note": "Fifteen months in Arles from February 1888 — the yellow house, the sunflowers, the night café, the starry night over the Rhône, and the collapse at the end of it."
+    },
+    {
+      "a": "vangogh",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "vangogh",
+      "b": "post-impressionism",
+      "kind": "of",
+      "word": "Post-Impressionist"
+    },
+    {
+      "a": "vangogh",
+      "b": "japonisme",
+      "kind": "copied",
+      "word": "Japan",
+      "note": "“All my work is founded on Japanese art,” Van Gogh wrote from Arles. He had gone south partly because he believed the light there would be the light of the prints."
+    },
+    {
+      "a": "whistler",
+      "b": "london",
+      "kind": "worked in",
+      "word": "London"
+    },
+    {
+      "a": "whistler",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "whistler",
+      "b": "japonisme",
+      "kind": "of",
+      "word": "Japan"
+    },
+    {
+      "a": "whistler",
+      "b": "salon",
+      "kind": "showed at",
+      "word": "Salon"
+    },
+    {
+      "a": "sargent",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "sargent",
+      "b": "london",
+      "kind": "worked in",
+      "word": "London"
+    },
+    {
+      "a": "sargent",
+      "b": "salon",
+      "kind": "showed at",
+      "word": "Salon"
+    },
+    {
+      "a": "sargent",
+      "b": "madrid",
+      "kind": "travelled to",
+      "word": "Madrid"
+    },
+    {
+      "a": "leutze",
+      "b": "london",
+      "kind": "exhibited in",
+      "word": "London"
+    },
+    {
+      "a": "nebamun-workshop",
+      "b": "thebes",
+      "kind": "painted at",
+      "word": "Thebes"
+    },
+    {
+      "a": "meidum-workshop",
+      "b": "thebes",
+      "kind": "painted at",
+      "word": "Egypt"
+    },
+    {
+      "a": "fayum-painters",
+      "b": "rome",
+      "kind": "under",
+      "word": "Roman"
+    },
+    {
+      "a": "dunhuang-painters",
+      "b": "dunhuang",
+      "kind": "painted at",
+      "word": "Dunhuang"
+    },
+    {
+      "a": "gu-kaizhi",
+      "b": "dunhuang",
+      "kind": "tradition of",
+      "word": "China"
+    },
+    {
+      "a": "john-white",
+      "b": "roanoke",
+      "kind": "drew at",
+      "word": "Roanoke"
+    },
+    {
+      "a": "john-white",
+      "b": "london",
+      "kind": "worked in",
+      "word": "London"
+    },
+    {
+      "a": "japonisme",
+      "b": "ukiyo-e",
+      "kind": "took from",
+      "word": "ukiyo",
+      "note": "Japanese prints reached Paris in quantity after 1858 — some, famously, as packing material — and within a decade had changed how European painters composed a picture."
+    },
+    {
+      "a": "veronese",
+      "b": "napoleon",
+      "kind": "looted by",
+      "word": "Napoleon",
+      "note": "Napoleon’s army took the Wedding at Cana out of its refectory in Venice in 1797. It was cut in half to be carried to Paris, and it is still there — the largest painting in the Louvre, hanging opposite the most famous small one."
+    },
+    {
+      "a": "impressionism",
+      "b": "first-impressionist",
+      "kind": "launched at",
+      "word": "1874",
+      "note": "Thirty artists, in Nadar’s old photographic studio on the boulevard des Capucines, April 1874, because the Salon would not have them."
+    },
+    {
+      "a": "impressionism",
+      "b": "caillebotte-bequest",
+      "kind": "entered France by",
+      "word": "bequest"
+    },
+    {
+      "a": "leonardo",
+      "b": "michelangelo",
+      "kind": "rivals in Florence, 1504",
+      "word": "Florence",
+      "note": "In 1504 Florence commissioned battle scenes for the same room of the Palazzo Vecchio from both of them at once. Leonardo was fifty-two and famous; Michelangelo was twenty-nine and had just finished the David. Neither fresco was finished, and the cartoons — copied by every young painter in Italy, Raphael among them — became the most influential drawings of the century."
+    },
+    {
+      "a": "raphael",
+      "b": "leonardo",
+      "kind": "learned sfumato from",
+      "word": "Leonardo",
+      "note": "Raphael reached Florence around 1504 and rebuilt his art on what he found there. The pyramid composition of his Madonnas and the soft smoke-edged modelling of his faces are Leonardo’s, absorbed in about two years by a painter thirty years younger."
+    },
+    {
+      "a": "raphael",
+      "b": "michelangelo",
+      "kind": "worked down the corridor from",
+      "word": "Michelangelo",
+      "note": "From 1508 they worked a few hundred metres apart in the same palace — Michelangelo on the Sistine ceiling, Raphael on the Stanze — and did not get on. Raphael saw the half-finished ceiling and promptly painted Michelangelo into the School of Athens as brooding Heraclitus, sitting alone on the steps."
+    },
+    {
+      "a": "michelangelo",
+      "b": "giotto",
+      "kind": "drew after",
+      "word": "Giotto",
+      "note": "Michelangelo’s earliest surviving drawings are copies after Giotto’s frescoes in Santa Croce. Two centuries separate them; the weight and solidity of the bodies passed straight across."
+    },
+    {
+      "a": "caravaggio",
+      "b": "rembrandt",
+      "kind": "the light that reached",
+      "word": "light",
+      "note": "Caravaggio never went north, but his followers did. By the 1620s the Utrecht painters had carried the single raking light and the hard black shadow back to Holland, where the young Rembrandt took it and made it his own."
+    },
+    {
+      "a": "veronese",
+      "b": "el-greco",
+      "kind": "Venice-trained alongside",
+      "word": "Venice",
+      "note": "Both learned to paint in Venice in the shadow of Titian — Veronese from Verona, El Greco from Crete — and both took the Venetian habit of building a figure out of colour rather than drawing it first."
+    },
+    {
+      "a": "velazquez",
+      "b": "manet",
+      "kind": "\"the painter of painters\", to",
+      "word": "Velázquez",
+      "note": "Manet went to Madrid in 1865 and stood in front of the Velázquezes. “The painter of painters,” he wrote home. The flat black, the refusal to model with shadow and the frank grey ground of Olympia all came back from that trip."
+    },
+    {
+      "a": "velazquez",
+      "b": "sargent",
+      "kind": "copied in Madrid by",
+      "word": "Velázquez",
+      "note": "Sargent copied Velázquez in the Prado at twenty-three. Madame X’s silhouette against a bare ground — the whole figure carried by one contour — is what he took away from it."
+    },
+    {
+      "a": "david",
+      "b": "ingres",
+      "kind": "taught",
+      "word": "David",
+      "note": "Ingres entered David’s studio at seventeen and stayed four years. He inherited the line and abandoned the politics, and spent his life being called the last classicist by people who could not see how strange his drawing had become."
+    },
+    {
+      "a": "gericault",
+      "b": "delacroix",
+      "kind": "who posed for the Raft",
+      "word": "Géricault",
+      "note": "They were friends, and Delacroix posed for the Raft of the Medusa — he is the figure lying face down with one arm outstretched in the foreground. Géricault died at thirty-two; Delacroix carried Romanticism for another forty years."
+    },
+    {
+      "a": "millet",
+      "b": "vangogh",
+      "kind": "copied, again and again, by",
+      "word": "Millet",
+      "note": "Van Gogh copied Millet all his life, from the drawings he made as a beginner to the canvases he painted in the asylum at Saint-Rémy. “Millet is father Millet,” he wrote, “counsellor and mentor in everything.”"
+    },
+    {
+      "a": "manet",
+      "b": "monet",
+      "kind": "friends, and forever confused",
+      "word": "Manet",
+      "note": "The two names were confused from the start — Manet complained when a Monet was praised as his at the Salon of 1865 — and they became friends anyway. Manet painted Monet at work in his floating studio at Argenteuil."
+    },
+    {
+      "a": "manet",
+      "b": "degas",
+      "kind": "friends and antagonists",
+      "word": "Degas",
+      "note": "Friends, and combative about it. Degas gave Manet a portrait of Manet and his wife; Manet, disliking how his wife had been painted, cut her out of it with a knife. Degas took the picture back, and they did not speak for a while."
+    },
+    {
+      "a": "manet",
+      "b": "cezanne",
+      "kind": "answered by a Modern Olympia",
+      "word": "Olympia",
+      "note": "Cézanne answered Olympia in 1873 with A Modern Olympia — the same scene painted as a violent sketch, with himself sitting in the picture watching. It hung in the first Impressionist exhibition and was the most mocked object there."
+    },
+    {
+      "a": "monet",
+      "b": "renoir",
+      "kind": "painted side by side at La Grenouillère",
+      "word": "Renoir",
+      "note": "In the summer of 1869 they set up their easels side by side at La Grenouillère on the Seine and painted the same bathers, the same boats, the same broken light on the water. Impressionism is roughly what they worked out that summer."
+    },
+    {
+      "a": "caillebotte",
+      "b": "renoir",
+      "kind": "collected and left to France",
+      "word": "Caillebotte",
+      "note": "Caillebotte painted with them and, being rich, bought from them. His will left the collection to the French state, and Renoir was his executor."
+    },
+    {
+      "a": "caillebotte",
+      "b": "monet",
+      "kind": "collected and left to France",
+      "word": "Caillebotte",
+      "note": "Caillebotte bought Monet’s work when almost nobody would, paid his rent more than once, and left the pictures to France. Much of what hangs in the Orsay today came in through that bequest."
+    },
+    {
+      "a": "caillebotte",
+      "b": "degas",
+      "kind": "collected and left to France",
+      "word": "Caillebotte",
+      "note": "Caillebotte collected Degas as he collected the rest of them, and organised and hung several of the Impressionist exhibitions himself."
+    },
+    {
+      "a": "hokusai",
+      "b": "hiroshige",
+      "kind": "the two great names of",
+      "word": "Hiroshige",
+      "note": "The two great landscape names of ukiyo-e, a generation apart. Hokusai’s Thirty-six Views of Mount Fuji made landscape a subject in its own right; Hiroshige’s Fifty-three Stations of the Tōkaidō made it weather."
+    },
+    {
+      "a": "hokusai",
+      "b": "vangogh",
+      "kind": "copied in Arles by",
+      "word": "Japanese",
+      "note": "Van Gogh collected Japanese prints in Paris by the hundred, hung them in his room, and said he wanted to see with a Japanese eye. The flat colour and high hard horizon of the Arles pictures are the result."
+    },
+    {
+      "a": "hiroshige",
+      "b": "vangogh",
+      "kind": "copied, in oil, by",
+      "word": "Hiroshige",
+      "note": "Van Gogh copied two Hiroshige prints in oil in 1887, framing them with borders of invented Japanese characters. He was not quoting them; he was trying to work out how they were made."
+    },
+    {
+      "a": "whistler",
+      "b": "degas",
+      "kind": "Japanese prints in common with",
+      "word": "Japanese",
+      "note": "Both were collecting and studying Japanese prints in the 1860s, and both took the same lesson: the off-centre subject, the cropped edge, the flat interval of empty ground."
+    },
+    {
+      "a": "durer",
+      "b": "hokusai",
+      "kind": "three centuries apart, the same block",
+      "word": "woodcut",
+      "note": "Three centuries and half a world apart, both worked in the same medium — a design cut into a block of wood and printed in editions — and both used it to put pictures into the hands of people who could never have owned a painting."
+    },
+    {
+      "a": "rembrandt",
+      "b": "vermeer",
+      "kind": "the two poles of the Dutch century",
+      "word": "Dutch",
+      "note": "The two poles of the Dutch century: Rembrandt made some three hundred paintings, Vermeer perhaps thirty-five. One painted the whole world in brown light; the other painted one corner of one room and got everything into it."
+    },
+    {
+      "a": "david",
+      "b": "napoleon",
+      "kind": "court painter to",
+      "word": "Napoleon",
+      "note": "David painted the coronation in Notre-Dame — twenty feet by thirty — and put Napoleon’s mother in the gallery watching, though she had refused to attend. He became First Painter to the Emperor and followed him into exile."
+    },
+    {
+      "a": "ingres",
+      "b": "raphael",
+      "kind": "venerated",
+      "word": "Raphael",
+      "note": "Ingres venerated Raphael to the point of quotation: engravings after him on the studio wall, and the instruction to his students that Raphael was not a man to be surpassed but a language to be learned."
+    },
+    {
+      "a": "whistler",
+      "b": "sargent",
+      "kind": "Americans abroad, with",
+      "word": "Whistler",
+      "note": "Two Americans who barely lived in America — Whistler in London, Sargent between Paris and London — both making their name at the Salon, and both notorious there."
+    },
+    {
+      "a": "leutze",
+      "b": "sargent",
+      "kind": "Americans abroad, with",
+      "word": "American",
+      "note": "Leutze painted Washington Crossing the Delaware in Düsseldorf, not America; Sargent painted his Americans in Paris. The national picture, in both cases, was made abroad."
+    },
+    {
+      "a": "bellini",
+      "b": "venice",
+      "kind": "worked in",
+      "word": "Venice"
+    },
+    {
+      "a": "domenichino",
+      "b": "rome",
+      "kind": "worked in",
+      "word": "Rome"
+    },
+    {
+      "a": "bellini",
+      "b": "high-renaissance",
+      "kind": "of",
+      "word": "Renaissance"
+    },
+    {
+      "a": "domenichino",
+      "b": "baroque",
+      "kind": "of",
+      "word": "Baroque"
+    },
+    {
+      "a": "domenichino",
+      "b": "caravaggio",
+      "kind": "argued against",
+      "word": "Domenichino",
+      "note": "Rome in the 1610s split between the Carracci school’s drawn, composed manner — Domenichino’s — and the dark naturalism Caravaggio had left behind him. This altarpiece is the case for the first, made at four metres high."
+    },
+    {
+      "a": "bellini",
+      "b": "venetian-school",
+      "kind": "founded",
+      "word": "Venetian",
+      "note": "Giorgione and Titian both came out of Bellini’s workshop, and what they took from him first was the sky: he was the painter who decided that the light behind a sacred figure should be the light of the place the picture would hang in."
+    }
+  ]
 }

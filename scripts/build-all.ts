@@ -1,12 +1,12 @@
 /**
- * build-all.ts — spec §5 / M3
+ * build-all.ts
  *
  * `pnpm build:assets` regenerates every shipped asset from data/.
  *
  * For each museum in data/museums/order.json, for each work it hangs:
  *   1. images   → wall/view/full × avif+webp+jpg, lqip.webp
  *   2. corpus   → corpus.bin + segment offsets
- *   3. glyphs   → glyphs.bin (+ glyphs-lo.bin for the low device tier, §14.2)
+ *   3. glyphs   → glyphs.bin (+ glyphs-lo.bin for the low device tier)
  *   4. meta     → meta.json (placard + provenance + corpus table + geometry)
  *
  * then per museum:

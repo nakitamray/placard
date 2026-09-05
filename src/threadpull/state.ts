@@ -37,10 +37,6 @@ export const artworkProjector: {
   project: ((u: number, v: number) => { x: number; y: number } | null) | null;
 } = { project: null };
 
-export function regionCentre(r: ArtworkRegion): [number, number] {
-  return [(r.box[0] + r.box[2]) / 2, (r.box[1] + r.box[3]) / 2];
-}
-
 /**
  * Which region contains a normalised point. Smallest box wins, so a small
  * region nested inside a large one (a face against a wall) is reachable.

@@ -672,7 +672,7 @@ async function download(
 
 /* ── CLI ────────────────────────────────────────────────────────────────── */
 
-// importing this module (the scorer is unit-tested) must not start a run
+// scripts/check.ts imports the scorer; importing must not start a fetch
 const invokedDirectly =
   !!process.argv[1] && path.basename(process.argv[1]).startsWith('fetch-images');
 

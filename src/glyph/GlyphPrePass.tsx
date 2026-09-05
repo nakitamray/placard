@@ -1,10 +1,10 @@
 /**
- * GlyphPrePass — spec §7.3.
+ * GlyphPrePass
  *
  * The glyph mesh is never drawn into the main scene. It renders in a
  * pre-pass (useFrame priority −1) into one reused WebGLRenderTarget, which
  * the active artwork plane samples as a map. Exactly one artwork renders
- * live glyphs at any moment (spec §7.4 LOD).
+ * live glyphs at any moment.
  */
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
@@ -18,11 +18,11 @@ import { lens } from '../transitions/lens';
 
 export const glyphRT: { current: THREE.WebGLRenderTarget | null } = { current: null };
 
-const CHAR_RATE = 6; // chars/sec through the corpus (spec §4.3)
+const CHAR_RATE = 6; // chars/sec through the corpus
 
 function buildGeometry(art: LoadedArtwork): THREE.InstancedBufferGeometry {
   const g = new THREE.InstancedBufferGeometry();
-  // unit quad, -0.5..0.5 — 4 verts, 2 tris (spec §7.1)
+  // unit quad, -0.5..0.5 — 4 verts, 2 tris
   g.setAttribute(
     'aQuad',
     new THREE.Float32BufferAttribute([-0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5], 2),
@@ -105,8 +105,7 @@ export function GlyphPrePass({
   const meshRef = useRef<THREE.Mesh | null>(null);
   const timeRef = useRef(0);
 
-  // swap attribute buffers when the active artwork changes (spec §7.5 —
-  // buffers are precomputed; this is only bufferData calls)
+  // swap attribute buffers when the active artwork changes ( // buffers are precomputed; this is only bufferData calls)
   useEffect(() => {
     if (!artwork) return;
     const geo = buildGeometry(artwork);
@@ -132,7 +131,7 @@ export function GlyphPrePass({
 
   useFrame((_, delta) => {
     if (!active || !artwork || !meshRef.current) return;
-    // corpus animation frozen under prefers-reduced-motion (spec §15)
+    // corpus animation frozen under prefers-reduced-motion
     if (!reducedMotion) {
       timeRef.current += delta;
     }
@@ -174,7 +173,7 @@ export function GlyphPrePass({
       charOffset: u.uCharOffset.value,
       detach: tp.detach,
     };
-  }, -1); // negative priority = before the default render (spec §7.3)
+  }, -1); // negative priority = before the default render
 
   return null;
 }

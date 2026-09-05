@@ -107,12 +107,11 @@ export const DEFAULT_GLYPH_CONFIG: GlyphConfig = {
 /**
  * The low device tier's variant of the same painting.
  *
- * This used to be `minCell × 2` alone, which did almost nothing: the quadtree
- * bottoms out on `maxCell` long before it reaches the floor, so glyphs-lo.bin
- * came out within two percent of glyphs.bin — 128KB either way, sixteen
- * thousand instances either way. The tier existed in the file names and
- * nowhere else. Doubling the ceiling as well as the floor is what actually
- * quarters it.
+ * Both cell bounds double, not just the floor: the quadtree bottoms out on
+ * `maxCell` long before it reaches `minCell`, so raising the floor alone
+ * changes the output by about two percent — the same 128KB and the same
+ * sixteen thousand instances under a different file name. Doubling the ceiling
+ * is what actually quarters it.
  */
 export const LOW_TIER_GLYPHS = (cfg: GlyphConfig): Partial<GlyphConfig> => ({
   minCell: cfg.minCell * 2,

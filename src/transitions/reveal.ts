@@ -1,5 +1,5 @@
 /**
- * Artwork reveal choreography — spec §10.6.
+ * Artwork reveal choreography
  *
  * Focus is created by ADDING light to the artwork, not by removing light
  * from the room: environment settles to 0.78, never a blackout.

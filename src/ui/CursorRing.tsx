@@ -1,5 +1,5 @@
 /**
- * Custom cursor — spec §10C.7.
+ * Custom cursor
  *
  * The first iteration drew a dark ring, which is invisible on the landing page
  * and in the corridor, where almost everything is dark: the pointer simply

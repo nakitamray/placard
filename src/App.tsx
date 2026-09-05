@@ -30,7 +30,7 @@ import { ControlHints } from './ui/ControlHints';
 import { CursorRing } from './ui/CursorRing';
 import { LoadingBar } from './ui/LoadingBar';
 import { FlashLayer } from './ui/Flash';
-import { endReveal } from './transitions/reveal';
+import { endReveal, startReveal } from './transitions/reveal';
 import { asset } from './lib/asset';
 import { attention, roomTone, setSound, sfx, soundEnabled, soundStored } from './lib/audio';
 import { loadAtlas, useAtlas } from './state/atlas';
@@ -158,7 +158,7 @@ export default function App() {
     };
   }, [webgl, setMuseums, setPhase]);
 
-  // global Esc: exits reveal, gallery→map, map→corridor (spec §9)
+  // global Esc: exits reveal, gallery→map, map→corridor
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
@@ -231,7 +231,7 @@ export default function App() {
         </Canvas>
       </div>
 
-      {/* reveal vignette — generous radius, 18% max (spec §10.6) */}
+      {/* reveal vignette — generous radius, 18% max */}
       <div className={`reveal-vignette ${revealed ? 'is-on' : ''}`} aria-hidden />
 
       {phase === 'boot' && <LoadingBar progress={progress} />}
@@ -266,9 +266,9 @@ export default function App() {
           <button className="caption atlas-open" onClick={() => useAtlas.getState().setOpen(true)}>
             ✦ The atlas
           </button>
-          {/* The colophon used to be reachable only from the entrance, where no
-              museum is loaded — so its list of corpus sources could never be
-              seen. It belongs wherever you are standing. */}
+          {/* The colophon belongs wherever you are standing: its list of corpus
+              sources is the sources of the room you are in, so reaching it only
+              from the entrance — where no museum is loaded — shows nothing. */}
           {phase !== 'landing' && (
             <button
               className="caption atlas-open"
@@ -303,7 +303,7 @@ export default function App() {
       <FlashLayer />
       <CursorRing />
 
-      {/* screen-reader / keyboard proxies for the canvas artworks (spec §15) */}
+      {/* screen-reader / keyboard proxies for the canvas artworks */}
       {inGallery && <ArtworkProxies />}
     </>
   );
@@ -513,11 +513,9 @@ function ArtworkProxies() {
           onFocus={() => setIndex(i)}
           onClick={() => {
             const s = useStore.getState();
-            if (i === index) {
-              void import('./transitions/reveal').then((m) =>
-                s.revealed ? m.endReveal(s.reducedMotion) : m.startReveal(s.reducedMotion),
-              );
-            }
+            if (i !== index) return;
+            if (s.revealed) endReveal(s.reducedMotion);
+            else startReveal(s.reducedMotion);
           }}
         />
       ))}

@@ -1,6 +1,6 @@
 /**
- * Shared lighting rig — spec §10A.5. The corridor must feel light, warm and
- * open (§10A.6 brightness guardrail): generous hemisphere fill, warm lamps,
+ * Shared lighting rig The corridor must feel light, warm and
+ * open: generous hemisphere fill, warm lamps,
  * ACES exposure 1.15 set on the renderer in App.
  */
 import { useEffect } from 'react';
@@ -27,8 +27,3 @@ export function Environment({ intensity = 0.45 }: { intensity?: number }) {
   return null;
 }
 
-export function HemisphereFill({ intensity = 0.4 }: { intensity?: number }) {
-  return <hemisphereLight args={['#FFF3E0', '#C9BCA6', intensity]} />;
-}
-
-export const LAMP = '#FFE9C6'; // ~3000K
