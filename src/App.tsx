@@ -36,6 +36,8 @@ import { endReveal, startReveal } from './transitions/reveal';
 import { asset } from './lib/asset';
 import { attention, roomTone, setSound, sfx, soundEnabled, soundStored } from './lib/audio';
 import { loadAtlas, useAtlas } from './state/atlas';
+import { FrameGovernor } from './render/frameGovernor';
+import { useCanvasLive } from './render/canvasGate';
 import type { MuseumIndexEntry } from './types';
 
 export default function App() {
@@ -58,6 +60,8 @@ export default function App() {
 
   const [sound, setSoundOn] = useState(false);
   const atlasOpen = useAtlas((s) => s.open);
+  /* nothing is drawn while something opaque is over the canvas — see canvasGate */
+  const canvasLive = useCanvasLive();
   /** the wall label is up: revealed by a click, not by a passing cursor */
   const placardOpen = useStore((s) => s.revealed && s.revealLatched);
   const wasPlacardOpen = useRef(false);
@@ -210,15 +214,29 @@ export default function App() {
     <>
       <div className={`canvas-wrap ${phase === 'map' ? 'is-blurred' : ''}`}>
         <Canvas
+          /* the loop is FrameGovernor's: see src/render/frameGovernor.tsx */
+          frameloop="never"
           dpr={[1, quality.dprCap]}
-          gl={{ antialias: true, powerPreference: 'high-performance' }}
+          gl={{
+            antialias: quality.antialias,
+            powerPreference: quality.powerPreference,
+          }}
           shadows={quality.shadows ? { type: THREE.PCFSoftShadowMap } : false}
           camera={{ fov: 48, position: [0, 1.6, 4], near: 0.1, far: 160 }}
           onCreated={({ gl }) => {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
             gl.outputColorSpace = THREE.SRGBColorSpace;
+            /*
+             * Shadows are redrawn on demand, not every frame. The only caster
+             * in either room is the key light, and it moves when the visitor
+             * walks — which is a small fraction of the frames they are here
+             * for. The scenes ask for a refresh when they move it.
+             */
+            gl.shadowMap.autoUpdate = false;
+            gl.shadowMap.needsUpdate = true;
           }}
         >
+          <FrameGovernor maxFps={quality.maxFps} running={canvasLive} />
           <ExposureRig exposure={exposure} />
           <FrameWatchdog quality={qualityName} onStruggling={setQualityName} />
           <color attach="background" args={[bg]} />
@@ -366,6 +384,11 @@ function ExposureRig({ exposure }: { exposure: number }) {
  * oscillating between budgets is worse than sitting on the lower one; and it
  * never overrides a visitor who has picked a level, because being second-
  * guessed by the page is more annoying than a slow frame.
+ *
+ * The frames it measures are the ones FrameGovernor let through, so a capped
+ * room reads as 30 or 60 rather than as whatever the machine could manage.
+ * That is the right thing to measure — it is what the visitor is looking at —
+ * and 24 sits below every cap, so a budget can never trip its own watchdog.
  */
 function FrameWatchdog({
   quality,
@@ -477,9 +500,19 @@ function WorkLabel() {
     let raf = 0;
     const cur = { x: 0, y: 0 };
     let first = true;
+    /*
+     * The label's own width, measured once.
+     *
+     * Reading `offsetWidth` inside a frame callback forces the browser to lay
+     * the page out again on the spot, every frame, to answer a question whose
+     * answer only changes when the label's text does — and its text is fixed
+     * for as long as this effect is mounted.
+     */
+    let width = 0;
     const tick = () => {
       const el = ref.current;
       if (el) {
+        if (!width) width = el.offsetWidth;
         const tx = pointer.x * (window.innerWidth / 2) + window.innerWidth / 2 + 22;
         const ty = pointer.y * (window.innerHeight / 2) + window.innerHeight / 2 + 20;
         if (first) {
@@ -490,8 +523,7 @@ function WorkLabel() {
           cur.x += (tx - cur.x) * 0.24;
           cur.y += (ty - cur.y) * 0.24;
         }
-        const w = el.offsetWidth;
-        const x = Math.min(cur.x, window.innerWidth - w - 20);
+        const x = Math.min(cur.x, window.innerWidth - width - 20);
         el.style.transform = `translate(${x}px, ${cur.y}px)`;
       }
       raf = requestAnimationFrame(tick);

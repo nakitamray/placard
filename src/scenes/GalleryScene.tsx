@@ -40,8 +40,31 @@ import { discoverWork } from '../state/atlas';
 import { artworkProjector, regionAt } from '../threadpull/state';
 import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
 import type { Quality } from '../lib/quality';
+import { useShadowRefresh } from '../render/shadows';
 
 const SPACING = 8;
+/**
+ * HOW MANY PICTURE LIGHTS EXIST AT ALL.
+ *
+ * There was one `pointLight` per painting, which on a seventy-work wing is
+ * seventy of them. Three.js has no spatial culling for lights: every light in
+ * the scene goes into the uniform array, and every lit fragment of every
+ * standard material loops over all of them. Seventy iterations per pixel is
+ * most of what the gallery costs to draw, and sixty-five of those iterations
+ * resolve to nothing — the lamps carry `distance={11}` against a bay spacing
+ * of 8, and three.js's distance falloff is *exactly* zero past the cutoff.
+ *
+ * So the room keeps five and slides them along the rail: the bay you are in,
+ * and two either side. Two is one more than a lamp can reach, which is the
+ * margin that keeps one from appearing at the edge of the screen while the
+ * rail is still gliding.
+ *
+ * Five, not "however many are in range". The light count is compiled into
+ * every material's shader, so a number that changed as you scrolled would
+ * recompile the whole room mid-scroll. This count never changes; only the
+ * positions do, and moving a light is free.
+ */
+const LIT_BAYS = 5;
 /**
  * How far back the camera stands, and how big the canvas is drawn.
  *
@@ -73,6 +96,25 @@ const LENS_RADIUS = 0.26;
 
 /** screen-space projection of the active plane for the DOM placard */
 export const placardAnchor = { x: 0, y: 0, edge: 0, visible: false };
+
+/** the warm end of the fill light; a constant, so it is made once */
+const FILL_WARM = new THREE.Color('#FFF3E0');
+
+/**
+ * Working values for the frame loop.
+ *
+ * Colours and vectors used to be built fresh inside `useFrame`, which is four
+ * throwaway objects per frame — a few hundred a second, all of them identical
+ * in shape and all of them immediately garbage. The room does not need them to
+ * survive the frame, so it stops making new ones: the collector has nothing to
+ * do, and the pauses it used to cause go with it.
+ */
+const scratch = {
+  accent: new THREE.Color(),
+  bg: new THREE.Color(),
+  point: new THREE.Vector3(),
+  projected: new THREE.Vector3(),
+};
 
 /* ── the moulded bay around one painting ────────────────────────────────── */
 
@@ -261,6 +303,19 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
   const spotRef = useRef<THREE.SpotLight>(null);
   const fillRef = useRef<THREE.HemisphereLight>(null);
   const spotTarget = useRef<THREE.Object3D>(new THREE.Object3D());
+  const refreshShadows = useShadowRefresh();
+  /** which bay the spot stood over when the shadow map was last drawn */
+  const shadowBay = useRef(-1);
+  /** the picture lights, placed by the frame loop rather than by React */
+  const lampRefs = useRef<Array<THREE.PointLight | null>>([]);
+  // a change of budget or of the hang itself is a new shadow map
+  useEffect(refreshShadows, [
+    refreshShadows,
+    quality.shadows,
+    quality.shadowMapSize,
+    quality.ornament,
+    artworks.length,
+  ]);
   const look = useRef({ x: 0, y: 0 });
   /** how far the room slides aside to make room for the wall label */
   const shift = useRef(0);
@@ -479,15 +534,31 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     // slow wash from one artist's ground to the next rather than a cut
     const nearest = artworks[Math.round(gallery.x / SPACING)] ?? artworks[index];
     if (nearest) {
-      const target = new THREE.Color(nearest.accent);
-      roomTone.current.lerp(target, Math.min(1, delta * 2.4));
-      const bg = roomTone.current.clone().multiplyScalar(0.34);
+      roomTone.current.lerp(scratch.accent.set(nearest.accent), Math.min(1, delta * 2.4));
+      const bg = scratch.bg.copy(roomTone.current).multiplyScalar(0.34);
       if (state.scene.background instanceof THREE.Color) state.scene.background.copy(bg);
       const fog = state.scene.fog as THREE.Fog | null;
       if (fog) fog.color.copy(bg);
       if (fillRef.current) {
-        fillRef.current.color.copy(roomTone.current).lerp(new THREE.Color('#FFF3E0'), 0.55);
+        fillRef.current.color.copy(roomTone.current).lerp(FILL_WARM, 0.55);
         fillRef.current.groundColor.copy(roomTone.current).multiplyScalar(0.7);
+      }
+    }
+
+    /*
+     * The picture lights follow the camera, not the snapped index.
+     *
+     * A jump from the rail indicator glides the room across several bays in
+     * under a second, and for that second the camera is nowhere near the bay
+     * it is heading for. Following `gallery.x` means the bays it passes are
+     * lit as it passes them, which is what a row of picture lights does.
+     */
+    const litBays = Math.min(artworks.length, LIT_BAYS);
+    if (litBays) {
+      const centre = Math.round(gallery.x / SPACING);
+      const start = clamp(centre - (litBays >> 1), 0, artworks.length - litBays);
+      for (let i = 0; i < litBays; i++) {
+        lampRefs.current[i]?.position.set((start + i) * SPACING, 4.8, 2.6);
       }
     }
 
@@ -497,6 +568,16 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
       spotTarget.current.position.set(index * SPACING, HANG_Y, 0);
       spotTarget.current.updateMatrixWorld();
       spotRef.current.intensity = revealAnim.spot * 3.4;
+      /*
+       * The spot steps from bay to bay; it does not drift. So its shadow map
+       * is redrawn on the step and not on the sixty frames of standing in
+       * front of a painting that follow — the light gets brighter through a
+       * reveal, and brightness is not something a depth buffer records.
+       */
+      if (shadowBay.current !== index) {
+        shadowBay.current = index;
+        refreshShadows();
+      }
     }
     scene.environmentIntensity = 0.45 * revealAnim.env;
 
@@ -504,7 +585,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     const activeEntry = artworks[index];
     if (activeEntry) {
       const { width: w, height: h } = fitWork(activeEntry.aspect, PLANE_H, MAX_W);
-      const v = new THREE.Vector3(index * SPACING + w / 2, HANG_Y, 0.1);
+      const v = scratch.point.set(index * SPACING + w / 2, HANG_Y, 0.1);
       v.project(camera);
       placardAnchor.x = (v.x * 0.5 + 0.5) * size.width;
       placardAnchor.y = (-v.y * 0.5 + 0.5) * size.height;
@@ -514,7 +595,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
       // Recomputed from the live camera on every call, so a resize mid-flight
       // simply produces new coordinates rather than a stale cached path.
       artworkProjector.project = (u: number, vv: number) => {
-        const p = new THREE.Vector3(
+        const p = scratch.projected.set(
           index * SPACING + (u - 0.5) * w,
           HANG_Y + (0.5 - vv) * h,
           0.05,
@@ -674,13 +755,15 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
         />
       ))}
 
-      {/* lighting: an accent-tinted fill, a picture light per bay, and the
-          reveal spot */}
+      {/* lighting: an accent-tinted fill, the picture lights — placed along
+          the rail by the frame loop, see LIT_BAYS — and the reveal spot */}
       <hemisphereLight ref={fillRef} args={['#FFF3E0', '#9C9080', 0.5]} />
-      {artworks.map((_, i) => (
+      {Array.from({ length: Math.min(artworks.length, LIT_BAYS) }, (_, i) => (
         <pointLight
           key={i}
-          position={[i * SPACING, 4.8, 2.6]}
+          ref={(el) => {
+            lampRefs.current[i] = el;
+          }}
           color={museum.style.light.lamp}
           intensity={9}
           distance={11}

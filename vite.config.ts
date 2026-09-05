@@ -25,10 +25,16 @@ export default defineConfig({
          */
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
-          if (id.includes('three')) return 'three';
+          /*
+           * Order matters, and it was wrong: `@react-three/fiber` and
+           * `@react-three/drei` both contain the substring "three", so the
+           * first test swallowed them and the r3f chunk was never emitted.
+           * Most specific first.
+           */
           if (id.includes('@react-three')) return 'r3f';
+          if (id.includes('/three/') || id.includes('three-stdlib')) return 'three';
           if (id.includes('gsap')) return 'gsap';
-          if (id.includes('react') || id.includes('scheduler')) return 'react';
+          if (id.includes('/react') || id.includes('scheduler')) return 'react';
         },
       },
     },

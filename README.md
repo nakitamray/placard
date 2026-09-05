@@ -103,6 +103,13 @@ buys. The exhibition also measures its own frame times for a few seconds when
 it starts and steps down once if the room is not keeping up — but never up, and
 never over a choice you have made yourself.
 
+**Smooth** is the one to reach for if the fan comes on. It drops the frame cap
+to thirty, turns off multisampling, and asks the browser for the low-power GPU
+rather than the discrete one, which on a two-GPU laptop is most of the heat by
+itself. Whatever budget you are on, the room stops drawing entirely while the
+atlas, the map or the credits are open, and while the tab is in the
+background.
+
 ## Accessibility
 
 `prefers-reduced-motion` is honoured throughout: the corpus animation freezes,
@@ -168,6 +175,7 @@ src/
   scenes/                   the corridor, the gallery, the entrance hero
   scenes/corridor/          ceilings, floors, walls, fixtures, atmosphere
   glyph/                    the atlas, the shader, the instanced pre-pass
+  render/                   when the canvas is drawn, and how often
   ui/                       everything in the DOM over the canvas
   state/                    one store for the room, one for the atlas
   lib/                      audio, music, images, quality, device tiering
@@ -416,6 +424,55 @@ Auto-detection never picks Rich. It reads a renderer string and a core count,
 which says what the machine is and nothing about what else it is doing, and
 guessing high costs a stuttering first impression.
 
+### What is drawn, and how often
+
+The budgets above decide how much is in a frame. These decide how many frames
+there are, which for a room that mostly drifts turns out to matter more.
+
+- **The frame loop is capped, and stops.** The canvas runs on
+  `frameloop="never"` and `src/render/frameGovernor.tsx` drives it: thirty
+  frames a second on Smooth, sixty on the other two. Nothing here resolves
+  faster than that — the camera eases, the letters breathe, the dust falls — so
+  on a 120Hz laptop panel the uncapped loop was drawing the whole corridor
+  twice for every change anybody could see. `src/render/canvasGate.ts` stops it
+  outright whenever something opaque is over the canvas: the atlas, which is a
+  second WebGL canvas of its own; the map, which is a scrim over a blurred
+  still; the credits sheet; another tab. The last frame stays on screen, which
+  is exactly what those screens were showing anyway.
+- **One picture light per bay in range, not one per painting.** Three.js has no
+  spatial culling for lights: every light in the scene goes into the uniform
+  array and every lit fragment loops over all of them. A seventy-work wing had
+  seventy of them, sixty-five of which were beyond their own `distance` and
+  contributing exactly zero. The gallery now slides a fixed window of five
+  along the rail — fixed, because the light count is compiled into the shader
+  and a count that changed as you scrolled would recompile every material in
+  the room mid-scroll.
+- **The glyph field redraws at thirty a second while it is still.** The
+  pre-pass is the most expensive thing in the gallery — tens of thousands of
+  instanced quads into a render target up to 2048 square — and the corpus it
+  animates steps six characters a second. Moving the reading lens, dissolving a
+  work or pulling a thread takes it straight back to full rate for as long as
+  that lasts.
+- **Shadow maps are drawn when the light moves.** Each one is a third pass over
+  the room's geometry, and three.js runs it every frame by default. The only
+  caster in either room is a single light over architecture that never moves,
+  so the map is redrawn while the visitor is walking and not while they are
+  standing still.
+- **Dust is moved thirty times a second.** Four hundred instance transforms
+  rebuilt and re-uploaded for motes drifting at a few centimetres a second is
+  arithmetic with no visible result. The skipped time is carried, so they fall
+  at the same speed.
+- **The DOM stops writing when it has arrived.** The cursor ring's loop ends
+  once it has caught up and wakes on the next pointer event; the wall label and
+  the placard measure themselves when their size changes rather than on every
+  frame, and skip writes that would set the transform they already have. The
+  map's scrim lost a `backdrop-filter` that was blurring a full screen of
+  already-blurred canvas underneath a gradient ninety per cent opaque.
+
+Nothing on this list changes what the exhibition looks like. They are all the
+same picture, arrived at without redrawing the parts of it that had not
+changed.
+
 **What a visit downloads**, excluding the JavaScript bundle, which is cached
 after the first visit:
 
@@ -439,8 +496,8 @@ which is what actually quarters the glyph field rather than shaving two percent
 off it.
 
 The bundle is split so the renderer caches separately from the exhibition:
-`three` (~192 kB gzip) changes only on a dependency upgrade, the app itself
-(~50 kB gzip) every time a placard is edited.
+`three` (~178 kB gzip) and `r3f` (~17 kB) change only on a dependency upgrade,
+the app itself (~60 kB gzip) every time a placard is edited.
 
 ## Deploying
 

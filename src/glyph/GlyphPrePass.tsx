@@ -18,7 +18,42 @@ import { lens } from '../transitions/lens';
 
 export const glyphRT: { current: THREE.WebGLRenderTarget | null } = { current: null };
 
+/**
+ * What the pass last drew.
+ *
+ * Thread Pull needs the character offset the field was showing at the moment
+ * a region was grabbed, so it can hold those exact letters still while the
+ * DOM text assembles. One shared object, written in place — it used to be a
+ * fresh object hung on `window` every frame, which is a few thousand
+ * throwaway allocations a minute for one number.
+ */
+export const prepass = { count: 0, corpusLen: 0, charOffset: 0, detach: 0 };
+if (typeof window !== 'undefined') {
+  // the same object, under the name the browser tests look for
+  (window as unknown as Record<string, unknown>).__prepass = prepass;
+}
+
 const CHAR_RATE = 6; // chars/sec through the corpus
+
+/**
+ * How often the field is redrawn when nothing is happening to it.
+ *
+ * This pass is the most expensive thing in the gallery: every glyph of the
+ * active work — tens of thousands of instanced quads, each sampling a corpus
+ * texture and a glyph atlas — rendered into a render target up to 2048 square.
+ * It was running on every frame, and almost none of those frames were
+ * different: the corpus steps six characters a second and the breathing is a
+ * slow sine.
+ *
+ * So a still field redraws thirty times a second, and anything a visitor is
+ * actually doing to it — moving the reading lens, dissolving the work, pulling
+ * a thread out of it — takes it straight back to the full frame rate for as
+ * long as that lasts. Half the cost of standing in front of a painting, and
+ * nothing about the picture changes.
+ */
+const IDLE_HZ = 30;
+/** the slack keeps a 30fps budget from losing every second pass to rounding */
+const IDLE_STEP = 1 / IDLE_HZ - 0.002;
 
 function buildGeometry(art: LoadedArtwork): THREE.InstancedBufferGeometry {
   const g = new THREE.InstancedBufferGeometry();
@@ -90,6 +125,19 @@ export function GlyphPrePass({
     };
   }, [rt, target]);
 
+  /**
+   * Something about the pass itself changed and the next frame must draw,
+   * whatever the throttle would otherwise say. A new artwork, a new target, or
+   * the pass being switched back on: all of them leave a render target holding
+   * a picture of something else.
+   */
+  const dirty = useRef(true);
+
+  // anything that changes what the target should be holding
+  useEffect(() => {
+    dirty.current = true;
+  }, [artwork, rt, active, clearAlpha]);
+
   const scene = useMemo(() => new THREE.Scene(), []);
   const camera = useMemo(() => new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), []);
   /*
@@ -104,6 +152,18 @@ export function GlyphPrePass({
   }, []);
   const meshRef = useRef<THREE.Mesh | null>(null);
   const timeRef = useRef(0);
+  /** seconds since the field was last drawn */
+  const idle = useRef(0);
+  /** what it was showing then, so a frame that changes nothing can be skipped */
+  const was = useRef({
+    lensX: Number.NaN,
+    lensY: Number.NaN,
+    dissolve: Number.NaN,
+    detach: Number.NaN,
+    wash: undefined as number | undefined,
+    inkLift: undefined as number | undefined,
+    sizeScale: undefined as number | undefined,
+  });
 
   // swap attribute buffers when the active artwork changes ( // buffers are precomputed; this is only bufferData calls)
   useEffect(() => {
@@ -135,26 +195,72 @@ export function GlyphPrePass({
     if (!reducedMotion) {
       timeRef.current += delta;
     }
+
+    /*
+     * The lens eases open and shut here rather than in a tween: it is written
+     * by every pointer move, and a GSAP tween restarted at pointer rate would
+     * spend more time being created than running. It eases on every frame,
+     * whether or not this one is drawn — the easing is a multiply, and the
+     * pass simply reads wherever it has got to.
+     */
+    const k = 1 - Math.pow(0.0015, Math.min(delta, 0.1) / 0.22);
+    lens.amt += (lens.want - lens.amt) * k;
+
+    /*
+     * IS ANYTHING HAPPENING TO THE FIELD?
+     *
+     * Everything a visitor can do to it: slide the reading lens across it,
+     * dissolve the work out of it, tear a region off it. While any of those is
+     * moving the pass runs every frame, because those are the moments the
+     * smoothness is the point. The rest of the time the field is a slow
+     * breath and six characters a second, and thirty a second draws that
+     * perfectly.
+     */
+    const dissolve = useStore.getState().dissolve;
+    const tp = threadPullAnim;
+    const busy =
+      dirty.current ||
+      Math.abs(lens.want - lens.amt) > 0.002 ||
+      lens.x !== was.current.lensX ||
+      lens.y !== was.current.lensY ||
+      dissolve !== was.current.dissolve ||
+      tp.detach !== was.current.detach ||
+      wash !== was.current.wash ||
+      inkLift !== was.current.inkLift ||
+      sizeScale !== was.current.sizeScale;
+
+    /*
+     * Under `prefers-reduced-motion` the corpus is frozen, so a field nobody
+     * is touching is not merely changing slowly — it is not changing at all,
+     * and the pass has nothing to draw that is not already on screen.
+     */
+    idle.current += delta;
+    if (!busy && (reducedMotion || idle.current < IDLE_STEP)) return;
+    idle.current = 0;
+    dirty.current = false;
+
+    const w = was.current;
+    w.lensX = lens.x;
+    w.lensY = lens.y;
+    w.dissolve = dissolve;
+    w.detach = tp.detach;
+    w.wash = wash;
+    w.inkLift = inkLift;
+    w.sizeScale = sizeScale;
+
     const u = material.uniforms;
     u.uCharOffset.value = Math.floor(timeRef.current * CHAR_RATE);
     u.uBreathe.value = timeRef.current * 1.4;
-    u.uDissolve.value = useStore.getState().dissolve;
+    u.uDissolve.value = dissolve;
     if (wash !== undefined) u.uWash.value = wash;
     if (inkLift !== undefined) u.uInkLift.value = inkLift;
     u.uSizeScale.value = sizeScale ?? 1;
+    u.uLens.value.set(lens.x, lens.y, lens.r);
+    u.uLensAmt.value = lens.amt;
 
     // Thread Pull: fade the extracted region out of the canvas while the DOM
     // text assembles, and hold its characters still (spec: the rest of the
     // painting remains intact and moving)
-    // The lens eases open and shut here rather than in a tween: it is written
-    // by every pointer move, and a GSAP tween restarted at pointer rate would
-    // spend more time being created than running.
-    const k = 1 - Math.pow(0.0015, Math.min(delta, 0.1) / 0.22);
-    lens.amt += (lens.want - lens.amt) * k;
-    u.uLens.value.set(lens.x, lens.y, lens.r);
-    u.uLensAmt.value = lens.amt;
-
-    const tp = threadPullAnim;
     u.uDetachAmt.value = tp.detach;
     u.uCharOffsetFrozen.value = tp.frozenOffset;
     u.uDetachBox.value.set(tp.box[0], tp.box[1], tp.box[2], tp.box[3]);
@@ -166,13 +272,11 @@ export function GlyphPrePass({
     gl.render(scene, camera);
     gl.setRenderTarget(prev);
 
-    // testing handle: confirms the pre-pass is live without touching the GPU
-    (window as unknown as Record<string, unknown>).__prepass = {
-      count: artwork.glyphs.count,
-      corpusLen: artwork.corpusLen,
-      charOffset: u.uCharOffset.value,
-      detach: tp.detach,
-    };
+    // what the field is showing, for Thread Pull and for the browser tests
+    prepass.count = artwork.glyphs.count;
+    prepass.corpusLen = artwork.corpusLen;
+    prepass.charOffset = u.uCharOffset.value;
+    prepass.detach = tp.detach;
   }, -1); // negative priority = before the default render
 
   return null;

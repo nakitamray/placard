@@ -39,6 +39,7 @@ import { bayZ, dimsFor, hangHeight, workMaxHeight, type Dims } from './corridor/
 import { Atmosphere } from './corridor/Atmosphere';
 import type { ArtworkIndexEntry, MuseumData } from '../types';
 import type { Quality } from '../lib/quality';
+import { useShadowRefresh } from '../render/shadows';
 
 /**
  * Wall textures, cached by artwork id for the life of the page.
@@ -649,8 +650,19 @@ export function CorridorScene({ quality }: { quality: Quality }) {
   const heldSince = useRef(0);
   const sprint = useRef<gsap.core.Tween | null>(null);
   const sunRef = useRef<THREE.DirectionalLight>(null);
+  const refreshShadows = useShadowRefresh();
+  /**
+   * Where the key light stood when the shadow map was last drawn. Infinity,
+   * not NaN: every comparison against NaN is false, so a NaN here would mean
+   * the test below never once passed and the room kept the shadow map it was
+   * given on the frame it mounted.
+   */
+  const shadowZ = useRef(Number.POSITIVE_INFINITY);
 
   const d = useMemo(() => (museum ? dimsFor(museum.style) : null), [museum]);
+
+  // a change of room, of budget or of hang is a new shadow map
+  useEffect(refreshShadows, [refreshShadows, museum, quality.shadows, quality.shadowMapSize]);
 
   // returning from the map drops you back short of the end, so the transition
   // does not immediately re-fire
@@ -829,6 +841,17 @@ export function CorridorScene({ quality }: { quality: Quality }) {
       t.updateMatrixWorld();
       sunRef.current.position.set(from[0], from[1], z - 6 + from[2]);
       sunRef.current.updateMatrixWorld();
+      /*
+       * ...and the shadow map is redrawn only when it has. Standing still in
+       * the corridor — which is most of the time anyone spends in it — the
+       * bars on the floor are already correct, and a third pass over the room
+       * to arrive at the same picture is the frame's most expensive no-op.
+       * The threshold is well under a pixel of movement at this scale.
+       */
+      if (Math.abs(z - shadowZ.current) > 0.01) {
+        shadowZ.current = z;
+        refreshShadows();
+      }
     }
   });
 

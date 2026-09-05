@@ -36,6 +36,7 @@ import {
 } from '../state/atlas';
 import { useStore, loadMuseum } from '../state/store';
 import { sfx } from '../lib/audio';
+import { FrameGovernor } from '../render/frameGovernor';
 import type { MuseumIndexEntry } from '../types';
 
 /** one colour per kind, out of the exhibition's own palette */
@@ -533,7 +534,15 @@ export function AtlasView() {
           spin.current.zoom = Math.max(0.45, Math.min(2.4, spin.current.zoom * (1 + e.deltaY * 0.0012)));
         }}
       >
-        <Canvas camera={{ fov: 45, position: [0, 0, 40], near: 0.1, far: 220 }} dpr={[1, 1.75]}>
+        <Canvas
+          /* the same capped loop the corridor runs on: the graph settles and
+             then holds still, and a still graph does not need a hundred and
+             twenty frames a second to go on holding still */
+          frameloop="never"
+          camera={{ fov: 45, position: [0, 0, 40], near: 0.1, far: 220 }}
+          dpr={[1, 1.75]}
+        >
+          <FrameGovernor maxFps={60} running />
           <Rig spin={spin} />
           <Starfield />
           {graph && (
