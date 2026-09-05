@@ -1,0 +1,19 @@
+{
+  "files": [
+    "01-leonardo-mona-lisa",
+    "02-veronese-wedding-cana",
+    "03-hokusai-great-wave",
+    "04-geese-of-meidum",
+    "05-michelangelo-creation-adam",
+    "06-caravaggio-entombment",
+    "07-vangogh-starry-night-rhone",
+    "08-millet-gleaners",
+    "09-leutze-washington-delaware",
+    "10-el-greco-view-toledo"
+  ],
+  "formats": [
+    "avif",
+    "webp",
+    "jpg"
+  ]
+}
