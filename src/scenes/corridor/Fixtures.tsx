@@ -8,6 +8,9 @@
  */
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import type { ThreeEvent } from '@react-three/fiber';
+import { corridor } from '../../state/motion';
+import { useStore } from '../../state/store';
 import type { MuseumStyle } from '../../types';
 import { bayZ, hangTop, type Dims } from './dims';
 
@@ -592,10 +595,18 @@ function Placard() {
  * Orsay's great clock. It closes the corridor, so it is the thing you walk
  * toward for the whole length of the nave — the terminal magnet the transition
  * to the floor plan fires on.
+ *
+ * Every other museum ends in a canvas you can click to go straight there. This
+ * one ends in a clock, and a clock is not a work, so clicking it does the
+ * other thing the end of a corridor is for: it walks you down the rest of the
+ * nave. `corridor.goal` is the damped scroll target, so setting it to the end
+ * is a walk rather than a jump, and arriving fires the floor plan exactly as
+ * walking there by hand does.
  */
 function GreatClock({ style, y, z }: { style: MuseumStyle; y: number; z: number }) {
   const p = style.palette;
   const R = 2.4;
+  const setHovered = useStore((s) => s.setHoveredWork);
   const ticks = useRef<THREE.InstancedMesh>(null);
   useLayoutEffect(() => {
     const mesh = ticks.current;
@@ -611,8 +622,33 @@ function GreatClock({ style, y, z }: { style: MuseumStyle; y: number; z: number 
     mesh.computeBoundingSphere();
   }, []);
 
+  const walkToTheEnd = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    if (useStore.getState().phase !== 'corridor') return;
+    document.body.style.cursor = '';
+    setHovered(null);
+    corridor.goal = 1;
+  };
+
   return (
     <group position={[0, y, z]}>
+      {/* the clock is the way out of the nave: one target over the whole face */}
+      <mesh
+        position={[0, 0, 0.14]}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = 'pointer';
+          setHovered({ index: -1, artist: "Musée d'Orsay", title: 'The great clock' });
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = '';
+          setHovered(null);
+        }}
+        onClick={walkToTheEnd}
+      >
+        <circleGeometry args={[R * 1.28, 48]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
       {/* glazed face — daylight comes through the clock from outside */}
       <mesh>
         <circleGeometry args={[R * 0.86, 48]} />

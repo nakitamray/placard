@@ -51,7 +51,8 @@
   },
   "ingres-grande-odalisque": {
     "commonsFile": "File:France-003335 - Grande Odalisque (16051027150).jpg",
-    "search": "Ingres Grande Odalisque 1814 Louvre"
+    "search": "Ingres Grande Odalisque 1814 Louvre",
+    "note": "The pinned file name reads like a photograph taken in the gallery rather than a flat reproduction. If the proportions gate refuses it, the file to pin instead is the plain reproduction Commons files under the painting's own name."
   },
   "delacroix-death-sardanapalus": {
     "search": "Delacroix Death of Sardanapalus Mort de Sardanapale"
@@ -78,8 +79,8 @@
     "search": "Meidum geese painting Itet tomb",
     "note": "Original panel is in Cairo; the British Museum holds facsimiles. See the placard."
   },
-  "white-portrait-lady": {
-    "search": "John White watercolour drawing British Museum 1585",
+  "white-the-flyer": {
+    "search": "John White The Flyer Secotan conjuror Roanoke watercolour British Museum",
     "note": "White's album is many sheets; search cannot know which. Pin one."
   },
   "schouman-birds": {
@@ -105,7 +106,8 @@
   },
   "raphael-school-athens": {
     "commonsFile": "File:The School of Athens by Raffaello Sanzio da Urbino in Vatican.jpg",
-    "search": "Raphael School of Athens Scuola di Atene Stanza"
+    "search": "Raphael School of Athens Scuola di Atene Stanza",
+    "note": "Pin the whole fresco, not a detail: search returns crops of Plato and Aristotle, and of the Ptolemy corner, under names that look like the full work."
   },
   "raphael-transfiguration": {
     "search": "Raphael Transfiguration 1520 Vatican Pinacoteca"
@@ -115,12 +117,6 @@
   },
   "leonardo-st-jerome": {
     "search": "Leonardo da Vinci Saint Jerome in the Wilderness unfinished"
-  },
-  "raphael-deliverance-peter": {
-    "search": "Raphael Liberation of Saint Peter Stanza di Eliodoro"
-  },
-  "giotto-stefaneschi-triptych": {
-    "search": "Giotto Stefaneschi Triptych Vatican"
   },
   "raphael-madonna-foligno": {
     "search": "Raphael Madonna of Foligno"
@@ -156,10 +152,6 @@
   "whistler-mother": {
     "search": "Whistler Arrangement in Grey and Black Portrait of the Artist's Mother"
   },
-  "caillebotte-floor-scrapers": {
-    "commonsFile": "File:Gustave Caillebotte - The Floor Planers - Google Art Project.jpg",
-    "search": "Caillebotte Les raboteurs de parquet Floor Scrapers 1875"
-  },
   "leutze-washington-delaware": {
     "search": "Emanuel Leutze Washington Crossing the Delaware 1851"
   },
@@ -192,5 +184,17 @@
   },
   "velazquez-juan-de-pareja": {
     "search": "Velázquez Portrait of Juan de Pareja 1650"
+  },
+  "bellini-pieta": {
+    "search": "Giovanni Bellini Pietà Compianto Cristo morto Pinacoteca Vaticana",
+    "note": "Bellini painted this subject many times; the Vatican panel is the one with the town and hills behind the group. Check the contact sheet before committing the scan."
+  },
+  "domenichino-last-communion-jerome": {
+    "search": "Domenichino Last Communion of Saint Jerome Pinacoteca Vaticana",
+    "note": "Tall altarpiece, roughly 0.61 wide to high — anything squarer is a detail or the Agostino Carracci version of the same subject."
+  },
+  "degas-letoile": {
+    "search": "Degas L'Étoile Danseuse sur scène Musée d'Orsay pastel",
+    "note": "The scan committed here is 960px on the long edge, which is under the published ladder's top rung. A larger upload of the same pastel would be worth pinning."
   }
 }

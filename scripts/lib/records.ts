@@ -44,6 +44,17 @@ export interface ArtworkRecord {
   creditLine: string;
   /** the painter's identifying colour — the whole artwork room takes it */
   accentColor: string;
+  /**
+   * Where to hold the picture when it is cropped to fill a window, as
+   * normalised image coordinates with y down: [0.5, 0.5] is the middle,
+   * [0.5, 0.3] keeps a head near the top of a tall canvas in frame.
+   *
+   * Only the entrance crops a painting — everything inside a museum is hung
+   * whole — so this is the one place it matters, and only works whose subject
+   * sits well off centre need it. Omitted, a tall work is held a little above
+   * centre and everything else in the middle.
+   */
+  heroFocus?: [number, number];
   labelText: string;
   extendedNote: string;
   placeholder: PlaceholderSpec;

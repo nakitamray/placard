@@ -12,31 +12,57 @@
     "accession": "",
     "creditLine": "Commissioned by Pope Julius II",
     "accentColor": "#5E5344",
+    "heroFocus": [
+      0.52,
+      0.44
+    ],
     "labelText": "God, borne along inside a billowing red mantle crowded with figures, reaches out toward Adam, who lies on the bare earth and lifts one heavy arm to meet him. Their fingers do not touch. The entire panel is built on that gap — a few centimetres of plaster carrying the whole idea of a creature about to become alive — and everything else in the composition, the diagonal of the cloak, the slope of the ground, the angle of both bodies, drives toward it.",
     "extendedNote": "Michelangelo did not want the job. He considered himself a sculptor, was in the middle of Julius II's tomb, and took the ceiling under pressure; he then spent four years on scaffolding painting some three hundred figures across a vault the length of a tennis court, in true fresco, which allows no revisions once the plaster sets. The Creation of Adam took about three working days of plaster.\n\nAdam is a sculptor's figure: modelled in the round, weighty, still slack, borrowed in part from an antique torso. God is the opposite — all motion, wrapped in drapery that the eye reads as a cross-section of the human brain if it is looking for one, which since 1990 a great many people have been. Whether Michelangelo intended anatomy or not, the figures crowded inside the mantle are certainly deliberate, and the one under God's left arm, looking out, is usually taken for Eve, existing already as an idea. The 1980s cleaning stripped away four centuries of soot and animal glue and returned colours nobody expected: acid pinks, apple greens, sharp lilacs. The restorers were accused of destroying Michelangelo's sombre tone. The sombre tone was dirt.",
     "placeholder": {
       "aspect": 2.04,
       "archetype": "fresco",
-      "palette": ["#3A322A", "#6B5C48", "#96876C", "#C0B294", "#E8DEC6", "#9E4034"],
+      "palette": [
+        "#3A322A",
+        "#6B5C48",
+        "#96876C",
+        "#C0B294",
+        "#E8DEC6",
+        "#9E4034"
+      ],
       "seed": 31
     },
     "regions": [
       {
         "id": "gap",
         "label": "The gap between the hands",
-        "box": [0.4, 0.36, 0.62, 0.6],
+        "box": [
+          0.4,
+          0.36,
+          0.62,
+          0.6
+        ],
         "text": "A few centimetres of bare plaster carrying the entire subject. God's finger is straight and charged; Adam's is slack, still falling, not yet capable of reaching. Michelangelo puts the moment immediately before contact rather than contact itself, so the fresco is permanently about to happen and never does."
       },
       {
         "id": "mantle",
         "label": "The red mantle",
-        "box": [0.5, 0.05, 1.0, 0.75],
+        "box": [
+          0.5,
+          0.05,
+          1.0,
+          0.75
+        ],
         "text": "God travels inside a billowing shell of drapery crowded with figures — angels without wings, and a young woman under his left arm looking out, usually identified as Eve, present as an idea before she exists as a body. Since 1990 the mantle's silhouette has also been read as a cross-section of the human brain. The anatomical claim is disputed; the crowding is not."
       },
       {
         "id": "adam",
         "label": "Adam on the ground",
-        "box": [0.0, 0.3, 0.45, 1.0],
+        "box": [
+          0.0,
+          0.3,
+          0.45,
+          1.0
+        ],
         "text": "A sculptor's body: modelled fully in the round, lying on bare earth at the edge of a slope, heavy and not yet animated. Michelangelo took the ceiling commission unwillingly — he thought of himself as a carver of marble — and Adam is the clearest evidence of it. The figure is a statue that has been laid down and painted."
       }
     ]
@@ -59,7 +85,14 @@
     "placeholder": {
       "aspect": 0.876,
       "archetype": "figure-group",
-      "palette": ["#1E2430", "#39465C", "#6E7386", "#A79E9E", "#DCCEB8", "#8C4A38"],
+      "palette": [
+        "#1E2430",
+        "#39465C",
+        "#6E7386",
+        "#A79E9E",
+        "#DCCEB8",
+        "#8C4A38"
+      ],
       "seed": 32
     }
   },
@@ -81,26 +114,48 @@
     "placeholder": {
       "aspect": 1.54,
       "archetype": "architectural",
-      "palette": ["#2E2A22", "#565044", "#847A64", "#B2A68A", "#E6DCC2", "#9E6A32"],
+      "palette": [
+        "#2E2A22",
+        "#565044",
+        "#847A64",
+        "#B2A68A",
+        "#E6DCC2",
+        "#9E6A32"
+      ],
       "seed": 33
     },
     "regions": [
       {
         "id": "centre",
         "label": "Plato and Aristotle",
-        "box": [0.38, 0.18, 0.62, 0.72],
+        "box": [
+          0.38,
+          0.18,
+          0.62,
+          0.72
+        ],
         "text": "Plato holds the Timaeus and points upward; Aristotle holds the Ethics and levels his palm at the floor. Two entire philosophical traditions are compressed into two hand positions, and the fresco's perspective is arranged so that its vanishing point falls in the gap between their heads. Plato's face is Leonardo's."
       },
       {
         "id": "steps",
         "label": "The figure on the steps",
-        "box": [0.2, 0.55, 0.45, 0.95],
+        "box": [
+          0.2,
+          0.55,
+          0.45,
+          0.95
+        ],
         "text": "A man sits alone on a block of marble, elbow on knee, writing, belonging to none of the groups around him. He was not in Raphael's original design; the plaster shows he was added later, after Raphael was finally shown the Sistine ceiling. He is Heraclitus, and he has Michelangelo's face, Michelangelo's build and Michelangelo's boots."
       },
       {
         "id": "geometry",
         "label": "The geometers",
-        "box": [0.6, 0.62, 0.92, 1.0],
+        "box": [
+          0.6,
+          0.62,
+          0.92,
+          1.0
+        ],
         "text": "Euclid — given the features of Bramante, architect of the new St Peter's rising outside the window — stoops with a pair of compasses over a slate while students crane to follow the demonstration. One has just understood and the one beside him has not. It is the only place in the fresco where somebody is being taught rather than knowing."
       }
     ]
@@ -123,7 +178,14 @@
     "placeholder": {
       "aspect": 0.68,
       "archetype": "figure-group",
-      "palette": ["#22261E", "#414838", "#6E7458", "#A0A184", "#EFEADA", "#B08A2E"],
+      "palette": [
+        "#22261E",
+        "#414838",
+        "#6E7458",
+        "#A0A184",
+        "#EFEADA",
+        "#B08A2E"
+      ],
       "seed": 34
     }
   },
@@ -140,12 +202,23 @@
     "accession": "",
     "creditLine": "From the Chiesa Nuova, Rome",
     "accentColor": "#2E2620",
+    "heroFocus": [
+      0.5,
+      0.44
+    ],
     "labelText": "Six figures lower a body onto a slab of stone whose corner juts out of the picture toward you, at the height of an altar — so that the burial happens on the same stone where the mass is celebrated. Nicodemus, a labourer with dirty feet, looks straight out and takes the weight. Christ's arm hangs and the fingers graze the rock. Above, a woman throws her arms up into the darkness, and there is no landscape at all: only bodies coming out of black.",
     "extendedNote": "Painted for the Vittrice chapel in Santa Maria in Vallicella, this was the most admired of Caravaggio's altarpieces in his own lifetime and the least controversial — the clergy who rejected his other commissions for indecorum accepted this one. Rubens copied it; so did Fragonard, Géricault and Cézanne.\n\nThe reason is the engineering. The whole composition is a downward diagonal from Mary of Cleophas's raised hands to Christ's trailing fingers, braced against the hard horizontal of the stone, and the stone is thrust into the viewer's space so that the mourners appear to be lowering the body out of the painting and onto the real altar below. Caravaggio painted from models off the street and lit them with a single hard raking source, which was his standing method and his standing scandal — a Virgin with a lined face and a workman with filthy soles. Here that realism serves the doctrine exactly: the body being handled is heavy, awkward and dead, and the picture insists on it. Napoleon's troops took the canvas to Paris in 1797; it came back in 1817 and stayed in the Vatican.",
     "placeholder": {
       "aspect": 0.677,
       "archetype": "figure-group",
-      "palette": ["#120F0C", "#332A20", "#5E4C38", "#94765A", "#D8C2A0", "#8E2E22"],
+      "palette": [
+        "#120F0C",
+        "#332A20",
+        "#5E4C38",
+        "#94765A",
+        "#D8C2A0",
+        "#8E2E22"
+      ],
       "seed": 35
     }
   },
@@ -167,52 +240,15 @@
     "placeholder": {
       "aspect": 0.728,
       "archetype": "portrait",
-      "palette": ["#1E1A12", "#3E3626", "#665A42", "#94866A", "#C6BA9C", "#7A5E38"],
+      "palette": [
+        "#1E1A12",
+        "#3E3626",
+        "#665A42",
+        "#94866A",
+        "#C6BA9C",
+        "#7A5E38"
+      ],
       "seed": 36
-    }
-  },
-  {
-    "id": "raphael-deliverance-peter",
-    "artist": "Raphael",
-    "artistDates": "1483–1520",
-    "title": "The Deliverance of Saint Peter",
-    "titleOriginal": "Liberazione di San Pietro",
-    "year": "1513–1514",
-    "medium": "Fresco, Stanza di Eliodoro",
-    "dimensions": "660 cm at the base",
-    "room": "Raphael Rooms",
-    "accession": "",
-    "creditLine": "Commissioned by Pope Julius II",
-    "accentColor": "#2A3240",
-    "labelText": "A night scene painted around a window, so the real daylight coming through the wall competes with the painted light inside it. Three moments run left to right: guards on the stairs startled by a glow, the angel waking Peter in his cell behind the bars, and the sleeping soldiers as the two escape. Four separate light sources — the angel, a torch, the moon, and the window itself — are set against each other in wet plaster, which is close to the hardest thing fresco can be asked to do.",
-    "extendedNote": "The room was Julius II's audience chamber and its programme is about divine intervention on behalf of the Church, which in 1513 had a specific application: Julius had been Cardinal of San Pietro in Vincoli, the church of Saint Peter's chains, and his successor Leo X had recently been a prisoner of the French. A fresco about a pope miraculously released from custody was not a neutral choice of subject.\n\nRaphael's problem was architectural. The wall is mostly window, leaving an awkward lunette split by a real opening, and he turned the obstacle into the subject by making the fresco nocturnal. The angel in the central cell is the brightest thing, throwing hard bars of shadow from the grille across the floor; the torch on the stairs is orange and smoky; the moon behind the clouds is cold; and the daylight from the actual window sits in the middle of all three. Painters had done night scenes before. Nobody had done four kinds of night light at once, at that scale, in a medium that dries in a day and cannot be corrected.",
-    "placeholder": {
-      "aspect": 2.0,
-      "archetype": "nocturne",
-      "palette": ["#141A26", "#2C3A50", "#4E5E76", "#8892A0", "#D8CCAE", "#E8B24A"],
-      "seed": 37
-    }
-  },
-  {
-    "id": "giotto-stefaneschi-triptych",
-    "artist": "Giotto di Bondone",
-    "artistDates": "c. 1267–1337",
-    "title": "Stefaneschi Triptych",
-    "titleOriginal": "Trittico Stefaneschi",
-    "year": "c. 1320",
-    "medium": "Tempera and gold on panel",
-    "dimensions": "220 × 245 cm",
-    "room": "Pinacoteca Vaticana",
-    "accession": "",
-    "creditLine": "Commissioned by Cardinal Jacopo Stefaneschi for Old St Peter's",
-    "accentColor": "#5E4A28",
-    "labelText": "A double-sided altarpiece made for the high altar of the basilica that stood here before the present St Peter's. Christ enthroned on one face, Saint Peter enthroned on the other, with the crucifixion of Peter and the beheading of Paul on the wings. Kneeling at Peter's feet is Cardinal Stefaneschi himself, holding a small model of this very triptych — a painting containing a picture of itself, three centuries before anyone had a word for it.",
-    "extendedNote": "Giotto is the painter usually credited with dragging European art out of the Byzantine manner and into weight, space and human expression, and the panels here are a demonstration of both halves of the transition. The gold ground is entirely medieval; the bodies standing on it are not. They occupy volume, cast shadows on their own drapery, and turn in space; the thrones are drawn in a perspective that does not quite work but is genuinely attempting to.\n\nHow much of it Giotto painted himself is an old argument — the workshop was large and the commission enormous — but the design is unmistakably his. The self-reference is the detail that lingers. Stefaneschi kneels and offers the triptych to Peter, and in the painted model you can see the same panels, at doll size, including the panel showing him kneeling. Old St Peter's was demolished in the sixteenth century to build the church outside these windows. This object is one of the few large things that came through it intact.",
-    "placeholder": {
-      "aspect": 1.11,
-      "archetype": "architectural",
-      "palette": ["#2A2014", "#54401E", "#8A6A2E", "#BC9A4E", "#EAD9A4", "#B0342C"],
-      "seed": 38
     }
   },
   {
@@ -233,7 +269,14 @@
     "placeholder": {
       "aspect": 0.606,
       "archetype": "fresco",
-      "palette": ["#242A2E", "#42505A", "#6E7C82", "#A5A794", "#E6DCBE", "#C08A34"],
+      "palette": [
+        "#242A2E",
+        "#42505A",
+        "#6E7C82",
+        "#A5A794",
+        "#E6DCBE",
+        "#C08A34"
+      ],
       "seed": 39
     }
   },
@@ -255,8 +298,81 @@
     "placeholder": {
       "aspect": 0.61,
       "archetype": "figure-group",
-      "palette": ["#262C34", "#48545E", "#78827E", "#ADAE98", "#E8E0C8", "#B4923A"],
+      "palette": [
+        "#262C34",
+        "#48545E",
+        "#78827E",
+        "#ADAE98",
+        "#E8E0C8",
+        "#B4923A"
+      ],
       "seed": 40
+    }
+  },
+  {
+    "id": "bellini-pieta",
+    "artist": "Giovanni Bellini",
+    "artistDates": "c. 1430–1516",
+    "title": "Pietà",
+    "titleOriginal": "Compianto sul Cristo morto",
+    "year": "c. 1474",
+    "medium": "Tempera on panel",
+    "dimensions": "107 × 84 cm",
+    "room": "Pinacoteca Vaticana",
+    "accession": "",
+    "creditLine": "Pinacoteca Vaticana",
+    "accentColor": "#4B5A63",
+    "heroFocus": [
+      0.5,
+      0.42
+    ],
+    "labelText": "Four figures and a body, pressed close to the front of the panel against an evening sky. Nicodemus holds Christ upright under the arms; Joseph of Arimathea steadies the legs; the Virgin and John lean in from either side. Nobody gestures and nobody weeps aloud. Bellini's subject is the moment after the noise has stopped, and he paints it in a light that is going — a low gold band on the horizon behind a landscape of real Veneto hills, with the towers of a town standing in for Jerusalem.",
+    "extendedNote": "Bellini painted the dead Christ held by mourners perhaps a dozen times across fifty years, and the type is one of the few subjects a Renaissance painter could return to without repeating himself, because everything depends on how close the figures stand and where the light comes from.\n\nHere they are very close indeed — the group fills the panel almost edge to edge, cut at the knees, so a viewer standing in front of it is at the same distance as the mourners. The body is greenish-grey; the living faces around it are warm. Bellini had begun working in oil by this date, and the flesh is built in thin transparent layers over a tempera base, which is what lets a bruise read as being under the skin rather than on it.\n\nThe landscape is the other invention. Behind the heads, a plain runs back to hills and a walled town under a sky draining from blue to gold, painted with the same care as the figures. That is a northern Italian evening, not a Judean one, and it is not carelessness: putting sacred history into the light of the place where the picture will hang was one of the arguments Venetian painting made throughout Bellini's lifetime. Giorgione and Titian both came out of his workshop, and what they took from him first was the sky.",
+    "placeholder": {
+      "aspect": 1.27,
+      "archetype": "figure-group",
+      "palette": [
+        "#1E262B",
+        "#3F4E58",
+        "#6E7A7E",
+        "#A89478",
+        "#D9C79E",
+        "#8A3B32"
+      ],
+      "seed": 37
+    }
+  },
+  {
+    "id": "domenichino-last-communion-jerome",
+    "artist": "Domenichino",
+    "artistDates": "1581–1641",
+    "title": "The Last Communion of Saint Jerome",
+    "titleOriginal": "L'ultima comunione di san Girolamo",
+    "year": "1614",
+    "medium": "Oil on canvas",
+    "dimensions": "419 × 256 cm",
+    "room": "Pinacoteca Vaticana",
+    "accession": "",
+    "creditLine": "Painted for San Girolamo della Carità, Rome",
+    "accentColor": "#7A4B33",
+    "heroFocus": [
+      0.5,
+      0.5
+    ],
+    "labelText": "Jerome, ninety years old and days from death, is carried out of his cell to take communion one last time. He cannot kneel, so he is held up: an arm under each shoulder, his weight entirely on other people. The whole enormous canvas is arranged around that fact. A deacon steadies the chalice, a woman kisses the wasted hand, the lion that followed Jerome through a thousand paintings lies quietly at the left, and above the architrave a group of small angels waits without hurrying.",
+    "extendedNote": "For two hundred years this was widely called one of the three greatest paintings in Rome, spoken of alongside Raphael's Transfiguration. Taste has moved on and Domenichino is no longer a household name, but the painting is unchanged, and what it does is still difficult.\n\nIt is an altarpiece more than four metres high, and it has to work from the back of a church, which means the story must be legible as a shape before it is legible as a scene. Domenichino built it as a shallow stage: a horizontal band of figures across the lower two-thirds, a run of pale architecture behind them, and sky above. The colour does the pointing — the deacon's red, the bishop's gold, the white cloth across Jerome's lap — while the saint himself is the palest thing in the picture, a grey-white body in a red cloak, at the exact centre.\n\nThe painting's other life is a scandal. Agostino Carracci had treated the same subject twenty years earlier, and Domenichino's rival Giovanni Lanfranco published an engraving of the older work side by side with this one and accused him of theft. The charge stuck for a century. It is worth looking at both: the borrowing is real, and so is the difference — Carracci's saint is a figure in a composition, and Domenichino's is a very old man being lifted.",
+    "placeholder": {
+      "aspect": 0.61,
+      "archetype": "figure-group",
+      "palette": [
+        "#241A14",
+        "#5A3A26",
+        "#96683E",
+        "#C8A272",
+        "#E6DCC6",
+        "#8E2A24"
+      ],
+      "seed": 38
     }
   }
 ]

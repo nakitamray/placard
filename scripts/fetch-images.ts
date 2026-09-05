@@ -1,6 +1,7 @@
 /**
  * fetch-images.ts — pull the real paintings from Wikimedia Commons.
  *
+ *   pnpm fetch:images --check         say which scans disagree with their pins
  *   pnpm fetch:images --dry           resolve everything, download nothing
  *   pnpm fetch:images                 fetch every work that has no scan yet
  *   pnpm fetch:images --force         re-fetch works that already have one
@@ -490,18 +491,26 @@ async function resolveFile(
     };
   };
 
-  // 1. an exact file, pinned by hand in data/image-sources.json.
-  //    Used as given: a human has looked at this one.
+  /*
+   * 1. An exact file, pinned by hand in data/image-sources.json.
+   *
+   * A pin is a decision, not a hint: somebody opened the work on Commons and
+   * said "this one". So a pin that cannot be resolved fails the work outright
+   * rather than falling through to search. Falling through was silent, and
+   * what it produced was the pinned work still hanging whatever search had
+   * found last time — which looks exactly like the pin having no effect.
+   */
   if (hint.commonsFile) {
     const file = hint.commonsFile.startsWith('File:')
       ? hint.commonsFile
       : `File:${hint.commonsFile}`;
     const page = await fileInfo(file);
-    if (page) {
-      const chosen = build(page, 999);
-      if (chosen) return { chosen, how: 'pinned' };
-    }
-    console.warn(`    pinned file not found: ${file} — falling back`);
+    const chosen = page && build(page, 999);
+    if (chosen) return { chosen, how: 'pinned' };
+    throw new Error(
+      `pinned file not found on Commons: ${file} — check the exact title on ` +
+        `commons.wikimedia.org and correct "commonsFile" in data/image-sources.json`,
+    );
   }
 
   // 2. Wikidata's own answer to "which picture is this work" (P18).
@@ -675,6 +684,7 @@ const value = (name: string) => {
 };
 
 const dry = flag('dry');
+const check = flag('check');
 const force = flag('force');
 const pin = flag('pin');
 const onlyIds = value('only')?.split(',').map((s) => s.trim());
@@ -682,7 +692,7 @@ const onlyMuseum = value('museum');
 const sheet = flag('sheet');
 const concurrency = Math.max(1, Math.min(8, Number(value('concurrency') ?? DEFAULT_CONCURRENCY)));
 
-if (invokedDirectly) await run();
+if (invokedDirectly) await (check ? runCheck() : run());
 
 interface Job {
   id: string;
@@ -704,6 +714,82 @@ interface Outcome {
   /** how it was resolved: pinned, wikidata, or a search score */
   how?: string;
   entry: Record<string, unknown>;
+}
+
+/**
+ * What is actually on disk, without asking Commons anything.
+ *
+ * Editing a pin and re-running is supposed to replace the picture, and when it
+ * does not — an interrupted run, a network that was down, a pin with a typo in
+ * it — nothing on the page says so: the exhibition just goes on hanging the
+ * old file. This lists every work whose scan came from somewhere other than
+ * the file its record now pins, and every work with no scan at all, offline
+ * and in a second.
+ */
+async function runCheck() {
+  const hints: Record<string, SourceHint> = JSON.parse(
+    fs.readFileSync(path.join(DATA, 'image-sources.json'), 'utf8'),
+  );
+
+  const stale: string[] = [];
+  const missing: string[] = [];
+  const unpinned: string[] = [];
+  let ok = 0;
+
+  for (const museumId of museumOrder()) {
+    for (const w of loadMuseumWithWorks(museumId).works) {
+      const hint = hints[w.id] ?? {};
+      const scan = path.join(artworkData(w.id), 'source.jpg');
+      if (!fs.existsSync(scan)) {
+        missing.push(`${w.id} — ${w.artist}, ${w.title}`);
+        continue;
+      }
+      if (!hint.commonsFile) {
+        unpinned.push(w.id);
+        continue;
+      }
+      if (changedPin(w.id, hint)) {
+        const credit = path.join(artworkData(w.id), 'image-credit.json');
+        const have = fs.existsSync(credit)
+          ? (JSON.parse(fs.readFileSync(credit, 'utf8')).commonsFile ?? '?')
+          : 'no image-credit.json';
+        stale.push(`${w.id}
+      pinned: ${hint.commonsFile}
+      on disk: ${have}`);
+        continue;
+      }
+      ok++;
+    }
+  }
+
+  console.log(`
+${ok} work${ok === 1 ? '' : 's'} match their pin.`);
+  if (unpinned.length) {
+    console.log(
+      `
+${unpinned.length} not pinned — whatever search finds is what hangs:
+  ` +
+        unpinned.join('\n  ') +
+        '\n  run `pnpm fetch:images --pin` once and commit what it writes.',
+    );
+  }
+  if (missing.length) {
+    console.log(`
+${missing.length} with no scan at all:
+  ` + missing.join('\n  '));
+  }
+  if (stale.length) {
+    console.log(
+      `
+${stale.length} hanging a different file from the one pinned:
+  ` +
+        stale.join('\n  ') +
+        `\n\n  fix with:  pnpm fetch:images --only ${stale
+          .map((l) => l.split('\n')[0])
+          .join(',')}`,
+    );
+  }
+  if (!missing.length && !stale.length) console.log('\nNothing to do.');
 }
 
 async function run() {

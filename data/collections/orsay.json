@@ -17,7 +17,14 @@
     "placeholder": {
       "aspect": 1.269,
       "archetype": "nocturne",
-      "palette": ["#0E1630", "#1E3060", "#3A5590", "#7E92B4", "#D8DCE6", "#F0C44A"],
+      "palette": [
+        "#0E1630",
+        "#1E3060",
+        "#3A5590",
+        "#7E92B4",
+        "#D8DCE6",
+        "#F0C44A"
+      ],
       "seed": 41
     }
   },
@@ -39,7 +46,14 @@
     "placeholder": {
       "aspect": 1.336,
       "archetype": "figure-group",
-      "palette": ["#2A2420", "#4E4238", "#7A6A5A", "#B0A08C", "#EDE4D2", "#5A6EA8"],
+      "palette": [
+        "#2A2420",
+        "#4E4238",
+        "#7A6A5A",
+        "#B0A08C",
+        "#EDE4D2",
+        "#5A6EA8"
+      ],
       "seed": 42
     }
   },
@@ -56,31 +70,57 @@
     "accession": "RF 644",
     "creditLine": "Offered to the State by public subscription, 1890",
     "accentColor": "#3A3630",
+    "heroFocus": [
+      0.44,
+      0.46
+    ],
     "labelText": "A naked woman lies on a bed and looks at you. Not past you, not down, not asleep — at you, with her chin level and one hand closed over her thigh. A Black maid, Laure, brings in a bouquet from a client; a cat arches at the foot of the bed. The pose is Titian's Venus of Urbino almost exactly, and everything Titian's picture asks you to enjoy, this one asks you to account for.",
     "extendedNote": "The Salon of 1865 accepted it and then had to post two guards in front of it. Visitors attacked the canvas with umbrellas. The critics wrote about a corpse, a female gorilla, a body the colour of dirty linen. The scandal was not nudity — the Salon was full of nudes that year — but the fact that this one was legible as a specific contemporary Parisian woman working in a specific trade: the orchid in her hair, the silk mule dangling from one foot, the black ribbon at her throat, the name Olympia itself, which was a courtesan's name.\n\nManet painted her flat, with almost no half-tones, lighting her frontally so the modelling collapses and the body reads as a silhouette against the cream sheet. That flatness was the other offence, and it is what painters took from the picture. Laure, the maid, was a woman Manet knew and painted more than once, and her presence sets the picture inside a real economy — flowers sent by a man who is standing, in effect, where the viewer is standing. When the state hesitated to accept the canvas after Manet's death, Monet organised a public subscription to buy it and force the issue.",
     "placeholder": {
       "aspect": 1.46,
       "archetype": "interior",
-      "palette": ["#1E1A16", "#3E362E", "#6A5F52", "#A89A86", "#EFE8D6", "#8A2E34"],
+      "palette": [
+        "#1E1A16",
+        "#3E362E",
+        "#6A5F52",
+        "#A89A86",
+        "#EFE8D6",
+        "#8A2E34"
+      ],
       "seed": 43
     },
     "regions": [
       {
         "id": "gaze",
         "label": "The look",
-        "box": [0.28, 0.12, 0.52, 0.42],
+        "box": [
+          0.28,
+          0.12,
+          0.52,
+          0.42
+        ],
         "text": "Titian's Venus lowers her eyes; Goya's Maja is amused; the Salon's nudes of 1865 are all conveniently unaware of being looked at. Olympia's chin is level and her gaze is direct, unhurried and entirely unembarrassed, which puts the viewer in a defined position — as the person who has just come in, and whose flowers are being carried across the room."
       },
       {
         "id": "maid",
         "label": "Laure and the bouquet",
-        "box": [0.5, 0.05, 0.86, 0.7],
+        "box": [
+          0.5,
+          0.05,
+          0.86,
+          0.7
+        ],
         "text": "The maid is Laure, a model Manet knew and painted more than once, named in his notebooks. She brings in a wrapped bouquet sent by a client, which sets the whole picture inside an economy rather than a mythology. For a century most accounts of the painting described her as a compositional foil; she is the figure who explains what is happening."
       },
       {
         "id": "cat",
         "label": "The black cat",
-        "box": [0.76, 0.55, 1.0, 0.95],
+        "box": [
+          0.76,
+          0.55,
+          1.0,
+          0.95
+        ],
         "text": "Where Titian put a sleeping dog — fidelity, domesticity — Manet put a cat with its back up and its tail erect. Nineteenth-century Paris did not need the substitution explained. The caricaturists of 1865 seized on it immediately, and for months the picture was known in the press simply as the one with the cat."
       }
     ]
@@ -103,7 +143,14 @@
     "placeholder": {
       "aspect": 1.27,
       "archetype": "figure-group",
-      "palette": ["#1C2018", "#333C28", "#576046", "#8E9070", "#E6E2CC", "#A8965E"],
+      "palette": [
+        "#1C2018",
+        "#333C28",
+        "#576046",
+        "#8E9070",
+        "#E6E2CC",
+        "#A8965E"
+      ],
       "seed": 44
     }
   },
@@ -120,12 +167,23 @@
     "accession": "",
     "creditLine": "Gift of Mme Pommery, 1890",
     "accentColor": "#5A5238",
+    "heroFocus": [
+      0.44,
+      0.56
+    ],
     "labelText": "Three women bend over a harvested field, picking up the grain the reapers left behind. Behind them, in bright distance, the harvest itself is going on — stacks, a cart, a mounted overseer. Gleaning was the ancient right of the poorest to what fell, and Millet painted it at the scale of history painting, with the bent backs given the weight and dignity that scale implies. The Salon of 1857 found this alarming.",
     "extendedNote": "Millet had moved to Barbizon, at the edge of the forest of Fontainebleau, and painted rural labour for the rest of his life. He always denied any political programme and insisted he was painting what he saw. His critics, less than a decade after 1848, did not believe him: one review called the three figures the scaffolds of poverty, and another saw pikes behind them.\n\nThe picture's argument is entirely formal. The three women occupy the foreground on a low horizon, so the viewer's eye is at their level and the sky is pushed to a thin band; their poses are three stages of a single movement, stooping, reaching, straightening. Behind them the abundance is bathed in golden light and clearly separate — the overseer on his horse is a small dark mark at the right — so the composition states the distance between those who have the harvest and those who have the leavings without a word of commentary. Van Gogh copied Millet obsessively and called him the painter who had taught him what a peasant was. The picture entered the Louvre in 1890 over public objection and has been in the national collection since.",
     "placeholder": {
       "aspect": 1.317,
       "archetype": "landscape",
-      "palette": ["#2E2A1C", "#54492C", "#867544", "#B8A46E", "#EFE0B8", "#8E4A32"],
+      "palette": [
+        "#2E2A1C",
+        "#54492C",
+        "#867544",
+        "#B8A46E",
+        "#EFE0B8",
+        "#8E4A32"
+      ],
       "seed": 45
     }
   },
@@ -147,7 +205,14 @@
     "placeholder": {
       "aspect": 1.257,
       "archetype": "still-life",
-      "palette": ["#2A241C", "#4E4434", "#7C6E58", "#B4A88E", "#F0EADA", "#C46A22"],
+      "palette": [
+        "#2A241C",
+        "#4E4434",
+        "#7C6E58",
+        "#B4A88E",
+        "#F0EADA",
+        "#C46A22"
+      ],
       "seed": 46
     }
   },
@@ -164,12 +229,23 @@
     "accession": "",
     "creditLine": "Paul and Marguerite Gachet gift, 1949",
     "accentColor": "#2E4A46",
+    "heroFocus": [
+      0.5,
+      0.36
+    ],
     "labelText": "Painted at the asylum of Saint-Rémy in the late summer of 1889, after a severe attack, and sent to his brother Theo with a note saying he hoped it would show he was calm. The suit and the background are the same cold blue-green, worked into a single field of writhing lines that curl around the head like weather. Inside it, the face is still: red beard, hollow cheeks, and eyes that are the most fixed thing in the picture.",
     "extendedNote": "He committed himself voluntarily in May 1889 and stayed a year. Between attacks he was allowed to paint, and produced some of his best-known work in that room and the walled field outside it. This portrait belongs to a recovery — he wrote to Theo that he had begun it the day he got up, that he was thin and pale as a devil, and that painting it had steadied him.\n\nThe whole surface except the face is in motion. Each stroke of the ground is a separate curling line of pale green over blue, and the same rhythm runs through the jacket, so the sitter and the air around him are made of one substance. Only the head resists it, painted in flatter, denser strokes with the pink and orange of the skin holding against the surrounding green — the complementary opposition he had been using since Arles, now doing psychological rather than decorative work. It came to the state through Paul Gachet, son of the doctor who looked after Van Gogh in his last months at Auvers, and who kept a remarkable group of the paintings his father was given.",
     "placeholder": {
       "aspect": 0.83,
       "archetype": "portrait",
-      "palette": ["#16261E", "#26463C", "#3E6A5C", "#7A9484", "#D2D6C0", "#C4622A"],
+      "palette": [
+        "#16261E",
+        "#26463C",
+        "#3E6A5C",
+        "#7A9484",
+        "#D2D6C0",
+        "#C4622A"
+      ],
       "seed": 47
     }
   },
@@ -191,7 +267,14 @@
     "placeholder": {
       "aspect": 1.2,
       "archetype": "interior",
-      "palette": ["#241E18", "#453B30", "#6E6250", "#A0937C", "#DCD2BA", "#5E6E8A"],
+      "palette": [
+        "#241E18",
+        "#453B30",
+        "#6E6250",
+        "#A0937C",
+        "#DCD2BA",
+        "#5E6E8A"
+      ],
       "seed": 48
     }
   },
@@ -208,35 +291,57 @@
     "accession": "RF 699",
     "creditLine": "Purchased by the State, 1891",
     "accentColor": "#3A3A38",
+    "heroFocus": [
+      0.46,
+      0.46
+    ],
     "labelText": "Anna McNeill Whistler sits in profile against a grey wall, hands folded, feet on a stool, beside a patterned curtain and a framed etching by her son. Whistler insisted on the title: an arrangement in grey and black, in which the subject happens to be his mother. The picture is built from horizontals and verticals and two or three tones, and it is the sentimental icon of American motherhood almost entirely against its own intentions.",
     "extendedNote": "The story that she stood in for a model who failed to arrive is probably true, and equally probably not the reason the picture looks like this. Whistler had been arguing for a decade that painting should be as abstract as music — hence his titles: nocturnes, symphonies, harmonies, arrangements — and that a portrait's likeness was of no more interest to the public than the identity of a note.\n\nThe Royal Academy took it in 1872 only after an argument and hung it badly. France understood it sooner: the state bought it in 1891, the first Whistler to enter a public collection anywhere, on the recommendation of Mallarmé and Clemenceau. What holds it together is an extremely narrow tonal range — the black dress, the grey wall, the white of the cap and cuffs — organised on a strict rectilinear grid, with the curtain's flowers as the only disorder. The sitter was a devout, widowed, Southern woman in her sixties who had crossed the Atlantic to live with a son whose life she disapproved of. None of that is in the painting, which is possibly why so many people have been able to put whatever they liked into it.",
     "placeholder": {
       "aspect": 1.125,
       "archetype": "interior",
-      "palette": ["#1C1C1A", "#3A3A38", "#63635E", "#94948C", "#E4E2D8", "#6E6A5A"],
+      "palette": [
+        "#1C1C1A",
+        "#3A3A38",
+        "#63635E",
+        "#94948C",
+        "#E4E2D8",
+        "#6E6A5A"
+      ],
       "seed": 49
     }
   },
   {
-    "id": "caillebotte-floor-scrapers",
-    "artist": "Gustave Caillebotte",
-    "artistDates": "1848–1894",
-    "title": "The Floor Scrapers",
-    "titleOriginal": "Les Raboteurs de parquet",
-    "year": "1875",
-    "medium": "Oil on canvas",
-    "dimensions": "102 × 146.5 cm",
+    "id": "degas-letoile",
+    "artist": "Edgar Degas",
+    "artistDates": "1834–1917",
+    "title": "The Star",
+    "titleOriginal": "L'Étoile, or Danseuse sur scène",
+    "year": "c. 1876",
+    "medium": "Pastel over monotype on paper",
+    "dimensions": "58.4 × 42 cm",
     "room": "Level 5",
-    "accession": "",
-    "creditLine": "Gift of the artist's heirs, 1894",
-    "accentColor": "#5A4A34",
-    "labelText": "Three men, stripped to the waist, kneel on the bare boards of a Paris apartment scraping off the old varnish. Light from the balcony window falls the length of the floor, and the long curls of shaved wood catch it. The Salon rejected it in 1875 as vulgar. It is one of the first paintings in France to take the urban working body as its subject without turning it into either a peasant idyll or a political poster.",
-    "extendedNote": "Caillebotte was rich — he trained as a lawyer and an engineer, inherited a fortune, and spent much of it buying his friends' pictures — which is one reason he was for a long time treated as an amateur attached to the Impressionists rather than as one of the best of them. The room being renovated is almost certainly in his own building on the rue de Miromesnil.\n\nThe picture's method is not Impressionist at all. The drawing is exact, the perspective is aggressive, and the floorboards run away from the viewer in converging lines that Caillebotte had clearly worked out with a ruler — an engineer's picture. What is Impressionist is the light: raking, specific to a time of day, catching on the shavings and on the men's backs. He hung it in the second Impressionist exhibition of 1876, where Zola criticised it as photographic, which is a fair description of what makes it strange. His will left his collection to the state on condition it be hung; the resulting fight, and the partial acceptance in 1896, is a large part of how France ended up owning the Impressionists at all.",
+    "accession": "RF 12258",
+    "creditLine": "Bequest of Gustave Caillebotte, 1894",
+    "accentColor": "#6B4F55",
+    "heroFocus": [
+      0.56,
+      0.52
+    ],
+    "labelText": "Seen from a box above the stage, the star takes her bow alone in the gaslight, head thrown back, arms open, her tutu a burst of white and flower-colour against the empty rake of the floor. In the wings — where Degas always looked — wait the shadowed legs of the corps de ballet and a man in evening black, one of the subscribers whose backstage privileges everyone at the Opéra understood. Pastel worked over a monotype base gives the light its powdery flare.",
+    "extendedNote": "Degas called himself a realist and detested the word 'impressionist,' yet the ballet pictures that made him famous are studies of exactly what the impressionists loved: artificial light, arrested movement, the odd truthful angle. He drew the Opéra's dancers for forty years — at the barre, at rest, scratching their backs, yawning, and only occasionally, as here, in glory.\n\nThe viewpoint is the picture's first invention. We look down from a box, so the stage floor tips up behind the dancer like a wall of amber light, and she floats against it with nothing else in focus. She is caught at the instant of the révérence, the bow taken alone after a solo: chin lifted, throat bare, eyes closed, one shoulder dipped. The gaslight of the footlights strikes her from below — the lighting that makes theatrical faces strange — and burns the front of her tutu to a white flare.\n\nThe second invention waits in the wings. Behind the flats stand the others: dancers' legs beneath drooping skirts, and a man in black evening dress, faceless, hands in pockets. He is an abonné — a season subscriber of the Paris Opéra, one of the wealthy men whose subscriptions bought entry to the foyer de la danse and to the company of the dancers, most of them working-class girls whose careers such men could make. Degas states the fact without comment, in the corner, the way facts stood in the ballet's actual world.\n\nThe sheet is pastel over monotype — Degas inked a metal plate, printed it, then worked colour over the ghostly print, a hybrid technique he made his own in these years. It belonged to his friend and fellow painter Gustave Caillebotte, whose bequest of 1894 forced the French state, amid real controversy, to hang the impressionists at last.",
     "placeholder": {
-      "aspect": 1.436,
-      "archetype": "interior",
-      "palette": ["#241C12", "#4E3C22", "#836440", "#B79364", "#EFDCB8", "#8A5A2E"],
-      "seed": 50
+      "aspect": 0.72,
+      "archetype": "figure-group",
+      "palette": [
+        "#3A2C2E",
+        "#6B4F55",
+        "#A8836A",
+        "#D9BE96",
+        "#F2ECE0",
+        "#C46A72"
+      ],
+      "seed": 39
     }
   }
 ]

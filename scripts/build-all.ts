@@ -12,7 +12,7 @@
  * then per museum:
  *   5. public/museums/{id}.json   corridor style + floor plan + artwork index
  *   6. public/museums/index.json  the landing page's list
- *   7. public/landing/            backgrounds drawn from every museum
+ *   7. public/museums/works.json  every work in the exhibition, for the entrance
  *
  * Adding a museum = two files in data/ and a line in order.json.
  * Adding a work   = one record in data/collections/{museum}.json.
@@ -33,8 +33,14 @@ import { buildCorpus } from './build-corpus.ts';
 import { buildGlyphs } from './build-glyphs.ts';
 import type { ArtworkRecord, MuseumRecord } from './lib/records.ts';
 
-/** kept in step with build-images.ts, which owns the flag */
-const SKIP_AVIF = process.env.PLACARD_SKIP_AVIF === '1';
+/**
+ * Where to hold a picture the entrance has to crop, when the record does not
+ * say. A tall canvas is nearly always a figure, and a figure's head is above
+ * the middle of it; everything else is held in the centre.
+ */
+function defaultFocus(aspect: number): [number, number] {
+  return aspect < 0.85 ? [0.5, 0.4] : [0.5, 0.5];
+}
 
 const museums = museumOrder();
 const museumIndex: Array<{
@@ -44,8 +50,22 @@ const museumIndex: Array<{
   subtitle: string;
   count: number;
 }> = [];
-/** one representative image per museum for the landing slideshow */
-const landingPicks: Array<{ museum: string; id: string }> = [];
+/**
+ * Every work in the exhibition, flat, for the entrance.
+ *
+ * The entrance draws from all of them rather than from a shortlist, so this is
+ * the list it reads: enough to choose a work, size it and hold it in frame,
+ * and nothing else. It carries no bytes of its own — the pictures it names are
+ * the ones already published per artwork.
+ */
+const exhibition: Array<{
+  id: string;
+  museum: string;
+  artist: string;
+  title: string;
+  aspect: number;
+  focus: [number, number];
+}> = [];
 
 let generatedCount = 0;
 let authenticCount = 0;
@@ -89,12 +109,21 @@ for (const museumId of museums) {
       JSON.stringify(meta, null, 2),
     );
 
+    const aspect = (full.width ?? 1) / (full.height ?? 1);
     index.push({
       id: record.id,
       artist: record.artist,
       title: record.title,
-      aspect: (full.width ?? 1) / (full.height ?? 1),
+      aspect,
       accent: record.accentColor,
+    });
+    exhibition.push({
+      id: record.id,
+      museum: museum.id,
+      artist: record.artist,
+      title: record.title,
+      aspect,
+      focus: record.heroFocus ?? defaultFocus(aspect),
     });
   }
 
@@ -127,10 +156,6 @@ for (const museumId of museums) {
     subtitle: museum.subtitle,
     count: index.length,
   });
-  // two backgrounds per museum keeps the landing slideshow varied without
-  // shipping fifty full-size jpegs the landing page would never reach
-  landingPicks.push({ museum: museumId, id: works[0].id });
-  if (works.length > 4) landingPicks.push({ museum: museumId, id: works[4].id });
 }
 
 fs.writeFileSync(
@@ -138,55 +163,14 @@ fs.writeFileSync(
   JSON.stringify(museumIndex, null, 2),
 );
 
-/*
- * Landing backgrounds.
- *
- * These are the first bytes anyone downloads, before a single museum has been
- * chosen, so they are the whole first impression of how fast this place is.
- * Ten full-bleed 1920px jpegs used to be fetched the moment the page mounted —
- * the browser sees ten `background-image` declarations and honours all ten,
- * even though nine of them are behind `opacity: 0`. They are now published at
- * 1600px in three formats and the slideshow mounts two at a time (see
- * src/ui/LandingLayer.tsx), so the landing page costs one picture instead of
- * ten.
- */
-const landingDir = path.join(PUBLIC, 'landing');
-fs.mkdirSync(landingDir, { recursive: true });
-const landingFormats = SKIP_AVIF ? ['webp', 'jpg'] : ['avif', 'webp', 'jpg'];
-const manifest: string[] = [];
-let landingBytes = 0;
-let n = 1;
-for (const pick of landingPicks) {
-  const stem = `${String(n).padStart(2, '0')}-${pick.id}`;
-  const at = () =>
-    sharp(path.join(artworkPublic(pick.id), 'full.jpg')).resize({
-      width: 1600,
-      withoutEnlargement: true,
-    });
-  for (const fmt of landingFormats) {
-    const pipe =
-      fmt === 'avif'
-        ? at().avif({ quality: 52, effort: 3 })
-        : fmt === 'webp'
-          ? at().webp({ quality: 72, effort: 4 })
-          : at().jpeg({ quality: 76, mozjpeg: true });
-    const info = await pipe.toFile(path.join(landingDir, `${stem}.${fmt}`));
-    landingBytes += info.size;
-  }
-  manifest.push(stem);
-  n++;
-}
 fs.writeFileSync(
-  path.join(landingDir, 'manifest.json'),
-  JSON.stringify({ files: manifest, formats: landingFormats }, null, 2),
+  path.join(PUBLIC, 'museums', 'works.json'),
+  JSON.stringify(exhibition, null, 2),
 );
 
 const total = authenticCount + generatedCount;
 console.log(`\n▸ ${museums.length} museums, ${total} works`);
-console.log(
-  `▸ landing: ${manifest.length} backgrounds, ${(landingBytes / 1024 / 1024).toFixed(1)} MB across ` +
-    `${landingFormats.join('/')} — one is fetched on load`,
-);
+console.log(`▸ entrance: draws from all ${exhibition.length}, one at a time`);
 console.log(
   `▸ published: ${(publishedBytes / 1024 / 1024).toFixed(1)} MB of pictures, ` +
     `${(glyphBytes / 1024 / 1024).toFixed(1)} MB of glyphs`,
@@ -217,18 +201,22 @@ function imageProvenance(id: string, authentic: boolean) {
     const c = JSON.parse(fs.readFileSync(creditPath, 'utf8'));
     return {
       file: 'full.jpg',
-      source: `Wikimedia Commons — ${c.commonsFile}${c.descriptionUrl ? ` (${c.descriptionUrl})` : ''}`,
+      source: 'Wikimedia Commons',
+      commonsFile: c.commonsFile ?? '',
+      url: c.descriptionUrl ?? '',
       license: c.license || 'see Commons',
       photoCredit: c.author || '',
+      note: c.crop ?? '',
     };
   }
   return {
     file: 'full.jpg',
-    source: authentic
-      ? 'Public-domain scan supplied at data/artworks/{id}/source.jpg'
-      : 'Procedural stand-in generated by Placard — no scan supplied for this work',
+    source: authentic ? 'Scan supplied with the record' : 'Procedural stand-in',
+    commonsFile: '',
+    url: '',
     license: authentic ? 'PD-Art' : 'CC0 (generated)',
     photoCredit: '',
+    note: authentic ? '' : 'No reproduction is published for this work yet.',
   };
 }
 

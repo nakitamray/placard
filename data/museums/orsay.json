@@ -31,7 +31,11 @@
     "light": {
       "key": "#FFF8E8",
       "keyIntensity": 2.5,
-      "keyFrom": [-4, 20, 7],
+      "keyFrom": [
+        -4,
+        20,
+        7
+      ],
       "sky": "#E6F0F8",
       "ground": "#7C7362",
       "ambient": 0.62,
@@ -39,7 +43,11 @@
       "lampIntensity": 5,
       "exposure": 1.08,
       "background": "#33302A",
-      "fog": ["#4C483E", 56, 160]
+      "fog": [
+        "#4C483E",
+        56,
+        160
+      ]
     },
     "fixtures": {
       "sculpture": "pedestal-figures",
@@ -54,17 +62,127 @@
     "viewBox": "20 30 520 260",
     "level": "Nave & Level 5",
     "rooms": [
-      { "id": "r-rhone", "name": "Rhône", "svgPath": "M40,44 L134,44 L134,124 L40,124 Z", "centroid": [87, 84], "active": true, "artworkIndex": 0 },
-      { "id": "r-moulin", "name": "Moulin", "svgPath": "M138,44 L232,44 L232,124 L138,124 Z", "centroid": [185, 84], "active": true, "artworkIndex": 1 },
-      { "id": "r-olympia", "name": "Olympia", "svgPath": "M236,44 L330,44 L330,124 L236,124 Z", "centroid": [283, 84], "active": true, "artworkIndex": 2 },
-      { "id": "r-dejeuner", "name": "Déjeuner", "svgPath": "M334,44 L428,44 L428,124 L334,124 Z", "centroid": [381, 84], "active": true, "artworkIndex": 3 },
-      { "id": "r-gleaners", "name": "Gleaners", "svgPath": "M40,196 L134,196 L134,276 L40,276 Z", "centroid": [87, 236], "active": true, "artworkIndex": 4 },
-      { "id": "r-apples", "name": "Apples", "svgPath": "M138,196 L232,196 L232,276 L138,276 Z", "centroid": [185, 236], "active": true, "artworkIndex": 5 },
-      { "id": "r-self", "name": "Self-Portrait", "svgPath": "M236,196 L330,196 L330,276 L236,276 Z", "centroid": [283, 236], "active": true, "artworkIndex": 6 },
-      { "id": "r-cards", "name": "Card Players", "svgPath": "M334,196 L428,196 L428,276 L334,276 Z", "centroid": [381, 236], "active": true, "artworkIndex": 7 },
-      { "id": "r-whistler", "name": "Whistler", "svgPath": "M434,44 L520,44 L520,156 L434,156 Z", "centroid": [477, 100], "active": true, "artworkIndex": 8 },
-      { "id": "r-scrapers", "name": "Scrapers", "svgPath": "M434,160 L520,160 L520,276 L434,276 Z", "centroid": [477, 218], "active": true, "artworkIndex": 9 },
-      { "id": "r-nave", "name": "Central nave", "svgPath": "M40,128 L428,128 L428,192 L40,192 Z", "centroid": [234, 160], "active": false, "artworkIndex": -1 }
+      {
+        "id": "r-rhone",
+        "name": "Rhône",
+        "svgPath": "M40,44 L134,44 L134,124 L40,124 Z",
+        "centroid": [
+          87,
+          84
+        ],
+        "active": true,
+        "artworkIndex": 0
+      },
+      {
+        "id": "r-moulin",
+        "name": "Moulin",
+        "svgPath": "M138,44 L232,44 L232,124 L138,124 Z",
+        "centroid": [
+          185,
+          84
+        ],
+        "active": true,
+        "artworkIndex": 1
+      },
+      {
+        "id": "r-olympia",
+        "name": "Olympia",
+        "svgPath": "M236,44 L330,44 L330,124 L236,124 Z",
+        "centroid": [
+          283,
+          84
+        ],
+        "active": true,
+        "artworkIndex": 2
+      },
+      {
+        "id": "r-dejeuner",
+        "name": "Déjeuner",
+        "svgPath": "M334,44 L428,44 L428,124 L334,124 Z",
+        "centroid": [
+          381,
+          84
+        ],
+        "active": true,
+        "artworkIndex": 3
+      },
+      {
+        "id": "r-gleaners",
+        "name": "Gleaners",
+        "svgPath": "M40,196 L134,196 L134,276 L40,276 Z",
+        "centroid": [
+          87,
+          236
+        ],
+        "active": true,
+        "artworkIndex": 4
+      },
+      {
+        "id": "r-apples",
+        "name": "Apples",
+        "svgPath": "M138,196 L232,196 L232,276 L138,276 Z",
+        "centroid": [
+          185,
+          236
+        ],
+        "active": true,
+        "artworkIndex": 5
+      },
+      {
+        "id": "r-self",
+        "name": "Self-Portrait",
+        "svgPath": "M236,196 L330,196 L330,276 L236,276 Z",
+        "centroid": [
+          283,
+          236
+        ],
+        "active": true,
+        "artworkIndex": 6
+      },
+      {
+        "id": "r-cards",
+        "name": "Card Players",
+        "svgPath": "M334,196 L428,196 L428,276 L334,276 Z",
+        "centroid": [
+          381,
+          236
+        ],
+        "active": true,
+        "artworkIndex": 7
+      },
+      {
+        "id": "r-whistler",
+        "name": "Whistler",
+        "svgPath": "M434,44 L520,44 L520,156 L434,156 Z",
+        "centroid": [
+          477,
+          100
+        ],
+        "active": true,
+        "artworkIndex": 8
+      },
+      {
+        "id": "r-etoile",
+        "name": "The Star",
+        "svgPath": "M434,160 L520,160 L520,276 L434,276 Z",
+        "centroid": [
+          477,
+          218
+        ],
+        "active": true,
+        "artworkIndex": 9
+      },
+      {
+        "id": "r-nave",
+        "name": "Central nave",
+        "svgPath": "M40,128 L428,128 L428,192 L40,192 Z",
+        "centroid": [
+          234,
+          160
+        ],
+        "active": false,
+        "artworkIndex": -1
+      }
     ]
   },
   "artworks": [
@@ -77,6 +195,6 @@
     "vangogh-self-portrait",
     "cezanne-card-players",
     "whistler-mother",
-    "caillebotte-floor-scrapers"
+    "degas-letoile"
   ]
 }

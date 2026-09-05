@@ -166,6 +166,10 @@ button:active { transform: translateY(1px); }
 .landing-content::-webkit-scrollbar { display: none; }
 .landing-mark { color: var(--gilt); letter-spacing: 0.35em; margin: 0 0 var(--s4); flex: none; }
 .landing-content .hero { margin: 0 0 var(--s4); flex: none; }
+.landing-blurb {
+  margin: 0 0 var(--s4); flex: none; max-width: 40ch;
+  color: var(--stone); opacity: 0.86;
+}
 .landing-content .hairline { border-color: rgba(216, 205, 186, 0.4); width: 220px; margin-left: 0; }
 .landing-choose { color: var(--stone); opacity: 0.85; margin: var(--s4) 0 var(--s2); flex: none; }
 .museum-list { list-style: none; margin: 0; padding: 0; flex: none; }
@@ -396,78 +400,158 @@ button:active { transform: translateY(1px); }
    pale grey type on near-black is where reading goes to die.
 
    So it follows the wall label and the thread panel instead: dark type on a
-   warm bone ground, over a light wash of the room behind it. It still has no
-   hard edge — the same feathered mask dissolves all four sides — so it reads
-   as a page drawn across the exhibition rather than a window cut out of it. */
+   warm bone ground, beside a spine that takes the room's own colour. */
 .credits {
   position: fixed; inset: 0; z-index: 55;
   background: radial-gradient(
     130% 100% at 50% 42%,
-    rgba(242, 235, 223, 0.5) 0%,
-    rgba(36, 31, 26, 0.52) 100%
+    rgba(242, 235, 223, 0.42) 0%,
+    rgba(20, 17, 14, 0.66) 100%
   );
   backdrop-filter: blur(11px) saturate(1.06);
   -webkit-backdrop-filter: blur(11px) saturate(1.06);
   display: grid; place-items: center; padding: var(--s6);
   animation: credits-in var(--d-base) var(--e-out);
+  /* overridden per museum from the room's own palette — see ui/Credits.tsx */
+  --c-accent: #6e5b4a;
+  --c-gilt: var(--gilt);
+  --c-spine: #2a2119;
 }
 @keyframes credits-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* A guide, not a dialog: a dark spine carrying the sections and a bone page
+   beside it. The panel has no border — its edge is a fade — and no radius,
+   because museums have sharp corners. */
 .credits-inner {
   position: relative;
-  background: rgba(246, 241, 232, 0.94);
+  display: grid; grid-template-columns: 252px minmax(0, 1fr);
+  background: rgba(246, 241, 232, 0.96);
   backdrop-filter: blur(30px) saturate(1.1);
   -webkit-backdrop-filter: blur(30px) saturate(1.1);
   color: var(--ink);
-  box-shadow: 0 30px 90px rgba(36, 31, 26, 0.4);
-  max-width: 700px; width: 100%; max-height: 86vh;
+  box-shadow: 0 40px 110px rgba(20, 17, 14, 0.5);
+  max-width: 940px; width: 100%; max-height: 86vh;
   overflow: hidden;
-  /*
-   * No border — the panel's edge is a fade, not a line.
-   *
-   * A mask clips the frosted backdrop along with everything drawn on top of
-   * it, so feathering all four sides here dissolves the page itself, not just
-   * the text on it. The side fades are narrower than the padding, so no line
-   * of type ever sits in one.
-   */
-  mask-image:
-    linear-gradient(to bottom, transparent 0, #000 34px, #000 calc(100% - 34px), transparent 100%),
-    linear-gradient(to right, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
-  mask-composite: intersect;
-  -webkit-mask-image:
-    linear-gradient(to bottom, transparent 0, #000 34px, #000 calc(100% - 34px), transparent 100%),
-    linear-gradient(to right, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
-  -webkit-mask-composite: source-in;
+  animation: credits-rise var(--d-slow) var(--e-out);
 }
+@keyframes credits-rise {
+  from { transform: translateY(14px) scale(0.995); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* ── the spine ── */
+.credits-rail {
+  display: flex; flex-direction: column; gap: var(--s5);
+  padding: var(--s7) var(--s5) var(--s5) var(--s6);
+  color: var(--bone);
+  /* the room's colour, but never at the room's brightness: the Orsay nave is
+     nearly white and a spine that pale cannot carry bone type. A third of the
+     hue over near-black keeps every museum legible and still distinct. */
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.22)),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--c-spine) 34%, #171310),
+      color-mix(in srgb, var(--c-spine) 16%, #100d0a)
+    );
+  /* the room's own colour, as a hairline down the inside edge */
+  box-shadow: inset -3px 0 0 -2px var(--c-gilt);
+}
+.credits-rail-mark {
+  color: var(--c-gilt); letter-spacing: 0.35em; margin: 0 0 var(--s3);
+}
+.credits-rail-title { margin: 0; color: var(--bone); }
+.credits-rail-where {
+  margin: var(--s2) 0 0; color: var(--taupe);
+  text-transform: none; letter-spacing: 0.04em;
+}
+
+.credits-nav { display: flex; flex-direction: column; }
+.credits-nav-item {
+  display: grid; grid-template-columns: 26px 1fr; gap: var(--s3);
+  align-items: baseline; text-align: left;
+  padding: var(--s3) 0; color: var(--stone);
+  border-top: 1px solid rgba(232, 223, 208, 0.16);
+  transition: color var(--d-fast), padding-left var(--d-fast) var(--e-out);
+}
+.credits-nav-item:last-child { border-bottom: 1px solid rgba(232, 223, 208, 0.16); }
+.credits-nav-item:hover { color: var(--bone); padding-left: 5px; }
+.credits-nav-num { color: var(--taupe); opacity: 0.7; }
+.credits-nav-text { display: flex; flex-direction: column; gap: 2px; }
+.credits-nav-label { font-size: 18px; line-height: 22px; }
+.credits-nav-blurb {
+  color: var(--taupe); text-transform: none; letter-spacing: 0.02em; opacity: 0.72;
+}
+.credits-nav-item.is-on { color: var(--bone); padding-left: 5px; }
+.credits-nav-item.is-on .credits-nav-num { color: var(--c-gilt); opacity: 1; }
+.credits-nav-item.is-on .credits-nav-label { color: var(--c-gilt); }
+
+.credits-close {
+  align-self: flex-start; margin-top: auto; color: var(--taupe);
+  transition: color var(--d-fast);
+}
+.credits-close:hover { color: var(--c-gilt); }
+
+/* ── the page ── */
 .credits-scroll {
   max-height: 86vh; overflow-y: auto; overscroll-behavior: contain;
   padding: var(--s7); scrollbar-width: thin;
+  /* the top and bottom of the reading column dissolve rather than being cut */
+  mask-image: linear-gradient(to bottom, transparent 0, #000 26px, #000 calc(100% - 26px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px, #000 calc(100% - 26px), transparent 100%);
 }
-.credits-header { display: flex; justify-content: space-between; align-items: baseline; }
+.credits-section {
+  color: var(--c-accent); margin: var(--s6) 0 var(--s3);
+  letter-spacing: 0.14em; text-transform: uppercase; font-size: 11px;
+  display: flex; align-items: center; gap: var(--s3);
+}
+.credits-scroll section:first-child .credits-section { margin-top: 0; }
+.credits-section::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, var(--c-gilt), transparent);
+  opacity: 0.55;
+}
+.credits-note { color: rgba(36, 31, 26, 0.88); margin: 0 0 var(--s4); }
+/* the first paragraph of a section carries the weight */
+.credits-lede { font-size: 18px; line-height: 30px; color: rgba(36, 31, 26, 0.94); }
 
-/* four ways into the same colophon: what it is made of, why it looks like
-   this, how it is built, and who built it */
-.credits-tabs {
-  display: flex; gap: var(--s5);
-  margin: var(--s5) 0 var(--s2);
-  border-bottom: 1px solid var(--limestone);
+/* one work: its own thumbnail, its texts beside it */
+.credits-works { list-style: none; margin: 0; padding: 0; }
+.credits-work {
+  display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: var(--s4);
+  padding: var(--s4) 0; border-bottom: 1px solid var(--limestone);
 }
-.credits-tabs button {
-  color: var(--umber); opacity: 0.62; padding: 0 0 9px;
-  position: relative; transition: color var(--d-fast), opacity var(--d-fast);
+.credits-work:last-child { border-bottom: 0; }
+.credits-work-thumb {
+  width: 68px; height: 68px; object-fit: cover; display: block;
+  background: var(--limestone);
+  box-shadow: 0 0 0 1px rgba(36, 31, 26, 0.12), 0 6px 16px rgba(36, 31, 26, 0.14);
 }
-.credits-tabs button:hover { opacity: 1; }
-.credits-tabs button.is-on { color: #8a6d12; opacity: 1; }
-.credits-tabs button.is-on::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: -1px;
-  height: 1px; background: #8a6d12;
-}
+.credits-work-body { min-width: 0; }
+.credits-work-artist { color: var(--umber); font-style: normal; }
+.credits-work-sources { list-style: none; margin: var(--s2) 0 var(--s1); padding: 0; }
+.credits-title { margin: 0; color: var(--ink); }
 
-/* the design rules — a list that reads as a list, not as prose in bullets */
-.credits-rules { list-style: none; margin: 0; padding: 0; }
+.credits-tracks { list-style: none; margin: var(--s2) 0 0; padding: 0; }
+.credits-tracks li {
+  display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: var(--s3);
+  padding: var(--s1) 0;
+}
+.credits-track-where { color: var(--c-accent); letter-spacing: 0.1em; }
+
+/* the design rules — numbered, because they are in an order */
+.credits-rules { list-style: none; counter-reset: rule; margin: 0; padding: 0; }
 .credits-rules li {
+  counter-increment: rule;
+  display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: var(--s3);
   padding: var(--s3) 0;
   border-bottom: 1px solid var(--limestone);
   color: rgba(36, 31, 26, 0.84);
+}
+.credits-rules li::before {
+  content: counter(rule, decimal-leading-zero);
+  font-size: 11px; letter-spacing: 0.09em; color: var(--c-gilt);
+  line-height: 26px;
 }
 .credits-rules li:last-child { border-bottom: 0; }
 .credits-rules strong { color: var(--ink); font-weight: 600; }
@@ -475,45 +559,66 @@ button:active { transform: translateY(1px); }
 /* the technical table: a label and a value, aligned */
 .credits-spec { list-style: none; margin: 0; padding: 0; }
 .credits-spec li {
-  display: grid; grid-template-columns: 118px 1fr; gap: var(--s4);
+  display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: var(--s4);
   align-items: baseline; padding: var(--s2) 0;
   border-bottom: 1px solid var(--limestone);
 }
 .credits-spec li:last-child { border-bottom: 0; }
-.credits-spec .caption { color: #8a6d12; }
+.credits-spec .caption { color: var(--c-accent); }
 .credits-spec .body { color: rgba(36, 31, 26, 0.86); font-size: 15px; }
-@media (max-width: 560px) {
-  .credits-spec li { grid-template-columns: 1fr; gap: 2px; }
-}
 
-.credits-bio { color: rgba(36, 31, 26, 0.66); }
 .credits-links { list-style: none; margin: var(--s4) 0 0; padding: 0; }
 .credits-inner code {
   font-family: ui-monospace, Menlo, Consolas, monospace;
-  font-size: 0.86em; color: #8a6d12;
+  font-size: 0.86em; color: var(--c-accent);
 }
-.credits-header .display { margin: 0; }
-.credits-close { color: var(--umber); }
-.credits-close:hover { color: #8a6d12; }
-.credits-section {
-  color: #8a6d12; margin: var(--s6) 0 var(--s2); letter-spacing: 0.06em;
-}
-.credits-note { color: rgba(36, 31, 26, 0.88); margin: 0 0 var(--s4); }
-.credits-artwork {
-  margin-bottom: var(--s4); padding-bottom: var(--s3);
-  border-bottom: 1px solid var(--limestone);
-}
-.credits-artwork:last-child { border-bottom: 0; }
-.credits-title { margin: 0; color: var(--ink); }
-.credits-inner ul { margin: var(--s2) 0; padding-left: var(--s4); }
-.credits-inner li::marker { color: var(--taupe); }
+.credits-inner ul.credits-work-sources li::marker { color: transparent; }
 .credits-source {
   color: rgba(36, 31, 26, 0.72); text-transform: none; letter-spacing: 0.02em;
   margin: var(--s1) 0;
 }
-.credits-source a { color: rgba(36, 31, 26, 0.92); text-decoration-color: var(--gilt); }
-.credits-source a:hover { color: #8a6d12; }
-.credits-imgsrc { color: rgba(36, 31, 26, 0.55); text-transform: none; letter-spacing: 0.02em; }
+/* every link on the page reads as ink with a gilt rule under it, never as a
+   browser default blue */
+.credits-scroll a {
+  color: rgba(36, 31, 26, 0.92);
+  text-decoration: underline; text-decoration-color: var(--c-gilt);
+  text-underline-offset: 3px;
+}
+.credits-scroll a:hover { color: var(--c-accent); }
+.credits-imgsrc {
+  color: rgba(36, 31, 26, 0.55); text-transform: none; letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 860px) {
+  .credits { padding: 0; }
+  .credits-inner {
+    grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr);
+    max-height: 100vh; height: 100%;
+  }
+  .credits-rail {
+    padding: var(--s5) var(--s5) var(--s3);
+    gap: var(--s4); box-shadow: inset 0 -3px 0 -2px var(--c-gilt);
+  }
+  .credits-rail-title { font-size: 26px; line-height: 30px; }
+  .credits-nav { flex-direction: row; overflow-x: auto; gap: var(--s5); scrollbar-width: none; }
+  .credits-nav::-webkit-scrollbar { display: none; }
+  .credits-nav-item {
+    grid-template-columns: 1fr; gap: 0; border: 0; padding: var(--s2) 0;
+    flex: none; white-space: nowrap;
+  }
+  .credits-nav-item:last-child { border-bottom: 0; }
+  .credits-nav-blurb { display: none; }
+  .credits-nav-num { display: none; }
+  .credits-close { position: absolute; top: var(--s5); right: var(--s5); }
+  .credits-scroll { max-height: none; padding: var(--s5); }
+}
+@media (max-width: 560px) {
+  .credits-spec li { grid-template-columns: 1fr; gap: 2px; }
+  .credits-work { grid-template-columns: 1fr; }
+  .credits-work-thumb { width: 100%; height: 120px; }
+  .credits-tracks li { grid-template-columns: 1fr; }
+}
 
 /* ─── contact ────────────────────────────────────────────────────────────
    Three fields on the About tab. It posts to VITE_CONTACT_ENDPOINT when one
@@ -846,13 +951,13 @@ button:active { transform: translateY(1px); }
 .sound-toggle {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 6px 13px; border-radius: 999px;
-  background: rgba(28, 24, 20, 0.3);
+  background: rgba(24, 20, 16, 0.46);
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
   border: 1px solid rgba(242, 235, 223, 0.09);
   color: var(--bone); font-size: 10px; letter-spacing: 0.12em;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
-  opacity: 0.5; transition: opacity var(--d-base) var(--e-out), color var(--d-fast);
+  opacity: 0.72; transition: opacity var(--d-base) var(--e-out), color var(--d-fast);
 }
 .sound-toggle:hover { opacity: 1; }
 .sound-toggle.is-on { opacity: 0.9; color: var(--gilt); }
@@ -971,18 +1076,25 @@ button:active { transform: translateY(1px); }
 /* The way in. Top centre, where nothing else lives in any phase — a control
    that opens a view of the whole collection should not be hiding in a corner
    with the render-quality switch. */
-.atlas-open {
+/* the two ways out of a room and into the whole collection, centred together
+   at the top so neither is hiding in a corner with the quality switch */
+.top-links {
   position: fixed; top: var(--s5); left: 50%; transform: translateX(-50%);
-  /* above the landing scrim, so it stays crisp over the hero */
+  /* above the landing scrim, so they stay crisp over the hero */
   z-index: 45;
+  display: flex; align-items: center; gap: var(--s2);
+}
+.atlas-open {
   padding: 6px 15px; border-radius: 999px;
-  background: rgba(28, 24, 20, 0.3);
+  /* dark enough to hold bone type over the Orsay's white roof, which is the
+     brightest thing any of these ever sit on */
+  background: rgba(24, 20, 16, 0.46);
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
-  border: 1px solid rgba(242, 235, 223, 0.09);
+  border: 1px solid rgba(242, 235, 223, 0.12);
   color: var(--bone); font-size: 10px; letter-spacing: 0.14em;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
-  opacity: 0.55; transition: opacity var(--d-base) var(--e-out), color var(--d-fast);
+  opacity: 0.78; transition: opacity var(--d-base) var(--e-out), color var(--d-fast);
 }
 .atlas-open:hover { opacity: 1; color: var(--gilt); }
 @media (max-width: 640px) { .atlas-open { font-size: 9px; padding: 5px 11px; } }

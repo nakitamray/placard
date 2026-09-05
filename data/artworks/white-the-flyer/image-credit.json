@@ -4,7 +4,8 @@
   "license": "Public domain",
   "author": "John White",
   "credit": "https://www.britishmuseum.org/collection/object/P_1906-0509-1-16",
-  "width": 1738,
-  "height": 2500,
-  "fetchedAt": "2026-09-02T21:57:32.357Z"
+  "width": 1381,
+  "height": 2223,
+  "fetchedAt": "2026-09-02T21:57:32.357Z",
+  "crop": "cropped to the sheet: the Commons scan includes the mount, a colour target and a ruler"
 }

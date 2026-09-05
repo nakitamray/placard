@@ -32,7 +32,7 @@ import { LoadingBar } from './ui/LoadingBar';
 import { FlashLayer } from './ui/Flash';
 import { endReveal } from './transitions/reveal';
 import { asset } from './lib/asset';
-import { roomTone, setSound, sfx, soundEnabled, soundStored } from './lib/audio';
+import { attention, roomTone, setSound, sfx, soundEnabled, soundStored } from './lib/audio';
 import { loadAtlas, useAtlas } from './state/atlas';
 import type { MuseumIndexEntry } from './types';
 
@@ -56,30 +56,54 @@ export default function App() {
 
   const [sound, setSoundOn] = useState(false);
   const atlasOpen = useAtlas((s) => s.open);
+  /** the wall label is up: revealed by a click, not by a passing cursor */
+  const placardOpen = useStore((s) => s.revealed && s.revealLatched);
+  const wasPlacardOpen = useRef(false);
 
   /*
-   * The room tone follows the room, and the atlas is a different room — no
-   * walls, nothing arriving, just something very large a long way off. Open
-   * the map from inside a gallery and the gallery's murmurs and footsteps
-   * stop, which is most of what makes the map feel like somewhere else.
+   * The ambience follows the room. The entrance has its own piece, each museum
+   * shuffles the corridor set, and the atlas is a different room again — no
+   * walls, nothing arriving, just something very large a long way off. Moving
+   * between them is a crossfade, so choosing a museum is a door rather than a
+   * cut.
    *
-   * `roomTone` is idempotent per id, so this can run on every render without
-   * restarting the graph.
+   * `roomTone` is idempotent per room, so this can run on every render without
+   * restarting anything.
    */
   useEffect(() => {
     if (!sound) return roomTone(null);
     if (atlasOpen) return roomTone('atlas', 'atlas');
-    roomTone(phase === 'boot' || phase === 'landing' ? null : (museum?.id ?? null));
+    if (phase === 'boot') return roomTone(null);
+    if (phase === 'landing') return roomTone('entrance', 'entrance');
+    roomTone(museum?.id ?? null);
   }, [sound, phase, museum, atlasOpen]);
 
-  // the two events worth marking: walking through the end wall, and a
-  // painting resolving out of its own text
+  /*
+   * How much room the visitor wants around them. Walking a corridor is the
+   * museum at full; standing in a gallery is quieter; a painting open in front
+   * of you leaves an ambient bed and nothing else — no murmurs, no footsteps
+   * behind you. Every step of that is a ramp, in both directions.
+   */
+  useEffect(() => {
+    // the atlas already plays a long way down; ducking it as well is silence
+    if (atlasOpen) return attention('room');
+    if (phase === 'gallery') return attention(revealed ? 'painting' : 'gallery');
+    attention('room');
+  }, [phase, revealed, atlasOpen]);
+
+  // the events worth marking: walking through the end wall, a painting
+  // resolving out of its own text, and the wall label arriving
   useEffect(() => {
     if (phase === 'warp') sfx.warp();
   }, [phase]);
   useEffect(() => {
     if (revealed) sfx.chime();
   }, [revealed]);
+  useEffect(() => {
+    if (placardOpen) sfx.placardOpen();
+    else if (wasPlacardOpen.current) sfx.placardClose();
+    wasPlacardOpen.current = placardOpen;
+  }, [placardOpen]);
 
   // a stored preference is honoured, but only once the visitor has clicked
   // something — the audio graph may not be created before a gesture
@@ -238,9 +262,22 @@ export default function App() {
         <QualityToggle value={qualityName} onChange={chooseQuality} />
       )}
       {phase !== 'boot' && (
-        <button className="caption atlas-open" onClick={() => useAtlas.getState().setOpen(true)}>
-          ✦ The atlas
-        </button>
+        <div className="top-links">
+          <button className="caption atlas-open" onClick={() => useAtlas.getState().setOpen(true)}>
+            ✦ The atlas
+          </button>
+          {/* The colophon used to be reachable only from the entrance, where no
+              museum is loaded — so its list of corpus sources could never be
+              seen. It belongs wherever you are standing. */}
+          {phase !== 'landing' && (
+            <button
+              className="caption atlas-open"
+              onClick={() => useStore.getState().setCreditsOpen(true)}
+            >
+              Colophon
+            </button>
+          )}
+        </div>
       )}
       {/* the corner switches, in one row so they can never land on each other */}
       {phase !== 'boot' && (
@@ -456,7 +493,9 @@ function WorkLabel() {
     <div className="work-label" ref={ref} aria-hidden>
       <p className="work-label-artist caption">{work.artist}</p>
       <p className="work-label-title">{work.title}</p>
-      <p className="work-label-cue caption">Click to enter this room</p>
+      <p className="work-label-cue caption">
+        {work.index < 0 ? 'Click to walk to the end' : 'Click to enter this room'}
+      </p>
     </div>
   );
 }

@@ -1,33 +1,29 @@
 /**
- * Landing — spec §10.1 / §10C.3.
+ * The entrance, as type.
  *
- * The background is the exhibition's own trick, running live: one painting
- * drawn out of its corpus at full bleed (see LandingScene), with the reading
- * lens under the cursor. This layer is the type over the top of it — headline,
- * museum list, and a scrim dark enough to read against.
+ * The background is the exhibition's own trick running live — one painting
+ * drawn out of its corpus at full bleed, see scenes/LandingScene — and this
+ * layer is everything over the top of it: the headline, the list of museums,
+ * and a scrim dark enough to read against.
  *
- * The still-photograph slideshow this page used to carry is still here, and is
- * what `prefers-reduced-motion` gets: a field of several thousand drifting
- * characters is precisely the thing that setting is asking us not to render.
- * Everything below that touches `images`, `current` or `warm` is that path. Choosing a museum fetches its
- * manifest — corridor style, floor plan and works — and then plays T1: the
- * landing layers push outward while the corridor, already rendering behind,
- * dollies in from the mouth (spec §11.1).
+ * `prefers-reduced-motion` gets a still slideshow instead, because a field of
+ * several thousand drifting characters is precisely what that setting is
+ * asking us not to render. It crossfades between the same fifty works, using
+ * the reproductions already published per artwork, and holds each one on its
+ * own focal point so a tall canvas is not cropped through the face.
  *
- * Only two backgrounds are ever in the DOM: the one showing and the one about
- * to. Mounting all ten and hiding nine behind `opacity: 0` does not stop the
- * browser fetching them — a `background-image` is honoured whatever the
- * element's opacity — so the landing page used to pull ten full-bleed
- * paintings before anyone had chosen anything, on the slowest connection in
- * the visit. It now pulls one, in AVIF or WebP where the browser takes them,
- * and the next arrives during the seconds the first one holds.
+ * Only two or three backgrounds are ever in the DOM. Mounting fifty and hiding
+ * forty-nine behind `opacity: 0` would not stop the browser fetching them — a
+ * `background-image` is honoured whatever the element's opacity — so the
+ * entrance costs one picture, and the next arrives during the seconds the
+ * first one holds.
  */
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { loadMuseum, useStore } from '../state/store';
 import { pointer } from '../state/motion';
-import { asset } from '../lib/asset';
-import { bestFormat } from '../lib/image';
+import { imageUrl } from '../lib/image';
+import { exhibitionWorks, shuffled, type ExhibitionWork } from '../state/works';
 
 const HOLD_MS = 7000;
 /* Long, and linear. A short crossfade between two full-bleed paintings reads
@@ -36,12 +32,6 @@ const HOLD_MS = 7000;
    incoming one fades in over it at a constant rate, so there is no dip and no
    moment where the change announces itself. */
 const FADE_MS = 2600;
-
-/** what build-all.ts writes to public/landing/manifest.json */
-interface LandingManifest {
-  files: string[];
-  formats: string[];
-}
 
 export function LandingLayer() {
   const phase = useStore((s) => s.phase);
@@ -60,7 +50,7 @@ export function LandingLayer() {
    * full-bleed JPEGs it will never show.
    */
   const stills = reducedMotion;
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<ExhibitionWork[]>([]);
   /*
    * The slide showing and the one it came from, moved together in a single
    * update.
@@ -91,21 +81,9 @@ export function LandingLayer() {
   useEffect(() => {
     if (!stills) return;
     let alive = true;
-    void (async () => {
-      try {
-        const [manifest, format] = await Promise.all([
-          fetch(asset('landing/manifest.json')).then((r) => r.json() as Promise<LandingManifest>),
-          bestFormat(),
-        ]);
-        if (!alive) return;
-        // the manifest names which formats were actually published, so a build
-        // run with PLACARD_SKIP_AVIF=1 does not leave the page asking for them
-        const ext = manifest.formats.includes(format) ? format : manifest.formats.at(-1) ?? 'jpg';
-        setImages(manifest.files.map((f) => asset(`landing/${f}.${ext}`)));
-      } catch {
-        if (alive) setImages([]);
-      }
-    })();
+    void exhibitionWorks().then((all) => {
+      if (alive) setImages(shuffled(all));
+    });
     return () => {
       alive = false;
     };
@@ -179,7 +157,7 @@ export function LandingLayer() {
             (i) => i !== null,
           ),
         ),
-      ].map((i) => ({ i: i as number, src: images[i as number] }))
+      ].map((i) => ({ i: i as number, work: images[i as number] }))
     : [];
 
   if (phase !== 'landing' && !leaving) return null;
@@ -238,14 +216,17 @@ export function LandingLayer() {
   return (
     <div className={`landing ${leaving ? 'is-leaving' : ''}`} ref={rootRef}>
       <div className="landing-bg" ref={bgRef} aria-hidden>
-        {mounted.map(({ src, i }) => (
+        {mounted.map(({ work, i }) => (
           <div
-            key={src}
+            key={work.id}
             className={`landing-img ${i === current ? 'is-active' : ''} ${
               i === prevIndex && i !== current ? 'is-prev' : ''
             }`}
             style={{
-              backgroundImage: `url(${src})`,
+              backgroundImage: `url(${imageUrl(work.id, 'view')})`,
+              // the work's own focal point, so a tall canvas is not cropped
+              // through the face — see scripts/build-all.ts
+              backgroundPosition: `${work.focus[0] * 100}% ${work.focus[1] * 100}%`,
               transitionDuration: `${FADE_MS}ms`,
               animationDuration: `${HOLD_MS + FADE_MS}ms`,
             }}
@@ -259,11 +240,12 @@ export function LandingLayer() {
       </a>
       <div className="landing-content" ref={contentRef}>
         <p className="landing-mark caption">Placard</p>
-        <h1 className="hero">
-          Paintings drawn
-          <br />
-          out of text
-        </h1>
+        <h1 className="hero">Read the paintings.</h1>
+        <p className="body landing-blurb">
+          Fifty works from five museums, each one redrawn out of the writing it left behind —
+          letters, reviews, catalogue entries, arguments — moving through the picture in
+          reading order.
+        </p>
         <hr className="hairline" />
         <p className="meta landing-choose">Choose a museum</p>
         <ul className="museum-list" id="museum-list">
@@ -295,7 +277,7 @@ export function LandingLayer() {
         {error && <p className="caption landing-error">{error}</p>}
         {!stills && (
           <p className={`caption landing-lenshint ${moved ? 'is-gone' : ''}`} aria-hidden>
-            Every stroke here is a letter. Move the cursor over the painting.
+            Move the cursor across the painting.
           </p>
         )}
         <button className="caption credits-link" onClick={() => setCreditsOpen(true)}>

@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Placard \u2014 Paintings drawn out of text. A web-based digital art exhibition where famous paintings are reconstructed out of moving text drawn from their own history.",
+  "description": "Placard — a digital exhibition of fifty paintings, each one redrawn out of the writing about it.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

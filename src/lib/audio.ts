@@ -3,30 +3,29 @@
  *
  * A gallery is never silent — there is air moving, a floor, the hum of a
  * building — and a silent one reads as a rendering however good it looks.
- * This is the cheapest thing on the whole site per unit of atmosphere, so it
- * is worth doing carefully and worth doing without a single audio file:
- * everything here is synthesised in WebAudio at run time, which costs no
- * bytes, no decode, and no request.
+ *
+ * Two layers do the work. The ambience is real music, streamed from YouTube
+ * (see lib/music.ts, which owns the tracks, the crossfades and the credits).
+ * Everything that has to land on a particular frame is synthesised here in
+ * WebAudio, which costs no bytes, no decode and no request:
  *
  *   the room    a synthesised convolution reverb — 2.6s of stone — that
  *               everything else is played through
  *   room tone   a quiet warm drone plus murmurs built out of formants and
- *               syllables, and footfalls in irregular pairs
- *   atlas tone  the same drone an octave and a half down, wet, and nothing
- *               else: no walls, nothing arriving
+ *               syllables, and footfalls in irregular pairs. This is the
+ *               FALLBACK bed: it plays only when the music player cannot be
+ *               built, because the alternative is silence
  *   rustle      a short band-passed noise burst — paper, or a lot of small
  *               letters moving at once
+ *   swoosh      the wall label arriving
  *   swell       the warp: a rising tone under a noise sweep
  *   chime       a single soft partial when a painting resolves
  *
- * WHAT CHANGED
- *   The ambience is now real music, streamed from YouTube — see lib/music.ts,
- *   which owns the tracks and the credits. The synthesised room tone below is
- *   still here and still exact, but it is the FALLBACK: it plays only when the
- *   player cannot be built (a blocked network, a script blocker, a video
- *   pulled from YouTube), because the alternative is silence. The one-shots —
- *   the chime, the warp, the rustle, the link — are unchanged and still
- *   synthesised, because they have to land on the frame they belong to.
+ * ATTENTION IS A VOLUME CONTROL. `attention()` says how much of the visitor
+ * is on the room and how much is on one painting. Walking the corridor is the
+ * full room; standing in a gallery is quieter; a painting open in front of you
+ * is a bed with nothing arriving in it. Nothing ever cuts — every change is a
+ * ramp measured in seconds, in both directions.
  *
  * OFF BY DEFAULT, always. Sound that starts by itself is an ambush, and
  * browsers are right to forbid it: the context is not even created until the
@@ -39,15 +38,25 @@ import {
   onMusicUnavailable,
   playMusic,
   resumeMusicOnGesture,
+  setMusicDuck,
   stopMusic,
+  type RoomKind,
 } from './music';
 
 const KEY = 'placard.sound';
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
-let room: { stop: () => void; id: string } | null = null;
+let room: { stop: () => void; id: string; level: AudioParam } | null = null;
 let enabled = false;
+
+/**
+ * How much of the visitor is on the room: 1 is the corridor, with people in
+ * it; lower values are the same room heard from further inside your own head.
+ */
+const ATTENTION = { room: 1, gallery: 0.62, painting: 0.24 } as const;
+export type Attention = keyof typeof ATTENTION;
+let attentionLevel: number = ATTENTION.room;
 
 export function soundStored(): boolean {
   try {
@@ -201,7 +210,7 @@ function impulse(c: AudioContext): AudioBuffer {
  * Nothing is ever intelligible, and that is deliberate: the moment a listener
  * starts making out words, the sound has stopped being a room.
  */
-function synthRoomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery') {
+function synthRoomTone(id: string | null, kind: RoomKind = 'gallery') {
   if (!enabled) {
     room?.stop();
     room = null;
@@ -220,16 +229,16 @@ function synthRoomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery')
   const out = c.createGain();
   out.gain.value = 0;
   out.connect(master);
-  out.gain.setTargetAtTime(1, now, 2.4);
+  out.gain.setTargetAtTime(attentionLevel, now, 2.4);
 
   // everything that happens in the room goes through the room
   const verb = c.createConvolver();
   verb.buffer = impulse(c);
   const wet = c.createGain();
-  wet.gain.value = kind === 'atlas' ? 0.9 : 0.62;
+  wet.gain.value = kind === 'atlas' || kind === 'entrance' ? 0.9 : 0.62;
   verb.connect(wet).connect(out);
   const dry = c.createGain();
-  dry.gain.value = kind === 'atlas' ? 0.25 : 0.5;
+  dry.gain.value = kind === 'atlas' || kind === 'entrance' ? 0.25 : 0.5;
   dry.connect(out);
   /** send a node to both the room and the ear */
   const place = (n: AudioNode) => {
@@ -243,8 +252,9 @@ function synthRoomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery')
    * half down and much slower — no walls, no footsteps, nothing arriving:
    * just something very large, very far away, breathing.
    */
-  const base = kind === 'atlas' ? 31 + seed * 6 : 48 + seed * 14;
-  const partials = kind === 'atlas'
+  const bare = kind === 'atlas' || kind === 'entrance';
+  const base = bare ? 31 + seed * 6 : 48 + seed * 14;
+  const partials = bare
     ? [
         { f: base, g: 0.055 },
         { f: base * 1.5, g: 0.03 },
@@ -382,7 +392,13 @@ function synthRoomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery')
   const later = (fn: () => void, min: number, max: number) => {
     const t = window.setTimeout(() => {
       if (!alive) return;
-      fn();
+      /*
+       * Nothing arrives while a painting is open. The bed stays — a room with
+       * the people taken out of it is still a room — but a voice or a footstep
+       * behind you is an interruption, and this is the one moment the visitor
+       * has asked not to be interrupted.
+       */
+      if (attentionLevel > 0.5) fn();
       later(fn, min, max);
     }, min + Math.random() * (max - min));
     timers.add(t);
@@ -394,6 +410,7 @@ function synthRoomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery')
 
   room = {
     id: key,
+    level: out.gain,
     stop: () => {
       alive = false;
       timers.forEach(window.clearTimeout);
@@ -414,18 +431,18 @@ function synthRoomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery')
 
 /* ── what the room actually plays ───────────────────────────────────────── */
 
+/** the room last asked for, so a late player failure knows what to fall back to */
+let lastRoom: { id: string; kind: RoomKind } | null = null;
+
 /**
- * Put the room's ambience on: music first, the synthesised tone only if the
+ * Put a room's ambience on: music first, the synthesised bed only if the
  * player cannot be built.
  *
  * Idempotent per room, so App can call it from an effect on every render
- * without restarting anything. `id` is the museum being visited (or 'atlas');
- * null is silence.
+ * without restarting anything. `id` is the museum being visited, or 'entrance'
+ * or 'atlas'; null is silence.
  */
-/** the room last asked for, so a late player failure knows what to fall back to */
-let lastRoom: { id: string; kind: 'gallery' | 'atlas' } | null = null;
-
-export function roomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery') {
+export function roomTone(id: string | null, kind: RoomKind = 'gallery') {
   lastRoom = enabled && id ? { id, kind } : null;
   if (!enabled || !id) {
     stopMusic();
@@ -439,6 +456,24 @@ export function roomTone(id: string | null, kind: 'gallery' | 'atlas' = 'gallery
   // the synth bed and the music must never run together
   synthRoomTone(null);
   playMusic(`${kind}:${id}`, kind);
+}
+
+/**
+ * Move the room to one of those levels.
+ *
+ * A ramp of seconds in both directions, never a cut, and nothing is stopped or
+ * restarted: walk away from a painting and the room comes back exactly where
+ * it was.
+ */
+export function attention(where: Attention) {
+  const next = ATTENTION[where];
+  if (next === attentionLevel) return;
+  attentionLevel = next;
+  setMusicDuck(next);
+  if (room && ctx) {
+    room.level.cancelScheduledValues(ctx.currentTime);
+    room.level.setTargetAtTime(next, ctx.currentTime, 0.8);
+  }
 }
 
 /*
@@ -492,9 +527,47 @@ function tone(from: number, to: number, dur: number, gain: number) {
   o.stop(now + dur + 0.05);
 }
 
+/**
+ * A swoosh: a band of noise swept across the spectrum under a soft envelope.
+ *
+ * The wall label needs a sound because it arrives from outside the picture,
+ * and it needs a quiet one because it arrives while somebody is looking at
+ * something. A sweep upward is a card sliding in; the same sweep downward is
+ * the same card leaving, which is why the direction is a parameter rather than
+ * two hand-tuned sounds that would never quite match.
+ */
+function swoosh(from: number, to: number, dur: number, gain: number) {
+  if (!enabled) return;
+  const c = ensure();
+  if (!c || !master) return;
+  const now = c.currentTime;
+  const src = c.createBufferSource();
+  src.buffer = noise(c);
+  const bp = c.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.Q.value = 1.4;
+  bp.frequency.setValueAtTime(from, now);
+  bp.frequency.exponentialRampToValueAtTime(to, now + dur);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0, now);
+  g.gain.linearRampToValueAtTime(gain, now + dur * 0.3);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+  const pan = c.createStereoPanner();
+  pan.pan.value = 0.25;
+  src.connect(bp).connect(g).connect(pan).connect(master);
+  src.start(now);
+  src.stop(now + dur + 0.05);
+}
+
 export const sfx = {
   /** a lot of small letters moving at once — a whisper, not a page turn */
   rustle: () => burst(0.5, 3200, 0.9, 0.022, 'bandpass'),
+  /** the wall label sliding in, and the same card leaving */
+  placardOpen: () => {
+    swoosh(400, 2600, 0.42, 0.035);
+    tone(392, 588, 0.5, 0.012);
+  },
+  placardClose: () => swoosh(2200, 380, 0.34, 0.022),
   /** walking through the end wall */
   warp: () => {
     tone(70, 420, 1.3, 0.1);

@@ -1,33 +1,45 @@
 /**
- * Credits — spec §15: every corpus source with licence and attribution
- * (required for CC BY-SA compliance), image provenance, the music, and a way
- * to write to whoever made the thing.
+ * The colophon.
  *
- * It used to be a dark panel. It is now a bone one, on a light scrim: the
- * rooms are dusk and the reading is not, and a colophon set in pale grey on
- * near-black reads as a lights-out screen however carefully it is composed.
- * Everything you are supposed to READ on this site — the wall label, the
- * thread panel, and now this — is dark type on a light ground.
+ * Every corpus source with its licence and attribution — which is what CC BY-SA
+ * requires and, licence aside, simply what an exhibition owes anyone reading
+ * it — plus where the pictures came from, what the rooms are played through,
+ * why the interface looks like this, how it is built, and a way to write to me.
+ *
+ * It is staged as a gallery guide rather than a settings panel: a dark spine
+ * down the left carrying the sections, the page itself on the right in dark
+ * type on bone, because everything on this site you are meant to READ is dark
+ * on light and everything you are meant to LOOK AT is light on dark.
+ *
+ * The colour is not chosen here. The spine, the rules and the links take the
+ * palette of whichever museum you are standing in, so the colophon opened in
+ * the Orsay is a different green-gold from the one opened in the Louvre, and
+ * closing it puts you back in a room you have not left.
  */
 import { useEffect, useState } from 'react';
 import { selectArtworks, useStore } from '../state/store';
 import { asset } from '../lib/asset';
-import { MUSEUM_TRACKS } from '../lib/music';
+import { imageUrl } from '../lib/image';
+import { ENTRANCE_TRACK, MUSEUM_TRACKS } from '../lib/music';
 import type { ArtworkMeta } from '../types';
 
 type Tab = 'sources' | 'design' | 'technical' | 'about';
 
-const TABS: Array<{ id: Tab; label: string }> = [
-  { id: 'sources', label: 'Sources' },
-  { id: 'design', label: 'Design' },
-  { id: 'technical', label: 'Technical' },
-  { id: 'about', label: 'About' },
+const TABS: Array<{ id: Tab; label: string; blurb: string }> = [
+  { id: 'sources', label: 'Sources', blurb: 'The texts, the pictures, the music' },
+  { id: 'design', label: 'Design', blurb: 'The idea and the rules it follows' },
+  { id: 'technical', label: 'Technical', blurb: 'How a painting is made of text' },
+  { id: 'about', label: 'About', blurb: 'Who made it, and how to write' },
 ];
+
+/** the room's own colour, so the colophon belongs to wherever it was opened */
+const DEFAULT_PALETTE = { accent: '#6E5B4A', gilt: '#C9A227', wall: '#2A2119' };
 
 export function Credits() {
   const open = useStore((s) => s.creditsOpen);
   const setOpen = useStore((s) => s.setCreditsOpen);
   const artworks = useStore(selectArtworks);
+  const museum = useStore((s) => s.museum);
   const [metas, setMetas] = useState<ArtworkMeta[]>([]);
   const [tab, setTab] = useState<Tab>('sources');
 
@@ -42,31 +54,49 @@ export function Credits() {
 
   if (!open) return null;
 
-  return (
-    <div className="credits" role="dialog" aria-label="Credits and sources">
-      <div className="credits-inner">
-        <div className="credits-scroll">
-          <header className="credits-header">
-            <h2 className="display">Colophon</h2>
-            <button className="caption credits-close" onClick={() => setOpen(false)}>
-              Close ✕
-            </button>
-          </header>
+  const p = museum?.style.palette ?? DEFAULT_PALETTE;
+  const skin = {
+    '--c-accent': p.accent,
+    '--c-gilt': p.gilt,
+    '--c-spine': p.wall,
+  } as React.CSSProperties;
 
-          <div className="credits-tabs caption" role="tablist">
-            {TABS.map((t) => (
+  return (
+    <div className="credits" role="dialog" aria-label="Credits and sources" style={skin}>
+      <div className="credits-inner">
+        <aside className="credits-rail">
+          <div className="credits-rail-top">
+            <p className="caption credits-rail-mark">Placard</p>
+            <h2 className="display credits-rail-title">Colophon</h2>
+            <p className="caption credits-rail-where">
+              {museum ? `${museum.name} · ${museum.city}` : 'The entrance'}
+            </p>
+          </div>
+
+          <nav className="credits-nav" role="tablist" aria-label="Colophon sections">
+            {TABS.map((t, i) => (
               <button
                 key={t.id}
                 role="tab"
                 aria-selected={tab === t.id}
-                className={tab === t.id ? 'is-on' : ''}
+                className={`credits-nav-item ${tab === t.id ? 'is-on' : ''}`}
                 onClick={() => setTab(t.id)}
               >
-                {t.label}
+                <span className="credits-nav-num caption">{String(i + 1).padStart(2, '0')}</span>
+                <span className="credits-nav-text">
+                  <span className="credits-nav-label">{t.label}</span>
+                  <span className="caption credits-nav-blurb">{t.blurb}</span>
+                </span>
               </button>
             ))}
-          </div>
+          </nav>
 
+          <button className="caption credits-close" onClick={() => setOpen(false)}>
+            Close <span aria-hidden>✕</span>
+          </button>
+        </aside>
+
+        <div className="credits-scroll">
           {tab === 'sources' && (
             <>
               <section>
@@ -80,30 +110,50 @@ export function Credits() {
                     Enter a museum and reopen this panel to see the texts behind its works.
                   </p>
                 )}
-                {metas.map((m) => (
-                  <div key={m.id} className="credits-artwork">
-                    <p className="body credits-title">
-                      <em>{m.title}</em> — {m.artist}
-                    </p>
-                    <ul>
-                      {m.corpus.sources.map((src) => (
-                        <li key={src.id} className="caption credits-source">
-                          {src.url ? (
-                            <a href={src.url} target="_blank" rel="noreferrer">
-                              {src.title}
+                <ul className="credits-works">
+                  {metas.map((m) => (
+                    <li key={m.id} className="credits-work">
+                      <img
+                        className="credits-work-thumb"
+                        src={imageUrl(m.id, 'wall')}
+                        alt=""
+                        loading="lazy"
+                      />
+                      <div className="credits-work-body">
+                        <p className="body credits-title">
+                          <em>{m.title}</em>
+                          <span className="credits-work-artist"> — {m.artist}</span>
+                        </p>
+                        <ul className="credits-work-sources">
+                          {m.corpus.sources.map((src) => (
+                            <li key={src.id} className="caption credits-source">
+                              {src.url ? (
+                                <a href={src.url} target="_blank" rel="noreferrer">
+                                  {src.title}
+                                </a>
+                              ) : (
+                                src.title
+                              )}{' '}
+                              — {src.attribution} · {src.license}
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="caption credits-imgsrc">
+                          Image: {m.image.url ? (
+                            <a href={m.image.url} target="_blank" rel="noreferrer">
+                              {m.image.commonsFile.replace(/^File:/, '')}
                             </a>
                           ) : (
-                            src.title
+                            m.image.source
                           )}{' '}
-                          — {src.attribution} · {src.license}
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="caption credits-imgsrc">
-                      Image: {m.image.source} · {m.image.license}
-                    </p>
-                  </div>
-                ))}
+                          · {m.image.license}
+                          {m.image.photoCredit ? ` · ${m.image.photoCredit}` : ''}
+                          {m.image.note ? ` · ${m.image.note}` : ''}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </section>
 
               <section>
@@ -128,13 +178,14 @@ export function Credits() {
                 <h3 className="meta credits-section">Music</h3>
                 <p className="body credits-note">
                   The rooms are played through these recordings, streamed from YouTube in an
-                  embedded player rather than copied or re-hosted — the corridors shuffle all
-                  four, and the atlas takes the last one, quietly. All credit and all traffic
-                  belong to the uploaders.
+                  embedded player rather than copied or re-hosted. The entrance has its own
+                  piece; the corridors shuffle the other four; the atlas takes one of them,
+                  quietly. All credit and all traffic belong to the uploaders.
                 </p>
-                <ul>
-                  {MUSEUM_TRACKS.map((t) => (
+                <ul className="credits-tracks">
+                  {[ENTRANCE_TRACK, ...MUSEUM_TRACKS].map((t, i) => (
                     <li key={t.id} className="caption credits-source">
+                      <span className="credits-track-where">{i === 0 ? 'Entrance' : 'Rooms'}</span>
                       <a href={t.url} target="_blank" rel="noreferrer">
                         {t.url}
                       </a>
@@ -149,7 +200,7 @@ export function Credits() {
             <>
               <section>
                 <h3 className="meta credits-section">The idea</h3>
-                <p className="body credits-note">
+                <p className="body credits-note credits-lede">
                   A painting is the thing everyone has already seen. What nobody sees is the
                   weight of writing behind it — the letters, the reviews, the catalogue entries,
                   the arguments. So the paintings here are literally built out of that writing:
@@ -161,7 +212,7 @@ export function Credits() {
               </section>
               <section>
                 <h3 className="meta credits-section">Rules the interface follows</h3>
-                <ul className="credits-rules">
+                <ol className="credits-rules">
                   <li className="body">
                     <strong>The interface is the quiet frame around a loud idea.</strong> One
                     serif, one accent, no colour that is not already in the room. Nothing is
@@ -190,7 +241,12 @@ export function Credits() {
                     through architecture — down a corridor, through an end wall, into a bay — and
                     all of it stops under <code>prefers-reduced-motion</code>.
                   </li>
-                </ul>
+                  <li className="body">
+                    <strong>Sound fades, never cuts.</strong> The room quietens when you stand in
+                    front of a painting and comes back when you walk away, on a ramp measured in
+                    seconds.
+                  </li>
+                </ol>
               </section>
               <section>
                 <h3 className="meta credits-section">The rooms</h3>
@@ -228,8 +284,9 @@ export function Credits() {
                   <li>
                     <span className="caption">Sound</span>
                     <span className="body">
-                      Music streamed from a hidden YouTube player; the chimes, the warp and the
-                      fallback room tone synthesised in WebAudio at run time
+                      Music streamed from two hidden YouTube players so rooms can cross over each
+                      other; the chimes, the swoosh, the warp and the fallback room tone
+                      synthesised in WebAudio at run time
                     </span>
                   </li>
                   <li>
@@ -274,7 +331,7 @@ export function Credits() {
                   </li>
                   <li>
                     <span className="caption">src/scenes/</span>
-                    <span className="body">the corridor, the gallery and the landing hero</span>
+                    <span className="body">the corridor, the gallery and the entrance</span>
                   </li>
                   <li>
                     <span className="caption">src/glyph/</span>
@@ -310,17 +367,19 @@ export function Credits() {
             <>
               <section>
                 <h3 className="meta credits-section">About</h3>
-                {/*
-                  Nakita: replace the paragraph below with your own bio.
-                  Nothing else on this tab needs touching.
-                */}
-                <p className="body credits-note">
+                <p className="body credits-note credits-lede">
                   Placard is made by <strong>Nakita Mray</strong>.
                 </p>
-                <p className="body credits-note credits-bio">
-                  [Your bio goes here — a few sentences: what you do, what drew you to putting
-                  paintings back together out of the writing about them, and anything you want a
-                  visitor to know.]
+                <p className="body credits-note">
+                  I kept coming back to the same thought in galleries: the painting is the part
+                  everyone already knows, and the part nobody sees is the pile of writing behind
+                  it. So I built the room the other way round — the words first, the picture out
+                  of them — and then built the museum to walk it in.
+                </p>
+                <p className="body credits-note">
+                  Fifty works, five corridors, and every letter on every canvas taken from
+                  something written about that painting. If you find a bug, or a work that
+                  should be here, the form below reaches me.
                 </p>
                 <ul className="credits-links">
                   <li className="caption credits-source">

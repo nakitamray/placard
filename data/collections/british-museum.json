@@ -12,6 +12,10 @@
     "accession": "",
     "creditLine": "Impression held in the Department of Asia",
     "accentColor": "#1C3350",
+    "heroFocus": [
+      0.36,
+      0.44
+    ],
     "labelText": "Three fishing boats are caught in the trough of a wave whose claw of foam hangs over them, and behind it — small, snow-capped, perfectly still — stands Mount Fuji. Hokusai was in his seventies and had been drawing for sixty years. The blue is Prussian blue, a European pigment newly cheap in Japan, and the print's entire modern life begins with it. Thousands of impressions were pulled; this is one of them.",
     "extendedNote": "It is not a painting and never was. Hokusai drew the design; a block-cutter destroyed the drawing in the act of carving it into cherry wood; a printer inked and pulled each impression by hand, one colour block at a time. The image exists in the plural, which is exactly why it travelled. It sold for about the price of a bowl of noodles.\n\nThe composition works by a single reversal: the wave is the mountain. Its crest occupies the place a peak would occupy, and the real Fuji is demoted to a small white triangle in the trough, so that a thing which lasts an instant is given the shape of the thing that lasts forever. The boats are oshiokuri-bune, fast craft that carried live fish to Edo, and the men in them are not drowning — they are ducking, in the practised way of people who do this every day. Prussian blue is the other half of the story: an imported synthetic pigment, arriving through the one Dutch trading post Japan allowed, which made possible a print built almost entirely out of blue.",
     "placeholder": {
@@ -134,6 +138,10 @@
     "accession": "",
     "creditLine": "Fayum region, Roman Egypt",
     "accentColor": "#3A2A22",
+    "heroFocus": [
+      0.5,
+      0.4
+    ],
     "labelText": "A young man looks out with dark, wide, slightly asymmetrical eyes, a shadow of beard on his jaw, his hair painted in short hooked strokes. The panel was made to be bound into the wrappings of his mummy over his face. It is Roman portraiture — the naturalism, the haircut, the fashion — doing an Egyptian funerary job, and the result is the most direct eye contact anyone makes across two thousand years.",
     "extendedNote": "Several hundred of these panels survive, most from the Fayum basin south-west of Cairo, painted between the first and third centuries AD for a population that was Egyptian, Greek and Roman at once. The technique is encaustic: pigment suspended in hot beeswax, laid on with a brush and a heated metal tool, which sets hard and keeps its colour with almost no fading. That is why the flesh still looks wet.\n\nWhat startles is not the realism but the specificity. These are individuals — a broken nose, a squint, a mole, an unfashionable beard — and they were painted for people who knew them. Some panels show signs of having hung in a house for years before burial. Nothing else from the ancient world looks back this way; Roman marble portraits are idealised, Egyptian funerary masks are schematic, and these are neither. When the panels began to appear in European collections in the nineteenth century they were treated as archaeology. It took modern painters — who recognised the brushwork immediately — to argue that they were also among the finest portraits ever made.",
     "placeholder": {
@@ -180,22 +188,26 @@
     }
   },
   {
-    "id": "white-portrait-lady",
+    "id": "white-the-flyer",
     "artist": "John White",
     "artistDates": "active 1585–1593",
-    "title": "Portrait of a Lady",
-    "titleOriginal": "From the album of White's American watercolours",
-    "year": "c. 1585–1593",
-    "medium": "Watercolour over graphite on paper",
-    "dimensions": "approx. 26 × 15 cm",
+    "title": "The Flyer",
+    "titleOriginal": "The flyer",
+    "year": "c. 1585–1586",
+    "medium": "Watercolour over graphite, touched with white and gold, on paper",
+    "dimensions": "26.3 × 15 cm",
     "room": "Prints and Drawings",
     "accession": "",
     "creditLine": "Sloane bequest, 1753",
     "accentColor": "#4C4436",
-    "labelText": "John White sailed to Roanoke as the expedition's artist and came back with a body of watercolours that is the earliest European eyewitness record of the peoples, plants and animals of the American east coast. The drawings are quiet, exact and unrhetorical: a standing figure, a fish, a crab, a dance, all set on blank paper with no background at all. This sheet belongs to that album, kept together and later engraved for print, which is how most of Europe first saw America.",
-    "extendedNote": "White made three Atlantic crossings and was governor of the second Roanoke colony — the one that vanished. He left for supplies in 1587 and was kept in England by the Armada; when he finally got back in 1590 the settlement, which included his daughter and his granddaughter Virginia Dare, was empty. He never found them, and he never went back.\n\nThe watercolours survive because they were copied. Theodor de Bry engraved them in 1590 for a Latin, French, German and English edition of Thomas Harriot's report on Virginia, and in the engraving the figures acquired classical poses and European musculature that White had not given them. White's own sheets are plainer and far better: bodies drawn as observed, tattoo patterns and hair recorded as fact, no allegory, no landscape, nothing arranged. They are also, unavoidably, reconnaissance — a colonising expedition's inventory of a place and its people — and both things are true of them at once.",
+    "heroFocus": [
+      0.5,
+      0.42
+    ],
+    "labelText": "A man caught mid-step, one arm raised, the other hand open, a bird's wing tied into his hair and a pouch at his hip — inscribed by White himself, in the corner, “The flyer.” He is a Secotan priest or conjuror, drawn from life on the Roanoke voyage of 1585. The paper is otherwise empty: no ground, no horizon, nothing but the figure and his own shadow of colour. White sailed as the expedition's artist and came back with the earliest European eyewitness record of the peoples, plants and animals of the American east coast.",
+    "extendedNote": "John White went to Roanoke in 1585 with the job of recording what was there, and he did it the way a surveyor does: one thing at a time, on blank paper, without arranging it into a scene. A fish, a crab, a village, a woman carrying a child, a man dancing. The drawings are quiet and exact, and their emptiness is the point — there is no allegory in them and nothing is made to look strange.\n\nThis sheet is the one he labelled “The flyer.” The figure is a Secotan religious specialist; the English word White reached for was the closest he had for what he had watched. The bird's wing in the hair, the fringed apron, the pouch, the position of the hands — all of it is set down as information, and much of what is known today about Algonquian dress in the 1580s is known because he drew it.\n\nWhat happened next to the drawings matters as much as their making. Theodor de Bry engraved them in Frankfurt in 1590 for a printed edition of Thomas Harriot's report on Virginia, and it was the engravings, not these watercolours, that Europe saw — with muscles classicised, poses corrected toward antique sculpture, and backgrounds invented behind the figures. The originals stayed in private hands, survived a warehouse fire in 1865 and reached the British Museum with the water stains still on them. Set the two side by side and the distance between observation and the picture Europe formed of America is measurable in inches.",
     "placeholder": {
-      "aspect": 0.6,
+      "aspect": 0.62,
       "archetype": "portrait",
       "palette": [
         "#302A20",
@@ -279,6 +291,10 @@
     "accession": "",
     "creditLine": "Stein collection, acquired 1907",
     "accentColor": "#4E3628",
+    "heroFocus": [
+      0.5,
+      0.36
+    ],
     "labelText": "In 1900 a Daoist caretaker at the Mogao caves near Dunhuang broke through a plastered wall into a small chamber packed floor to ceiling with manuscripts, silk paintings and banners, sealed for roughly nine hundred years. This banner is one of them: a bodhisattva painted on silk in mineral pigment and ink, made as a votive object to hang in a cave shrine on the edge of the Taklamakan desert.",
     "extendedNote": "Cave 17 held perhaps fifty thousand items — Buddhist sutras in Chinese, Tibetan, Sanskrit, Sogdian, Uyghur and Khotanese; contracts; a printed Diamond Sutra of 868 that is the earliest dated printed book in existence; and several hundred paintings on silk, hemp and paper. Why it was sealed is still unsettled: an evacuation ahead of an invasion, or a sacred waste deposit for texts too holy to destroy.\n\nAurel Stein reached the site in 1907 and left with several thousand items for a fraction of what they were worth; Paul Pelliot followed a year later, and the contents of the cave are now divided between London, Paris, Beijing, Delhi and St Petersburg. The paintings themselves are provincial in the best sense — made on a trade route where Chinese, Indian, Tibetan and Central Asian conventions met, by workshops rather than court masters, in a palette of malachite, azurite, cinnabar and gold. The line is fluent and repetitive, the way work is when the same figure has been painted a thousand times, and the silk has kept its colour because it spent nine centuries in the dark.",
     "placeholder": {
@@ -307,6 +323,10 @@
     "room": "Japanese galleries",
     "accession": "",
     "accentColor": "#27384F",
+    "heroFocus": [
+      0.5,
+      0.44
+    ],
     "labelText": "Rain drawn as line. The downpour is cut into the block as two crossing sets of fine parallel strokes, laid at slightly different angles so the shower has depth, and the figures on the bridge hurry under it with their backs bent and their umbrellas tipped forward. The far bank at Atake has already dissolved into a flat grey band. Nothing in the picture is dramatic except the weather, and the weather is only straight lines.",
     "extendedNote": "The bridge cuts the sheet on a diagonal from lower left to upper right, and everything else is arranged against it: the raft below, the dark water, the vertical rain. Hiroshige uses the bokashi gradation the Edo printers had perfected — ink wiped from the block by hand before each impression — so the river darkens toward the bottom edge and the sky darkens toward the top, and the lit band across the middle is where the whole composition breathes.\n\nVan Gogh copied it in oil in 1887, squaring it up and surrounding it with a border of invented Japanese characters. He could not reproduce the rain: what is a single confident cut in the woodblock became, in paint, a thicket of brushstrokes. The print is the argument for the medium — a shower rendered by a knife in cherrywood, printed identically several thousand times.",
     "placeholder": {

@@ -31,7 +31,11 @@
     "light": {
       "key": "#FFEFC8",
       "keyIntensity": 2.7,
-      "keyFrom": [12, 9, 5],
+      "keyFrom": [
+        12,
+        9,
+        5
+      ],
       "sky": "#F2E8D0",
       "ground": "#7C6C50",
       "ambient": 0.48,
@@ -39,7 +43,11 @@
       "lampIntensity": 11,
       "exposure": 1.0,
       "background": "#3A3122",
-      "fog": ["#4C4029", 44, 130]
+      "fog": [
+        "#4C4029",
+        44,
+        130
+      ]
     },
     "fixtures": {
       "sculpture": "busts",
@@ -54,17 +62,127 @@
     "viewBox": "20 40 520 240",
     "level": "Galleria delle Carte Geografiche",
     "rooms": [
-      { "id": "r-creation", "name": "Creation", "svgPath": "M40,55 L130,55 L130,141 L40,141 Z", "centroid": [85, 98], "active": true, "artworkIndex": 0 },
-      { "id": "r-judgment", "name": "Last Judgment", "svgPath": "M138,55 L228,55 L228,141 L138,141 Z", "centroid": [183, 98], "active": true, "artworkIndex": 1 },
-      { "id": "r-athens", "name": "Athens", "svgPath": "M236,55 L326,55 L326,141 L236,141 Z", "centroid": [281, 98], "active": true, "artworkIndex": 2 },
-      { "id": "r-transfiguration", "name": "Transfiguration", "svgPath": "M334,55 L424,55 L424,141 L334,141 Z", "centroid": [379, 98], "active": true, "artworkIndex": 3 },
-      { "id": "r-entombment", "name": "Entombment", "svgPath": "M432,55 L522,55 L522,141 L432,141 Z", "centroid": [477, 98], "active": true, "artworkIndex": 4 },
-      { "id": "r-jerome", "name": "St Jerome", "svgPath": "M40,179 L130,179 L130,265 L40,265 Z", "centroid": [85, 222], "active": true, "artworkIndex": 5 },
-      { "id": "r-peter", "name": "St Peter", "svgPath": "M138,179 L228,179 L228,265 L138,265 Z", "centroid": [183, 222], "active": true, "artworkIndex": 6 },
-      { "id": "r-stefaneschi", "name": "Stefaneschi", "svgPath": "M236,179 L326,179 L326,265 L236,265 Z", "centroid": [281, 222], "active": true, "artworkIndex": 7 },
-      { "id": "r-foligno", "name": "Foligno", "svgPath": "M334,179 L424,179 L424,265 L334,265 Z", "centroid": [379, 222], "active": true, "artworkIndex": 8 },
-      { "id": "r-virgin", "name": "Coronation", "svgPath": "M432,179 L522,179 L522,265 L432,265 Z", "centroid": [477, 222], "active": true, "artworkIndex": 9 },
-      { "id": "r-gallery", "name": "Gallery of Maps", "svgPath": "M40,147 L522,147 L522,173 L40,173 Z", "centroid": [281, 160], "active": false, "artworkIndex": -1 }
+      {
+        "id": "r-creation",
+        "name": "Creation",
+        "svgPath": "M40,55 L130,55 L130,141 L40,141 Z",
+        "centroid": [
+          85,
+          98
+        ],
+        "active": true,
+        "artworkIndex": 0
+      },
+      {
+        "id": "r-judgment",
+        "name": "Last Judgment",
+        "svgPath": "M138,55 L228,55 L228,141 L138,141 Z",
+        "centroid": [
+          183,
+          98
+        ],
+        "active": true,
+        "artworkIndex": 1
+      },
+      {
+        "id": "r-athens",
+        "name": "Athens",
+        "svgPath": "M236,55 L326,55 L326,141 L236,141 Z",
+        "centroid": [
+          281,
+          98
+        ],
+        "active": true,
+        "artworkIndex": 2
+      },
+      {
+        "id": "r-transfiguration",
+        "name": "Transfiguration",
+        "svgPath": "M334,55 L424,55 L424,141 L334,141 Z",
+        "centroid": [
+          379,
+          98
+        ],
+        "active": true,
+        "artworkIndex": 3
+      },
+      {
+        "id": "r-entombment",
+        "name": "Entombment",
+        "svgPath": "M432,55 L522,55 L522,141 L432,141 Z",
+        "centroid": [
+          477,
+          98
+        ],
+        "active": true,
+        "artworkIndex": 4
+      },
+      {
+        "id": "r-jerome",
+        "name": "St Jerome",
+        "svgPath": "M40,179 L130,179 L130,265 L40,265 Z",
+        "centroid": [
+          85,
+          222
+        ],
+        "active": true,
+        "artworkIndex": 5
+      },
+      {
+        "id": "r-pieta",
+        "name": "Pietà",
+        "svgPath": "M138,179 L228,179 L228,265 L138,265 Z",
+        "centroid": [
+          183,
+          222
+        ],
+        "active": true,
+        "artworkIndex": 6
+      },
+      {
+        "id": "r-jerome-communion",
+        "name": "Last Communion",
+        "svgPath": "M236,179 L326,179 L326,265 L236,265 Z",
+        "centroid": [
+          281,
+          222
+        ],
+        "active": true,
+        "artworkIndex": 7
+      },
+      {
+        "id": "r-foligno",
+        "name": "Foligno",
+        "svgPath": "M334,179 L424,179 L424,265 L334,265 Z",
+        "centroid": [
+          379,
+          222
+        ],
+        "active": true,
+        "artworkIndex": 8
+      },
+      {
+        "id": "r-virgin",
+        "name": "Coronation",
+        "svgPath": "M432,179 L522,179 L522,265 L432,265 Z",
+        "centroid": [
+          477,
+          222
+        ],
+        "active": true,
+        "artworkIndex": 9
+      },
+      {
+        "id": "r-gallery",
+        "name": "Gallery of Maps",
+        "svgPath": "M40,147 L522,147 L522,173 L40,173 Z",
+        "centroid": [
+          281,
+          160
+        ],
+        "active": false,
+        "artworkIndex": -1
+      }
     ]
   },
   "artworks": [
@@ -74,9 +192,9 @@
     "raphael-transfiguration",
     "caravaggio-entombment",
     "leonardo-st-jerome",
-    "raphael-deliverance-peter",
-    "giotto-stefaneschi-triptych",
     "raphael-madonna-foligno",
-    "raphael-coronation-virgin"
+    "raphael-coronation-virgin",
+    "bellini-pieta",
+    "domenichino-last-communion-jerome"
   ]
 }

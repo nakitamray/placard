@@ -47,7 +47,19 @@ export interface ArtworkMeta {
     attribution: string;
     url: string;
   };
-  image: { file: string; source: string; license: string; photoCredit: string };
+  image: {
+    file: string;
+    /** where the reproduction came from, in words */
+    source: string;
+    /** the Commons file it was fetched from, if it was */
+    commonsFile: string;
+    /** that file's page on Commons */
+    url: string;
+    license: string;
+    photoCredit: string;
+    /** anything done to the scan after fetching it, e.g. a crop */
+    note: string;
+  };
   /**
    * Which variants of this painting were actually published, and what each
    * one weighs. Written by scripts/build-images.ts; `src/lib/image.ts` names

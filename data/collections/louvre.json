@@ -12,31 +12,57 @@
     "accession": "INV 779",
     "creditLine": "Acquired by François I; French royal collection",
     "accentColor": "#3E4234",
+    "heroFocus": [
+      0.5,
+      0.34
+    ],
     "labelText": "A Florentine merchant's wife sits on a loggia with a road and a river winding away behind her into blue distance. Leonardo carried the panel with him for the rest of his life and never gave it up, working the flesh in layers of glaze so thin the transitions have no edges at all. The face is where sfumato — his own word, smoke — does its work: the corners of the mouth and eyes dissolve, so the expression changes with where you look.",
     "extendedNote": "The sitter is generally identified as Lisa Gherardini, wife of the silk merchant Francesco del Giocondo, which gives the picture both its Italian and its French names. What is certain is that Leonardo began it in Florence around 1503 and was still adjusting it in France more than fifteen years later. He never delivered it. It entered the French royal collection after his death at Amboise and has been public property since the Revolution.\n\nTwo things make it strange rather than merely famous. The first is the handling: glazes laid so thin and so many that no brushstroke survives anywhere on the surface, the modelling passing from light to shadow without a single hard boundary. The second is the landscape, which does not agree with itself — the horizon on the right sits higher than the one on the left, so the eye is quietly unbalanced whichever side of the face it settles on. The theft of 1911, when an Italian workman walked out of the Louvre with the panel under his coat, turned a famous painting into the most famous object in any museum on earth.",
     "placeholder": {
       "aspect": 0.688,
       "archetype": "portrait",
-      "palette": ["#221C12", "#3F3520", "#655130", "#96794C", "#CDB183", "#7C8874"],
+      "palette": [
+        "#221C12",
+        "#3F3520",
+        "#655130",
+        "#96794C",
+        "#CDB183",
+        "#7C8874"
+      ],
       "seed": 11
     },
     "regions": [
       {
         "id": "face",
         "label": "The face",
-        "box": [0.32, 0.2, 0.7, 0.52],
+        "box": [
+          0.32,
+          0.2,
+          0.7,
+          0.52
+        ],
         "text": "The corners of the mouth and the outer corners of the eyes are the two places Leonardo softened furthest, until neither has a definite edge. Because the sharpest part of human vision covers only a small angle, looking directly at the mouth pushes the eyes into peripheral vision and vice versa — and the peripheral reading of a soft edge differs from the central one. The expression genuinely does change as the gaze moves. It is not an illusion of mood; it is an illusion of geometry."
       },
       {
         "id": "landscape",
         "label": "The landscape behind",
-        "box": [0.0, 0.0, 1.0, 0.45],
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.45
+        ],
         "text": "A road on one side, a river and a bridge on the other, and beyond them ice-blue peaks dissolving into haze — aerial perspective worked out as physics, not convention. The two horizons do not match. The right one sits higher than the left, so the ground behind the sitter's shoulders cannot be a single continuous landscape, and the eye adjusts each time it crosses her face."
       },
       {
         "id": "hands",
         "label": "The hands",
-        "box": [0.18, 0.66, 0.82, 1.0],
+        "box": [
+          0.18,
+          0.66,
+          0.82,
+          1.0
+        ],
         "text": "The hands close the composition in a broad, calm pyramid, one resting over the other on the arm of the chair. They are as finished as the face and were laid in with the same near-invisible glazes. Contemporary copies show a pair of columns flanking the loggia, which the panel no longer has — the original was trimmed at the edges, and with them went most of the balcony the sitter is sitting on."
       }
     ]
@@ -54,31 +80,57 @@
     "accession": "RF 129",
     "creditLine": "Purchased by the State, 1831",
     "accentColor": "#4A3B33",
+    "heroFocus": [
+      0.46,
+      0.4
+    ],
     "labelText": "The three days of July 1830 that brought down Charles X, painted within months of the event. An allegorical figure of Liberty strides over the barricade with the tricolour raised, bare-breasted and carrying a bayoneted musket, and behind her come a boy with pistols, a top-hatted bourgeois with a shotgun, and a factory worker with a sabre. Powder smoke opens just enough at the back to show the towers of Notre-Dame. Delacroix wrote to his brother that if he had not fought for his country, he could at least paint for it.",
     "extendedNote": "Delacroix was not on the barricades. He watched the July Revolution from a distance and then made the picture that fixed it, submitting it to the Salon of 1831 where the state bought it almost immediately — and then kept it out of sight for most of the next twenty years, because a canvas that shows a crowd winning is a difficult thing for any government to hang.\n\nWhat is radical about it is the mixture. Liberty is a classical personification, barefoot and in a Phrygian cap, painted with the weight and dirt of a real body; the men behind her are contemporary Parisians identified by exactly what they are wearing. Allegory and reportage stand on the same heap of paving stones, over the bodies of the dead, in the same light. The pyramid of the composition is entirely traditional and the handling is not: the tricolour is picked up and scattered through the whole canvas in flecks of red, white and blue, so the flag is everywhere at once.",
     "placeholder": {
       "aspect": 1.25,
       "archetype": "figure-group",
-      "palette": ["#221C18", "#4A3E34", "#7A6A56", "#B6A186", "#E2D3B4", "#B02A20"],
+      "palette": [
+        "#221C18",
+        "#4A3E34",
+        "#7A6A56",
+        "#B6A186",
+        "#E2D3B4",
+        "#B02A20"
+      ],
       "seed": 12
     },
     "regions": [
       {
         "id": "flag",
         "label": "The tricolour",
-        "box": [0.36, 0.0, 0.72, 0.34],
+        "box": [
+          0.36,
+          0.0,
+          0.72,
+          0.34
+        ],
         "text": "The flag is the highest point of the composition and the source of its colour scheme: Delacroix scattered the same red, white and blue through the whole canvas in small flecks — a sash, a cockade, a shirt, a stripe of sky — so that the tricolour is present everywhere and the eye is never allowed to leave it for long."
       },
       {
         "id": "liberty",
         "label": "Liberty herself",
-        "box": [0.3, 0.15, 0.62, 0.82],
+        "box": [
+          0.3,
+          0.15,
+          0.62,
+          0.82
+        ],
         "text": "She is a classical personification — bare feet, a Phrygian cap, a body built on antique proportions — painted with the weight, dirt and underarm hair of a real woman, and carrying an infantry musket with the bayonet fixed. Critics of 1831 were more scandalised by that combination than by the politics. Allegory was supposed to float; this one is walking over rubble."
       },
       {
         "id": "dead",
         "label": "The dead in the foreground",
-        "box": [0.0, 0.66, 1.0, 1.0],
+        "box": [
+          0.0,
+          0.66,
+          1.0,
+          1.0
+        ],
         "text": "The barricade is built on bodies, and Delacroix put them across the whole bottom edge where the viewer has to step over them to enter the picture. One is stripped to a shirt, another still in uniform. The victory above is not separable from them: the composition's rising pyramid has its base here, in the cost."
       }
     ]
@@ -101,7 +153,14 @@
     "placeholder": {
       "aspect": 1.576,
       "archetype": "figure-group",
-      "palette": ["#221A18", "#4E2A26", "#7C4A34", "#B08A5C", "#E6D6B2", "#A81E22"],
+      "palette": [
+        "#221A18",
+        "#4E2A26",
+        "#7C4A34",
+        "#B08A5C",
+        "#E6D6B2",
+        "#A81E22"
+      ],
       "seed": 13
     }
   },
@@ -118,31 +177,57 @@
     "accession": "INV 4884",
     "creditLine": "Purchased at the artist's estate sale, 1824",
     "accentColor": "#2F3228",
+    "heroFocus": [
+      0.58,
+      0.48
+    ],
     "labelText": "In 1816 the French frigate Méduse ran aground off Senegal under an incompetent captain appointed by patronage. A hundred and forty-seven people were put onto a makeshift raft and towed until the tow ropes were cut; fifteen were alive thirteen days later. Géricault painted the moment they first sight a rescue ship on the horizon — a speck at the end of a rising diagonal of bodies that climbs from a dead man in the foreground to a figure waving a rag at the top.",
     "extendedNote": "Géricault was twenty-seven and had no commission. He researched the wreck like a journalist: interviewing survivors, having the ship's carpenter build him a scale model of the raft, visiting hospitals and morgues to study the dying and the dead, and keeping severed limbs in the studio until the smell drove out his friends. He shaved his head so he would not be tempted to go out. The picture took eighteen months.\n\nThe composition is built from two triangles pulling against each other — one anchored on the mast and its straining sail, which is filled by a wind blowing the raft away from the ship; the other rising toward the rescue signal. Hope and its opposite are structurally locked together. At the top of the surge of bodies is a Black man, Jean Charles, one of the survivors, in the picture's most heroic position — a deliberate act at a moment when France was arguing about the slave trade. The Salon of 1819 could not decide whether it was a history painting or an accusation. It is both: the shipwreck was a government scandal, and the canvas is the size of a coronation.",
     "placeholder": {
       "aspect": 1.458,
       "archetype": "figure-group",
-      "palette": ["#141310", "#33301F", "#5C523A", "#8E7C5C", "#C7B48C", "#7A2E22"],
+      "palette": [
+        "#141310",
+        "#33301F",
+        "#5C523A",
+        "#8E7C5C",
+        "#C7B48C",
+        "#7A2E22"
+      ],
       "seed": 14
     },
     "regions": [
       {
         "id": "signal",
         "label": "The figure signalling",
-        "box": [0.6, 0.06, 0.92, 0.5],
+        "box": [
+          0.6,
+          0.06,
+          0.92,
+          0.5
+        ],
         "text": "At the apex of the pile of bodies a man waves a scrap of cloth at a speck on the horizon. Géricault gave the picture's highest and most heroic position to Jean Charles, one of the survivors, a Black soldier — a deliberate choice in a France still arguing over the slave trade, and one contemporary critics noticed."
       },
       {
         "id": "sail",
         "label": "The sail and the mast",
-        "box": [0.08, 0.0, 0.5, 0.55],
+        "box": [
+          0.08,
+          0.0,
+          0.5,
+          0.55
+        ],
         "text": "The second triangle. The wind in that sail is carrying the raft away from the ship the men have just sighted, so the two structures of the composition pull in opposite directions at the same instant. The picture holds rescue and its failure in the same frame, and refuses to say which one wins."
       },
       {
         "id": "dead",
         "label": "The dead at the front",
-        "box": [0.0, 0.6, 0.55, 1.0],
+        "box": [
+          0.0,
+          0.6,
+          0.55,
+          1.0
+        ],
         "text": "The bottom edge is a slack corpse sliding into the water and an old man holding a dead son, immobile while everyone behind him surges upward. Géricault studied the dead from life — hospital wards, the morgue, severed limbs kept in the studio until the smell became unbearable — and it shows in the weight of the flesh, which sags rather than poses."
       }
     ]
@@ -165,7 +250,14 @@
     "placeholder": {
       "aspect": 1.468,
       "archetype": "architectural",
-      "palette": ["#221E18", "#484432", "#77705A", "#A8A088", "#E4DCC2", "#B8912F"],
+      "palette": [
+        "#221E18",
+        "#484432",
+        "#77705A",
+        "#A8A088",
+        "#E4DCC2",
+        "#B8912F"
+      ],
       "seed": 15
     }
   },
@@ -182,12 +274,23 @@
     "accession": "INV 3692",
     "creditLine": "Royal commission, painted in Rome",
     "accentColor": "#4A4034",
+    "heroFocus": [
+      0.42,
+      0.48
+    ],
     "labelText": "Three brothers stretch their arms toward the swords their father holds up, swearing to fight for Rome to the death. To the right, in the same painting and a different world, their sister and mother collapse in grief — one of the women is engaged to a man on the opposing side. David divides the canvas with three plain arches: the men under two of them, rigid and lit; the women under the third, curved and shadowed. Nothing decorative survives anywhere on the surface.",
     "extendedNote": "David painted it in Rome on a royal commission and exhibited it there before it reached the Paris Salon of 1785, where it landed like a manifesto. The subject came from Roman legend by way of Corneille, but the treatment came from nowhere: a stage-flat space, a light with no atmosphere in it, contours as hard as engraving, and colour reduced to earth, steel and one shock of red.\n\nThe picture's argument is in the geometry. Everything to the left is straight — arms, legs, swords, the taut line of the spears — and everything to the right is a curve. The men's certainty and the women's knowledge are given equal space and opposite shapes, and David does not tell you which is right. Five years before the Revolution, audiences read it as a call to civic sacrifice, and the reading stuck; David himself would go on to vote for the king's death and to organise the pageantry of the Republic. The painting became the founding image of Neoclassicism largely because it looks less like a painting than like a demonstration.",
     "placeholder": {
       "aspect": 1.288,
       "archetype": "architectural",
-      "palette": ["#1E1A16", "#3E362C", "#6A5C4A", "#A08E74", "#D8C8AA", "#A32820"],
+      "palette": [
+        "#1E1A16",
+        "#3E362C",
+        "#6A5C4A",
+        "#A08E74",
+        "#D8C8AA",
+        "#A32820"
+      ],
       "seed": 16
     }
   },
@@ -204,12 +307,23 @@
     "accession": "INV 1448",
     "creditLine": "Purchased 1870",
     "accentColor": "#4E3E24",
+    "heroFocus": [
+      0.5,
+      0.44
+    ],
     "labelText": "Vermeer's smallest painting, and the one that comes closest to the eye. A young woman bends over a lacemaking pillow, bobbins in both hands, her whole attention inside a few square centimetres of thread. Vermeer put the picture plane almost against her hands, threw the foreground deliberately out of focus, and rendered the red and white threads spilling from the sewing cushion as unbound smears of paint — the sharpest thing in the picture is where she is looking.",
     "extendedNote": "The canvas is the size of a sheet of paper. Everything in it is arranged around a single act of concentration: the head tipped forward, the hands raised, the bobbins caught mid-movement. Vermeer gives the eye no wall, no window, no map, none of the deep interiors he is famous for — the background is a bare flat ground, and there is nowhere to look except at the work.\n\nWhat makes it modern is the focus. The threads tumbling from the blue cushion in the immediate foreground are rendered as pure liquid colour with no drawing at all, while the taut white thread between her fingers is precise. That is how a lens behaves, and how an eye behaves when it is fixed on one plane; it is not how seventeenth-century painting normally behaves. Renoir called it, with Watteau's Embarkation, the most beautiful picture in the world, and Salvador Dalí was obsessed enough with it to be allowed to copy it in the Louvre, producing a version made of rhinoceros horns.",
     "placeholder": {
       "aspect": 0.875,
       "archetype": "interior",
-      "palette": ["#241C14", "#4A3A22", "#7A6034", "#B49A5E", "#E8DCC0", "#C8A02A"],
+      "palette": [
+        "#241C14",
+        "#4A3A22",
+        "#7A6034",
+        "#B49A5E",
+        "#E8DCC0",
+        "#C8A02A"
+      ],
       "seed": 17
     }
   },
@@ -231,7 +345,14 @@
     "placeholder": {
       "aspect": 1.78,
       "archetype": "interior",
-      "palette": ["#1C1C22", "#38384A", "#5E5E72", "#95919A", "#DCD2C6", "#2E4C6E"],
+      "palette": [
+        "#1C1C22",
+        "#38384A",
+        "#5E5E72",
+        "#95919A",
+        "#DCD2C6",
+        "#2E4C6E"
+      ],
       "seed": 18
     }
   },
@@ -253,7 +374,14 @@
     "placeholder": {
       "aspect": 1.265,
       "archetype": "figure-group",
-      "palette": ["#1C1210", "#48201C", "#7A3628", "#B4703E", "#E4C08A", "#B4231C"],
+      "palette": [
+        "#1C1210",
+        "#48201C",
+        "#7A3628",
+        "#B4703E",
+        "#E4C08A",
+        "#B4231C"
+      ],
       "seed": 19
     }
   },
@@ -270,12 +398,23 @@
     "accession": "INV 775",
     "creditLine": "French royal collection",
     "accentColor": "#26201A",
+    "heroFocus": [
+      0.5,
+      0.34
+    ],
     "labelText": "Leonardo's last painting, and his darkest. A figure emerges from a ground of almost pure black, lit as if by a single close flame, one arm crossing the chest and one finger raised toward heaven. There is no desert, no locusts, no wilderness — only shoulders, a smile, and a gesture. The saint who is supposed to be gaunt and ascetic is soft, ambiguous and very close.",
     "extendedNote": "The panel was still with Leonardo in France at his death and passed into the royal collection, which is why it hangs here. It is the furthest he took sfumato: the modelling emerges from the dark by degrees so gradual that the eye cannot find where the figure begins, and the surface has darkened further with age until the background is nearly opaque.\n\nContemporaries were unsettled by it and later viewers more so — the raised finger is orthodox iconography, pointing to the one who comes after, but the face beneath it is not a preacher's. It is the same smile as the Mona Lisa's, on a body of no determinable age or sex, wearing a leopard skin and holding a reed cross that is barely legible in the gloom. Leonardo had spent forty years arguing that painting's advantage over sculpture was its command of light and shade. This is that argument reduced to its minimum: one body, one light source, and a great deal of darkness doing the work.",
     "placeholder": {
       "aspect": 0.826,
       "archetype": "portrait",
-      "palette": ["#14100C", "#2C241A", "#4E4030", "#7E6A4E", "#C4AC86", "#8A7050"],
+      "palette": [
+        "#14100C",
+        "#2C241A",
+        "#4E4030",
+        "#7E6A4E",
+        "#C4AC86",
+        "#8A7050"
+      ],
       "seed": 20
     }
   }
