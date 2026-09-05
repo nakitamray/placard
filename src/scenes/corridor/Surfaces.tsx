@@ -12,6 +12,7 @@ import type { MuseumStyle } from '../../types';
 import type { Quality } from '../../lib/quality';
 import { bayZ, hangBottom, hangTop, type Dims } from './dims';
 import { CourtFacade } from './CourtFacade';
+import { glowTexture } from './glow';
 
 interface Props {
   style: MuseumStyle;
@@ -388,67 +389,156 @@ export function Walls({ style, d, quality }: Props) {
 
   if (kind === 'uffizi-corridor') {
     /*
-     * The Uffizi's east corridor is asymmetric and that is the whole of its
-     * character: paintings down one side, and down the other a run of tall
-     * windows that is doing all the lighting in the room. Standing in it, the
-     * hang is always on your left and the light is always on your right.
+     * The Uffizi's east corridor is asymmetric, and that asymmetry is the
+     * whole of its character: the pictures are on your left and the light is
+     * on your right, all the way down. Nothing hangs opposite the windows —
+     * anything there would be looked at against the day and seen as a
+     * silhouette, which is why the real corridor does not hang there either.
      *
-     * Above the pictures, on both walls, runs a continuous frieze of small
-     * dark-framed portraits — several hundred of them in the real corridor,
-     * instanced here as one draw of plain dark panels, because from the floor
-     * that is exactly what they are.
+     * The light is the subject. The glazed wall is unshaded so it stays the
+     * brightest thing in the room whatever the exposure does, the mullions
+     * between the windows are slender enough to be joinery rather than
+     * columns, and a warm patch is laid on the floor under each opening — the
+     * one thing that makes a bright wall read as daylight coming IN rather
+     * than as a lit panel.
+     *
+     * Above both hangs runs the frieze of small dark-framed portraits: several
+     * hundred of them in the real corridor, one instanced draw here, because
+     * from the floor that is exactly what they are.
      */
-    // the real bays are wide; a mullion every metre reads as a picket fence
-    const glazing = 2.1;
-    const nWindows = Math.round(run / glazing);
-    const friezeY = hangTop(d, style) + 0.42;
+    const glazing = 2.2;
+    const nWindows = Math.max(1, Math.round(run / glazing));
+    const pitch = run / nWindows;
+    /** the sill, and the head — sized so the frieze clears the openings */
+    const sill = 0.95;
+    const head = Math.min(d.wallHeight * 0.74, hangTop(d, style) - 0.1);
+    const friezeY = hangTop(d, style) + 0.46;
+    /** centre-line z of window i */
+    const winZ = (i: number) => mid - run / 2 + pitch * (i + 0.5);
+
     return (
       <group>
-        {/* the hung wall */}
+        {/* ── the hung wall ─────────────────────────────────────────── */}
         {base(-1, p.wall)}
         {bands(-1, p.molding, 1.0)}
-
-        {/* the glazed wall: a bright plane behind a grid of stone mullions */}
-        <mesh
-          position={[d.halfWidth, d.wallHeight / 2, mid]}
-          rotation={[0, -Math.PI / 2, 0]}
+        {/* a shallow pilaster on every bay division, which is what gives the
+            hung wall its rhythm and stops it reading as one long panel */}
+        <Instanced
+          count={d.bays + 1}
+          place={(i, m) =>
+            m.makeTranslation(-(d.halfWidth - 0.08), (sill + head) / 2, -i * d.bayDepth)
+          }
         >
-          <planeGeometry args={[run, d.wallHeight]} />
-          {/* basic, not standard: this is the light source in the room, and a
-              shaded surface here reads as a painted wall rather than as day */}
-          <meshBasicMaterial color={p.sky} toneMapped={false} />
+          <boxGeometry args={[0.16, head - sill, 0.34]} />
+          <meshStandardMaterial color={p.molding} roughness={0.84} />
+        </Instanced>
+        {/* the dado: a panelled base with a moulded rail on top of it */}
+        <mesh position={[-(d.halfWidth - 0.05), sill / 2, mid]}>
+          <boxGeometry args={[0.1, sill, run]} />
+          <meshStandardMaterial color={p.wallDeep} roughness={0.9} />
         </mesh>
-        {/* the pier between each window */}
+        <mesh position={[-(d.halfWidth - 0.09), sill, mid]}>
+          <boxGeometry args={[0.2, 0.1, run]} />
+          <meshStandardMaterial color={p.molding} roughness={0.8} />
+        </mesh>
+
+        {/* ── the glazed wall ───────────────────────────────────────── */}
+        {/* the day itself: unshaded, so it stays the brightest surface in the
+            room whatever the tone mapping is doing */}
+        <Instanced
+          count={nWindows}
+          place={(i, m) => m.makeTranslation(d.halfWidth - 0.16, (sill + head) / 2, winZ(i))}
+        >
+          <boxGeometry args={[0.04, head - sill, pitch - 0.34]} />
+          <meshBasicMaterial color={p.sky} toneMapped={false} />
+        </Instanced>
+        {/* the reveal each window sits in: a splayed stone jamb, which is what
+            gives an opening its thickness */}
+        {Array.from({ length: nWindows }, (_, i) => (
+          <group key={`rev${i}`} position={[d.halfWidth - 0.1, 0, winZ(i)]}>
+            {[-1, 1].map((e) => (
+              <mesh key={e} position={[0, (sill + head) / 2, (e * (pitch - 0.34)) / 2]}>
+                <boxGeometry args={[0.22, head - sill, 0.06]} />
+                <meshStandardMaterial color={p.molding} roughness={0.82} />
+              </mesh>
+            ))}
+            {/* the glazing bars: two lights across, four up */}
+            <Instanced
+              count={3}
+              place={(j, m) =>
+                m.makeTranslation(-0.09, sill + ((head - sill) * (j + 1)) / 4, 0)
+              }
+            >
+              <boxGeometry args={[0.05, 0.035, pitch - 0.36]} />
+              <meshStandardMaterial color={p.molding} roughness={0.7} />
+            </Instanced>
+            <mesh position={[-0.09, (sill + head) / 2, 0]}>
+              <boxGeometry args={[0.05, head - sill, 0.035]} />
+              <meshStandardMaterial color={p.molding} roughness={0.7} />
+            </mesh>
+          </group>
+        ))}
+        {/* the mullion between the openings — joinery, not architecture */}
         <Instanced
           count={nWindows + 1}
           castShadow
           place={(i, m) =>
-            m.makeTranslation(
-              d.halfWidth - 0.14,
-              d.wallHeight / 2,
-              mid - run / 2 + i * glazing,
-            )
+            m.makeTranslation(d.halfWidth - 0.12, (sill + head) / 2, mid - run / 2 + i * pitch)
           }
         >
-          <boxGeometry args={[0.36, d.wallHeight, 0.5]} />
-          <meshStandardMaterial color={p.wallDeep} roughness={0.86} />
+          <boxGeometry args={[0.2, head - sill, 0.32]} />
+          <meshStandardMaterial color={p.molding} roughness={0.84} />
         </Instanced>
-        {/* the transom and the sill, which is what makes them windows and not
-            a gap between columns */}
-        {[d.wallHeight * 0.78, 1.05].map((y) => (
-          <mesh key={y} position={[d.halfWidth - 0.13, y, mid]}>
-            <boxGeometry args={[0.32, 0.16, run]} />
-            <meshStandardMaterial color={p.molding} roughness={0.82} />
-          </mesh>
-        ))}
-        {/* below the sill the wall is solid */}
-        <mesh position={[d.halfWidth - 0.06, 0.52, mid]}>
-          <boxGeometry args={[0.14, 1.05, run]} />
-          <meshStandardMaterial color={p.wall} roughness={0.88} />
+        {/* the sill, projecting, and the moulded architrave over the heads */}
+        <mesh position={[d.halfWidth - 0.2, sill, mid]}>
+          <boxGeometry args={[0.42, 0.13, run]} />
+          <meshStandardMaterial color={p.molding} roughness={0.8} />
+        </mesh>
+        <mesh position={[d.halfWidth - 0.15, head + 0.09, mid]}>
+          <boxGeometry args={[0.34, 0.18, run]} />
+          <meshStandardMaterial color={p.molding} roughness={0.8} />
+        </mesh>
+        <mesh position={[d.halfWidth - 0.11, head + 0.22, mid]}>
+          <boxGeometry args={[0.26, 0.07, run]} />
+          <meshStandardMaterial color={p.gilt} metalness={0.5} roughness={0.5} />
+        </mesh>
+        {/* below the sill the wall is solid, paired with the dado opposite */}
+        <mesh position={[d.halfWidth - 0.05, sill / 2, mid]}>
+          <boxGeometry args={[0.12, sill, run]} />
+          <meshStandardMaterial color={p.wallDeep} roughness={0.9} />
+        </mesh>
+        {/* and above the architrave, back to plaster up to the beams */}
+        <mesh
+          position={[d.halfWidth, (head + 0.3 + d.wallHeight) / 2, mid]}
+          rotation={[0, -Math.PI / 2, 0]}
+        >
+          <planeGeometry args={[run, d.wallHeight - head - 0.3]} />
+          <meshStandardMaterial color={p.wall} roughness={0.92} />
         </mesh>
         {bands(1, p.molding, 1.0)}
 
-        {/* the portrait frieze, both walls */}
+        {/* the sun on the floor, one patch per opening. Additive and soft: it
+            is light landing on stone, not a decal of a rectangle. */}
+        {Array.from({ length: nWindows }, (_, i) => (
+          <mesh
+            key={`sun${i}`}
+            position={[d.halfWidth * 0.34, 0.02, winZ(i) - 0.5]}
+            rotation={[-Math.PI / 2, 0, 0]}
+          >
+            <planeGeometry args={[d.halfWidth * 1.5, pitch * 0.72]} />
+            <meshBasicMaterial
+              map={glowTexture()}
+              color={p.sky}
+              transparent
+              opacity={0.5}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
+        ))}
+
+        {/* the portrait frieze, both walls, above everything */}
         {[-1, 1].map((side) => (
           <Instanced
             key={side}
@@ -462,7 +552,7 @@ export function Walls({ style, d, quality }: Props) {
             }
           >
             <boxGeometry args={[0.06, 0.44, 0.36]} />
-            <meshStandardMaterial color="#3A2A1C" roughness={0.72} />
+            <meshStandardMaterial color="#4A3524" roughness={0.72} />
           </Instanced>
         ))}
         {/* the rail the frieze sits on */}

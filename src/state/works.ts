@@ -23,6 +23,8 @@ export interface ExhibitionWork {
   focus: [number, number];
   /** a real scan is published for it, rather than a procedural stand-in */
   authentic: boolean;
+  /** the entrance is allowed to open on it — see `heroSkip` in the records */
+  hero: boolean;
 }
 
 let pending: Promise<ExhibitionWork[]> | null = null;
@@ -43,12 +45,12 @@ export function exhibitionWorks(): Promise<ExhibitionWork[]> {
  * The works the entrance is willing to open on.
  *
  * A procedural stand-in is honest on a wall and wrong as the first thing
- * anybody sees, so the entrance draws from the works with real scans — unless
- * there are none, in which case a stand-in is still better than a black
- * screen.
+ * anybody sees, and so is a work that cannot survive being cropped to a
+ * window — so the entrance draws from the works the build marked as heroes.
+ * If there are none, a stand-in is still better than a black screen.
  */
 export function heroWorks(all: ExhibitionWork[]): ExhibitionWork[] {
-  const real = all.filter((w) => w.authentic);
+  const real = all.filter((w) => w.hero);
   return real.length ? real : all;
 }
 

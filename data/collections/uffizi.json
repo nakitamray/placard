@@ -490,6 +490,7 @@
     "accession": "Inv. 1890 nn. 1615, 3342",
     "creditLine": "Galleria degli Uffizi, Florence",
     "accentColor": "#4C5E52",
+    "heroSkip": true,
     "heroFocus": [
       0.5,
       0.44

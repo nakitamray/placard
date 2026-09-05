@@ -56,6 +56,17 @@ export interface ArtworkRecord {
    */
   heroFocus?: [number, number];
   /**
+   * Keep this work off the entrance.
+   *
+   * The entrance is the one screen that crops a painting to whatever shape
+   * the window happens to be, and some works cannot survive it: a scroll six
+   * times wider than it is tall, a hanging banner, a small watercolour whose
+   * best available scan is soft at full bleed. They are perfectly good on a
+   * wall, where they are hung whole and at their own size, and this is the
+   * flag that says so.
+   */
+  heroSkip?: boolean;
+  /**
    * How this work is framed, where a rectangle is the wrong answer: 'round'
    * for a tondo, 'divided' for a pair of panels hung as one object with a
    * moulded divider between them, 'arched' for a round-headed altarpiece
@@ -72,6 +83,8 @@ export interface MuseumRecord {
   id: string;
   name: string;
   city: string;
+  /** the museum's own site, which the corridor title and the colophon link to */
+  homepage: string;
   subtitle: string;
   blurb: string;
   corridorNote: string;

@@ -475,36 +475,34 @@ export function buildArchedFrame(
  * This is the museum's own sight-edge and bed courses, turned on their side
  * and run vertically down the centre of the frame, so the join is made of the
  * same moulding as the surround.
+ *
+ * IT IS DELIBERATELY PLAIN, AND HALF THE WIDTH OF THE SURROUND. The ornament
+ * on a diptych belongs to the frame around the pair; a carved bar between two
+ * small panels competes with both of them and takes a slice out of each face.
+ * A slender moulded strip says "two panels, one object" and then gets out of
+ * the way, which is all it is for.
  */
 export function buildDivider(
   kind: FrameKind,
   height: number,
 ): { gilt: THREE.BufferGeometry; beads: THREE.Vector3[]; beadRadius: number } {
   const spec = SPECS[kind] ?? SPECS['louvre-salon'];
-  const s = height;
   const parts: THREE.BufferGeometry[] = [];
   const mat = new THREE.Matrix4();
-  const outer = Math.max(...spec.courses.map((c) => c.offset + c.width)) * s;
+  const outer = Math.max(...spec.courses.map((c) => c.offset + c.width)) * height;
 
   // the bed, and a raised sight lip either side of it
-  const bed = new THREE.BoxGeometry(outer * 1.15, height, outer * 0.5);
-  mat.makeTranslation(0, 0, outer * 0.25);
+  const bed = new THREE.BoxGeometry(outer * 0.58, height, outer * 0.4);
+  mat.makeTranslation(0, 0, outer * 0.2);
   parts.push(transformed(bed, mat));
   for (const sx of [-1, 1]) {
-    const lip = new THREE.BoxGeometry(outer * 0.2, height, outer * 0.72);
-    mat.makeTranslation((sx * outer * 1.15) / 2, 0, outer * 0.36);
+    const lip = new THREE.BoxGeometry(outer * 0.1, height, outer * 0.56);
+    mat.makeTranslation((sx * outer * 0.58) / 2, 0, outer * 0.28);
     parts.push(transformed(lip, mat));
   }
 
-  const beads: THREE.Vector3[] = [];
-  const radius = (spec.bead?.radius ?? 0.008) * s;
-  const spacing = (spec.bead?.spacing ?? 0.04) * s;
-  const n = Math.max(6, Math.floor(height / spacing));
-  for (let i = 0; i < n; i++) {
-    beads.push(new THREE.Vector3(0, (i / (n - 1) - 0.5) * height * 0.98, outer * 0.5 + radius));
-  }
-
-  return { gilt: merge(parts)!, beads, beadRadius: radius };
+  // no bead course: see above
+  return { gilt: merge(parts)!, beads: [], beadRadius: (spec.bead?.radius ?? 0.008) * height };
 }
 
 export function buildFrame(
@@ -513,13 +511,38 @@ export function buildFrame(
   height: number,
   /** carve the bead course, cartouches and reeding */
   ornament = true,
+  /**
+   * A grander version of the same moulding.
+   *
+   * Used where one frame carries more than one panel — a diptych hung as a
+   * single object — because a pair inside a plain surround reads as two
+   * pictures that happen to be adjacent. Two further courses are added
+   * outside the spec: a broad carved band and a stepped outer lip, in the
+   * frame's own materials and proportions, so it is unmistakably the same
+   * frame and unmistakably a bigger one.
+   */
+  rich = false,
 ): FrameGeometry {
   const spec = SPECS[kind] ?? SPECS['louvre-salon'];
   const s = height; // every dimension in the spec is a fraction of the height
   const parts: Record<Role, THREE.BufferGeometry[]> = { gilt: [], dark: [] };
   const mat = new THREE.Matrix4();
 
-  for (const c of spec.courses) {
+  const courses = rich
+    ? [
+        ...spec.courses,
+        ...(() => {
+          const out = Math.max(...spec.courses.map((c) => c.offset + c.width));
+          const deep = Math.max(...spec.courses.map((c) => c.z));
+          return [
+            { offset: out, width: 0.05, depth: deep * 1.25, z: deep * 1.25, bevel: 0.014, role: 'gilt' as Role },
+            { offset: out + 0.05, width: 0.018, depth: deep * 1.5, z: deep * 1.5, bevel: 0.005, role: 'dark' as Role },
+          ];
+        })(),
+      ]
+    : spec.courses;
+
+  for (const c of courses) {
     const innerW = width + c.offset * s * 2;
     const innerH = height + c.offset * s * 2;
     const geo = ringGeometry(innerW, innerH, c.width * s, c.depth * s, c.bevel * s);
@@ -531,7 +554,7 @@ export function buildFrame(
 
   // corner cartouches — raised carved blocks breaking the run of the moulding
   if (spec.cartouche && ornament) {
-    const outer = Math.max(...spec.courses.map((c) => c.offset + c.width));
+    const outer = Math.max(...courses.map((c) => c.offset + c.width));
     const size = spec.cartouche.size * s;
     const cx = width / 2 + outer * s - size * 0.28;
     const cy = height / 2 + outer * s - size * 0.28;

@@ -315,7 +315,7 @@ function Graph({
     if (g) {
       placed.length = 0;
       for (const b of ordered) {
-        const el = labelEls.current.get(b.id);
+        const el = labelEls.get(b.id);
         if (!el) continue;
         w.copy(b.p).applyMatrix4(g.matrixWorld);
         const dist = w.distanceTo(camera.position);
@@ -325,7 +325,7 @@ function Graph({
         el.style.transform = `translate(-50%, 0) translate(${x}px, ${y}px)`;
 
         if (v.z > 1) {
-          el.style.opacity = '0';
+          hide(el);
           continue;
         }
         // half the label's own width, so the test is against real extents
@@ -340,7 +340,7 @@ function Graph({
         // whatever is focused always gets its name, collision or not
         const forced = !!near && near.nodes.has(b.id);
         if (clash && !forced) {
-          el.style.opacity = '0';
+          hide(el);
           continue;
         }
         placed.push({ x, y, half });
@@ -352,25 +352,17 @@ function Graph({
         // a label belonging to nothing you are looking at gets out of the way
         const dim = near && !near.nodes.has(b.id) ? 0.2 : 1;
         el.style.opacity = String(byDist * dim);
+        el.style.pointerEvents = 'auto';
       }
     }
   });
 
   const v = useMemo(() => new THREE.Vector3(), []);
   const w = useMemo(() => new THREE.Vector3(), []);
-  const labelEls = useRef(new Map<string, HTMLElement>());
   /** most-connected first, so the important names win a collision */
   const ordered = useMemo(() => [...bodies].sort((a, b) => b.degree - a.degree), [bodies]);
   /** label extents already claimed this frame, reused rather than reallocated */
   const placed = useMemo<Array<{ x: number; y: number; half: number }>>(() => [], []);
-
-  // hand the DOM label layer the elements to move
-  useEffect(() => {
-    labelEls.current = new Map();
-    document.querySelectorAll<HTMLElement>('[data-atlas-label]').forEach((el) => {
-      labelEls.current.set(el.dataset.atlasLabel!, el);
-    });
-  }, [graph, found, focus]);
 
   return (
     <group ref={groupRef} name="atlas-graph">
@@ -665,6 +657,25 @@ export function AtlasView() {
   );
 }
 
+/*
+ * The DOM elements the frame loop moves, registered by the labels themselves.
+ *
+ * IT HAS TO BE REGISTRATION, NOT A QUERY. The graph lives inside the r3f
+ * canvas, which is its own React root: an effect in there can run before the
+ * label layer's own elements have been committed to the page, and a label the
+ * frame loop never learned about is never moved off the top-left corner —
+ * which is a name sitting under the Back button until the selection changes
+ * again. Each label puts itself in here when it mounts and takes itself out
+ * when it goes, so there is no window in which one exists and is unknown.
+ */
+const labelEls = new Map<string, HTMLElement>();
+
+/** out of the frame and out of the way of anything under it */
+function hide(el: HTMLElement) {
+  el.style.opacity = '0';
+  el.style.pointerEvents = 'none';
+}
+
 /** applies the drag/zoom to the graph, damped, so it never snaps */
 function Rig({ spin }: { spin: React.MutableRefObject<{ yaw: number; pitch: number; zoom: number }> }) {
   const scene = useThree((s) => s.scene);
@@ -730,17 +741,48 @@ function LabelLayer({ graph, focus }: { graph: AtlasGraph; focus: string | null 
       {graph.nodes.map((n) => {
         if (!found.has(n.id) || !shown.has(n.id)) return null;
         return (
-          <button
-            key={n.id}
-            data-atlas-label={n.id}
-            className={`atlas-label caption ${selected === n.id ? 'is-on' : ''}`}
-            style={{ color: KIND_COLOUR[n.kind] }}
-            onClick={() => select(n.id)}
-          >
-            {n.label}
-          </button>
+          <AtlasLabel key={n.id} node={n} on={selected === n.id} onPick={() => select(n.id)} />
         );
       })}
     </div>
+  );
+}
+
+/**
+ * One projected name.
+ *
+ * It arrives hidden and stays hidden until the frame loop has a screen
+ * position for it, so a label is never seen at the origin on the frame it
+ * mounts.
+ */
+function AtlasLabel({
+  node,
+  on,
+  onPick,
+}: {
+  node: AtlasNode;
+  on: boolean;
+  onPick: () => void;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    hide(el);
+    labelEls.set(node.id, el);
+    return () => {
+      labelEls.delete(node.id);
+    };
+  }, [node.id]);
+
+  return (
+    <button
+      ref={ref}
+      className={`atlas-label caption ${on ? 'is-on' : ''}`}
+      style={{ color: KIND_COLOUR[node.kind] }}
+      onClick={onPick}
+    >
+      {node.label}
+    </button>
   );
 }

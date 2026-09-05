@@ -67,9 +67,17 @@ if (typeof window !== 'undefined') {
  * make both feel unreliable. So zoom is the two keys everyone already tries —
  * `+` and `-` — plus the modifier-wheel and pinch gestures the browser itself
  * treats as zoom, and `0` to go back to the room as composed.
+ *
+ * IT ONLY MEANS ANYTHING IN A ROOM. Standing in front of one painting, zoom
+ * leans you in and out of it; in the corridor the camera is on a rail and
+ * nothing reads `view`, so pressing + there moved a number and changed
+ * nothing on the screen. A control that appears to do nothing is worse than
+ * one that is not offered, so outside a gallery these gestures are left to
+ * the browser and the hint line does not mention them.
  */
-export function attachZoom() {
+export function attachZoom(active: () => boolean) {
   const onKey = (e: KeyboardEvent) => {
+    if (!active()) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const el = document.activeElement;
     if (el && /^(INPUT|TEXTAREA)$/.test(el.tagName)) return;
@@ -88,6 +96,7 @@ export function attachZoom() {
   // ctrl/⌘ + wheel is the browser's own zoom gesture, and what a trackpad
   // pinch reports; taking it over is what the visitor is already asking for
   const onWheel = (e: WheelEvent) => {
+    if (!active()) return;
     if (!e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
     nudgeZoom(Math.exp(-e.deltaY * 0.0022));
@@ -101,7 +110,7 @@ export function attachZoom() {
     if (e.touches.length === 2) pinch = spread(e.touches);
   };
   const onTouchMove = (e: TouchEvent) => {
-    if (e.touches.length !== 2 || !pinch) return;
+    if (!active() || e.touches.length !== 2 || !pinch) return;
     const now = spread(e.touches);
     nudgeZoom(now / pinch);
     pinch = now;

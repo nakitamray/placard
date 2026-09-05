@@ -38,14 +38,24 @@ import type { DeviceTier } from '../types';
 const HOLD_MS = 15000;
 const FADE_MS = 3200;
 
+/** how far the picture leans against the pointer, as a fraction of the window */
+const LEAN = 0.035;
+
 /**
- * A little over-scale, so the lean has somewhere to move without opening a
- * gap at the edge of the window. Every percent of it is picture thrown away,
- * so it is only as much as the lean actually needs.
+ * Over-scale, so both the framing shift and the lean have somewhere to move
+ * without opening a gap at the edge of the window.
+ *
+ * It has to cover BOTH. An earlier version gave the lean its 3.5% and then
+ * spent the same slack again holding the focal point in frame, and a work
+ * whose framing was already against the stop showed a band of empty
+ * background as soon as the cursor moved toward it. Every percent here is
+ * picture thrown away, so it is exactly twice the lean and not a percent more.
  */
-const OVERSCALE = 1.08;
+const OVERSCALE = 1 + LEAN * 4;
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+/** eased at both ends, so a change starts and stops rather than switching on */
+const smoothstep = (t: number) => t * t * (3 - 2 * t);
 
 const vert = /* glsl */ `
 varying vec2 vUv;
@@ -97,14 +107,29 @@ function Hero({
   work,
   tier,
   rtSize,
-  opacity,
+  fade,
+  role,
   live,
 }: {
   work: ExhibitionWork;
   tier: DeviceTier;
   rtSize: number;
-  /** 0..1, driven by the crossfade */
-  opacity: number;
+  /**
+   * The crossfade, as mutable state read inside the frame loop rather than as
+   * a prop. Setting it through React meant a re-render of the whole entrance
+   * sixty times a second for three seconds, which is exactly the stutter the
+   * fade was there to avoid.
+   */
+  fade: React.MutableRefObject<{ mix: number }>;
+  /**
+   * Which side of the fade this is.
+   *
+   * The outgoing work stays FULLY OPAQUE and the incoming one fades up over
+   * it. Fading both — one down, one up — leaves the two alphas summing to
+   * less than one in the middle of the cross, and what shows through the gap
+   * is the empty background: a dark flash halfway through every change.
+   */
+  role: 'in' | 'out';
   /** whether this pass should keep rendering; a faded-out one need not */
   live: boolean;
 }) {
@@ -182,8 +207,11 @@ function Hero({
      */
     const slackX = Math.max(0, (planeW - vw) / 2);
     const slackY = Math.max(0, (planeH - vh) / 2);
-    const shiftX = clamp((0.5 - work.focus[0]) * planeW, -slackX, slackX);
-    const shiftY = clamp((work.focus[1] - 0.5) * planeH, -slackY, slackY);
+    // the lean's half of the slack is reserved before the framing takes its own
+    const leanX = Math.min(vw * LEAN, slackX / 2);
+    const leanY = Math.min(vh * LEAN, slackY / 2);
+    const shiftX = clamp((0.5 - work.focus[0]) * planeW, -(slackX - leanX), slackX - leanX);
+    const shiftY = clamp((work.focus[1] - 0.5) * planeH, -(slackY - leanY), slackY - leanY);
 
     /*
      * The picture leans against the pointer. Not a lot — a couple of per cent
@@ -192,12 +220,14 @@ function Hero({
      */
     if (!reducedMotion) {
       const k = 1 - Math.pow(0.001, Math.min(delta, 0.1) / 0.55);
-      lean.current.x += (-pointer.x * vw * 0.035 - lean.current.x) * k;
-      lean.current.y += (pointer.y * vh * 0.035 - lean.current.y) * k;
+      lean.current.x += (-pointer.x * leanX - lean.current.x) * k;
+      lean.current.y += (pointer.y * leanY - lean.current.y) * k;
     }
 
-    const offsetX = shiftX + (reducedMotion ? 0 : lean.current.x);
-    const offsetY = shiftY + (reducedMotion ? 0 : lean.current.y);
+    // clamped again against the full slack: whatever the two of them ask for
+    // between them, an edge of this plane never comes into the window
+    const offsetX = clamp(shiftX + (reducedMotion ? 0 : lean.current.x), -slackX, slackX);
+    const offsetY = clamp(shiftY + (reducedMotion ? 0 : lean.current.y), -slackY, slackY);
     mesh.position.addScaledVector(
       right.set(1, 0, 0).applyQuaternion(camera.quaternion),
       offsetX,
@@ -210,7 +240,7 @@ function Hero({
       const wy = (-pointer.y * vh) / 2 - offsetY;
       lens.x = (wx / planeW + 0.5) * iw;
       lens.y = (0.5 - wy / planeH) * ih;
-      lens.r = Math.min(iw, ih) * 0.28;
+      lens.r = Math.min(iw, ih) * 0.21;
       lens.want = 1;
     }
 
@@ -222,7 +252,7 @@ function Hero({
 
     const k = 1 - Math.pow(0.001, Math.min(delta, 0.1) / 0.4);
     u.uHasPaint.value += ((art.fullTex ? 1 : 0) - u.uHasPaint.value) * k;
-    u.uFade.value = opacity;
+    u.uFade.value = role === 'out' ? 1 : smoothstep(fade.current.mix);
   });
 
   return (
@@ -230,7 +260,7 @@ function Hero({
       <GlyphPrePass
         artwork={art}
         rtSize={rtSize}
-        active={!!art && (live || opacity > 0.01)}
+        active={!!art}
         target={target}
         wash={0.3}
         inkLift={0.9}
@@ -238,7 +268,8 @@ function Hero({
         sizeScale={0.68}
         clearAlpha={0}
       />
-      <mesh ref={meshRef} frustumCulled={false} renderOrder={-1}>
+      {/* the outgoing work is drawn first; both are behind everything else */}
+      <mesh ref={meshRef} frustumCulled={false} renderOrder={role === 'out' ? -2 : -1}>
         <planeGeometry args={[1, 1]} />
         <shaderMaterial
           vertexShader={vert}
@@ -255,7 +286,6 @@ function Hero({
 }
 
 export function LandingScene({ tier }: { tier: DeviceTier }) {
-  const reducedMotion = useStore((s) => s.reducedMotion);
   const heroRT = useMemo(() => (tier.name === 'low' ? tier.rtSize : 2048), [tier]);
 
   /**
@@ -283,21 +313,30 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
    * two places.
    */
   const [pair, setPair] = useState({ from: 0, to: 0 });
-  const [mix, setMix] = useState(1);
+  /** true only while two works are on screen at once */
+  const [crossing, setCrossing] = useState(false);
+  const fade = useRef({ mix: 1 });
 
   useEffect(() => {
-    if (order.length < 2 || reducedMotion) return;
+    if (order.length < 2) return;
     let raf = 0;
     let timer = 0;
     const advance = () => {
       setPair((p) => ({ from: p.to, to: (p.to + 1) % order.length }));
-      setMix(0);
+      fade.current.mix = 0;
+      setCrossing(true);
       const started = performance.now();
       const step = () => {
         const t = Math.min(1, (performance.now() - started) / FADE_MS);
-        setMix(t);
-        if (t < 1) raf = requestAnimationFrame(step);
-        else timer = window.setTimeout(advance, HOLD_MS);
+        fade.current.mix = t;
+        if (t < 1) {
+          raf = requestAnimationFrame(step);
+        } else {
+          // the only render in the whole change: the outgoing work leaves the
+          // tree, and its pre-pass and its target go with it
+          setCrossing(false);
+          timer = window.setTimeout(advance, HOLD_MS);
+        }
       };
       raf = requestAnimationFrame(step);
     };
@@ -306,7 +345,7 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
       window.clearTimeout(timer);
       cancelAnimationFrame(raf);
     };
-  }, [order, reducedMotion]);
+  }, [order]);
 
   /*
    * The lens belongs to this page, so this page puts it away. It is module
@@ -324,7 +363,7 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
 
   if (!order.length) return null;
 
-  const outgoing = mix < 1 && pair.from !== pair.to ? order[pair.from] : null;
+  const outgoing = crossing && pair.from !== pair.to ? order[pair.from] : null;
   const incoming = order[pair.to];
 
   return (
@@ -335,11 +374,20 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
           work={outgoing}
           tier={tier}
           rtSize={heroRT}
-          opacity={1 - mix}
+          fade={fade}
+          role="out"
           live={false}
         />
       )}
-      <Hero key={`in-${incoming.id}`} work={incoming} tier={tier} rtSize={heroRT} opacity={mix} live />
+      <Hero
+        key={`in-${incoming.id}`}
+        work={incoming}
+        tier={tier}
+        rtSize={heroRT}
+        fade={fade}
+        role="in"
+        live
+      />
     </group>
   );
 }

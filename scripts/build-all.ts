@@ -49,6 +49,7 @@ const museumIndex: Array<{
   id: string;
   name: string;
   city: string;
+  homepage: string;
   subtitle: string;
   count: number;
 }> = [];
@@ -69,6 +70,8 @@ const exhibition: Array<{
   focus: [number, number];
   /** whether a real scan is published for it, or a procedural stand-in */
   authentic: boolean;
+  /** whether the entrance may open on it */
+  hero: boolean;
 }> = [];
 
 /**
@@ -144,6 +147,7 @@ for (const museumId of museums) {
       aspect,
       focus: record.heroFocus ?? defaultFocus(aspect),
       authentic: images.authentic,
+      hero: images.authentic && !record.heroSkip,
     });
   }
 
@@ -156,6 +160,7 @@ for (const museumId of museums) {
         id: museum.id,
         name: museum.name,
         city: museum.city,
+        homepage: museum.homepage,
         subtitle: museum.subtitle,
         blurb: museum.blurb,
         corridorNote: museum.corridorNote,
@@ -173,6 +178,7 @@ for (const museumId of museums) {
     id: museum.id,
     name: museum.name,
     city: museum.city,
+    homepage: museum.homepage,
     subtitle: museum.subtitle,
     count: index.length,
   });

@@ -279,7 +279,7 @@ export function LandingLayer() {
           </p>
         )}
         <button className="caption credits-link" onClick={() => setCreditsOpen(true)}>
-          Credits &amp; sources
+          Sources &amp; about me
         </button>
       </div>
     </div>

@@ -169,7 +169,18 @@ export interface MuseumStyle {
   wall: WallKind;
   frame: FrameKind;
   /** how the works are distributed on the wall */
-  hang: 'salon' | 'single' | 'alternating';
+  /**
+   * salon       a large work with two smaller ones stacked above it, both walls
+   * single      one work per bay, both walls
+   * alternating one work per bay, sides alternating
+   * one-wall    one work per bay, all of them on the left
+   *
+   * one-wall is for a corridor whose other side is not a wall — the Uffizi,
+   * where the whole right-hand side is glazed. It also has the property that
+   * ten bays hang ten works exactly once: the two-sided patterns fill twenty
+   * slots from ten records and hang everything twice.
+   */
+  hang: 'salon' | 'single' | 'alternating' | 'one-wall';
   /** half the corridor width, metres */
   halfWidth: number;
   /** wall height to the cornice, metres */
@@ -207,7 +218,14 @@ export interface MuseumStyle {
   };
   fixtures: {
     sculpture: 'pedestal-figures' | 'busts' | 'court-figures' | 'none';
-    seating: 'bench' | 'ottoman' | 'none';
+    /**
+     * bench         a single waxed dark oak bench on the centre line
+     * stone-benches two rows of pale stone benches with cushioned tops, one
+     *               either side of the centre line — the Orsay's nave, and the
+     *               thing that most tells it apart from the Louvre's corridor
+     * ottoman       a round tufted leather sofa in the middle of the room
+     */
+    seating: 'bench' | 'stone-benches' | 'ottoman' | 'none';
     chandeliers: boolean;
     placards: boolean;
     /** Orsay's great clock on the end wall */
@@ -222,6 +240,14 @@ export interface MuseumStyle {
     vitrines?: boolean;
     /** a lighting track down the centre line, with directional spots on it */
     spotTrack?: boolean;
+    /**
+     * The room is lit by its windows rather than by its lamps.
+     *
+     * Warm light is placed just inside the glazed wall and thrown across the
+     * corridor at the hang, instead of the row of point lights down the
+     * centre line that an artificially lit gallery gets.
+     */
+    daylight?: boolean;
   };
 }
 
@@ -245,6 +271,7 @@ export interface MuseumData {
   id: string;
   name: string;
   city: string;
+  homepage: string;
   subtitle: string;
   blurb: string;
   corridorNote: string;
@@ -257,6 +284,7 @@ export interface MuseumIndexEntry {
   id: string;
   name: string;
   city: string;
+  homepage: string;
   subtitle: string;
   count: number;
 }

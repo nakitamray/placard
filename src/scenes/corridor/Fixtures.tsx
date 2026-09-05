@@ -549,6 +549,49 @@ function Bench({ length }: { length: number }) {
   );
 }
 
+/**
+ * The Orsay's nave seating: a long block of pale stone with a cushion on it.
+ *
+ * The nave is a railway station, and its furniture is station furniture —
+ * heavy, pale, cut from the same limestone as the terraces, and set out in two
+ * rows down either side of the centre line rather than as one bench in the
+ * middle. That plan is most of what tells a photograph of the Orsay from a
+ * photograph of the Louvre, so it is worth building properly: a moulded plinth,
+ * a projecting cap, and a padded top in a colour no other room here uses.
+ */
+function StoneBench({ length, stone }: { length: number; stone: string }) {
+  return (
+    <group>
+      {/* the plinth, set back, so the cap above it reads as a cap */}
+      <mesh position={[0, 0.17, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.54, 0.34, length * 0.94]} />
+        <meshStandardMaterial color={stone} roughness={0.78} />
+      </mesh>
+      {/* the cap */}
+      <mesh position={[0, 0.37, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.72, 0.09, length]} />
+        <meshStandardMaterial color={stone} roughness={0.62} metalness={0.04} />
+      </mesh>
+      {/* the cushion: buttoned green leather, the one soft thing in the nave */}
+      <mesh position={[0, 0.46, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.62, 0.11, length * 0.97]} />
+        <meshStandardMaterial color="#3F4A3C" roughness={0.52} metalness={0.03} />
+      </mesh>
+      {/* the buttons */}
+      <Instanced
+        count={Math.max(3, Math.round(length / 0.55))}
+        place={(i, m) => {
+          const n = Math.max(3, Math.round(length / 0.55));
+          m.makeTranslation(0, 0.515, (i / (n - 1) - 0.5) * length * 0.86);
+        }}
+      >
+        <sphereGeometry args={[0.022, 8, 6]} />
+        <meshStandardMaterial color="#2E362C" roughness={0.4} />
+      </Instanced>
+    </group>
+  );
+}
+
 /** round tufted leather seating — the National Gallery's centre-of-room sofa */
 function Ottoman() {
   return (
@@ -960,6 +1003,23 @@ export function Fixtures({ style, d }: Props) {
           <Bench length={d.bayDepth * 0.55} />
         </group>,
       );
+    }
+  }
+
+  if (f.seating === 'stone-benches') {
+    // two rows, offset from the centre line, so the walk down the middle stays
+    // clear and the nave reads as a concourse rather than as a corridor
+    for (let b = 1; b < d.bays; b += 2) {
+      for (const side of [-1, 1]) {
+        nodes.push(
+          <group
+            key={`sb${b}${side}`}
+            position={[side * d.halfWidth * 0.44, 0, bayZ(d, b)]}
+          >
+            <StoneBench length={d.bayDepth * 0.62} stone={p.molding} />
+          </group>,
+        );
+      }
     }
   }
 

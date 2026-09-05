@@ -5,52 +5,45 @@
  * controls have to be stated somewhere, and the only honest place is quietly,
  * at the bottom, in the smallest type in the system.
  *
- * ONE LINE, NOT FIVE. Five lines of instructions under a painting is a manual
- * taped to a wall: it is read once, ignored afterwards, and in between it is
- * the loudest thing on the screen. So the two moves that actually get you
- * through a room are always shown, and everything else — zoom, thread mode,
- * the way back — is one keystroke behind a mark at the end of the line. All of
- * it is still there; none of it is in the way.
+ * EVERYTHING, ONCE. An earlier version kept two moves on the line and put the
+ * rest behind a "more" mark, which is worse than either extreme: the visitor
+ * cannot see what they are missing, so they never press it, and the controls
+ * they need are one click away in a place they have no reason to look. So the
+ * whole set is here — but written as short as it can be said, four items to a
+ * room, each one a key and a verb. Anything longer than a verb belongs in the
+ * help card behind the ? in the corner, not on the floor of the gallery.
  */
 import { useEffect, useState } from 'react';
 import { useStore } from '../state/store';
 
 interface Hint {
   keys?: string[];
-  /** joins the keys, e.g. "or" between ⇧ and ⏎ */
-  sep?: string;
   text: string;
-  /** shown without asking — the moves that get you through the room */
-  always?: boolean;
 }
 
 const CORRIDOR: Hint[] = [
-  { keys: ['↑', '↓'], text: 'walk', always: true },
-  { text: 'click a painting', always: true },
-  { keys: ['⇧', '⏎'], sep: 'or', text: 'hurry to the end' },
-  { text: 'move the mouse to look around' },
-  { keys: ['+', '−'], text: 'zoom' },
+  { keys: ['↑', '↓'], text: 'walk' },
+  { keys: ['⇧'], text: 'hurry to the end' },
+  { text: 'move the mouse to look' },
+  { text: 'click a painting' },
   { keys: ['esc'], text: 'back' },
 ];
 
 const GALLERY: Hint[] = [
-  { keys: ['←', '→'], text: 'move', always: true },
-  { text: 'click for the painting', always: true },
-  { text: 'move over the canvas for the reading lens' },
-  { keys: ['space'], text: 'thread mode: rest on any part to read its text' },
-  { keys: ['+', '−'], text: 'lean in' },
-  { keys: ['esc'], text: 'close · back' },
+  { keys: ['←', '→'], text: 'move' },
+  { text: 'click for the placard' },
+  { keys: ['space'], text: 'thread mode' },
+  { keys: ['esc'], text: 'back' },
 ];
 
 const MAP: Hint[] = [
-  { text: 'click a painting to walk into its room', always: true },
+  { text: 'click a room to walk into it' },
   { keys: ['esc'], text: 'back to the corridor' },
 ];
 
 export function ControlHints() {
   const phase = useStore((s) => s.phase);
   const [settled, setSettled] = useState(false);
-  const [open, setOpen] = useState(false);
 
   // any input at all means the controls have been found; from then on the line
   // stays available but stops asking to be read
@@ -69,39 +62,20 @@ export function ControlHints() {
     };
   }, [settled]);
 
-  // the rest of the controls close themselves when you leave the room
-  useEffect(() => setOpen(false), [phase]);
-
   const hints =
     phase === 'corridor' ? CORRIDOR : phase === 'gallery' ? GALLERY : phase === 'map' ? MAP : null;
   if (!hints) return null;
 
-  const shown = open ? hints : hints.filter((h) => h.always);
-  const rest = hints.length - hints.filter((h) => h.always).length;
-
   return (
-    <div className={`control-hints caption ${settled ? 'is-settled' : ''} ${open ? 'is-open' : ''}`}>
-      {shown.map((h, i) => (
+    <div className={`control-hints caption ${settled ? 'is-settled' : ''}`}>
+      {hints.map((h, i) => (
         <span key={i} className="control-hint" aria-hidden>
-          {h.keys?.map((k, j) => (
-            <span key={k}>
-              {j > 0 && <span className="hint-sep">{h.sep ?? ''}</span>}
-              <kbd>{k}</kbd>
-            </span>
+          {h.keys?.map((k) => (
+            <kbd key={k}>{k}</kbd>
           ))}
           {h.text}
         </span>
       ))}
-      {rest > 0 && (
-        <button
-          className="control-more"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          aria-label={open ? 'Hide the rest of the controls' : 'Show all the controls'}
-        >
-          {open ? 'less' : 'more'}
-        </button>
-      )}
     </div>
   );
 }

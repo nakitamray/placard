@@ -68,8 +68,19 @@ export const MUSEUM_TRACKS: MusicTrack[] = [
   },
 ];
 
-/** the atlas gets one of them, and gets it quietly */
-export const ATLAS_TRACK: MusicTrack = MUSEUM_TRACKS[3];
+/**
+ * The atlas is not a room, so it does not get a room's recording.
+ *
+ * It is the collection seen from above, at night, and it plays something of
+ * its own — quieter than a corridor, faded in over the same long crossfade so
+ * that opening the map is a drift rather than a cut.
+ */
+export const ATLAS_TRACK: MusicTrack = {
+  id: '8wLwxmjrZj8',
+  title: 'The atlas',
+  channel: 'YouTube',
+  url: 'https://youtu.be/8wLwxmjrZj8',
+};
 
 export type RoomKind = 'entrance' | 'gallery' | 'atlas';
 
@@ -81,7 +92,7 @@ export type RoomKind = 'entrance' | 'gallery' | 'atlas';
  * site makes — the level at which a corridor is atmosphere is the level at
  * which a front door is loud.
  */
-const VOLUME: Record<RoomKind, number> = { entrance: 12, gallery: 34, atlas: 9 };
+const VOLUME: Record<RoomKind, number> = { entrance: 12, gallery: 34, atlas: 17 };
 
 /**
  * How long one room takes to give way to the next.
@@ -102,6 +113,7 @@ const API_TIMEOUT_MS = 8000;
 interface YTPlayer {
   loadPlaylist(opts: { playlist: string[]; index?: number; startSeconds?: number }): void;
   setLoop(on: boolean): void;
+  getCurrentTime(): number;
   setVolume(v: number): void;
   playVideo(): void;
   pauseVideo(): void;
@@ -185,6 +197,16 @@ const decks: Deck[] = [0, 1].map((slot) => ({
   fade: null,
   pending: null,
 }));
+
+/**
+ * Where each room's music had got to when it was last faded out.
+ *
+ * Without this, leaving a corridor and coming back to the entrance restarts
+ * the entrance track from the same point every time, and by the third visit
+ * the visitor has heard those opening bars more than any other music on the
+ * site. Rooms are resumed instead: the recording carried on without you.
+ */
+const elapsed = new Map<string, number>();
 
 let active: Deck = decks[0];
 let unavailable = false;
@@ -324,9 +346,15 @@ function flush(deck: Deck) {
   deck.level = 0;
   applyLevel(deck);
   try {
-    // start somewhere inside the first track rather than at its head, which is
-    // half of "never the same twice"
-    deck.player.loadPlaylist({ playlist: ids, index: 0, startSeconds: Math.random() * 90 });
+    // Pick up where this room left off; failing that, start somewhere inside
+    // the first track rather than at its head, which is half of "never the
+    // same twice".
+    const resume = deck.key ? elapsed.get(deck.key) : undefined;
+    deck.player.loadPlaylist({
+      playlist: ids,
+      index: 0,
+      startSeconds: resume ?? Math.random() * 90,
+    });
     deck.player.setLoop(true);
     deck.player.playVideo();
   } catch {
@@ -338,6 +366,15 @@ function flush(deck: Deck) {
 
 function stopDeck(deck: Deck, ms: number) {
   const wasKey = deck.key;
+  // read the position now, while it is still playing, not after the fade
+  if (wasKey && deck.player && deck.ready) {
+    try {
+      const at = deck.player.getCurrentTime();
+      if (Number.isFinite(at) && at > 0) elapsed.set(wasKey, at + ms / 1000);
+    } catch {
+      /* the iframe may already be gone */
+    }
+  }
   ramp(deck, 0, ms, () => {
     // a deck asked for something new mid-fade keeps it
     if (deck.key !== wasKey) return;

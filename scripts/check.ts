@@ -48,6 +48,11 @@ for (const museumId of museumOrder()) {
   }
   works += records.length;
 
+  // the corridor title and the colophon both link straight out to this
+  if (!/^https:\/\/[^\s]+$/.test(museum.homepage ?? '')) {
+    fail(`${museumId}: homepage "${museum.homepage}" is not an https address`);
+  }
+
   const plan = museum.plan as { rooms: Array<{ id: string; name: string; artworkIndex: number }> };
   const rooms = plan.rooms.filter((r) => r.artworkIndex >= 0);
   if (rooms.length !== records.length) {

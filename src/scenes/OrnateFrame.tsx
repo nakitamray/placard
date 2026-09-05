@@ -51,7 +51,8 @@ export function OrnateFrame({
         ? buildRoundFrame(kind, Math.min(width, height), detail === 'full')
         : shape === 'arched'
           ? buildArchedFrame(kind, width, height, detail === 'full')
-          : buildFrame(kind, width, height, detail === 'full'),
+          : // a pair hung as one object gets the grander version of the surround
+            buildFrame(kind, width, height, detail === 'full', shape === 'divided'),
     [kind, width, height, detail, shape],
   );
   const divider = useMemo(

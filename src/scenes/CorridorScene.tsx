@@ -247,6 +247,9 @@ const ARCH_HANG_Y = 1.66;
  *             stacked above it — the Louvre's densely packed wall
  * single      one large work per bay, both walls
  * alternating one work per bay, sides alternating
+ * one-wall    one work per bay, all on the left — for a corridor glazed down
+ *             the other side, where a hang opposite the windows would be a
+ *             painting in permanent silhouette
  */
 function Bays({
   museum,
@@ -267,10 +270,16 @@ function Bays({
 
   for (let bay = 0; bay < d.bays; bay++) {
     const z = bayZ(d, bay);
-    const sides: Array<1 | -1> = hang === 'alternating' ? [bay % 2 === 0 ? 1 : -1] : [1, -1];
+    const sides: Array<1 | -1> =
+      hang === 'one-wall'
+        ? [-1]
+        : hang === 'alternating'
+          ? [bay % 2 === 0 ? 1 : -1]
+          : [1, -1];
 
     for (const side of sides) {
-      const slot = hang === 'alternating' ? bay : bay * 2 + (side > 0 ? 0 : 1);
+      const slot =
+        hang === 'alternating' || hang === 'one-wall' ? bay : bay * 2 + (side > 0 ? 0 : 1);
       const i = slot % artworks.length;
       const x = side * (d.halfWidth - 0.09);
       const ry = side > 0 ? -Math.PI / 2 : Math.PI / 2;
@@ -496,6 +505,44 @@ function Lamps({
 }) {
   const l = museum.style.light;
   const lights: React.ReactNode[] = [];
+
+  /*
+   * A daylit room is lit from the side, not from overhead.
+   *
+   * The lights sit just inside the glazed wall at the height of the window
+   * heads and are thrown ACROSS the corridor, so the hang opposite is raked
+   * rather than washed and the mouldings on it cast the short shadows that
+   * make them read as mouldings. A row of lamps down the centre line would
+   * flatten exactly the wall the room exists to show.
+   */
+  if (museum.style.fixtures.daylight) {
+    const step = Math.max(2, Math.ceil(d.bays / quality.maxLamps));
+    for (let b = 0; b < d.bays; b += step) {
+      lights.push(
+        <pointLight
+          key={`day${b}`}
+          position={[d.halfWidth - 0.5, d.wallHeight * 0.62, bayZ(d, b)]}
+          color={l.sky}
+          intensity={l.lampIntensity * 1.5}
+          distance={d.bayDepth * 3.4}
+          decay={1.7}
+        />,
+      );
+    }
+    return (
+      <>
+        {lights}
+        <pointLight
+          position={[0, d.wallHeight * 0.6, d.apseZ + 2.4]}
+          color={l.lamp}
+          intensity={l.lampIntensity * 2 + 6}
+          distance={d.bayDepth * 3}
+          decay={1.7}
+        />
+      </>
+    );
+  }
+
   // Every point light is evaluated per fragment across every lit surface in
   // the room, so the count is a budget rather than a look: they are spread
   // evenly down the corridor and thinned rather than truncated.
@@ -609,7 +656,10 @@ export function CorridorScene({ quality }: { quality: Quality }) {
         }
         keys.current.add(e.key);
       }
-      if (e.key === 'Enter' || e.key === 'Shift') {
+      // Shift, and only Shift. Two keys for one move meant the hint line had
+      // to say "⇧ or ⏎" where it could have said "⇧", and the second one was
+      // never the one anybody reached for.
+      if (e.key === 'Shift') {
         e.preventDefault();
         accelerate();
       }

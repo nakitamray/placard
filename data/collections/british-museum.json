@@ -109,6 +109,7 @@
     "accession": "",
     "creditLine": "Acquired 1903",
     "accentColor": "#4A4034",
+    "heroSkip": true,
     "labelText": "One of the earliest Chinese paintings to survive in any form: nine scenes illustrating a third-century text of instruction for palace women, painted in fine line and thin colour on silk. A handscroll is not meant to be hung. It is opened an arm's width at a time, read right to left, and rolled shut behind you — so the picture is experienced as duration rather than as a single view. The section shown here is one of those arm's-widths.",
     "extendedNote": "The scroll is almost certainly a Tang copy of a lost original attributed to Gu Kaizhi, one of the first Chinese painters known by name. That layering is normal in Chinese painting, where copying a master was scholarship rather than forgery, and where the copy carries the original forward when the original perishes.\n\nIts surface is a record of everyone who ever owned it. Emperor Huizong wrote on it in the twelfth century; the Qianlong Emperor added an orchid he painted himself and a great many seals; collectors stamped their marks in red across the silk for a thousand years. It left the Summer Palace during the looting of 1900 and was sold to the British Museum for twenty-five pounds by a cavalry officer who thought the jade toggle was the valuable part. The painting itself is deliberately plain in technique — even, wire-thin outline, colour laid inside it like a wash — because the point of the images is the text they carry, which advises court women that beauty without virtue is a danger and that no one, however favoured, is safe.",
     "placeholder": {
@@ -171,6 +172,7 @@
     "accession": "",
     "creditLine": "The original panel is in the Egyptian Museum, Cairo; British Museum holdings are 19th-century facsimile copies",
     "accentColor": "#5E5230",
+    "heroSkip": true,
     "labelText": "Six geese feed along a strip of ground, three walking left and three walking right, in three pairs of matched species. They are four and a half thousand years old and painted with enough ornithological precision that modern specialists argue about which species they are — and whether one of them ever lived in Egypt at all. Nothing in the panel is stylised except the arrangement, which is perfectly symmetrical.",
     "extendedNote": "A note on where it is: the panel itself was lifted from the tomb-chapel of Nefermaat and his wife Itet at Meidum in the 1870s and has been in Cairo ever since. What the British Museum holds are nineteenth-century facsimiles, made when copying tomb paintings by hand was the only way to bring them to a European audience. Those copies are now historical objects in their own right, and several of the tombs they record have since been destroyed.\n\nThe painting technique is unusual for its date: pigment laid into a fine plaster ground rather than the paste-filled incisions Nefermaat's chapel uses elsewhere, which is probably why the colour has held. The composition is arranged for balance — a mirrored pair at each end, a grazing pair at the centre — and within that scheme every bird is observed. White-fronted geese, bean geese, and a pair of red-breasted geese, a species that does not appear in Egypt today and may never have; some scholars take that as evidence of a wider ancient range, and others as evidence that Egyptian painters worked from pattern books as well as from life.",
     "placeholder": {
@@ -200,6 +202,7 @@
     "accession": "",
     "creditLine": "Sloane bequest, 1753",
     "accentColor": "#4C4436",
+    "heroSkip": true,
     "heroFocus": [
       0.5,
       0.42
@@ -291,6 +294,7 @@
     "accession": "",
     "creditLine": "Stein collection, acquired 1907",
     "accentColor": "#4E3628",
+    "heroSkip": true,
     "heroFocus": [
       0.5,
       0.36
@@ -323,6 +327,7 @@
     "room": "Japanese galleries",
     "accession": "",
     "accentColor": "#27384F",
+    "heroSkip": true,
     "heroFocus": [
       0.5,
       0.44

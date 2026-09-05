@@ -25,8 +25,8 @@ Requires WebGL2. Sound is off until you turn it on.
 | **The British Museum** | a coffered stone hall between two colossal fluted columns, walls made of a marching colonnade of square piers with alcoves between them, spotlights on a track down the centre line |
 | **The National Gallery** | crimson walls under a pitched glass lantern on gilded archways, polished light wood, tufted leather seating |
 | **Vatican Museums** | frescoed vault in deeply carved gilded stucco, map panels between gilded pilasters, marble inlay, crystal chandeliers |
-| **Galleria degli Uffizi** | a flat ceiling of dark crossbeams over grotesque frescoes, daylight down one whole side, a diagonal checkerboard floor, brass stanchions and red rope |
-| **Musée d'Orsay** | the colossal arched steel-and-glass nave, stone terraces behind glass railings, the great gilded clock closing the far end |
+| **Galleria degli Uffizi** | warm brown crossbeams over painted grotesque compartments, the hang down one side and a run of tall windows down the other, a diagonal checkerboard floor with the day lying on it |
+| **Musée d'Orsay** | the colossal arched steel-and-glass nave, two rows of pale stone benches down the concourse, stone terraces behind glass railings, the great gilded clock closing the far end |
 | **The Metropolitan Museum of Art** | a sunlit court under a peaked skylight: red brick and white voussoired arches one side, marble ashlar the other, a glass wall at the end |
 
 The British Museum room is its **Egyptian sculpture gallery, Room 4**, with
@@ -39,15 +39,16 @@ follows and where it departs from it.
 
 ## Moving through it
 
-The controls are stated in the interface as well, on a quiet scrim along the
-bottom of the screen.
+The controls are stated in the interface as well: the moves for the room you
+are standing in, on a quiet scrim along the bottom of the screen, and the
+complete set behind the **?** in the bottom right corner.
 
 | Where | Input | What happens |
 |---|---|---|
 | Entrance | click a museum | fetches that wing and walks you into its corridor |
 | Corridor | move the mouse | look around — wide enough to face either wall |
 | Corridor | <kbd>↑</kbd> <kbd>↓</kbd> | walk forward and back; a tap is a step, a hold is a stride |
-| Corridor | <kbd>Shift</kbd> or <kbd>Enter</kbd> | hurry to the far end |
+| Corridor | <kbd>Shift</kbd> | hurry to the far end |
 | Corridor | wheel, drag | also moves along the rail |
 | Corridor | click a canvas | walk straight into that painting's room |
 | Floor plan | click a room | choose a painter and warp into their room |
@@ -55,9 +56,10 @@ bottom of the screen.
 | Gallery | move over a painting | the **reading lens** — a soft circle where the words give way and the paint shows through |
 | Gallery | click, or <kbd>Enter</kbd> | the whole work dissolves out of its text and the wall label arrives |
 | Gallery | <kbd>space</kbd>, or the **Threads** toggle | **Thread Pull** — the canvas becomes a map of its own passages |
-| Anywhere | <kbd>+</kbd> <kbd>−</kbd>, ⌘/Ctrl-scroll, pinch | zoom: a longer lens in the corridor, a step closer in a room |
-| Anywhere | <kbd>0</kbd> | back to the distance the room was composed for |
+| Gallery | <kbd>+</kbd> <kbd>−</kbd>, ⌘/Ctrl-scroll, pinch | lean in and back — a room gesture only; the corridor camera is on a rail |
+| Gallery | <kbd>0</kbd> | back to the distance the room was composed for |
 | Anywhere | <kbd>Esc</kbd> | step back one level |
+| Anywhere | the **?** by the quality words | the whole set of controls, in one card |
 
 <kbd>Esc</kbd> walks the whole way out: painting → gallery → floor plan →
 corridor → entrance.
@@ -177,12 +179,23 @@ shared/                     types shared between the build and the runtime
 Adding a museum is two files and a line in `order.json`. Adding a work is one
 record.
 
-A **museum record** carries a `style` block that drives the entire corridor:
-`ceiling`, `floor`, `wall` and `frame` kinds, room proportions, a ten-colour
-palette, a full lighting rig (key colour, intensity and direction; sky and
-ground fill; lamp colour; tone-mapping exposure; background and fog) and which
-fixtures to place — sculpture, seating, chandeliers, label stands, a clock,
-terraces. Nothing about a particular building is hard-coded in the renderer.
+A **museum record** carries its identity — name, city, subtitle, the blurb the
+entrance lists, the `corridorNote` saying which real room it follows, and the
+`homepage` the corridor title and the colophon link out to — plus a `style`
+block that drives the entire corridor: `ceiling`, `floor`, `wall` and `frame`
+kinds, the `hang` pattern, room proportions, a ten-colour palette, a full
+lighting rig (key colour, intensity and direction; sky and ground fill; lamp
+colour; tone-mapping exposure; background and fog) and which fixtures to place —
+sculpture, seating, chandeliers, label stands, ropes, vitrines, a lighting
+track, a clock, terraces, and whether the room is lit by its windows rather
+than by its lamps. Nothing about a particular building is hard-coded in the
+renderer.
+
+`hang` decides how the works are distributed: `salon` stacks three to a bay on
+both walls, `single` hangs one per bay on both, `alternating` swaps sides bay by
+bay, and `one-wall` hangs everything on the left — for the Uffizi, whose other
+side is a run of windows, where anything hung opposite would be seen against
+the day.
 
 An **artwork record** carries the placard (artist, dates, title, year, medium,
 dimensions, room, accession, credit line, wall label, extended note), the
@@ -193,6 +206,9 @@ optionally hand-authored Thread Pull `regions`.
 matters in exactly one place: the entrance is the only screen that crops a
 painting, and a centred crop of a tall canvas throws away the face. Omit it and
 a tall work is held a little above centre and everything else in the middle.
+`heroSkip: true` keeps a work off the entrance altogether — a scroll six times
+wider than it is tall, or a work whose best scan is soft at full bleed, is
+fine on a wall and wrong across a window.
 
 `frameShape` handles the works a rectangle is wrong for. `'round'` turns the
 museum's own moulding on a lathe and cuts the canvas to a circle, for a tondo;

@@ -27,6 +27,7 @@ import { AtlasToast } from './ui/AtlasToast';
 import { ThreadPull } from './ui/ThreadPull';
 import { setThreadMode, toggleThreadMode } from './threadpull/state';
 import { ControlHints } from './ui/ControlHints';
+import { HelpBubble } from './ui/HelpBubble';
 import { CursorRing } from './ui/CursorRing';
 import { LoadingBar } from './ui/LoadingBar';
 import { OrientationGate } from './ui/OrientationGate';
@@ -129,7 +130,8 @@ export default function App() {
   }, []);
 
   useEffect(() => attachPointer(), []);
-  useEffect(() => attachZoom(), []);
+  // zoom is a gallery gesture; see attachZoom
+  useEffect(() => attachZoom(() => useStore.getState().phase === 'gallery'), []);
   // a new room is seen at the distance it was composed for
   useEffect(() => resetZoom(), [phase]);
 
@@ -246,16 +248,26 @@ export default function App() {
           <button className="caption gallery-back" onClick={() => setPhase('landing')}>
             ← Entrance
           </button>
-          {/* Shift and Enter hurry you to the far end, and neither exists on a
-              touch screen. Same move, with a face on it, shown only where the
-              keys are not. */}
+          {/* Shift hurries you to the far end, and there is no Shift on a
+              touch screen. Same move, with a face on it. */}
           <button className="caption walk-end" onClick={() => (corridor.goal = 1)}>
             To the end →
           </button>
-          <p className="caption corridor-title">
+          {/* the room's name, and the way out of the exhibition to the real
+              museum it is named after — the one link on this site that leaves it */}
+          <a
+            className="caption corridor-title"
+            href={museum?.homepage}
+            target="_blank"
+            rel="noreferrer"
+            title={`${museum?.name} — the museum's own site`}
+          >
             {museum?.name}
             <span className="corridor-sub"> · {museum?.subtitle}</span>
-          </p>
+            <span className="corridor-out" aria-hidden>
+              ↗
+            </span>
+          </a>
           <WorkLabel />
         </>
       )}
@@ -430,6 +442,7 @@ function QualityToggle({
           <p className="quality-summary">{info.summary}</p>
         </div>
       )}
+      <HelpBubble />
       <div className="quality-toggle caption" role="group" aria-label="Rendering quality">
         {order.map((name) => (
           <button

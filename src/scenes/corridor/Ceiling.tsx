@@ -6,8 +6,10 @@
  * above you — so each museum gets its own construction rather than a tinted
  * copy of one vault.
  */
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import { grotesqueTexture } from './grotesque';
+import { glowTexture } from './glow';
 import type { MuseumStyle } from '../../types';
 import { bayZ, type Dims } from './dims';
 
@@ -310,6 +312,30 @@ function SteelGlassArch({ style, d }: Props) {
         <meshBasicMaterial color={p.ceiling} toneMapped={false} side={THREE.BackSide} />
       </mesh>
 
+      {/* The day coming through it, landing on the floor.
+          A glazed vault whose only evidence is a bright ceiling reads as a lit
+          panel; what says "roof" is the light arriving underneath it. One soft
+          pool per bay, offset from the centre line the way the sun is offset
+          from the ridge, added rather than painted. */}
+      {Array.from({ length: d.bays }, (_, b) => (
+        <mesh
+          key={`shaft${b}`}
+          position={[d.halfWidth * 0.2, 0.02, bayZ(d, b) + d.bayDepth * 0.15]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <planeGeometry args={[d.halfWidth * 1.5, d.bayDepth * 0.9]} />
+          <meshBasicMaterial
+            map={glowTexture()}
+            color={p.sky}
+            transparent
+            opacity={0.22}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+
       {/* the great arched ribs, closely spaced — two per bay */}
       <Repeated
         count={d.bays * 2 + 1}
@@ -480,12 +506,13 @@ function PeakedCourt({ style, d }: Props) {
  * and small figures that Renaissance decorators took from the excavated
  * rooms of Nero's palace, which were underground and therefore "grottoes".
  *
- * The frescoes themselves are not modelled. Painting a room's worth of
- * grotesque geometry costs more triangles than the entire rest of the
- * corridor and is read, from standing height, as a warm patterned field —
- * so that is what it is: a tinted plane with a moulded border and a
- * medallion at the centre of each compartment, under beams that are the
- * thing you actually see.
+ * The frescoes are PAINTED, not modelled. A room's worth of grotesque
+ * geometry costs more triangles than the whole of the rest of the corridor
+ * and reads, from standing height, as a smear; the same ornament drawn into a
+ * canvas at load — see ./grotesque — is legible, costs one texture, and tiles
+ * the length of the run compartment by compartment. What is modelled is what
+ * you can see is solid: the beams, their carved soffit, and the moulded
+ * cornice they land on.
  */
 function GrotesqueBeams({ style, d }: Props) {
   const p = style.palette;
@@ -498,49 +525,72 @@ function GrotesqueBeams({ style, d }: Props) {
   const count = d.bays * perBay + 2;
   const step = runLength / count;
 
+  /*
+   * Warm brown, not black-brown. The beams are the largest single area of
+   * colour over your head and they set the temperature of the whole corridor:
+   * at #4A3524 the room read as a cold cellar with a bright wall in it.
+   */
+  const beam = '#7A5330';
+  const beamLit = '#916540';
+
+  // one tile per compartment down the run, and one across
+  const fresco = useMemo(() => {
+    const t = grotesqueTexture();
+    if (!t) return null;
+    const own = t.clone();
+    own.needsUpdate = true;
+    own.wrapS = THREE.RepeatWrapping;
+    own.wrapT = THREE.RepeatWrapping;
+    own.repeat.set(1, count);
+    return own;
+  }, [count]);
+
   return (
     <group>
       {/* the painted field */}
       <mesh position={[0, h, mid]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[w, runLength]} />
-        <meshStandardMaterial color={p.ceiling} roughness={0.94} />
+        <meshStandardMaterial
+          color={fresco ? '#FFFFFF' : p.ceiling}
+          map={fresco}
+          roughness={0.94}
+        />
       </mesh>
 
-      {/* a medallion at the centre of every compartment: the one piece of the
-          grotesque big enough to read from the floor */}
-      <Repeated
-        count={count}
-        place={(i, m) => {
-          // face down, not forward: an unrotated circle hangs off the ceiling
-          // like a paper lantern
-          m.makeRotationX(Math.PI / 2);
-          m.setPosition(0, h - 0.02, mid + (i - count / 2 + 0.5) * step);
-        }}
-      >
-        <ringGeometry args={[Math.min(step, w) * 0.13, Math.min(step, w) * 0.17, 32]} />
-        <meshStandardMaterial
-          color={p.ceilingAccent}
-          roughness={0.9}
-          side={THREE.DoubleSide}
-        />
-      </Repeated>
-
-      {/* the crossbeams. Dark, deep, and the reason the ceiling reads as
+      {/* the crossbeams. Deep, warm, and the reason the ceiling reads as
           carpentry rather than as a painted lid. */}
       <Repeated
         count={count + 1}
         place={(i, m) => m.makeTranslation(0, h - 0.14, mid + (i - (count + 1) / 2 + 0.5) * step)}
       >
         <boxGeometry args={[w, 0.3, 0.34]} />
-        <meshStandardMaterial color="#4A3524" roughness={0.72} />
+        <meshStandardMaterial color={beam} roughness={0.68} />
+      </Repeated>
+      {/* the carved soffit under each beam: a lighter moulded band, which is
+          what catches the light and separates beam from ceiling */}
+      <Repeated
+        count={count + 1}
+        place={(i, m) =>
+          m.makeTranslation(0, h - 0.31, mid + (i - (count + 1) / 2 + 0.5) * step)
+        }
+      >
+        <boxGeometry args={[w, 0.08, 0.44]} />
+        <meshStandardMaterial color={beamLit} roughness={0.6} />
       </Repeated>
 
       {/* the two long beams down the sides, where the ceiling meets the wall */}
       {[-1, 1].map((side) => (
-        <mesh key={side} position={[side * (d.halfWidth - 0.17), h - 0.16, mid]}>
-          <boxGeometry args={[0.34, 0.34, runLength]} />
-          <meshStandardMaterial color="#4A3524" roughness={0.72} />
-        </mesh>
+        <group key={side}>
+          <mesh position={[side * (d.halfWidth - 0.17), h - 0.16, mid]}>
+            <boxGeometry args={[0.34, 0.34, runLength]} />
+            <meshStandardMaterial color={beam} roughness={0.68} />
+          </mesh>
+          {/* a gilt fillet along the bottom edge of it */}
+          <mesh position={[side * (d.halfWidth - 0.17), h - 0.34, mid]}>
+            <boxGeometry args={[0.38, 0.05, runLength]} />
+            <meshStandardMaterial color={p.gilt} metalness={0.55} roughness={0.44} />
+          </mesh>
+        </group>
       ))}
 
       {/* the dentil course under the beams, running the length of both walls */}

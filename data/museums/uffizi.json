@@ -2,6 +2,7 @@
   "id": "uffizi",
   "name": "Galleria degli Uffizi",
   "city": "Florence",
+  "homepage": "https://www.uffizi.it/en",
   "subtitle": "The east corridor",
   "blurb": "A long flat-ceilinged corridor under grotesque frescoes and dark crossbeams, daylight down one whole side, a checkerboard marble floor and a line of empty plinths.",
   "corridorNote": "Modelled on the east corridor of the Uffizi: a flat coffered ceiling divided by heavy dark wooden crossbeams with symmetrical grotesque frescoes painted between them in gold, red and muted blue on cream; a continuous frieze of small dark-framed portraits running above the picture rail; off-white plaster on the inner wall carrying large gold-framed paintings; a run of tall rectangular windows down the outer wall flooding the hall with daylight; classical statuary on dark squared plinths down both sides behind brass stanchions and red velvet rope; and a highly polished diagonal checkerboard floor of dark charcoal and pale grey marble that reflects the light from the windows in long streaks.",
@@ -10,43 +11,43 @@
     "floor": "checkerboard",
     "wall": "uffizi-corridor",
     "frame": "uffizi-gilt",
-    "hang": "single",
+    "hang": "one-wall",
     "halfWidth": 3.1,
     "wallHeight": 5.0,
     "vaultHeight": 5.4,
     "bays": 10,
     "bayDepth": 5.0,
     "palette": {
-      "wall": "#E4DDCE",
-      "wallDeep": "#CFC5B2",
-      "molding": "#F3EDE0",
+      "wall": "#EFE3C9",
+      "wallDeep": "#D9C8A6",
+      "molding": "#F7EFDD",
       "gilt": "#C9A227",
-      "ceiling": "#EDE4D0",
+      "ceiling": "#F1E7D2",
       "ceilingAccent": "#8E6B3A",
-      "floor": "#D6D0C4",
-      "floorInlay": "#4E4A44",
-      "accent": "#7A6A4E",
-      "sky": "#F4F8FC"
+      "floor": "#DED6C6",
+      "floorInlay": "#5A5348",
+      "accent": "#8A7350",
+      "sky": "#FFF3DC"
     },
     "light": {
-      "key": "#FFF6E4",
-      "keyIntensity": 2.6,
+      "key": "#FFEFD2",
+      "keyIntensity": 3.4,
       "keyFrom": [
+        11,
         9,
-        12,
-        4
+        3
       ],
-      "sky": "#E4EFFA",
-      "ground": "#8A8378",
-      "ambient": 0.62,
-      "lamp": "#FFE7BE",
-      "lampIntensity": 3.5,
-      "exposure": 1.02,
-      "background": "#3A342A",
+      "sky": "#FFF0D8",
+      "ground": "#A2917A",
+      "ambient": 0.86,
+      "lamp": "#FFDFB0",
+      "lampIntensity": 3.0,
+      "exposure": 1.12,
+      "background": "#4A3F2E",
       "fog": [
-        "#4A4235",
-        54,
-        150
+        "#6A5942",
+        62,
+        165
       ]
     },
     "fixtures": {
@@ -56,7 +57,8 @@
       "placards": true,
       "clock": false,
       "terraces": false,
-      "ropes": true
+      "ropes": true,
+      "daylight": true
     }
   },
   "plan": {

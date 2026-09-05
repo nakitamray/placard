@@ -2,6 +2,7 @@
   "id": "orsay",
   "name": "Musée d'Orsay",
   "city": "Paris",
+  "homepage": "https://www.musee-orsay.fr/en",
   "subtitle": "The central nave",
   "blurb": "A railway station turned gallery: arched steel and glass overhead, carved stone terraces, the great clock at the end.",
   "corridorNote": "Modelled on the vast central nave of the Gare d'Orsay. A colossal vaulted roof of arched steel and glass floods the hall with daylight; the walls and archways are light carved stone set with deep rosettes; raised galleries with modern glass railings flank a wide central promenade; and the enormous gilded clock hangs at the far end, which is where the corridor's vanishing point lands.",
@@ -21,37 +22,37 @@
       "wallDeep": "#B0A692",
       "molding": "#E6DFCE",
       "gilt": "#C9A227",
-      "ceiling": "#DFE6EC",
-      "ceilingAccent": "#C4CBD3",
+      "ceiling": "#EAF1F7",
+      "ceilingAccent": "#CFD7DE",
       "floor": "#CAC2B3",
       "floorInlay": "#A79C89",
       "accent": "#BEB5A1",
-      "sky": "#EFF5FB"
+      "sky": "#F6FAFF"
     },
     "light": {
-      "key": "#FFF8E8",
-      "keyIntensity": 2.5,
+      "key": "#FFFAF0",
+      "keyIntensity": 3.0,
       "keyFrom": [
-        -4,
-        20,
-        7
+        -5,
+        24,
+        8
       ],
-      "sky": "#E6F0F8",
+      "sky": "#EAF3FC",
       "ground": "#7C7362",
-      "ambient": 0.62,
+      "ambient": 0.7,
       "lamp": "#FFE2B2",
       "lampIntensity": 5,
-      "exposure": 1.08,
-      "background": "#33302A",
+      "exposure": 1.06,
+      "background": "#3B3830",
       "fog": [
-        "#4C483E",
-        56,
-        160
+        "#5A564A",
+        66,
+        175
       ]
     },
     "fixtures": {
       "sculpture": "pedestal-figures",
-      "seating": "bench",
+      "seating": "stone-benches",
       "chandeliers": false,
       "placards": true,
       "clock": true,
