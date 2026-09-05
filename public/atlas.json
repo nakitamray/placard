@@ -193,18 +193,6 @@
       "note": "Thebes, c.1350 BC"
     },
     {
-      "id": "meidum-workshop",
-      "kind": "painter",
-      "label": "The Meidum painters",
-      "note": "Egypt, c.2600 BC"
-    },
-    {
-      "id": "fayum-painters",
-      "kind": "painter",
-      "label": "The Fayum painters",
-      "note": "Roman Egypt, 1st–3rd c."
-    },
-    {
       "id": "dunhuang-painters",
       "kind": "painter",
       "label": "The Dunhuang painters",
@@ -569,6 +557,24 @@
       "kind": "event",
       "label": "Oil painting",
       "note": "Not an invention with a date, but a technique that became the default in the north within one generation of the Arnolfini Portrait"
+    },
+    {
+      "id": "ani-scribes",
+      "kind": "painter",
+      "label": "The scribes of Ani",
+      "note": "Thebes, c.1250 BC"
+    },
+    {
+      "id": "rubens",
+      "kind": "painter",
+      "label": "Peter Paul Rubens",
+      "note": "1577–1640"
+    },
+    {
+      "id": "antwerp",
+      "kind": "place",
+      "label": "Antwerp",
+      "note": ""
     }
   ],
   "works": {
@@ -588,8 +594,8 @@
     "hokusai-great-wave": "hokusai",
     "hiroshige-sudden-shower": "hiroshige",
     "nebamun-marshes": "nebamun-workshop",
-    "geese-of-meidum": "meidum-workshop",
-    "fayum-mummy-portraits": "fayum-painters",
+    "rubens-isabella-brant": "rubens",
+    "ani-book-of-the-dead": "ani-scribes",
     "gu-kaizhi-admonitions": "gu-kaizhi",
     "white-the-flyer": "john-white",
     "schouman-birds": "schouman",
@@ -1267,18 +1273,6 @@
       "word": "Thebes"
     },
     {
-      "a": "meidum-workshop",
-      "b": "thebes",
-      "kind": "painted at",
-      "word": "Egypt"
-    },
-    {
-      "a": "fayum-painters",
-      "b": "rome",
-      "kind": "under",
-      "word": "Roman"
-    },
-    {
       "a": "dunhuang-painters",
       "b": "dunhuang",
       "kind": "painted at",
@@ -1735,6 +1729,52 @@
       "kind": "proved",
       "word": "oil",
       "note": "Van Eyck did not invent oil paint, but he is the first painter who used it as though it were the only sensible way to describe the world — and every northern workshop for a century afterwards was answering him."
+    },
+    {
+      "a": "ani-scribes",
+      "b": "thebes",
+      "kind": "worked at",
+      "word": "Thebes"
+    },
+    {
+      "a": "ani-scribes",
+      "b": "nebamun-workshop",
+      "kind": "the same necropolis",
+      "word": "Thebes",
+      "note": "Ani's papyrus and Nebamun's tomb-chapel walls were made a century apart for two officials buried on the same stretch of the west bank at Thebes, by workshops using the same pigments — carbon black, the ochres, Egyptian blue — on two surfaces that could hardly be less alike."
+    },
+    {
+      "a": "rubens",
+      "b": "antwerp",
+      "kind": "worked in",
+      "word": "Antwerp"
+    },
+    {
+      "a": "rubens",
+      "b": "baroque",
+      "kind": "of",
+      "word": "Baroque"
+    },
+    {
+      "a": "rubens",
+      "b": "titian",
+      "kind": "copied",
+      "word": "Titian",
+      "note": "Rubens spent eight years in Italy copying Titian, and went on copying him for the rest of his life — including, on the 1628 embassy to Madrid, some thirty of the Titians in the Spanish royal collection. What he took was the handling of flesh: colour laid warm over warm rather than modelled out of shadow."
+    },
+    {
+      "a": "rubens",
+      "b": "velazquez",
+      "kind": "met",
+      "word": "Madrid",
+      "note": "Rubens came to Madrid in 1628 as a diplomat and stayed eight months. Velázquez, thirty and court painter, was assigned to accompany him; they rode out to the Escorial together to look at the Titians. Velázquez left for Italy the year after, and what came back was a painter who had stopped drawing edges."
+    },
+    {
+      "a": "rubens",
+      "b": "london",
+      "kind": "worked in",
+      "word": "London",
+      "note": "Rubens negotiated the Anglo-Spanish peace in London in 1629, was knighted by Charles I for it, and took away the commission for the Banqueting House ceiling — the only one of his great decorative schemes still in the building it was painted for."
     }
   ]
 }

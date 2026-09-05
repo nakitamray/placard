@@ -454,9 +454,12 @@ async function resolveFile(
     titleOriginal?: string;
     dimensions: string;
     medium: string;
+    reproduction?: string;
   },
 ): Promise<{ chosen: Omit<Resolved, 'id' | 'museum'>; how: string } | null> {
   const { artist, title, dimensions } = work;
+  // see `reproduction` in the records: a fragment is not the whole object, and
+  // scoring candidates against the whole object's shape buries the right file
   /*
    * Match against the work's names in every form it is catalogued under, not
    * just the English one. Commons files the Mona Lisa under "Mona Lisa" but
@@ -467,7 +470,7 @@ async function resolveFile(
   const wanted = keywords(
     [artist, title, work.titleOriginal ?? '', hint.search ?? ''].join(' '),
   );
-  const expected = expectedAspect(dimensions);
+  const expected = work.reproduction ? null : expectedAspect(dimensions);
 
   const build = (page: any, score: number) => {
     const info = page?.imageinfo?.[0];
@@ -631,7 +634,12 @@ async function download(
   // Last gate, on the real pixels rather than on the API's reported size. A
   // pinned file skips scoring entirely, so this is the only thing standing
   // between a hand-pinned photograph-of-a-frame and the exhibition wall.
-  const err = aspectError(expected, meta.width ?? 0, meta.height ?? 0);
+  //
+  // Unless the record has already said the picture is not the catalogued
+  // object. A scroll shown as one of its nine scenes has nothing to do with
+  // the proportions of the whole scroll, and holding a `reproduction` work to
+  // them refuses the only file that could ever be right.
+  const err = expected === null ? 0 : aspectError(expected, meta.width ?? 0, meta.height ?? 0);
   if (err > MAX_ASPECT_ERROR) {
     const got = ((meta.width ?? 1) / (meta.height ?? 1)).toFixed(3);
     throw new Error(
@@ -703,6 +711,8 @@ interface Job {
   year: string;
   dimensions: string;
   medium: string;
+  /** set when the record says the picture is not the catalogued object */
+  reproduction?: string;
 }
 
 interface Outcome {
@@ -811,6 +821,7 @@ async function run() {
         year: w.year,
         dimensions: w.dimensions,
         medium: w.medium,
+        reproduction: w.reproduction,
       });
     }
   }
@@ -911,7 +922,13 @@ async function one(job: Job, hint: SourceHint): Promise<Outcome> {
         ` · ${target.license}`,
     );
 
-    const expected = expectedAspect(job.dimensions);
+    /*
+     * A work reproduced as a fragment of itself has no catalogued
+     * proportions to be measured against — one scene of a nine-scene scroll
+     * is not 24 × 344 cm — so the record's own sentence turns the test off
+     * rather than the file being refused for being what it says it is.
+     */
+    const expected = job.reproduction ? null : expectedAspect(job.dimensions);
     if (expected) {
       const err = aspectError(expected, target.width, target.height);
       lines.push(

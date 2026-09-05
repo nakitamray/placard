@@ -54,6 +54,15 @@ export interface ArtworkMeta {
   };
   labelText: string;
   extendedNote: string;
+  /**
+   * One way out of the exhibition, for a work that cannot be shown whole.
+   *
+   * A handscroll is twelve metres of painting hung here as one scene of it,
+   * and no wall label can make up for that. The honest thing is to say which
+   * scene it is and point at the rest, which is what this is: a label and a
+   * URL, shown under the wall text, and only on the works that need one.
+   */
+  link?: { label: string; url: string };
   textProvenance: {
     type: 'museum_verbatim' | 'other_museum' | 'placard_original';
     attribution: string;

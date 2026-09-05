@@ -68,30 +68,25 @@
     "note": "Search may return the whole tomb-chapel group; pin the marsh-hunting fragment."
   },
   "gu-kaizhi-admonitions": {
-    "search": "Admonitions Scroll Gu Kaizhi British Museum",
-    "note": "A handscroll: pick a section, not the full 3.4m strip, or it hangs as a sliver."
-  },
-  "fayum-mummy-portraits": {
-    "search": "Fayum mummy portrait young man encaustic Roman Egypt",
-    "note": "Generic subject — search will pick some Fayum portrait, not a specific one. Pin the one you want."
-  },
-  "geese-of-meidum": {
-    "search": "Meidum geese painting Itet tomb",
-    "note": "Original panel is in Cairo; the British Museum holds facsimiles. See the placard."
+    "commonsFile": "File:Admonitions Scroll Scene 4.jpg",
+    "search": "Admonitions Scroll Gu Kaizhi British Museum scene",
+    "note": "Scene Four of nine, the toilette scene. The scroll is reproduced on Commons scene by scene; the whole-scroll files are three metres of silk at a hundred pixels high and unusable on a wall."
   },
   "white-the-flyer": {
     "search": "John White The Flyer Secotan conjuror Roanoke watercolour British Museum",
     "note": "White's album is many sheets; search cannot know which. Pin one."
   },
   "schouman-birds": {
-    "search": "Aert Schouman bird watercolour drawing"
+    "search": "Aert Schouman bird studies watercolour British Museum prints and drawings",
+    "note": "A sheet from the British Museum's Department of Prints and Drawings, landscape format — not one of the many Schouman bird sheets in Dutch collections."
   },
   "durer-rhinoceros": {
     "search": "Dürer Rhinocerus 1515 woodcut",
     "note": "The 1515 woodcut itself, not a later re-cut or a photograph of the sheet in its mount."
   },
   "dunhuang-cave-17": {
-    "search": "Dunhuang silk painting banner Stein collection bodhisattva"
+    "search": "British Museum Stein collection Dunhuang silk painting bodhisattva banner Cave 17",
+    "note": "A Stein-collection silk painting from Cave 17 in the British Museum. Several of these are banners two metres long with their streamers attached, whose proportions are nothing like the painted panel the placard measures — check which one a candidate is before pinning it."
   },
   "hiroshige-sudden-shower": {
     "search": "Hiroshige Sudden shower over Shin-Ohashi bridge and Atake",
@@ -130,7 +125,9 @@
     "search": "Van Gogh Starry Night Over the Rhone 1888"
   },
   "renoir-moulin-galette": {
-    "search": "Renoir Bal du moulin de la Galette 1876 Orsay"
+    "commonsFile": "File:Renoir, Pierre-Auguste - Dance at Le Moulin de la Galette, 1876.jpg",
+    "search": "Renoir Bal du moulin de la Galette Musee d'Orsay",
+    "note": "The Musée d'Orsay's canvas, flat: a 3:2 file is a camera's shape, not this painting's."
   },
   "manet-olympia": {
     "search": "Édouard Manet Olympia 1863 Orsay"
@@ -282,5 +279,15 @@
   "caravaggio-supper-emmaus": {
     "commonsFile": "File:1602-3 Caravaggio,Supper at Emmaus National Gallery, London.jpg",
     "search": "Caravaggio Supper at Emmaus National Gallery London"
+  },
+  "ani-book-of-the-dead": {
+    "commonsFile": "File:BD Weighing of the Heart.jpg",
+    "search": "Papyrus of Ani Book of the Dead weighing of the heart British Museum",
+    "note": "The judgement scene from the Papyrus of Ani, one sheet of a scroll cut into thirty-seven for mounting."
+  },
+  "rubens-isabella-brant": {
+    "commonsFile": "File:Peter Paul Rubens - Portrait of Isabella Brant (British Museum 1482535001).jpg",
+    "search": "Rubens Portrait of Isabella Brant drawing British Museum",
+    "note": "The chalk drawing in the British Museum's Department of Prints and Drawings — not the painted portraits of the same sitter in Florence and Cleveland."
   }
 }

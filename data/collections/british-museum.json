@@ -100,20 +100,60 @@
     "id": "gu-kaizhi-admonitions",
     "artist": "After Gu Kaizhi",
     "artistDates": "c. 344–406",
-    "title": "The Admonitions Scroll",
+    "title": "The Admonitions Scroll: Scene Four",
     "titleOriginal": "女史箴圖 · Admonitions of the Instructress to the Court Ladies",
     "year": "Tang-dynasty copy, 5th–8th century",
     "medium": "Ink and colour on silk handscroll",
-    "dimensions": "24.4 × 343.8 cm — shown here as a section",
     "room": "Chinese galleries",
-    "accession": "",
+    "accession": "1903,0408,0.1",
     "creditLine": "Acquired 1903",
     "accentColor": "#4A4034",
     "heroSkip": true,
-    "labelText": "One of the earliest Chinese paintings to survive in any form: nine scenes illustrating a third-century text of instruction for palace women, painted in fine line and thin colour on silk. A handscroll is not meant to be hung. It is opened an arm's width at a time, read right to left, and rolled shut behind you — so the picture is experienced as duration rather than as a single view. The section shown here is one of those arm's-widths.",
-    "extendedNote": "The scroll is almost certainly a Tang copy of a lost original attributed to Gu Kaizhi, one of the first Chinese painters known by name. That layering is normal in Chinese painting, where copying a master was scholarship rather than forgery, and where the copy carries the original forward when the original perishes.\n\nIts surface is a record of everyone who ever owned it. Emperor Huizong wrote on it in the twelfth century; the Qianlong Emperor added an orchid he painted himself and a great many seals; collectors stamped their marks in red across the silk for a thousand years. It left the Summer Palace during the looting of 1900 and was sold to the British Museum for twenty-five pounds by a cavalry officer who thought the jade toggle was the valuable part. The painting itself is deliberately plain in technique — even, wire-thin outline, colour laid inside it like a wash — because the point of the images is the text they carry, which advises court women that beauty without virtue is a danger and that no one, however favoured, is safe.",
+    "dimensions": "24.4 × 343.8 cm overall — Scene Four of the nine that survive",
+    "reproduction": "The scroll is three and a half metres long and was never meant to be seen at once: a handscroll is opened an arm's width at a time. What is reproduced here is the fourth of its nine surviving scenes, so its proportions are that scene's rather than the whole scroll's.",
+    "link": {
+      "label": "The whole scroll, at the British Museum",
+      "url": "https://www.britishmuseum.org/collection/object/A_1903-0408-0-1"
+    },
+    "labelText": "Scene Four: the toilette. Two court ladies at their mirrors — one kneeling to have her hair dressed by an attendant, the other seated before a bronze mirror on a stand, with her lacquer boxes open on the floor beside her. Nothing is happening, and that is the admonition. The text written alongside it says that everyone knows how to adorn their face and no one knows how to adorn their character, and the painter has answered it by making the grooming beautiful and giving the faces nothing to say.",
+    "extendedNote": "The scroll illustrates a political poem of about AD 292 by Zhang Hua, written to reprove an empress and framed as advice from an instructress to the ladies of the court. It is attributed to Gu Kaizhi, the first Chinese painter whose name and reputation both survive; what the British Museum holds is a copy made in the fifth to eighth century, which is to say a copy that is itself over a thousand years old and the earliest thing of its kind that exists.\n\nNine scenes survive of an original twelve. This is the fourth, and it is the one painters have gone back to: the mirror on its stand, the fall of a sleeve, the kneeling attendant's arm — done with a line the Chinese critics called \"like a silk thread drawn from a cocoon\", even in weight from end to end, laid down without correction and without shading. There is no background. The figures sit on empty silk, and the empty silk is the room.\n\nThe scroll was in the imperial collection for centuries; the Qianlong emperor kept it in a cabinet, added his own seals and a painting of an orchid, and it went into the Summer Palace. In 1900, in the looting that followed the Boxer uprising, an officer of the Bengal Lancers named Clarence Johnson took it home, and in 1903 sold it to the British Museum for twenty-five pounds — he had thought the jade toggle on the roller was the valuable part. It was then cut into panels and mounted flat in the Japanese manner, a conservation decision made in 1914 and regretted since, because a handscroll is an object you unroll, and this one can no longer be.",
+    "regions": [
+      {
+        "id": "mirror",
+        "label": "The mirror",
+        "box": [
+          0.46,
+          0.16,
+          0.72,
+          0.72
+        ],
+        "text": "A polished bronze disc on a lacquered stand, and the seated lady looks into it while the painter shows us her face directly. A mirror in this scene is the whole argument of the poem: it is the instrument of the thing being criticised, and it is also the only object here anybody is honest with."
+      },
+      {
+        "id": "hair",
+        "label": "The hairdressing",
+        "box": [
+          0.04,
+          0.1,
+          0.42,
+          0.86
+        ],
+        "text": "The kneeling attendant's arms and the fall of the sleeves are the line the scroll is famous for — even in weight from end to end, laid down in one pass, no shading, no correction. Chinese critics called it a silk thread drawn from a cocoon, and a thousand years of copying this scroll was a thousand years of painters trying to get that line."
+      },
+      {
+        "id": "ground",
+        "label": "The empty silk",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.24
+        ],
+        "text": "There is no room. No wall, no floor, no horizon — the figures and their boxes sit on bare silk, and the bare silk does the work that perspective does in European painting. The text of the poem is written into it in columns, so the empty ground is also the page."
+      }
+    ],
     "placeholder": {
-      "aspect": 3.4,
+      "aspect": 1.6,
       "archetype": "register",
       "palette": [
         "#2A2218",
@@ -127,64 +167,138 @@
     }
   },
   {
-    "id": "fayum-mummy-portraits",
-    "artist": "Unknown painters, Roman Egypt",
-    "artistDates": "1st–3rd century AD",
-    "title": "Mummy Portrait of a Young Man",
-    "titleOriginal": "Fayum mummy portrait",
-    "year": "c. AD 100–120",
-    "medium": "Encaustic (pigment in hot wax) on limewood panel",
-    "dimensions": "approx. 38 × 22 cm",
+    "id": "ani-book-of-the-dead",
+    "artist": "Unknown Egyptian scribes",
+    "artistDates": "19th Dynasty, c. 1250 BC",
+    "title": "The Papyrus of Ani: the Weighing of the Heart",
+    "titleOriginal": "Book of the Dead of Ani",
+    "year": "c. 1250 BC",
+    "medium": "Ink and pigment on papyrus",
+    "dimensions": "42 cm high; the scroll runs 23.6 m — this is the judgement scene",
     "room": "Egyptian galleries",
-    "accession": "",
-    "creditLine": "Fayum region, Roman Egypt",
-    "accentColor": "#3A2A22",
-    "heroFocus": [
-      0.5,
-      0.4
+    "accession": "EA10470/3",
+    "creditLine": "Acquired in Egypt by E. A. Wallis Budge, 1888",
+    "accentColor": "#8A6A2E",
+    "heroSkip": true,
+    "reproduction": "The Papyrus of Ani is twenty-three and a half metres long and is kept, and shown, in separate sheets. What is reproduced here is one scene of it — the judgement — so its proportions are the sheet's rather than the scroll's.",
+    "link": {
+      "label": "The whole papyrus, at the British Museum",
+      "url": "https://www.britishmuseum.org/collection/object/Y_EA10470-3"
+    },
+    "labelText": "A man's heart is being weighed against a feather. Ani and his wife Tutu stand at the left in white linen; Anubis, jackal-headed, steadies the balance; the feather of Maat — truth, order, the way things should be — sits in the other pan. Thoth waits with a scribe's palette to write down the result. Beside him crouches Ammit, part crocodile, part lion, part hippopotamus, who eats the hearts that fail. Above, fourteen gods sit as a jury. The verdict is never in doubt in these papyri: the point of owning one was to have the right answer written down in advance.",
+    "extendedNote": "Ani was a royal scribe and an accountant of temple offerings at Thebes, and this was made for his burial around 1250 BC. What Egyptologists call the Book of the Dead is not a book but a spell list — the Egyptian title is closer to \"the spells for going out by day\" — copied to order for anyone who could afford it, with the buyer's name written into the gaps. Ani's copy is one of the longest and by a wide margin the finest: twenty-three and a half metres of it, the vignettes drawn by an artist who was allowed to take his time.\n\nThe scene reproduced here is the judgement, chapter 125, and it is the reason the papyrus is famous. The heart was the seat of the mind and the record of a life, and it is weighed rather than examined — an accountant's afterlife, which for a man who audited grain offerings for a living is not a coincidence. The spell beside it is a plea to the heart not to testify against its owner.\n\nBudge bought it for the British Museum in 1888 and cut it into thirty-seven sheets for mounting, which is why it is shown, and reproduced, a scene at a time. The pigments are mineral: carbon black, red and yellow ochre, orpiment, Egyptian blue — the first synthetic pigment anyone made, calcium copper silicate, fired in a kiln at a thousand degrees a thousand years before this was painted.",
+    "regions": [
+      {
+        "id": "scales",
+        "label": "The balance",
+        "box": [
+          0.34,
+          0.3,
+          0.6,
+          0.9
+        ],
+        "text": "The heart in one pan, the feather of Maat in the other, and Anubis on one knee with a hand on the plumb line. Maat is truth and order and the correct working of the world all at once, and weighing a life against it is the whole Egyptian theory of judgement in one image: not a trial, a measurement."
+      },
+      {
+        "id": "ammit",
+        "label": "Ammit",
+        "box": [
+          0.58,
+          0.52,
+          0.78,
+          0.95
+        ],
+        "text": "Crocodile at the front, lion in the middle, hippopotamus behind — the three animals most likely to kill an Egyptian, assembled into one. She sits beside the scales waiting to eat the heart that fails, and a heart she eats is not punished but ended. Annihilation, not hell."
+      },
+      {
+        "id": "jury",
+        "label": "The jury",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.3
+        ],
+        "text": "Fourteen gods on mats along the top of the sheet, each to be named and addressed in turn by the dead man, who tells each one a sin he has not committed. The list is the famous part: I have not stolen, I have not killed, I have not taken milk from the mouths of children, I have not stopped a god in his procession."
+      }
     ],
-    "labelText": "A young man looks out with dark, wide, slightly asymmetrical eyes, a shadow of beard on his jaw, his hair painted in short hooked strokes. The panel was made to be bound into the wrappings of his mummy over his face. It is Roman portraiture — the naturalism, the haircut, the fashion — doing an Egyptian funerary job, and the result is the most direct eye contact anyone makes across two thousand years.",
-    "extendedNote": "Several hundred of these panels survive, most from the Fayum basin south-west of Cairo, painted between the first and third centuries AD for a population that was Egyptian, Greek and Roman at once. The technique is encaustic: pigment suspended in hot beeswax, laid on with a brush and a heated metal tool, which sets hard and keeps its colour with almost no fading. That is why the flesh still looks wet.\n\nWhat startles is not the realism but the specificity. These are individuals — a broken nose, a squint, a mole, an unfashionable beard — and they were painted for people who knew them. Some panels show signs of having hung in a house for years before burial. Nothing else from the ancient world looks back this way; Roman marble portraits are idealised, Egyptian funerary masks are schematic, and these are neither. When the panels began to appear in European collections in the nineteenth century they were treated as archaeology. It took modern painters — who recognised the brushwork immediately — to argue that they were also among the finest portraits ever made.",
     "placeholder": {
-      "aspect": 0.58,
-      "archetype": "portrait",
+      "aspect": 2.55,
+      "archetype": "register",
       "palette": [
-        "#1A120C",
-        "#3A281C",
-        "#5E4430",
-        "#8E6E4E",
-        "#C9A882",
-        "#9C2E22"
+        "#241A0E",
+        "#6A4E22",
+        "#8A6A2E",
+        "#C4A464",
+        "#E8DCBE",
+        "#9C3A24"
       ],
       "seed": 24
     }
   },
   {
-    "id": "geese-of-meidum",
-    "artist": "Unknown painter, Meidum",
-    "artistDates": "Old Kingdom, Dynasty IV",
-    "title": "The Geese of Meidum",
-    "titleOriginal": "From the tomb-chapel of Nefermaat and Itet",
-    "year": "c. 2600 BC",
-    "medium": "Painted plaster",
-    "dimensions": "27 × 172 cm",
-    "room": "Egyptian galleries",
-    "accession": "",
-    "creditLine": "The original panel is in the Egyptian Museum, Cairo; British Museum holdings are 19th-century facsimile copies",
-    "accentColor": "#5E5230",
-    "heroSkip": true,
-    "labelText": "Six geese feed along a strip of ground, three walking left and three walking right, in three pairs of matched species. They are four and a half thousand years old and painted with enough ornithological precision that modern specialists argue about which species they are — and whether one of them ever lived in Egypt at all. Nothing in the panel is stylised except the arrangement, which is perfectly symmetrical.",
-    "extendedNote": "A note on where it is: the panel itself was lifted from the tomb-chapel of Nefermaat and his wife Itet at Meidum in the 1870s and has been in Cairo ever since. What the British Museum holds are nineteenth-century facsimiles, made when copying tomb paintings by hand was the only way to bring them to a European audience. Those copies are now historical objects in their own right, and several of the tombs they record have since been destroyed.\n\nThe painting technique is unusual for its date: pigment laid into a fine plaster ground rather than the paste-filled incisions Nefermaat's chapel uses elsewhere, which is probably why the colour has held. The composition is arranged for balance — a mirrored pair at each end, a grazing pair at the centre — and within that scheme every bird is observed. White-fronted geese, bean geese, and a pair of red-breasted geese, a species that does not appear in Egypt today and may never have; some scholars take that as evidence of a wider ancient range, and others as evidence that Egyptian painters worked from pattern books as well as from life.",
+    "id": "rubens-isabella-brant",
+    "artist": "Peter Paul Rubens",
+    "artistDates": "1577–1640",
+    "title": "Portrait of Isabella Brant",
+    "year": "c. 1621",
+    "medium": "Black, red and white chalk, heightened with white, touched with pen and brown ink",
+    "dimensions": "38.1 × 29.5 cm",
+    "room": "Prints and Drawings",
+    "accession": "Gg,2.229",
+    "creditLine": "Bequeathed by Richard Payne Knight, 1824",
+    "accentColor": "#8A5A3E",
+    "heroFocus": [
+      0.5,
+      0.42
+    ],
+    "labelText": "Rubens drew his wife in three chalks — black, red, white — on a sheet the size of a sheet of paper, and it is the most direct thing he ever made. She is leaning very slightly forward, about to speak or having just spoken; the mouth is caught between two expressions. The eyes are worked hardest and the collar is barely there, four or five strokes of white over a hatched ground. It was drawn perhaps five years before she died, and there is no reason to think it was made for anything but himself.",
+    "extendedNote": "Isabella Brant was the daughter of an Antwerp lawyer and Rubens married her in 1609, the year after he came back from eight years in Italy with a reputation and a workshop's worth of ideas. He painted her often — in the honeysuckle bower beside himself, in the great double portrait made in the first months of the marriage — but the paintings are performances and this is not. It is drawn at conversational distance, on paper, at a scale that fits on a table.\n\nThe technique is trois crayons, three chalks used together, which Rubens took from the French and Italian portrait draughtsmen and pushed further than either: the red does the warmth of the face, the black does the structure and the hair, and the white is not a highlight but a light source, laid over both to lift the forehead and the bridge of the nose forward. Pen and ink sharpen the eyes at the very end, and that is the only place in the sheet where the line is hard.\n\nShe died in 1626, probably of plague, at thirty-four. Rubens wrote to a friend in Paris a year later, in the flat voice of somebody who has decided not to be eloquent: \"I have lost an excellent companion, whom one could love — indeed had to love, with good reason — as having none of the faults of her sex.\" He remarried four years later, to Helena Fourment, who was sixteen. The drawing stayed in his house.",
+    "regions": [
+      {
+        "id": "eyes",
+        "label": "The eyes",
+        "box": [
+          0.24,
+          0.2,
+          0.78,
+          0.42
+        ],
+        "text": "The only hard line in the sheet. Everything else is chalk laid in hatching and rubbed, and then at the end Rubens takes a pen and brown ink to the lids and the pupils — which is why, at any distance, the face finds you before the rest of the drawing arrives."
+      },
+      {
+        "id": "mouth",
+        "label": "The mouth",
+        "box": [
+          0.34,
+          0.4,
+          0.68,
+          0.56
+        ],
+        "text": "Caught between two expressions, which is a thing chalk can do and paint mostly cannot: the corners are left unresolved, two possible mouths drawn faintly over each other, and the eye settles on whichever one it expects. She is about to speak, or has just spoken, depending on how long you look."
+      },
+      {
+        "id": "collar",
+        "label": "The collar",
+        "box": [
+          0.1,
+          0.62,
+          0.92,
+          0.98
+        ],
+        "text": "Four or five strokes of white over the hatched ground and a lace collar exists. Rubens spends nothing here, and the economy is the point: the drawing is finished exactly where his interest stops, which is at her face."
+      }
+    ],
     "placeholder": {
-      "aspect": 3.0,
-      "archetype": "register",
+      "aspect": 0.774,
+      "archetype": "portrait",
       "palette": [
-        "#2C2418",
-        "#584828",
-        "#877044",
-        "#B79B6C",
-        "#E8DDC2",
-        "#A6402A"
+        "#2A1C14",
+        "#5E3A28",
+        "#8A5A3E",
+        "#B98A6A",
+        "#E2CDB4",
+        "#7A2E24"
       ],
       "seed": 25
     }

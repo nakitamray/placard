@@ -167,6 +167,18 @@ export function Placard() {
 
         <p className="body placard-label">{meta.labelText}</p>
 
+        {/* a work shown as one scene of itself says where the rest is */}
+        {meta.link && (
+          <a
+            className="caption placard-link"
+            href={meta.link.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {meta.link.label} <span aria-hidden>↗</span>
+          </a>
+        )}
+
         <button
           className="caption placard-more"
           onClick={() => setExpanded(!expanded)}
