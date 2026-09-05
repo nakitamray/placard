@@ -29,7 +29,7 @@ import { corridor, warp, pointer, resetCorridor } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
 import { flash } from '../ui/Flash';
 import { OrnateFrame } from './OrnateFrame';
-import { archOutline, frameReach } from './frames';
+import { frameReach } from './frames';
 import { fitWork } from './fit';
 import { fallbackUrl, imageUrl } from '../lib/image';
 import { Ceiling } from './corridor/Ceiling';
@@ -212,12 +212,10 @@ function HungWork({
           open();
         }}
       >
-        {/* a tondo is cut out of a square panel and a round-headed altarpiece
-            out of a rectangular one, so neither canvas is a rectangle */}
+        {/* a tondo is cut out of a square panel, so its canvas is not a
+            rectangle either */}
         {artwork.shape === 'round' ? (
           <circleGeometry args={[Math.min(width, height) / 2, 48]} />
-        ) : artwork.shape === 'arched' ? (
-          <shapeGeometry args={[archOutline(width, height)]} />
         ) : (
           <planeGeometry args={[width, height]} />
         )}
@@ -516,16 +514,36 @@ function Lamps({
    * flatten exactly the wall the room exists to show.
    */
   if (museum.style.fixtures.daylight) {
+    /*
+     * Which side the windows are on is a fact about the wall treatment, so it
+     * is read from the wall treatment. The Uffizi is glazed to the right of
+     * the hang; the British Museum's Egyptian gallery is lit from the left,
+     * high up, through screens.
+     */
+    const daySide = museum.style.wall === 'fluted-pilasters' ? -1 : 1;
     const step = Math.max(2, Math.ceil(d.bays / quality.maxLamps));
     for (let b = 0; b < d.bays; b += step) {
       lights.push(
         <pointLight
           key={`day${b}`}
-          position={[d.halfWidth - 0.5, d.wallHeight * 0.62, bayZ(d, b)]}
+          position={[daySide * (d.halfWidth - 0.5), d.wallHeight * 0.62, bayZ(d, b)]}
           color={l.sky}
           intensity={l.lampIntensity * 1.5}
           distance={d.bayDepth * 3.4}
           decay={1.7}
+        />,
+      );
+      // and the room's own fixtures, warm, under the ceiling. Scaled from the
+      // record: a daylit corridor that also has lamps says so by asking for a
+      // high lampIntensity, and one that does not is left alone.
+      lights.push(
+        <pointLight
+          key={`warm${b}`}
+          position={[0, d.wallHeight - 0.7, bayZ(d, b)]}
+          color={l.lamp}
+          intensity={l.lampIntensity * 0.55}
+          distance={d.bayDepth * 2.6}
+          decay={2}
         />,
       );
     }
@@ -541,6 +559,35 @@ function Lamps({
         />
       </>
     );
+  }
+
+  /*
+   * A room lit from its cornice, upward.
+   *
+   * The Gallery of Maps has a continuous warm source hidden at the top of
+   * both walls, and everything about how that ceiling looks follows from it:
+   * the light climbs the vault, the raised stucco casts its shadows
+   * downward, and the gold is brightest where the carving is deepest. Lamps
+   * hung in the middle of the room — which is what a chandelier is — light
+   * the floor and flatten the vault, so where a museum asks for a cove the
+   * chandeliers are only jewellery and the cove does the work.
+   */
+  if (museum.style.fixtures.cove) {
+    const step = Math.max(2, Math.ceil(d.bays / Math.max(2, quality.maxLamps - 1)));
+    for (let b = 0; b < d.bays; b += step) {
+      for (const side of [-1, 1]) {
+        lights.push(
+          <pointLight
+            key={`cove${b}${side}`}
+            position={[side * (d.halfWidth - 0.35), d.wallHeight + 0.15, bayZ(d, b)]}
+            color={l.lamp}
+            intensity={l.lampIntensity * 0.85}
+            distance={d.bayDepth * 2.8}
+            decay={1.8}
+          />,
+        );
+      }
+    }
   }
 
   // Every point light is evaluated per fragment across every lit surface in

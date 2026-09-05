@@ -13,6 +13,7 @@ import type { Quality } from '../../lib/quality';
 import { bayZ, hangBottom, hangTop, type Dims } from './dims';
 import { CourtFacade } from './CourtFacade';
 import { glowTexture } from './glow';
+import { mapPanelTexture } from './fresco';
 
 interface Props {
   style: MuseumStyle;
@@ -57,6 +58,10 @@ function Instanced({
 
 /** one square of the Uffizi's diagonal checkerboard, metres */
 const TILE = 0.9;
+/** one course of the British Museum's banded stone floor, metres */
+const BAND = 1.35;
+/** one square of the Gallery of Maps' floor labyrinth, metres */
+const MAZE = 3.2;
 
 export function Floor({ style, d, quality }: Props) {
   const p = style.palette;
@@ -74,11 +79,21 @@ export function Floor({ style, d, quality }: Props) {
         ? 0.62
         : kind === 'court-paving'
           ? 0.22
-          : kind === 'parquet'
-            ? 0.4
-            : 0.5;
+          : kind === 'stone-bands'
+            ? 0.18
+            : kind === 'parquet'
+              ? 0.4
+              : 0.5;
   const roughness =
-    kind === 'court-paving' ? 0.5 : kind === 'parquet' ? 0.3 : kind === 'checkerboard' ? 0.12 : 0.18;
+    kind === 'court-paving'
+      ? 0.5
+      : kind === 'stone-bands'
+        ? 0.62
+        : kind === 'parquet'
+          ? 0.3
+          : kind === 'checkerboard'
+            ? 0.12
+            : 0.18;
 
   return (
     <group>
@@ -93,7 +108,7 @@ export function Floor({ style, d, quality }: Props) {
             resolution={quality.reflectionRes}
             blur={[400, 100]}
             mixBlur={0.85}
-            mixStrength={kind === 'court-paving' ? 0.35 : 0.6}
+            mixStrength={kind === 'court-paving' || kind === 'stone-bands' ? 0.3 : 0.6}
             roughness={roughness}
             depthScale={0.7}
             minDepthThreshold={0.4}
@@ -159,41 +174,85 @@ export function Floor({ style, d, quality }: Props) {
       )}
 
       {kind === 'marble-inlay' && (
-        <group>
-          {/* border bands in dark marble */}
-          {[-1, 1].map((s) => (
+        /*
+         * The Gallery of Maps' floor: a black and white labyrinth.
+         *
+         * Not a medallion and not a border — a bold interlocking maze of
+         * thick bands, large squares inside larger squares with the corners
+         * broken open, laid the width of the corridor and repeating down it.
+         * It is the hardest, coldest thing in the room, and it is doing a
+         * particular job: the vault above is an unbroken blaze of gold, and
+         * without something equally rigid underfoot the whole corridor reads
+         * as soft.
+         *
+         * Drawn as bands rather than as tiles. Only the dark marble is
+         * geometry; the white is the polished plane showing through, so the
+         * reflection of the vault runs across it unbroken — which is what
+         * makes a floor look wet.
+         */
+        <group position={[0, 0, 0]}>
+          {Array.from({ length: Math.ceil(run / MAZE) + 1 }, (_, cell) => {
+            const z = -cell * MAZE;
+            // one square-in-square, with the ring broken at the corners
+            const rings = [0.88, 0.5];
+            return (
+              <group key={cell} position={[0, 0, z]}>
+                {rings.map((k, ri) => {
+                  const half = (MAZE * k) / 2;
+                  const t = MAZE * 0.042;
+                  return (
+                    <group key={k}>
+                      {/* the two bands across, and the two along */}
+                      {[-1, 1].map((sy) => (
+                        <mesh
+                          key={`x${sy}`}
+                          rotation={[-Math.PI / 2, 0, 0]}
+                          position={[0, 0.005 + ri * 0.001, sy * half]}
+                        >
+                          <planeGeometry args={[half * 2 + t, t]} />
+                          <meshStandardMaterial
+                            color={p.floorInlay}
+                            roughness={0.16}
+                            metalness={0.2}
+                          />
+                        </mesh>
+                      ))}
+                      {[-1, 1].map((sx) => (
+                        <mesh
+                          key={`z${sx}`}
+                          rotation={[-Math.PI / 2, 0, 0]}
+                          position={[sx * half, 0.005 + ri * 0.001, 0]}
+                        >
+                          <planeGeometry args={[t, half * 2 - t * 1.6]} />
+                          <meshStandardMaterial
+                            color={p.floorInlay}
+                            roughness={0.16}
+                            metalness={0.2}
+                          />
+                        </mesh>
+                      ))}
+                    </group>
+                  );
+                })}
+                {/* the key that ties one square into the next */}
+                <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.008, MAZE / 2]}>
+                  <planeGeometry args={[MAZE * 0.042, MAZE * 0.12]} />
+                  <meshStandardMaterial color={p.floorInlay} roughness={0.16} metalness={0.2} />
+                </mesh>
+              </group>
+            );
+          })}
+          {/* the dark border band down each edge of the walk */}
+          {[-1, 1].map((sx) => (
             <mesh
-              key={s}
+              key={sx}
               rotation={[-Math.PI / 2, 0, 0]}
-              position={[s * (d.halfWidth - 0.55), 0.005, mid]}
+              position={[sx * (d.halfWidth - 0.5), 0.005, mid]}
             >
-              <planeGeometry args={[0.34, run]} />
-              <meshStandardMaterial color={p.floorInlay} roughness={0.22} metalness={0.15} />
+              <planeGeometry args={[0.4, run]} />
+              <meshStandardMaterial color={p.floorInlay} roughness={0.16} metalness={0.2} />
             </mesh>
           ))}
-          {/* a repeating geometric medallion down the centre of the gallery */}
-          <Instanced
-            count={d.bays}
-            place={(i, m) => {
-              m.makeRotationX(-Math.PI / 2);
-              m.multiply(new THREE.Matrix4().makeRotationZ(Math.PI / 4));
-              m.setPosition(0, 0.006, bayZ(d, i));
-            }}
-          >
-            <planeGeometry args={[1.5, 1.5]} />
-            <meshStandardMaterial color={p.floorInlay} roughness={0.2} metalness={0.15} />
-          </Instanced>
-          <Instanced
-            count={d.bays}
-            place={(i, m) => {
-              m.makeRotationX(-Math.PI / 2);
-              m.multiply(new THREE.Matrix4().makeRotationZ(Math.PI / 4));
-              m.setPosition(0, 0.007, bayZ(d, i));
-            }}
-          >
-            <planeGeometry args={[0.9, 0.9]} />
-            <meshStandardMaterial color={p.wall} roughness={0.22} metalness={0.12} />
-          </Instanced>
         </group>
       )}
 
@@ -203,6 +262,43 @@ export function Floor({ style, d, quality }: Props) {
           <planeGeometry args={[w * 0.46, run]} />
           <meshStandardMaterial color={p.floorInlay} roughness={0.28} metalness={0.1} />
         </mesh>
+      )}
+
+      {kind === 'stone-bands' && (
+        /*
+         * Wide bands of matte stone running ACROSS the hall.
+         *
+         * Not a grid and not a checkerboard: the Egyptian gallery's floor is
+         * laid in broad courses that cross the width, alternating a chalky
+         * mid grey with a dense charcoal, and that is most of why the room
+         * reads as heavy. Bands across a corridor also do the opposite of what
+         * a runner does — they measure the length out in front of you instead
+         * of pulling you down it.
+         *
+         * Only the dark courses are drawn; the pale ones are the floor plane
+         * showing through, which halves the geometry and keeps the specular
+         * sheen continuous under them.
+         */
+        <group position={[0, 0.003, 0]}>
+          <Instanced
+            count={Math.ceil(run / (BAND * 2)) + 1}
+            place={(i, m) => m.makeTranslation(0, 0, -i * BAND * 2)}
+          >
+            <boxGeometry args={[w, 0.004, BAND]} />
+            <meshStandardMaterial color={p.floorInlay} roughness={0.62} metalness={0.06} />
+          </Instanced>
+          {/* the joint between courses: a hairline, darker than either */}
+          <Instanced
+            count={Math.ceil(run / BAND) + 1}
+            place={(i, m) => {
+              m.makeRotationX(-Math.PI / 2);
+              m.setPosition(0, 0.006, -i * BAND);
+            }}
+          >
+            <planeGeometry args={[w, 0.03]} />
+            <meshStandardMaterial color={p.accent} roughness={0.8} />
+          </Instanced>
+        </group>
       )}
 
       {kind === 'court-paving' && (
@@ -279,110 +375,178 @@ export function Walls({ style, d, quality }: Props) {
 
   if (kind === 'court-facade') return <CourtFacade style={style} d={d} quality={quality} />;
 
-  if (kind === 'pier-alcoves') {
+  if (kind === 'fluted-pilasters') {
     /*
-     * The British Museum's sculpture hall: the wall IS a colonnade.
+     * The British Museum's Egyptian sculpture gallery.
      *
-     * Both sides are a march of thick square piers stepping back toward the
-     * vanishing point, and the flat spans between them are shallow alcoves —
-     * which, with the sculpture taken out, is what the paintings hang in. The
-     * whole character of the room is that rhythm, so the piers are the only
-     * thing given any depth: everything else is plain pale stone.
+     * The room is not made of what is in it — the sculpture has been taken
+     * out and it is still overwhelming — it is made of two things repeated
+     * without variation for fifty metres: a fluted pilaster, and the flat
+     * span of wall between two of them.
      *
-     * At the mouth stand the two colossal fluted columns that frame the view.
-     * They are round where everything else is square, they are the first thing
-     * in the frame, and they are what makes the hall read as a proscenium
-     * rather than as a corridor.
+     * The pilasters are ENGAGED, not free: thick rectangular shafts standing
+     * only a third of a metre proud of the wall, cut with unbroken vertical
+     * flutes from the plinth to the capital, and the capital is a plain
+     * square block with no carving on it at all. That austerity is the whole
+     * effect. A Corinthian capital here would make the hall decorative; a
+     * heavy square one makes it structural, and the room reads as something
+     * holding up a very great weight.
+     *
+     * Down one side, high above the hang, are the tall narrow windows —
+     * behind translucent screens, so what comes through is a flat milky
+     * daylight with no sun in it, and the shadows in the room are cast by the
+     * ceiling rather than by the sky.
      */
-    const pierW = 0.9;
-    const pierD = 0.62;
+    const flutes = 9;
+    const pw = 1.45;
+    const pd = 0.46;
+    const capH = 0.62;
+    const baseH = 0.5;
+    const shaftTop = d.wallHeight - capH;
+    /** the tall lights, above everything hung */
+    const winBottom = Math.min(hangTop(d, style) + 0.5, d.wallHeight - 2.6);
+    const winTop = d.wallHeight - capH - 0.35;
+    const winW = 0.92;
+
     return (
       <group>
-        {base(-1, p.wallDeep)}
-        {base(1, p.wallDeep)}
         {[-1, 1].map((side) => (
           <group key={side}>
-            {/* the alcove face: a pale flat span set between the piers, which
-                is the surface a canvas is actually hung on */}
-            <mesh
-              position={[side * (d.halfWidth - 0.03), d.wallHeight / 2, mid]}
-              rotation={[0, side > 0 ? -Math.PI / 2 : Math.PI / 2, 0]}
-              receiveShadow
-            >
-              <planeGeometry args={[run, d.wallHeight]} />
-              <meshStandardMaterial color={p.wall} roughness={0.9} />
+            {base(side as 1 | -1, p.wall)}
+            {/* the skirting: one heavy course, the only thing at floor level */}
+            <mesh position={[side * (d.halfWidth - 0.07), 0.19, mid]} receiveShadow>
+              <boxGeometry args={[0.14, 0.38, run]} />
+              <meshStandardMaterial color={p.molding} roughness={0.86} />
             </mesh>
 
-            {/* the piers */}
+            {/* the shafts, one on every bay division */}
             <Instanced
               count={d.bays + 2}
               castShadow
               place={(i, m) =>
                 m.makeTranslation(
-                  side * (d.halfWidth - pierD / 2 + 0.02),
-                  d.wallHeight / 2,
-                  d.bayDepth * 0.5 - i * d.bayDepth,
+                  side * (d.halfWidth - pd / 2),
+                  baseH + (shaftTop - baseH) / 2,
+                  d.bayDepth - i * d.bayDepth,
                 )
               }
             >
-              <boxGeometry args={[pierD, d.wallHeight, pierW]} />
+              <boxGeometry args={[pd, shaftTop - baseH, pw]} />
+              <meshStandardMaterial color={p.molding} roughness={0.9} />
+            </Instanced>
+
+            {/*
+             * The fluting. Seven channels to a shaft, drawn as recessed
+             * half-round grooves rather than as ridges: a groove catches a
+             * line of shadow along one side of itself, and it is that line,
+             * repeated, that reads as fluting from across a hall.
+             */}
+            <Instanced
+              count={(d.bays + 2) * flutes}
+              place={(i, m) => {
+                const bay = Math.floor(i / flutes);
+                const f = i % flutes;
+                m.makeRotationZ(Math.PI / 2);
+                m.setPosition(
+                  side * (d.halfWidth - pd - 0.015),
+                  baseH + (shaftTop - baseH) / 2,
+                  d.bayDepth - bay * d.bayDepth + (f / (flutes - 1) - 0.5) * pw * 0.82,
+                );
+              }}
+            >
+              <cylinderGeometry args={[0.075, 0.075, shaftTop - baseH, 10, 1, false, 0, Math.PI]} />
+              <meshStandardMaterial color={p.wallDeep} roughness={0.95} />
+            </Instanced>
+
+            {/* the plinth under each shaft, and the plain square capital over
+                it — heavier than the shaft, and completely unadorned */}
+            <Instanced
+              count={d.bays + 2}
+              place={(i, m) =>
+                m.makeTranslation(
+                  side * (d.halfWidth - pd / 2 - 0.04),
+                  baseH / 2,
+                  d.bayDepth - i * d.bayDepth,
+                )
+              }
+            >
+              <boxGeometry args={[pd + 0.08, baseH, pw + 0.12]} />
+              <meshStandardMaterial color={p.molding} roughness={0.88} />
+            </Instanced>
+            <Instanced
+              count={d.bays + 2}
+              castShadow
+              place={(i, m) =>
+                m.makeTranslation(
+                  side * (d.halfWidth - pd / 2 - 0.05),
+                  shaftTop + capH / 2,
+                  d.bayDepth - i * d.bayDepth,
+                )
+              }
+            >
+              <boxGeometry args={[pd + 0.1, capH, pw + 0.16]} />
               <meshStandardMaterial color={p.molding} roughness={0.86} />
             </Instanced>
-            {/* their plinths and capitals: two square steps, no curves */}
-            {[0.22, d.wallHeight - 0.22].map((y) => (
-              <Instanced
-                key={y}
-                count={d.bays + 2}
-                place={(i, m) =>
-                  m.makeTranslation(
-                    side * (d.halfWidth - pierD / 2 + 0.02),
-                    y,
-                    d.bayDepth * 0.5 - i * d.bayDepth,
-                  )
-                }
-              >
-                <boxGeometry args={[pierD + 0.16, 0.44, pierW + 0.16]} />
-                <meshStandardMaterial color={p.molding} roughness={0.84} />
-              </Instanced>
-            ))}
-            {/* the skirting, unbroken along the alcove faces */}
-            <mesh position={[side * (d.halfWidth - 0.06), 0.16, mid]} receiveShadow>
-              <boxGeometry args={[0.12, 0.32, run]} />
-              <meshStandardMaterial color={p.molding} roughness={0.82} />
+
+            {/* the entablature the capitals carry, running unbroken */}
+            <mesh position={[side * (d.halfWidth - 0.12), d.wallHeight - 0.18, mid]} receiveShadow>
+              <boxGeometry args={[0.3, 0.36, run]} />
+              <meshStandardMaterial color={p.molding} roughness={0.88} />
             </mesh>
           </group>
         ))}
 
-        {/* The two colossal fluted columns at the mouth. Round where the rest
-            of the hall is square, and close enough to the camera at the start
-            of the walk to frame the whole view. */}
-        {[-1, 1].map((side) => (
-          <group key={`col${side}`} position={[side * (d.halfWidth - 0.5), 0, d.bayDepth * 1.3]}>
-            <mesh castShadow>
-              <cylinderGeometry args={[0.72, 0.78, d.wallHeight, 24]} />
-              <meshStandardMaterial color={p.molding} roughness={0.8} />
-            </mesh>
-            {/* the flutes: shallow half-round channels round the shaft */}
-            <Instanced
-              count={20}
-              place={(i, m) => {
-                const a = (i / 20) * Math.PI * 2;
-                m.makeTranslation(Math.cos(a) * 0.74, d.wallHeight / 2, Math.sin(a) * 0.74);
-              }}
-            >
-              <boxGeometry args={[0.07, d.wallHeight, 0.07]} />
-              <meshStandardMaterial color={p.wallDeep} roughness={0.88} />
-            </Instanced>
-            <mesh position={[0, d.wallHeight - 0.3, 0]} castShadow>
-              <boxGeometry args={[1.9, 0.6, 1.9]} />
-              <meshStandardMaterial color={p.molding} roughness={0.82} />
-            </mesh>
-            <mesh position={[0, 0.22, 0]}>
-              <boxGeometry args={[1.9, 0.44, 1.9]} />
-              <meshStandardMaterial color={p.molding} roughness={0.82} />
-            </mesh>
-          </group>
-        ))}
+        {/*
+         * The windows, high on the left wall only.
+         *
+         * One to a bay, between the pilasters, and screened: the pane is an
+         * unshaded flat white so it stays the brightest thing in the room, and
+         * the diffuse light it stands for is placed as a separate fixture (see
+         * `daylight` in CorridorScene) rather than baked into the wall.
+         */}
+        {Array.from({ length: d.bays + 1 }, (_, i) => {
+          const z = d.bayDepth / 2 - i * d.bayDepth;
+          return (
+            <group key={`win${i}`} position={[-(d.halfWidth - 0.09), (winBottom + winTop) / 2, z]}>
+              <mesh>
+                <boxGeometry args={[0.05, winTop - winBottom, winW]} />
+                <meshBasicMaterial color={p.sky} toneMapped={false} />
+              </mesh>
+              {/* the screen over it: three horizontal bars and one mullion,
+                  which is what stops a bright rectangle reading as a hole */}
+              <Instanced
+                count={3}
+                place={(j, m) =>
+                  m.makeTranslation(
+                    -0.05,
+                    ((j + 1) / 4 - 0.5) * (winTop - winBottom),
+                    0,
+                  )
+                }
+              >
+                <boxGeometry args={[0.05, 0.05, winW]} />
+                <meshStandardMaterial color={p.molding} roughness={0.8} />
+              </Instanced>
+              <mesh position={[-0.05, 0, 0]}>
+                <boxGeometry args={[0.05, winTop - winBottom, 0.05]} />
+                <meshStandardMaterial color={p.molding} roughness={0.8} />
+              </mesh>
+              {/* the splayed stone reveal round the opening */}
+              {[-1, 1].map((e) => (
+                <mesh key={e} position={[-0.03, 0, (e * (winW + 0.16)) / 2]}>
+                  <boxGeometry args={[0.16, winTop - winBottom + 0.3, 0.16]} />
+                  <meshStandardMaterial color={p.molding} roughness={0.86} />
+                </mesh>
+              ))}
+              {[-1, 1].map((e) => (
+                <mesh key={`h${e}`} position={[-0.03, (e * (winTop - winBottom + 0.16)) / 2, 0]}>
+                  <boxGeometry args={[0.18, 0.16, winW + 0.3]} />
+                  <meshStandardMaterial color={p.molding} roughness={0.86} />
+                </mesh>
+              ))}
+            </group>
+          );
+        })}
       </group>
     );
   }
@@ -567,43 +731,146 @@ export function Walls({ style, d, quality }: Props) {
   }
 
   if (kind === 'fresco-maps') {
-    // Painted map panels between gilded pilasters, busts along the base.
+    /*
+     * The Vatican's Gallery of Maps.
+     *
+     * The walls here are the opposite of the British Museum's: no depth at
+     * all. They are flat expanses divided into enormous rectangular panels,
+     * each one a painted map in ocean blue and forest green, separated by
+     * pilasters that are painted onto the wall rather than standing off it
+     * and framed with bands of polished marble that run the whole length of
+     * the corridor in an unbroken line.
+     *
+     * The maps are drawn rather than modelled — see ./fresco — and dealt out
+     * so that no two neighbours are the same panel. Above them, on the window
+     * side, is the clerestory the room is actually lit through.
+     */
+    const panelTop = d.wallHeight * 0.86;
+    const panelBottom = 1.05;
+    const panelH = panelTop - panelBottom;
+    /** the side the windows are on: the maps opposite get the daylight */
+    const winSide = 1;
+
     return (
       <group>
-        {base(-1, p.wallDeep)}
-        {base(1, p.wallDeep)}
         {[-1, 1].map((side) => (
           <group key={side}>
-            {Array.from({ length: d.bays }, (_, b) => (
-              <mesh
-                key={b}
-                position={[side * (d.halfWidth - 0.04), d.wallHeight * 0.56, bayZ(d, b)]}
-                rotation={[0, side > 0 ? -Math.PI / 2 : Math.PI / 2, 0]}
-              >
-                <planeGeometry args={[d.bayDepth * 0.78, d.wallHeight * 0.62]} />
-                <meshStandardMaterial
-                  color={b % 2 ? p.wall : p.accent}
-                  roughness={0.92}
-                />
-              </mesh>
-            ))}
-            {/* gilded pilasters at every bay division */}
+            {base(side as 1 | -1, p.wallDeep)}
+            {/* the dado the panels stand on */}
+            <mesh position={[side * (d.halfWidth - 0.05), panelBottom / 2, mid]} receiveShadow>
+              <boxGeometry args={[0.1, panelBottom, run]} />
+              <meshStandardMaterial color={p.wall} roughness={0.86} />
+            </mesh>
+            <mesh position={[side * (d.halfWidth - 0.09), panelBottom, mid]}>
+              <boxGeometry args={[0.18, 0.09, run]} />
+              <meshStandardMaterial color={p.accent} roughness={0.3} metalness={0.16} />
+            </mesh>
+
+            {/* the maps themselves, one to a bay */}
+            {Array.from({ length: d.bays + 1 }, (_, b) => {
+              const z = d.bayDepth / 2 - b * d.bayDepth;
+              const tex = mapPanelTexture(b * 2 + (side > 0 ? 1 : 0));
+              return (
+                <mesh
+                  key={`m${b}`}
+                  position={[side * (d.halfWidth - 0.04), (panelBottom + panelTop) / 2, z]}
+                  rotation={[0, side > 0 ? -Math.PI / 2 : Math.PI / 2, 0]}
+                >
+                  <planeGeometry args={[d.bayDepth * 0.78, panelH]} />
+                  <meshStandardMaterial
+                    color={tex ? '#FFFFFF' : p.accent}
+                    map={tex}
+                    roughness={0.86}
+                  />
+                </mesh>
+              );
+            })}
+
+            {/* the flat pilasters between them: painted, barely proud of the
+                wall, with a marble band either side of each */}
             <Instanced
-              count={d.bays + 1}
-              castShadow
+              count={d.bays + 2}
               place={(i, m) =>
                 m.makeTranslation(
-                  side * (d.halfWidth - 0.09),
-                  d.wallHeight / 2,
-                  -i * d.bayDepth,
+                  side * (d.halfWidth - 0.05),
+                  (panelBottom + panelTop) / 2,
+                  d.bayDepth - i * d.bayDepth,
                 )
               }
             >
-              <boxGeometry args={[0.18, d.wallHeight, 0.42]} />
-              <meshStandardMaterial color={p.molding} metalness={0.6} roughness={0.42} />
+              <boxGeometry args={[0.09, panelH, d.bayDepth * 0.2]} />
+              <meshStandardMaterial color={p.wall} roughness={0.8} />
             </Instanced>
-            {bands(side as 1 | -1, p.molding, 1.15)}
+            <Instanced
+              count={(d.bays + 2) * 2}
+              place={(i, m) => {
+                const bay = Math.floor(i / 2);
+                m.makeTranslation(
+                  side * (d.halfWidth - 0.1),
+                  (panelBottom + panelTop) / 2,
+                  d.bayDepth - bay * d.bayDepth + (i % 2 ? 1 : -1) * d.bayDepth * 0.1,
+                );
+              }}
+            >
+              <boxGeometry args={[0.12, panelH, 0.07]} />
+              <meshStandardMaterial color={p.accent} roughness={0.3} metalness={0.16} />
+            </Instanced>
+
+            {/* the marble trim above and below the run of panels, unbroken */}
+            {[panelBottom - 0.06, panelTop + 0.06].map((y) => (
+              <mesh key={y} position={[side * (d.halfWidth - 0.1), y, mid]}>
+                <boxGeometry args={[0.14, 0.12, run]} />
+                <meshStandardMaterial color={p.accent} roughness={0.3} metalness={0.16} />
+              </mesh>
+            ))}
+            {/* and the frieze between the trim and the cornice */}
+            <mesh
+              position={[side * (d.halfWidth - 0.03), (panelTop + d.wallHeight) / 2 + 0.06, mid]}
+              rotation={[0, side > 0 ? -Math.PI / 2 : Math.PI / 2, 0]}
+            >
+              <planeGeometry args={[run, d.wallHeight - panelTop - 0.12]} />
+              <meshStandardMaterial color={p.wall} roughness={0.88} />
+            </mesh>
           </group>
+        ))}
+
+        {/*
+         * The clerestory on the window side: tall openings in the frieze,
+         * unshaded, which is where the hard white reflections on the floor
+         * come from.
+         */}
+        {Array.from({ length: d.bays + 1 }, (_, b) => (
+          <mesh
+            key={`w${b}`}
+            position={[
+              winSide * (d.halfWidth - 0.06),
+              (panelTop + d.wallHeight) / 2 + 0.06,
+              d.bayDepth / 2 - b * d.bayDepth,
+            ]}
+          >
+            <boxGeometry args={[0.05, (d.wallHeight - panelTop) * 0.5, d.bayDepth * 0.42]} />
+            <meshBasicMaterial color={p.sky} toneMapped={false} />
+          </mesh>
+        ))}
+
+        {/* the day landing on that glassy floor, one pool per opening */}
+        {Array.from({ length: d.bays + 1 }, (_, b) => (
+          <mesh
+            key={`sun${b}`}
+            position={[winSide * d.halfWidth * 0.3, 0.02, d.bayDepth / 2 - b * d.bayDepth - 0.6]}
+            rotation={[-Math.PI / 2, 0, 0]}
+          >
+            <planeGeometry args={[d.halfWidth * 1.4, d.bayDepth * 0.8]} />
+            <meshBasicMaterial
+              map={glowTexture()}
+              color={p.sky}
+              transparent
+              opacity={0.34}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
         ))}
       </group>
     );

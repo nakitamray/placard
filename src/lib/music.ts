@@ -9,9 +9,10 @@
  *
  * TWO PLAYERS, NOT ONE
  *   One player can hold one video, so moving between rooms with a single
- *   player is a cut. Two decks can overlap: the arriving room fades up while
- *   the room behind you fades down, over a couple of seconds, and the visitor
- *   hears a door rather than a switch.
+ *   player is a cut. Two decks can overlap: the room behind you thins out
+ *   over seven seconds, there is a beat of silence, and the arriving room
+ *   comes up over twelve — long enough that it is established without ever
+ *   having been heard to start.
  *
  * DUCKING
  *   `setMusicDuck` scales whatever is playing without changing what is
@@ -102,7 +103,20 @@ const VOLUME: Record<RoomKind, number> = { entrance: 12, gallery: 34, atlas: 17 
  * length at which the entrance has genuinely thinned out before the corridor
  * is established, and it is still shorter than the walk in.
  */
-const CROSSFADE_MS = 6000;
+const CROSSFADE_MS = 7000;
+/**
+ * How long the arriving room takes to come up, and how long it waits first.
+ *
+ * Arriving is not the same move as leaving, and it should not be the same
+ * curve. Walking into a gallery, the room you were in falls away and for a
+ * moment there is nothing — then the new room is there, without having
+ * started. So the arriving deck holds at silence while the last one thins
+ * out, and then takes twelve seconds to reach its own level, which is longer
+ * than anybody walks down a corridor and is meant to be: the music should be
+ * established without ever having been noticed to begin.
+ */
+const ENTER_HOLD_MS = 2400;
+const FADE_IN_MS = 12000;
 /** how long a duck takes to settle, either way — slow enough to be a room */
 const DUCK_MS = 3200;
 /** how long the API script gets before we give up and fall back */
@@ -185,6 +199,8 @@ interface Deck {
   fade: number | null;
   /** the playlist to load once the player reports ready */
   pending: { ids: string[]; base: number } | null;
+  /** the beat of silence before this deck starts to rise */
+  hold: number | null;
 }
 
 const decks: Deck[] = [0, 1].map((slot) => ({
@@ -196,6 +212,7 @@ const decks: Deck[] = [0, 1].map((slot) => ({
   level: 0,
   fade: null,
   pending: null,
+  hold: null,
 }));
 
 /**
@@ -361,11 +378,22 @@ function flush(deck: Deck) {
     giveUp();
     return;
   }
-  ramp(deck, base, CROSSFADE_MS);
+  // a beat of nothing, then a long way up — see ENTER_HOLD_MS
+  if (deck.hold !== null) window.clearTimeout(deck.hold);
+  const wasKey = deck.key;
+  deck.hold = window.setTimeout(() => {
+    deck.hold = null;
+    if (deck.key !== wasKey) return;
+    ramp(deck, base, FADE_IN_MS);
+  }, ENTER_HOLD_MS);
 }
 
 function stopDeck(deck: Deck, ms: number) {
   const wasKey = deck.key;
+  if (deck.hold !== null) {
+    window.clearTimeout(deck.hold);
+    deck.hold = null;
+  }
   // read the position now, while it is still playing, not after the fade
   if (wasKey && deck.player && deck.ready) {
     try {
@@ -415,8 +443,15 @@ function tracksFor(kind: RoomKind): string[] {
 export function playMusic(key: string, kind: RoomKind) {
   if (unavailable) return;
   if (active.key === key) {
-    // already here; make sure it is at its proper level and running
-    if (active.fade === null && active.level !== active.base) ramp(active, active.base, 400);
+    /*
+     * Already here. Make sure it is running and heading for its own level —
+     * but never yank it there: React can call this again in the middle of the
+     * arrival, and a 400ms jump to full volume is exactly the abrupt entrance
+     * the long fade exists to avoid.
+     */
+    if (active.fade === null && active.hold === null && active.level !== active.base) {
+      ramp(active, active.base, FADE_IN_MS);
+    }
     resumeMusicOnGesture();
     return;
   }
@@ -426,6 +461,10 @@ export function playMusic(key: string, kind: RoomKind) {
   if (next.fade !== null) {
     window.clearInterval(next.fade);
     next.fade = null;
+  }
+  if (next.hold !== null) {
+    window.clearTimeout(next.hold);
+    next.hold = null;
   }
 
   next.key = key;

@@ -51,6 +51,8 @@ const SPACING = 8;
  * canvas wins — a moulding wrapped round a work that only fills three fifths
  * of the frame leaves the picture itself at barely half.
  */
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+
 const CAM_Z = 5.2;
 /** the height a work is hung at unless it is too wide to allow it */
 export const PLANE_H = 2.55;
@@ -262,6 +264,8 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
   const look = useRef({ x: 0, y: 0 });
   /** how far the room slides aside to make room for the wall label */
   const shift = useRef(0);
+  /** where the zoom is leaning, in world units off the canvas centre */
+  const pan = useRef({ x: 0, y: 0 });
   const touch = useRef({ x: 0, active: false });
   const roomTone = useRef(new THREE.Color('#3A3630'));
 
@@ -416,6 +420,35 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     const dz = Math.max(1.55, CAM_Z / view.v);
 
     /*
+     * Zoom in on what you are looking at, not on the middle.
+     *
+     * Leaning in always toward the centre of the canvas is the one thing a
+     * zoom must not do: the reason to lean in is a hand, a signature, a
+     * wormhole in an apple, and those are never in the middle. So the camera
+     * pans toward the point under the cursor as it approaches — none at 1×,
+     * halfway to it at 2×, all the way in the limit — which keeps whatever
+     * you pointed at roughly where it was on the screen while the picture
+     * grows around it.
+     *
+     * The pan is damped and clamped to the work's own extents, so it can
+     * never carry the camera off the side of the painting, and it unwinds by
+     * itself as you zoom back out. `0` still puts everything back.
+     */
+    const entry = artworks[index];
+    const fit = entry ? fitWork(entry.aspect, PLANE_H, MAX_W) : { width: 0, height: 0 };
+    const halfH = Math.tan(((camera.fov || 45) * Math.PI) / 360) * dz;
+    const halfW = halfH * (size.width / Math.max(1, size.height));
+    const toward = 1 - 1 / Math.max(1, view.v);
+    const wantPanX = reducedMotion
+      ? 0
+      : clamp(pointer.x * halfW * toward, -fit.width / 2, fit.width / 2);
+    const wantPanY = reducedMotion
+      ? 0
+      : clamp(-pointer.y * halfH * toward, -fit.height / 2, fit.height / 2);
+    pan.current.x = damp(pan.current.x, wantPanX, 0.12, delta);
+    pan.current.y = damp(pan.current.y, wantPanY, 0.12, delta);
+
+    /*
      * Step aside for the label.
      *
      * The canvas is drawn large enough now that a 380px card at the right of
@@ -428,8 +461,8 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     shift.current = damp(shift.current, wantShift, 0.11, delta);
 
     camera.position.set(
-      gallery.x + shift.current + look.current.x * 0.1,
-      1.96 + look.current.y * -0.05,
+      gallery.x + shift.current + look.current.x * 0.1 + pan.current.x,
+      1.96 + look.current.y * -0.05 + pan.current.y,
       dz,
     );
     camera.rotation.set(

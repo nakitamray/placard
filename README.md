@@ -22,9 +22,9 @@ Requires WebGL2. Sound is off until you turn it on.
 | Museum | The corridor |
 |---|---|
 | **Musée du Louvre** | white barrel vault pierced by arched skylights, thick classical moulding, deep blue-grey walls, salon hang stacked to the cornice |
-| **The British Museum** | a coffered stone hall between two colossal fluted columns, walls made of a marching colonnade of square piers with alcoves between them, spotlights on a track down the centre line |
+| **The British Museum** | a stone hall under a deep grid of stepped coffers, engaged fluted pilasters with plain square capitals, tall screened windows high on one side, wide bands of grey and charcoal underfoot |
 | **The National Gallery** | crimson walls under a pitched glass lantern on gilded archways, polished light wood, tufted leather seating |
-| **Vatican Museums** | frescoed vault in deeply carved gilded stucco, map panels between gilded pilasters, marble inlay, crystal chandeliers |
+| **Vatican Museums** | a barrel vault of gilded stucco and painted compartments lit from the cornice upward, walls of painted map panels in ocean blue and forest green, a black and white labyrinth polished to a mirror |
 | **Galleria degli Uffizi** | warm brown crossbeams over painted grotesque compartments, the hang down one side and a run of tall windows down the other, a diagonal checkerboard floor with the day lying on it |
 | **Musée d'Orsay** | the colossal arched steel-and-glass nave, two rows of pale stone benches down the concourse, stone terraces behind glass railings, the great gilded clock closing the far end |
 | **The Metropolitan Museum of Art** | a sunlit court under a peaked skylight: red brick and white voussoired arches one side, marble ashlar the other, a glass wall at the end |
@@ -187,9 +187,9 @@ kinds, the `hang` pattern, room proportions, a ten-colour palette, a full
 lighting rig (key colour, intensity and direction; sky and ground fill; lamp
 colour; tone-mapping exposure; background and fog) and which fixtures to place —
 sculpture, seating, chandeliers, label stands, ropes, vitrines, a lighting
-track, a clock, terraces, and whether the room is lit by its windows rather
-than by its lamps. Nothing about a particular building is hard-coded in the
-renderer.
+track, a clock, terraces, whether the room is lit by its windows rather than by
+its lamps, and whether it has a cove throwing light up into its ceiling.
+Nothing about a particular building is hard-coded in the renderer.
 
 `hang` decides how the works are distributed: `salon` stacks three to a bay on
 both walls, `single` hangs one per bay on both, `alternating` swaps sides bay by
@@ -212,11 +212,11 @@ fine on a wall and wrong across a window.
 
 `frameShape` handles the works a rectangle is wrong for. `'round'` turns the
 museum's own moulding on a lathe and cuts the canvas to a circle, for a tondo;
-`'arched'` gives it a round-headed top, straight sides and a flat foot, for a
-panel cut for an altarpiece; `'divided'` keeps the rectangle and runs a moulded
-bar down the centre, for a pair of panels hung as one object. In every case the
-canvas is cut to the same silhouette in the shader, so the words stop where the
-panel does. Omitted, a work takes the museum's plain frame.
+`'divided'` keeps the rectangle, runs a moulded bar down the centre and gives
+the surround two extra carved courses, for a pair of panels hung as one object.
+A round work is cut to the same silhouette in the shader as in the frame, so
+the words stop where the panel does. Omitted, a work takes the museum's plain
+frame.
 
 `data/artworks/{id}/` is optional and exists only to override generated assets:
 

@@ -7,7 +7,7 @@
  * that arch. Set per artwork in the collection record; everything else takes
  * the museum's own frame.
  */
-export type FrameShape = 'round' | 'divided' | 'arched';
+export type FrameShape = 'round' | 'divided';
 
 export interface ArtworkIndexEntry {
   id: string;
@@ -114,8 +114,8 @@ export type CeilingKind =
   | 'peaked-court'
   /** Uffizi: a flat ceiling of dark crossbeams with grotesque frescoes between */
   | 'grotesque-beams'
-  /** British Museum: deep stepped coffers with a lighting track down the centre */
-  | 'coffered-track';
+  /** British Museum: a deep grid of stepped coffers between heavy square beams */
+  | 'deep-coffers';
 
 export type FloorKind =
   /** pale reflective stone */
@@ -129,7 +129,9 @@ export type FloorKind =
   /** smooth outdoor-courtyard paving slabs */
   | 'court-paving'
   /** polished marble laid as a diagonal checkerboard, charcoal and pale grey */
-  | 'checkerboard';
+  | 'checkerboard'
+  /** British Museum: wide bands of matte stone across the hall, grey and charcoal */
+  | 'stone-bands';
 
 export type WallKind =
   /** densely stacked salon hang on deep blue-grey */
@@ -144,8 +146,8 @@ export type WallKind =
   | 'court-facade'
   /** Uffizi: plaster and a portrait frieze one side, tall windows the other */
   | 'uffizi-corridor'
-  /** British Museum: a colonnade of square piers with shallow alcoves between */
-  | 'pier-alcoves';
+  /** British Museum: engaged fluted pilasters, and tall screened windows high on one side */
+  | 'fluted-pilasters';
 
 export type FrameKind =
   /** deep gilt salon frame, corner cartouches, bead course */
@@ -248,6 +250,12 @@ export interface MuseumStyle {
      * centre line that an artificially lit gallery gets.
      */
     daylight?: boolean;
+    /**
+     * A continuous warm source hidden along the top of both walls, throwing
+     * light up into the ceiling. The Gallery of Maps is lit this way and it
+     * is the whole reason that vault glows.
+     */
+    cove?: boolean;
   };
 }
 

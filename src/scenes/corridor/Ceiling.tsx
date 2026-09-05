@@ -10,6 +10,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { grotesqueTexture } from './grotesque';
 import { glowTexture } from './glow';
+import { vaultFrescoTexture } from './fresco';
 import type { MuseumStyle } from '../../types';
 import { bayZ, type Dims } from './dims';
 
@@ -211,84 +212,133 @@ function PitchedGlass({ style, d }: Props) {
   );
 }
 
-/* ── Vatican: frescoed vault in heavy gilded stucco ─────────────────────── */
+/**
+ * Two colours, blended.
+ *
+ * Used to bake the occlusion a coffer would cast into the colour of the
+ * coffer, which is the only way a recess a few centimetres deep reads as deep
+ * from four metres below it.
+ */
+function mix(a: string, b: string, t: number): string {
+  return '#' + new THREE.Color(a).lerp(new THREE.Color(b), t).getHexString();
+}
 
+/**
+ * The Vatican's Gallery of Maps: a barrel vault encrusted end to end.
+ *
+ * The single most decorated surface in the exhibition, and the one that
+ * cannot be modelled. The real vault is a continuous topography of sculpted
+ * plaster — figures, vines, cartouches, deep ornate borders — acting as heavy
+ * frames for a hundred painted scenes, the whole of it gilded and running
+ * unbroken for a hundred and twenty metres.
+ *
+ * So the fresco is PAINTED (see ./fresco): one bay of gold ground, painted
+ * compartments and grotesque borders, drawn into a canvas at load and tiled
+ * along the vault. What stays modelled is only what has to catch a moving
+ * highlight — the transverse ribs, the longitudinal bands and the cornice —
+ * because gilding is specular, and a texture of gold under a lamp reads as
+ * yellow paint the moment the camera moves.
+ *
+ * THE LIGHT COMES FROM THE CORNICE, UPWARD. That is the actual lighting of
+ * that gallery and the reason it glows: a continuous warm source hidden at
+ * the top of the walls, throwing light up into the vault so the raised stucco
+ * casts its shadows downward and every carved thing pops. A lamp hung in the
+ * middle of the room would flatten the entire ceiling.
+ */
 function FrescoVault({ style, d }: Props) {
   const p = style.palette;
   const r = d.halfWidth;
   const springing = d.wallHeight;
   const mid = -d.length / 2;
+  const runLength = d.length + d.bayDepth * 3;
+
+  const fresco = useMemo(
+    () => vaultFrescoTexture(Math.round(runLength / d.bayDepth)),
+    [runLength, d.bayDepth],
+  );
 
   return (
     <group>
-      {/* base vault — the fresco ground */}
+      {/* the painted vault */}
       <mesh position={[0, springing, mid]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry
-          args={[r, r, d.length + d.bayDepth * 3, 40, 1, true, Math.PI / 2, Math.PI]}
+        <cylinderGeometry args={[r, r, runLength, 48, 1, true, Math.PI / 2, Math.PI]} />
+        <meshStandardMaterial
+          color={fresco ? '#FFFFFF' : p.ceiling}
+          map={fresco}
+          roughness={0.72}
+          metalness={0.12}
+          side={THREE.BackSide}
         />
-        <meshStandardMaterial color={p.ceiling} roughness={0.92} side={THREE.BackSide} />
       </mesh>
 
-      {/* painted fields: an alternating sequence of coloured panels set into
-          the vault, standing in for the fresco cycle */}
-      {Array.from({ length: d.bays }, (_, b) => {
-        const z = bayZ(d, b);
-        const warm = b % 2 === 0;
-        return (
-          <group key={b}>
-            <mesh position={[0, springing + r * 0.86, z]} rotation={[Math.PI / 2, 0, 0]}>
-              <planeGeometry args={[r * 0.66, d.bayDepth * 0.6]} />
-              <meshStandardMaterial
-                color={warm ? p.ceilingAccent : p.wallDeep}
-                roughness={0.9}
-              />
-            </mesh>
-            {/* side panels, angled into the curve of the vault */}
-            {[-1, 1].map((s) => (
-              <mesh
-                key={s}
-                position={[s * r * 0.56, springing + r * 0.6, z]}
-                rotation={[Math.PI / 2, 0, 0, 'ZXY']}
-                scale={[1, 1, 1]}
-              >
-                <planeGeometry args={[r * 0.36, d.bayDepth * 0.55]} />
-                <meshStandardMaterial
-                  color={warm ? p.wallDeep : p.ceilingAccent}
-                  roughness={0.9}
-                />
-              </mesh>
-            ))}
-          </group>
-        );
-      })}
-
-      {/* deeply carved gilded stucco: transverse ribs plus longitudinal bands,
-          which is what gives the Gallery of Maps its coffered density */}
+      {/* the transverse ribs: heavy gilt half-hoops on every bay division */}
       <Repeated
-        count={d.bays + 1}
-        place={(i, m) => m.makeTranslation(0, springing, -i * d.bayDepth)}
+        count={d.bays + 3}
+        place={(i, m) => m.makeTranslation(0, springing, d.bayDepth - i * d.bayDepth)}
       >
-        <torusGeometry args={[r - 0.03, 0.14, 8, 24, Math.PI]} />
-        <meshStandardMaterial color={p.molding} metalness={0.72} roughness={0.36} />
+        <torusGeometry args={[r - 0.04, 0.17, 10, 28, Math.PI]} />
+        <meshStandardMaterial color={p.molding} metalness={0.78} roughness={0.3} />
       </Repeated>
-      {[-0.62, 0, 0.62].map((f) => {
+      {/* and a thinner one just inside each, which is what gives a carved
+          border its double line from the floor */}
+      <Repeated
+        count={d.bays + 3}
+        place={(i, m) => m.makeTranslation(0, springing, d.bayDepth - i * d.bayDepth + 0.34)}
+      >
+        <torusGeometry args={[r - 0.05, 0.07, 8, 24, Math.PI]} />
+        <meshStandardMaterial color={p.gilt} metalness={0.8} roughness={0.28} />
+      </Repeated>
+
+      {/* the longitudinal bands running the length of the vault */}
+      {[-0.72, -0.36, 0, 0.36, 0.72].map((f) => {
         const a = (f * Math.PI) / 2;
+        const thick = Math.abs(f) < 0.01 ? 0.2 : 0.13;
         return (
           <mesh
             key={f}
             position={[Math.sin(a) * (r - 0.06), springing + Math.cos(a) * (r - 0.06), mid]}
+            rotation={[0, 0, -a]}
           >
-            <boxGeometry args={[0.16, 0.16, d.length + d.bayDepth * 3]} />
-            <meshStandardMaterial color={p.molding} metalness={0.7} roughness={0.38} />
+            <boxGeometry args={[thick, thick, runLength]} />
+            <meshStandardMaterial color={p.molding} metalness={0.74} roughness={0.34} />
           </mesh>
         );
       })}
-      {/* gilt cornice at the springing */}
+
+      {/* raised bosses where the ribs cross the bands: the one piece of the
+          stucco big enough to read as sculpture rather than as pattern */}
+      <Repeated
+        count={(d.bays + 3) * 2}
+        place={(i, m) => {
+          const bay = Math.floor(i / 2);
+          const a = ((i % 2 ? 0.36 : -0.36) * Math.PI) / 2;
+          m.makeTranslation(
+            Math.sin(a) * (r - 0.14),
+            springing + Math.cos(a) * (r - 0.14),
+            d.bayDepth - bay * d.bayDepth,
+          );
+        }}
+      >
+        <sphereGeometry args={[0.16, 12, 10]} />
+        <meshStandardMaterial color={p.gilt} metalness={0.82} roughness={0.26} />
+      </Repeated>
+
+      {/* the gilt cornice at the springing, both sides */}
       {[-1, 1].map((side) => (
-        <mesh key={side} position={[side * (r - 0.08), springing - 0.12, mid]}>
-          <boxGeometry args={[0.26, 0.34, d.length + d.bayDepth * 3]} />
-          <meshStandardMaterial color={p.molding} metalness={0.62} roughness={0.42} />
-        </mesh>
+        <group key={side}>
+          <mesh position={[side * (r - 0.08), springing - 0.14, mid]}>
+            <boxGeometry args={[0.3, 0.4, runLength]} />
+            <meshStandardMaterial color={p.molding} metalness={0.66} roughness={0.38} />
+          </mesh>
+          {/* the hidden source: a band of warm light on the cornice itself,
+              unshaded, so the top of the wall glows the way it does in the
+              room. The lights that actually throw it up into the vault are
+              placed with the rest of the rig — see Lamps. */}
+          <mesh position={[side * (r - 0.2), springing - 0.02, mid]}>
+            <boxGeometry args={[0.1, 0.07, runLength]} />
+            <meshBasicMaterial color={p.sky} toneMapped={false} />
+          </mesh>
+        </group>
       ))}
     </group>
   );
@@ -617,22 +667,27 @@ function GrotesqueBeams({ style, d }: Props) {
 /**
  * The British Museum's Egyptian gallery: a stone lid, coffered and lit.
  *
- * No glass, no vault, no daylight. The ceiling is a grid of deep rectangular
- * coffers between thick transverse beams, every moulding stepped and square —
- * there is not a curve anywhere in it, and that hardness is most of why the
- * hall reads as an Edwardian museum rather than a palace.
+ * No glass, no vault, no daylight from above. The ceiling is a gigantic
+ * inverted grid — thick square beams crossing at right angles, and between
+ * them deep recessed squares whose inner borders step upward in receding
+ * layers, like a squared upside-down staircase, before reaching a flat inner
+ * panel. It repeats without variation the entire length of the hall.
  *
- * The coffers are built as one instanced sunken panel plus one instanced inner
- * step, which is what gives the shadow line. A recess drawn as a box would
- * need six faces each; a plane set back behind a raised border needs two, and
- * from below the difference is invisible.
+ * THE SHADOW IS THE SUBJECT. What makes a coffered ceiling read is not the
+ * moulding, it is the dark the moulding traps: every recess holds a wedge of
+ * shadow, and from the floor the roof is a sharp checkerboard of light and
+ * dark. Real-time shadows will not do that here — the caster and the receiver
+ * are centimetres apart and the map resolution is spent on the room below —
+ * so the occlusion is built into the colours instead: each step deeper into a
+ * coffer is a shade darker than the one outside it, and the flat inner panel
+ * is darkest of all. It is exactly what the light would do, and it costs
+ * nothing.
  *
- * Down the exact centre line runs a thin metal track carrying small
- * directional spots. It is the only modern object in the room and the only
- * light source, and it is what puts a hard warm pool on each painting and
- * leaves the stone between them in shadow.
+ * The fixtures are small and tucked into the beams, not slung under them: in
+ * the real hall you notice the pools of warm light long before you find what
+ * is making them.
  */
-function CofferedTrack({ style, d }: Props) {
+function DeepCoffers({ style, d }: Props) {
   const p = style.palette;
   const h = d.wallHeight;
   const w = d.halfWidth * 2;
@@ -645,92 +700,143 @@ function CofferedTrack({ style, d }: Props) {
   const cols = 3;
   const colW = w / cols;
 
+  /** the beam face, and then three shades of the dark inside a recess */
+  const face = p.molding;
+  const shade = [
+    mix(p.molding, p.ceilingAccent, 0.3),
+    mix(p.molding, p.ceilingAccent, 0.62),
+    p.ceilingAccent,
+  ];
+  /*
+   * The steps, as fractions of a coffer and heights above the soffit.
+   *
+   * Each one is a flat TREAD — a closed ring of four slabs — that bridges the
+   * whole distance in to the next step up, so the recess is solid all the way
+   * round and there is nowhere to see through it into the roof void. That
+   * bridging is the difference between a stepped coffer and a stack of bars
+   * floating under a hole, and it is only visible at a shallow angle, which
+   * is exactly the angle you look down a fifty-metre hall at.
+   *
+   * Rings rather than nested boxes: a box has to be seen from inside to read
+   * as a recess, and the moment one closes over the one below it the whole
+   * recess turns back into a flat panel.
+   */
+  const steps = [0.8, 0.66, 0.53, 0.42];
+  const riser = 0.15;
+  /*
+   * Where the underside of the whole ceiling is.
+   *
+   * THE RECESS HAS TO FIT INSIDE THE DEPTH OF THE BEAMS. A coffer that rises
+   * above the beam grid can be seen into from anywhere in the hall, and from
+   * a shallow angle — which is the angle you look at a fifty-metre ceiling
+   * from — the treads read as a rack of floating slats. Sunk inside the
+   * beams, the far coffers close up exactly as they do in the room: you see
+   * into the ones over your head, and the rest are a grid of shadow.
+   */
+  const bottom = h - 0.4;
+
+  const cell = (i: number) => {
+    const r = Math.floor(i / cols);
+    const c = i % cols;
+    return [(c - (cols - 1) / 2) * colW, mid + (r - rows / 2 + 0.5) * step] as const;
+  };
+
   return (
     <group>
-      {/* the field the coffers are sunk into */}
-      <mesh position={[0, h, mid]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+      {/* the flat inner surface every recess reaches — the darkest thing in
+          the room, because it is the furthest into the pocket */}
+      <mesh
+        position={[0, bottom + riser * (steps.length - 1) + 0.02, mid]}
+        rotation={[Math.PI / 2, 0, 0]}
+      >
         <planeGeometry args={[w, runLength]} />
-        <meshStandardMaterial color={p.ceiling} roughness={0.95} />
+        <meshStandardMaterial color={mix(p.ceilingAccent, '#000000', 0.14)} roughness={0.97} />
       </mesh>
 
-      {/* the sunken panel of each coffer, dropped above the field and darker:
-          the shadow inside a recess is the whole effect */}
-      <Repeated
-        count={rows * cols}
-        place={(i, m) => {
-          const r = Math.floor(i / cols);
-          const c = i % cols;
-          m.makeRotationX(Math.PI / 2);
-          m.setPosition(
-            (c - (cols - 1) / 2) * colW,
-            h + 0.34,
-            mid + (r - rows / 2 + 0.5) * step,
-          );
-        }}
-      >
-        <planeGeometry args={[colW * 0.74, step * 0.74]} />
-        <meshStandardMaterial color={p.ceilingAccent} roughness={0.96} />
-      </Repeated>
+      {/* the receding treads: four slabs to a ring, three rings to a recess */}
+      {steps.slice(0, -1).map((k, level) => {
+        const kIn = steps[level + 1];
+        const ax = (colW * k) / 2;
+        const bx = (colW * kIn) / 2;
+        const az = (step * k) / 2;
+        const bz = (step * kIn) / 2;
+        const y = bottom + riser * level + riser / 2;
+        return (
+          <group key={level}>
+            {/* the two treads across the corridor */}
+            <Repeated
+              count={rows * cols * 2}
+              place={(i, m) => {
+                const [x, z] = cell(Math.floor(i / 2));
+                m.makeTranslation(x, y, z + (i % 2 ? 1 : -1) * ((az + bz) / 2));
+              }}
+            >
+              <boxGeometry args={[ax * 2, riser, az - bz]} />
+              <meshStandardMaterial color={shade[level]} roughness={0.96} />
+            </Repeated>
+            {/* and the two along it, meeting them at the corners */}
+            <Repeated
+              count={rows * cols * 2}
+              place={(i, m) => {
+                const [x, z] = cell(Math.floor(i / 2));
+                m.makeTranslation(x + (i % 2 ? 1 : -1) * ((ax + bx) / 2), y, z);
+              }}
+            >
+              <boxGeometry args={[ax - bx, riser, bz * 2]} />
+              <meshStandardMaterial color={shade[level]} roughness={0.96} />
+            </Repeated>
+          </group>
+        );
+      })}
 
-      {/* the inner step round each recess, which is what casts the line */}
-      <Repeated
-        count={rows * cols}
-        place={(i, m) => {
-          const r = Math.floor(i / cols);
-          const c = i % cols;
-          m.makeTranslation(
-            (c - (cols - 1) / 2) * colW,
-            h + 0.17,
-            mid + (r - rows / 2 + 0.5) * step,
-          );
-        }}
-      >
-        <boxGeometry args={[colW * 0.82, 0.34, step * 0.82]} />
-        <meshStandardMaterial color={p.molding} roughness={0.92} side={THREE.BackSide} />
-      </Repeated>
-
-      {/* the transverse beams, thick and square */}
+      {/* the transverse beams: thick, square, unadorned */}
       <Repeated
         count={rows + 1}
-        place={(i, m) =>
-          m.makeTranslation(0, h - 0.2, mid + (i - (rows + 1) / 2 + 0.5) * step)
-        }
+        place={(i, m) => m.makeTranslation(0, h - 0.14, mid + (i - (rows + 1) / 2 + 0.5) * step)}
       >
-        <boxGeometry args={[w, 0.4, 0.42]} />
-        <meshStandardMaterial color={p.molding} roughness={0.9} />
+        <boxGeometry args={[w, 0.52, step * (1 - steps[0]) + 0.04]} />
+        <meshStandardMaterial color={face} roughness={0.9} />
       </Repeated>
-
-      {/* and the two ribs running the length, dividing the coffers across */}
+      {/* and the ribs the other way, so the grid closes */}
       {[-1, 1].map((side) => (
-        <mesh key={side} position={[(side * colW) / 2, h - 0.2, mid]}>
-          <boxGeometry args={[0.34, 0.4, runLength]} />
-          <meshStandardMaterial color={p.molding} roughness={0.9} />
+        <mesh key={side} position={[(side * colW) / 2, h - 0.14, mid]}>
+          <boxGeometry args={[colW * (1 - steps[0]) + 0.04, 0.52, runLength]} />
+          <meshStandardMaterial color={face} roughness={0.9} />
         </mesh>
       ))}
+      {/* a thin fascia under every beam, which is the line the whole grid
+          reads by from the far end of the hall */}
+      <Repeated
+        count={rows + 1}
+        place={(i, m) => m.makeTranslation(0, h - 0.42, mid + (i - (rows + 1) / 2 + 0.5) * step)}
+      >
+        <boxGeometry args={[w, 0.09, step * (1 - steps[0]) + 0.14]} />
+        <meshStandardMaterial color={mix(p.molding, p.ceilingAccent, 0.25)} roughness={0.92} />
+      </Repeated>
 
-      {/* the cornice, both walls */}
+      {/* the cornice both walls, where the grid lands on the entablature */}
       {[-1, 1].map((side) => (
         <mesh key={side} position={[side * (d.halfWidth - 0.16), h - 0.44, mid]}>
           <boxGeometry args={[0.42, 0.5, runLength]} />
-          <meshStandardMaterial color={p.molding} roughness={0.88} />
+          <meshStandardMaterial color={face} roughness={0.88} />
         </mesh>
       ))}
 
-      {/* the lighting track: one thin rail down the centre line */}
-      <mesh position={[0, h - 0.62, mid]}>
-        <boxGeometry args={[0.09, 0.09, runLength]} />
-        <meshStandardMaterial color="#26241F" metalness={0.6} roughness={0.5} />
-      </mesh>
-      {/* and the spot heads on it, a pair to a bay */}
+      {/* the fixtures: small dark cans recessed into the beam soffits, two to
+          a bay, aimed down the walls rather than at the floor */}
       <Repeated
-        count={d.bays * 2 + 2}
+        count={(d.bays + 1) * 2}
         place={(i, m) => {
-          m.makeRotationZ(Math.PI / 2);
-          m.setPosition(0, h - 0.76, mid - runLength / 2 + (i + 0.5) * (runLength / (d.bays * 2 + 2)));
+          const bay = Math.floor(i / 2);
+          m.makeTranslation(
+            (i % 2 ? 1 : -1) * (colW / 2),
+            h - 0.44,
+            d.bayDepth / 2 - bay * d.bayDepth,
+          );
         }}
       >
-        <cylinderGeometry args={[0.055, 0.075, 0.2, 10]} />
-        <meshStandardMaterial color="#26241F" metalness={0.5} roughness={0.55} />
+        <cylinderGeometry args={[0.075, 0.075, 0.1, 12]} />
+        <meshStandardMaterial color="#1E1C18" metalness={0.4} roughness={0.6} />
       </Repeated>
     </group>
   );
@@ -743,7 +849,7 @@ const CEILINGS = {
   'steel-glass-arch': SteelGlassArch,
   'peaked-court': PeakedCourt,
   'grotesque-beams': GrotesqueBeams,
-  'coffered-track': CofferedTrack,
+  'deep-coffers': DeepCoffers,
 } as const;
 
 export function Ceiling(props: Props) {

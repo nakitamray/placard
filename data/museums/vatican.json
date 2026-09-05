@@ -18,36 +18,36 @@
     "bays": 11,
     "bayDepth": 4.6,
     "palette": {
-      "wall": "#B9A67E",
-      "wallDeep": "#8C7752",
-      "molding": "#D9B84E",
-      "gilt": "#D4AF37",
+      "wall": "#D8C9A6",
+      "wallDeep": "#B9A67E",
+      "molding": "#E3C15A",
+      "gilt": "#F0D479",
       "ceiling": "#E6D9BA",
       "ceilingAccent": "#9C3B34",
-      "floor": "#EFE9DC",
-      "floorInlay": "#7C2E2C",
+      "floor": "#F4F1E8",
+      "floorInlay": "#17161A",
       "accent": "#C3AF84",
-      "sky": "#FFF6DC"
+      "sky": "#FFF8E2"
     },
     "light": {
-      "key": "#FFEFC8",
-      "keyIntensity": 2.7,
+      "key": "#FFF3D4",
+      "keyIntensity": 2.2,
       "keyFrom": [
-        12,
-        9,
+        14,
+        8,
         5
       ],
-      "sky": "#F2E8D0",
-      "ground": "#7C6C50",
-      "ambient": 0.48,
-      "lamp": "#FFD98A",
-      "lampIntensity": 11,
-      "exposure": 1.0,
-      "background": "#3A3122",
+      "sky": "#F6EBD2",
+      "ground": "#6A5C42",
+      "ambient": 0.5,
+      "lamp": "#FFCF7A",
+      "lampIntensity": 13,
+      "exposure": 1.02,
+      "background": "#2E2718",
       "fog": [
-        "#4C4029",
-        44,
-        130
+        "#463A26",
+        48,
+        140
       ]
     },
     "fixtures": {
@@ -56,7 +56,9 @@
       "chandeliers": true,
       "placards": false,
       "clock": false,
-      "terraces": false
+      "terraces": false,
+      "cove": true,
+      "ropes": true
     }
   },
   "plan": {

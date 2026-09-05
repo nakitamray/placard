@@ -7,47 +7,47 @@
   "blurb": "A coffered stone hall between two colossal fluted columns, its walls a marching colonnade of square piers with shallow alcoves between them, lit by spotlights on a track down the centre line.",
   "corridorNote": "Modelled on the Egyptian sculpture gallery at the British Museum — Room 4: a strictly symmetrical one-point hall framed by two colossal fluted columns, under a deeply coffered ceiling of thick transverse beams with stepped rectilinear moulding and no curves anywhere in it; a thin metal lighting track runs down the exact centre line with small directional spotlights on it. The walls are not flat but a colonnade of thick pale stone piers stepping back toward the vanishing point, and the flat spans between them are the gallery walls. The sculpture has been taken out, so the plinths, stepped pedestals and glass vitrines stand empty down both sides, and the floor is large matte grey-beige stone tiles with a flush metal ventilation grate near the entrance.",
   "style": {
-    "ceiling": "coffered-track",
-    "floor": "court-paving",
-    "wall": "pier-alcoves",
+    "ceiling": "deep-coffers",
+    "floor": "stone-bands",
+    "wall": "fluted-pilasters",
     "frame": "museum-plain",
-    "hang": "single",
-    "halfWidth": 4.4,
-    "wallHeight": 6.4,
-    "vaultHeight": 6.8,
-    "bays": 9,
-    "bayDepth": 5.4,
+    "hang": "alternating",
+    "halfWidth": 4.6,
+    "wallHeight": 7.0,
+    "vaultHeight": 7.4,
+    "bays": 10,
+    "bayDepth": 5.2,
     "palette": {
-      "wall": "#CFC7B6",
-      "wallDeep": "#B5AC99",
-      "molding": "#E2DBCB",
+      "wall": "#E8E1D0",
+      "wallDeep": "#CFC6B1",
+      "molding": "#F2ECDD",
       "gilt": "#B8963E",
-      "ceiling": "#C6BFAE",
-      "ceilingAccent": "#8E8776",
-      "floor": "#BFB7A6",
-      "floorInlay": "#A49B88",
-      "accent": "#7A7263",
-      "sky": "#F2F4F6"
+      "ceiling": "#EDE6D5",
+      "ceilingAccent": "#8C8371",
+      "floor": "#B9B4AA",
+      "floorInlay": "#565349",
+      "accent": "#6E6A61",
+      "sky": "#FBF6EA"
     },
     "light": {
-      "key": "#FFEFD2",
+      "key": "#FFF4E0",
       "keyIntensity": 1.5,
       "keyFrom": [
-        0,
-        16,
-        6
+        -14,
+        10,
+        5
       ],
-      "sky": "#DDE2E8",
-      "ground": "#6E685C",
-      "ambient": 0.34,
-      "lamp": "#FFD9A0",
-      "lampIntensity": 11,
-      "exposure": 1.06,
+      "sky": "#F2EEE2",
+      "ground": "#5E594E",
+      "ambient": 0.3,
+      "lamp": "#FFD79A",
+      "lampIntensity": 9,
+      "exposure": 1.0,
       "background": "#241F19",
       "fog": [
         "#3A342B",
-        46,
-        140
+        50,
+        150
       ]
     },
     "fixtures": {
@@ -58,7 +58,8 @@
       "clock": false,
       "terraces": false,
       "vitrines": true,
-      "spotTrack": true
+      "spotTrack": false,
+      "daylight": true
     }
   },
   "plan": {

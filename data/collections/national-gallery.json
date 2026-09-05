@@ -272,72 +272,71 @@
     }
   },
   {
-    "id": "leonardo-virgin-rocks",
-    "artist": "Leonardo da Vinci",
-    "artistDates": "1452–1519",
-    "title": "The Virgin of the Rocks",
-    "titleOriginal": "Vergine delle rocce",
-    "year": "c. 1491–1508",
-    "medium": "Oil on poplar panel, thinned and cradled",
-    "dimensions": "189.5 × 120 cm",
-    "room": "Room 9",
-    "accession": "NG1093",
-    "creditLine": "Bought, 1880",
-    "accentColor": "#2E3E42",
+    "id": "caravaggio-supper-emmaus",
+    "artist": "Caravaggio",
+    "artistDates": "1571–1610",
+    "title": "The Supper at Emmaus",
+    "titleOriginal": "Cena in Emmaus",
+    "year": "1601",
+    "medium": "Oil and tempera on canvas",
+    "dimensions": "141 × 196.2 cm",
+    "room": "Room 32",
+    "accession": "NG172",
+    "creditLine": "Presented by Lord Vernon, 1839",
+    "accentColor": "#7A3B24",
     "heroFocus": [
       0.5,
       0.46
     ],
-    "frameShape": "arched",
-    "labelText": "Four figures in a cave: the Virgin, an angel, the infant Christ and the infant John the Baptist, arranged in a pyramid under a roof of weathered rock with a cold blue distance showing through the gaps. The panel is round-headed, and the composition is built for that arch — the Virgin's head sits exactly where the curve begins. This is the second version; the first is in the Louvre, and the two are the subject of a dispute that ran for twenty years.",
-    "extendedNote": "The commission was for the centre panel of an altarpiece for the Confraternity of the Immaculate Conception in Milan, agreed in 1483. The confraternity and the painters fell out over money almost immediately, and the dispute went on into the sixteenth century. One version left Milan; another was painted; which came first, and how much of the London panel is Leonardo's own hand rather than the de Predis workshop's, has been argued ever since. Infrared imaging in 2005 found a completely different composition underneath — a kneeling woman with a child — so the panel was begun for something else and abandoned.\n\nThe geology is not decorative. Leonardo studied rock formation and water erosion for years, and the cave here is drawn as though it were being described in a notebook: sandstone above, harder weathered stacks below, a stream cutting through, plants growing where soil has collected. Every species in the foreground is identifiable.\n\nWhat the picture is famous for is the light. There is no line anywhere in the faces. The modelling is done entirely by transitions so gradual that no edge exists to be found — sfumato, which he described as being without lines or borders, in the manner of smoke. It is built in dozens of glazes, each one dry before the next, and it is the reason a face painted in 1500 still reads as a face turning in real air.",
+    "labelText": "Two disciples are eating with a stranger they met on the road. He blesses the bread, and in that second they realise who he is. Caravaggio paints the second: one man grips the arms of his chair as though about to stand, the other throws his arms wide, and the innkeeper standing over them sees nothing at all. The table is pushed to the very front of the picture and a basket of fruit sits on the edge of it, tipped past the point where it should fall.",
+    "extendedNote": "It was painted for Ciriaco Mattei, whose family were among Caravaggio's most important Roman patrons, and it belongs to the years just after the Contarelli Chapel made him famous overnight. The subject is Luke 24: two of Christ's followers walk to Emmaus on the evening of the resurrection with a stranger who explains the scriptures to them, and only recognise him when he breaks the bread at supper — at which moment he vanishes.\n\nEverything in the painting is arranged around that instant of recognition. The Christ is beardless and young, which shocked contemporaries and is the point: he is not immediately knowable, and the disciples have spent a whole day failing to know him. The gestures are the recognition itself. The outflung arms of the disciple on the right come straight out of the canvas toward the viewer in violent foreshortening; the other man's chair is coming up off the floor. The innkeeper, standing, sees a meal.\n\nThe still life is doing theological work as well as showing off. The fruit is out of season and some of it is going over — a wormhole in an apple, split figs, spotted leaves — and it sits in a basket balanced over the edge of the table, in our space rather than theirs. Caravaggio's early biographer Bellori complained that he painted a basket of fruit with as much care as a figure. That was meant as an insult and reads now as the description of what makes him modern: the light falls on the bread, the shoulder and the wormhole with exactly the same attention.",
     "regions": [
-      {
-        "id": "faces",
-        "label": "The faces",
-        "box": [
-          0.2,
-          0.16,
-          0.84,
-          0.5
-        ],
-        "text": "There is no line anywhere in them. The modelling is done entirely by transitions so gradual that no edge exists to be found — sfumato, which Leonardo described as being without lines or borders, in the manner of smoke. It is built in dozens of glazes, each dry before the next, and it is the reason a face painted in 1500 still reads as a face turning in real air."
-      },
-      {
-        "id": "rocks",
-        "label": "The rocks",
-        "box": [
-          0.0,
-          0.0,
-          1.0,
-          0.36
-        ],
-        "text": "Not decoration. Leonardo studied rock formation and water erosion for years, and the cave is drawn as though it were being described in a notebook: sandstone above, harder weathered stacks below, a stream cutting through, plants growing where soil has collected. The blue distance showing through the gaps is thin glaze over glaze, standing in for kilometres of air."
-      },
       {
         "id": "hands",
         "label": "The hands",
         "box": [
-          0.24,
-          0.44,
-          0.9,
-          0.76
+          0.52,
+          0.2,
+          0.98,
+          0.62
         ],
-        "text": "The composition is a pyramid, and the hands are what hold it together: the Virgin's over John, the angel's pointing, Christ's raised in blessing. The panel is round-headed and the whole arrangement is built for that arch — her head sits exactly where the curve begins. Infrared imaging in 2005 found an entirely different composition underneath, a kneeling woman with a child, so the panel was begun for something else and abandoned."
+        "text": "The disciple on the right throws his arms open straight out of the canvas, foreshortened so hard that one hand is nearly a circle. It is the recognition happening — not a reaction to it, but the thing itself. Caravaggio composes so that the viewer is standing where the arms are heading, which puts you at the table rather than in front of a picture of one."
+      },
+      {
+        "id": "christ",
+        "label": "The blessing",
+        "box": [
+          0.3,
+          0.1,
+          0.66,
+          0.56
+        ],
+        "text": "The Christ is beardless and young, which shocked contemporaries and is exactly the point: he has walked with these men all day without being known. His hand is over the bread, and his face is the only calm thing in the painting. The shadow it casts on the wall behind is doing the work an aureole would have done in an altarpiece a generation earlier."
+      },
+      {
+        "id": "basket",
+        "label": "The basket",
+        "box": [
+          0.28,
+          0.6,
+          0.62,
+          0.94
+        ],
+        "text": "Out of season, and some of it going over: a wormhole in the apple, split figs, spotted leaves. The basket sits balanced past the edge of the table, in the viewer's space rather than the disciples'. Bellori complained that Caravaggio painted fruit with as much care as a figure. He did, and the light falls on the bread, the shoulder and the wormhole with exactly the same attention."
       }
     ],
     "placeholder": {
-      "aspect": 0.63,
+      "aspect": 1.39,
       "archetype": "figure-group",
       "palette": [
-        "#12181A",
-        "#2E3E42",
-        "#5A6E6A",
-        "#9A8A6E",
-        "#D8C8A8",
-        "#6A4A3A"
+        "#14100C",
+        "#3A2416",
+        "#7A3B24",
+        "#B98A52",
+        "#E4D2AE",
+        "#5C6B4A"
       ],
-      "seed": 75
+      "seed": 41
     }
   },
   {

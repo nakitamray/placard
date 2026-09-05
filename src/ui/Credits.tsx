@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from '../state/store';
 import { asset } from '../lib/asset';
 import { imageUrl } from '../lib/image';
-import { ENTRANCE_TRACK, MUSEUM_TRACKS } from '../lib/music';
+import { ATLAS_TRACK, ENTRANCE_TRACK, MUSEUM_TRACKS } from '../lib/music';
 import { exhibitionWorks } from '../state/works';
 import type { ArtworkMeta } from '../types';
 
@@ -225,13 +225,15 @@ export function Credits() {
                 <p className="body credits-note">
                   The rooms are played through these recordings, streamed from YouTube in an
                   embedded player rather than copied or re-hosted. The entrance has its own
-                  piece; the corridors shuffle the other four; the atlas takes one of them,
-                  quietly. All credit and all traffic belong to the uploaders.
+                  piece, the corridors shuffle four between them, and the atlas has one of its
+                  own. All credit and all traffic belong to the uploaders.
                 </p>
                 <ul className="credits-tracks">
-                  {[ENTRANCE_TRACK, ...MUSEUM_TRACKS].map((t, i) => (
+                  {[ENTRANCE_TRACK, ...MUSEUM_TRACKS, ATLAS_TRACK].map((t, i, all) => (
                     <li key={t.id} className="caption credits-source">
-                      <span className="credits-track-where">{i === 0 ? 'Entrance' : 'Rooms'}</span>
+                      <span className="credits-track-where">
+                        {i === 0 ? 'Entrance' : i === all.length - 1 ? 'The atlas' : 'Rooms'}
+                      </span>
                       <a href={t.url} target="_blank" rel="noreferrer">
                         {t.url}
                       </a>
@@ -532,6 +534,9 @@ export function Credits() {
               <section>
                 <h3 className="meta credits-section">About me</h3>
                 <p className="body credits-note credits-lede">
+                  Hi there! I&rsquo;m Nakita, and I built Placard.
+                </p>
+                <p className="body credits-note">
                   As a Computer Science major, I build with code, but my greatest inspirations
                   come from a deep love of art and travel. Placard is the bridge between these
                   two worlds.
@@ -577,7 +582,8 @@ export function Credits() {
 /**
  * The contact form.
  *
- * Two ways it can deliver, and it picks whichever is configured:
+ * The address itself is never shown — see CONTACT_EMAIL below. Two ways it
+ * can deliver, and it picks whichever is configured:
  *
  *   1. An HTTP endpoint in `VITE_CONTACT_ENDPOINT` — a Formspree / Getform /
  *      Basin form URL, or a serverless function of your own. The message is
@@ -592,6 +598,12 @@ export function Credits() {
  * The form is deliberately three fields. Every extra one costs replies.
  */
 const CONTACT_ENDPOINT = (import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined) ?? '';
+/*
+ * Never rendered. A mail address printed on a public page is scraped within
+ * days, so this is only ever used as the target of a mailto: the browser
+ * hands to the visitor's own mail client — where they see it, and no crawler
+ * does. Nothing in the interface says what it is, including the errors.
+ */
 const CONTACT_EMAIL =
   (import.meta.env.VITE_CONTACT_EMAIL as string | undefined) ?? 'nakitamray@gmail.com';
 
@@ -645,8 +657,7 @@ function ContactForm() {
         <p className="body credits-note">
           {CONTACT_ENDPOINT
             ? 'Thank you — it arrived. I read everything.'
-            : 'Your mail client should be opening with the message in it. If it did not, write ' +
-              `to ${CONTACT_EMAIL}.`}
+            : 'Your mail client should be opening with the message in it, ready to send.'}
           <br />
           <button className="caption contact-again" onClick={() => setState('idle')}>
             Write another →
@@ -697,7 +708,7 @@ function ContactForm() {
               </button>
               {state === 'failed' && (
                 <span className="caption contact-error">
-                  That did not go through. Write to {CONTACT_EMAIL} instead?
+                  That did not go through. Try again in a moment?
                 </span>
               )}
             </div>

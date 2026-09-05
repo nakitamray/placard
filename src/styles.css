@@ -718,13 +718,15 @@ button:active { transform: translateY(1px); }
 .credits-contact {
   margin-top: var(--s7);
   padding: var(--s6) var(--s6) var(--s5);
-  border-radius: 12px;
-  background:
-    radial-gradient(120% 140% at 12% 0%, rgba(110, 91, 74, 0.55), transparent 62%),
-    radial-gradient(90% 120% at 100% 100%, rgba(201, 162, 39, 0.16), transparent 58%),
-    linear-gradient(160deg, #2f2720, #201b16 62%);
-  border: 1px solid rgba(201, 162, 39, 0.22);
-  box-shadow: 0 24px 60px rgba(24, 20, 16, 0.28), inset 0 1px 0 rgba(242, 235, 223, 0.06);
+  /* Flat, not a gradient. Nothing else on this site is a soft-cornered card
+     with light pooling in one corner of it; the rooms are flat colour and a
+     rule, and so is this. One tone of the exhibition's own wall, a hairline,
+     and a gilt band along the top — which is a wall label, which is what the
+     rest of the page is made of. */
+  background: var(--c-spine);
+  border: 1px solid rgba(242, 235, 223, 0.1);
+  border-top: 2px solid var(--gilt);
+  border-radius: var(--r-sm);
   color: var(--bone);
 }
 .credits-contact .credits-note { color: rgba(242, 235, 223, 0.82); }
@@ -737,7 +739,7 @@ button:active { transform: translateY(1px); }
 .contact-field input,
 .contact-field textarea {
   font: inherit; font-size: 15px; line-height: 24px; color: var(--bone);
-  background: rgba(12, 10, 8, 0.34);
+  background: rgba(12, 10, 8, 0.3);
   border: 1px solid rgba(242, 235, 223, 0.16);
   border-radius: var(--r-sm);
   padding: 8px 11px;
@@ -749,8 +751,7 @@ button:active { transform: translateY(1px); }
 .contact-field textarea:focus {
   outline: none;
   border-color: rgba(201, 162, 39, 0.75);
-  background: rgba(12, 10, 8, 0.5);
-  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.12);
+  background: rgba(12, 10, 8, 0.45);
 }
 .contact-field input::placeholder,
 .contact-field textarea::placeholder { color: rgba(242, 235, 223, 0.34); }
@@ -758,10 +759,9 @@ button:active { transform: translateY(1px); }
 .contact-send {
   color: #241f1a; background: var(--gilt);
   padding: 9px 24px; border-radius: 999px; font-weight: 500;
-  box-shadow: 0 6px 18px rgba(201, 162, 39, 0.22);
-  transition: background-color var(--d-fast), opacity var(--d-fast), transform var(--d-fast);
+  transition: background-color var(--d-fast), opacity var(--d-fast);
 }
-.contact-send:hover:not(:disabled) { background: #ddb734; transform: translateY(-1px); }
+.contact-send:hover:not(:disabled) { background: #ddb734; }
 .contact-send:disabled { opacity: 0.35; cursor: default; }
 .contact-error { color: #e0876d; text-transform: none; letter-spacing: 0.02em; }
 .contact-again { color: var(--gilt); margin-top: var(--s2); }

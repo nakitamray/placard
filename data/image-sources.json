@@ -259,11 +259,6 @@
     "commonsFile": "File:John-constable-the-hay-wain.jpg",
     "search": "Constable The Hay Wain National Gallery"
   },
-  "leonardo-virgin-rocks": {
-    "commonsFile": "File:Leonardo da Vinci Virgin of the Rocks (National Gallery London).jpg",
-    "search": "Leonardo Virgin of the Rocks National Gallery London",
-    "note": "The London version, not the Louvre one. The panel is round-headed and hangs in an arched frame here; a scan cropped square at the top is the wrong shape for it."
-  },
   "holbein-ambassadors": {
     "commonsFile": "File:Hans Holbein the Younger - The Ambassadors - Google Art Project.jpg",
     "search": "Holbein The Ambassadors National Gallery"
@@ -283,5 +278,9 @@
   "stubbs-whistlejacket": {
     "commonsFile": "File:Whistlejacket by George Stubbs edit.jpg",
     "search": "George Stubbs Whistlejacket National Gallery"
+  },
+  "caravaggio-supper-emmaus": {
+    "commonsFile": "File:1602-3 Caravaggio,Supper at Emmaus National Gallery, London.jpg",
+    "search": "Caravaggio Supper at Emmaus National Gallery London"
   }
 }
