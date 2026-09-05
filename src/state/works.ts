@@ -2,7 +2,7 @@
  * Every work in the exhibition, flat.
  *
  * The museums are loaded one at a time — entering the Louvre never costs the
- * download of the other four — but the entrance draws from all fifty, so it
+ * download of the others — but the entrance draws from all of them, so it
  * needs a list that crosses them. `scripts/build-all.ts` writes it: id,
  * museum, artist, title, proportions, and where to hold the picture when it
  * has to be cropped to fill a window.

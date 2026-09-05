@@ -549,7 +549,9 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
 
       {/* one fully moulded bay per painting */}
       {artworks.map((a, i) => {
-        const { width, height } = fitWork(a.aspect, PLANE_H, MAX_W);
+        // a tondo is square whatever its scan measures, and the frame is
+        // turned rather than mitred
+        const { width, height } = fitWork(a.shape === 'round' ? 1 : a.aspect, PLANE_H, MAX_W);
         return (
           <group key={`bay${a.id}`} position={[i * SPACING, 0, 0]}>
             <MouldedBay artwork={a} museum={museum} width={width} height={height} />
@@ -560,6 +562,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
                 height={height}
                 gilt={p.gilt}
                 dark={p.wallDeep}
+                shape={a.shape}
                 detail={
                   quality.ornament && Math.abs(i - index) <= 1 ? 'full' : 'plain'
                 }
@@ -575,8 +578,9 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
           key={a.id}
           artwork={loaded.get(i) ?? null}
           position={[i * SPACING, HANG_Y, 0.09]}
-          height={fitWork(a.aspect, PLANE_H, MAX_W).height}
+          height={fitWork(a.shape === 'round' ? 1 : a.aspect, PLANE_H, MAX_W).height}
           aspect={a.aspect}
+          shape={a.shape}
           active={i === index}
           onLeave={() => {
             if (i !== index) return;

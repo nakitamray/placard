@@ -198,5 +198,48 @@
   "degas-letoile": {
     "search": "Degas L'Étoile Danseuse sur scène Musée d'Orsay pastel",
     "note": "The scan committed here is 960px on the long edge, which is under the published ladder's top rung. A larger upload of the same pastel would be worth pinning."
+  },
+  "botticelli-birth-venus": {
+    "commonsFile": "File:La nascita di Venere (Botticelli).jpg",
+    "search": "Botticelli Nascita di Venere Uffizi"
+  },
+  "botticelli-primavera": {
+    "commonsFile": "File:Botticelli-primavera.jpg",
+    "search": "Botticelli Primavera Uffizi"
+  },
+  "leonardo-annunciation": {
+    "commonsFile": "File:Annunciation (Leonardo).jpg",
+    "search": "Leonardo da Vinci Annunciazione Uffizi"
+  },
+  "michelangelo-doni-tondo": {
+    "commonsFile": "File:Tondo Doni, por Miguel Ángel.jpg",
+    "search": "Michelangelo Tondo Doni Uffizi",
+    "note": "A tondo: the scan is square and the hang cuts it to a circle. Anything noticeably off square is a photograph of the panel in its own carved frame."
+  },
+  "titian-venus-urbino": {
+    "commonsFile": "File:Tiziano - Venere di Urbino - Google Art Project.jpg",
+    "search": "Titian Venus of Urbino Uffizi"
+  },
+  "caravaggio-medusa": {
+    "commonsFile": "File:Caravaggio - Medusa - Google Art Project.jpg",
+    "search": "Caravaggio Medusa shield Uffizi",
+    "note": "Painted on a convex parade shield, so the scan is close to square and the hang cuts it to a circle."
+  },
+  "raphael-madonna-goldfinch": {
+    "commonsFile": "File:Raffaello Sanzio - Madonna del Cardellino - Google Art Project.jpg",
+    "search": "Raphael Madonna del Cardellino Uffizi"
+  },
+  "piero-urbino-diptych": {
+    "commonsFile": "File:Piero della Francesca - Portraits of the Duke and Duchess of Urbino, Federico da Montefeltro and Battista Sforza - Google Art Project.jpg",
+    "search": "Piero della Francesca Duke and Duchess of Urbino diptych",
+    "note": "One file carrying both panels side by side, Battista on the left and Federico on the right. The hang draws an ornate divider down the middle of the frame between them, which is how the diptych reads in the room."
+  },
+  "lippi-madonna-two-angels": {
+    "commonsFile": "File:Madonna and Child with two Angels (by Filippo Lippi) – Galleria degli Uffizi, Florence.jpg",
+    "search": "Filippo Lippi Madonna col Bambino e due angeli Uffizi"
+  },
+  "caravaggio-bacchus": {
+    "commonsFile": "File:Bacchus by Caravaggio 1.jpg",
+    "search": "Caravaggio Bacco Uffizi"
   }
 }

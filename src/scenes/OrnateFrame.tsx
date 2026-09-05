@@ -7,8 +7,8 @@
  */
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { buildFrame } from './frames';
-import type { FrameKind } from '../types';
+import { buildDivider, buildFrame, buildRoundFrame } from './frames';
+import type { FrameKind, FrameShape } from '../types';
 
 export function OrnateFrame({
   kind,
@@ -27,6 +27,12 @@ export function OrnateFrame({
    * gets the mouldings without the carving.
    */
   detail = 'full',
+  /**
+   * 'round' turns the whole profile on a lathe, for a tondo; 'divided' keeps
+   * the rectangle and runs a moulded bar down the middle, for a pair hung as
+   * one object. Omitted, the frame is the museum's plain rectangle.
+   */
+  shape,
 }: {
   kind: FrameKind;
   width: number;
@@ -35,11 +41,20 @@ export function OrnateFrame({
   dark?: string;
   z?: number;
   detail?: 'full' | 'plain';
+  shape?: FrameShape;
 }) {
   const frame = useMemo(
-    () => buildFrame(kind, width, height, detail === 'full'),
-    [kind, width, height, detail],
+    () =>
+      shape === 'round'
+        ? buildRoundFrame(kind, Math.min(width, height), detail === 'full')
+        : buildFrame(kind, width, height, detail === 'full'),
+    [kind, width, height, detail, shape],
   );
+  const divider = useMemo(
+    () => (shape === 'divided' ? buildDivider(kind, height) : null),
+    [shape, kind, height],
+  );
+  const dividerBeadRef = useRef<THREE.InstancedMesh>(null);
   const beadRef = useRef<THREE.InstancedMesh>(null);
 
   useEffect(
@@ -49,6 +64,19 @@ export function OrnateFrame({
     },
     [frame],
   );
+  useEffect(() => () => divider?.gilt.dispose(), [divider]);
+
+  useLayoutEffect(() => {
+    const mesh = dividerBeadRef.current;
+    if (!mesh || !divider) return;
+    const m = new THREE.Matrix4();
+    divider.beads.forEach((p, i) => {
+      m.makeTranslation(p.x, p.y, p.z);
+      mesh.setMatrixAt(i, m);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+  }, [divider]);
 
   useLayoutEffect(() => {
     const mesh = beadRef.current;
@@ -90,6 +118,22 @@ export function OrnateFrame({
           <sphereGeometry args={[frame.beadRadius, 6, 4]} />
           <meshStandardMaterial color={beadColor} metalness={0.85} roughness={0.3} />
         </instancedMesh>
+      )}
+      {divider && (
+        <group>
+          <mesh geometry={divider.gilt} castShadow receiveShadow>
+            <meshStandardMaterial color={gilt} metalness={0.72} roughness={0.52} />
+          </mesh>
+          {detail === 'full' && divider.beads.length > 0 && (
+            <instancedMesh
+              ref={dividerBeadRef}
+              args={[undefined, undefined, divider.beads.length]}
+            >
+              <sphereGeometry args={[divider.beadRadius, 6, 4]} />
+              <meshStandardMaterial color={gilt} metalness={0.85} roughness={0.3} />
+            </instancedMesh>
+          )}
+        </group>
       )}
     </group>
   );

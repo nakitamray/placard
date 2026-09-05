@@ -1,3 +1,13 @@
+/**
+ * How a work is framed, where a rectangle is the wrong answer.
+ *
+ * A tondo hung in a rectangular frame is not the same object, and a diptych
+ * hung as one picture loses the hinge the whole composition is built across.
+ * Set per artwork in the collection record; everything else takes the
+ * museum's own frame.
+ */
+export type FrameShape = 'round' | 'divided';
+
 export interface ArtworkIndexEntry {
   id: string;
   artist: string;
@@ -5,6 +15,7 @@ export interface ArtworkIndexEntry {
   aspect: number;
   /** per-painter wall tone — the colour the whole artwork room takes */
   accent: string;
+  shape?: FrameShape;
 }
 
 /** Thread Pull: a semantic area of the canvas mapped to a readable passage. */
@@ -99,7 +110,9 @@ export type CeilingKind =
   /** Orsay: colossal arched steel-and-glass train-shed roof */
   | 'steel-glass-arch'
   /** Met sculpture court: peaked triangular skylight over an indoor courtyard */
-  | 'peaked-court';
+  | 'peaked-court'
+  /** Uffizi: a flat ceiling of dark crossbeams with grotesque frescoes between */
+  | 'grotesque-beams';
 
 export type FloorKind =
   /** pale reflective stone */
@@ -111,7 +124,9 @@ export type FloorKind =
   /** wide pale promenade with a darker central runner */
   | 'promenade'
   /** smooth outdoor-courtyard paving slabs */
-  | 'court-paving';
+  | 'court-paving'
+  /** polished marble laid as a diagonal checkerboard, charcoal and pale grey */
+  | 'checkerboard';
 
 export type WallKind =
   /** densely stacked salon hang on deep blue-grey */
@@ -123,7 +138,9 @@ export type WallKind =
   /** carved light stone with recessed bays */
   | 'carved-stone'
   /** asymmetric court: pale stone one side, red brick and white arches the other */
-  | 'court-facade';
+  | 'court-facade'
+  /** Uffizi: plaster and a portrait frieze one side, tall windows the other */
+  | 'uffizi-corridor';
 
 export type FrameKind =
   /** deep gilt salon frame, corner cartouches, bead course */
@@ -135,7 +152,9 @@ export type FrameKind =
   /** slim reeded gilt, the impressionist standard */
   | 'orsay-reeded'
   /** broad flat-topped American gilt */
-  | 'met-broad';
+  | 'met-broad'
+  /** Florentine cassetta: a flat gilt bed between two carved courses */
+  | 'uffizi-gilt';
 
 export interface MuseumStyle {
   ceiling: CeilingKind;
@@ -190,6 +209,8 @@ export interface MuseumStyle {
     terraces: boolean;
     /** the corridor ends in a floor-to-ceiling window rather than a solid wall */
     glazedEnd?: boolean;
+    /** brass stanchions and red rope down both sides, in front of the plinths */
+    ropes?: boolean;
   };
 }
 

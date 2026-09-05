@@ -7,7 +7,7 @@ stroke on every canvas is a character from a text about that work, moving
 through the corpus in reading order. Hold the cursor still and the picture
 resolves out of its own words.
 
-Five museums, ten works each, each corridor modelled on the real room it is
+Six museums, ten works each, each corridor modelled on the real room it is
 named after. Navigation is spatial: **entrance → corridor → floor plan →
 gallery rail → one painting**.
 
@@ -17,13 +17,14 @@ Requires WebGL2. Sound is off until you turn it on.
 
 # Visiting
 
-## The five rooms
+## The six rooms
 
 | Museum | The corridor |
 |---|---|
 | **Musée du Louvre** | white barrel vault pierced by arched skylights, thick classical moulding, deep blue-grey walls, salon hang stacked to the cornice |
 | **The British Museum** | crimson walls under a pitched glass lantern on gilded archways, polished light wood, tufted leather seating |
 | **Vatican Museums** | frescoed vault in deeply carved gilded stucco, map panels between gilded pilasters, marble inlay, crystal chandeliers |
+| **Galleria degli Uffizi** | a flat ceiling of dark crossbeams over grotesque frescoes, daylight down one whole side, a diagonal checkerboard floor, brass stanchions and red rope |
 | **Musée d'Orsay** | the colossal arched steel-and-glass nave, stone terraces behind glass railings, the great gilded clock closing the far end |
 | **The Metropolitan Museum of Art** | a sunlit court under a peaked skylight: red brick and white voussoired arches one side, marble ashlar the other, a glass wall at the end |
 
@@ -65,7 +66,7 @@ not dissolve out from under you. Clicking is the decision.
 
 **The corridor lights one work at a time.** Bringing the cursor onto a canvas
 drops the room's exposure and brings a narrow warm spot up on that painting,
-which is how a gallery is actually lit, and what makes a wall of fifty
+which is how a gallery is actually lit, and what makes a wall of sixty
 rectangles resolve into one thing worth looking at.
 
 ## Thread Pull
@@ -123,7 +124,7 @@ pnpm dev
 Node ≥ 20. `pnpm approve-builds` may be needed once so `sharp` can install its
 prebuilt binaries. `public/artworks/` and `public/museums/` are generated and
 not committed, so `build:assets` has to run once after install; it takes a few
-minutes, because fifty works are each analysed into a glyph field twice.
+minutes, because sixty works are each analysed into a glyph field twice.
 
 `fetch:images` is optional — skip it and any work without a scan renders a
 procedural stand-in, which is honest and obvious and not what you want on a
@@ -190,6 +191,12 @@ optionally hand-authored Thread Pull `regions`.
 matters in exactly one place: the entrance is the only screen that crops a
 painting, and a centred crop of a tall canvas throws away the face. Omit it and
 a tall work is held a little above centre and everything else in the middle.
+
+`frameShape` handles the works a rectangle is wrong for. `'round'` turns the
+museum's own moulding on a lathe and cuts the canvas to a circle, for a tondo;
+`'divided'` keeps the rectangle and runs a moulded bar down the centre, for a
+pair of panels hung as one object. Omitted, a work takes the museum's plain
+frame.
 
 `data/artworks/{id}/` is optional and exists only to override generated assets:
 
@@ -269,9 +276,9 @@ search. Search rankings drift, and an exhibition that hangs a different picture
 next month is not one you can point people at.
 
 **Then open `data/.cache/contact-sheet.html`.** Every run builds it: one page
-showing all fifty pictures with the file each came from, the catalogued
-dimensions and how it was resolved. Fifty works is too many to check by
-clicking through fifty Commons pages, and not checking is how an exhibition
+showing every picture with the file it came from, the catalogued
+dimensions and how it was resolved. Sixty works is too many to check by
+clicking through sixty Commons pages, and not checking is how an exhibition
 ends up hanging a photograph of a frame. Each card carries a **pin this** block
 to paste straight into `data/image-sources.json`:
 
@@ -332,7 +339,7 @@ material before they reach the GPU, so an elaborate five-course frame with
 ornament costs three draw calls.
 
 **Corridors** (`src/scenes/corridor/`). Ceiling, floor, wall treatment and
-fixtures are five implementations each, selected by the style record.
+fixtures are half a dozen implementations each, selected by the style record.
 Everything repeated — ribs, purlins, mullions, pilasters, brick courses, paving
 joints, dentils, bead courses, dust motes — is instanced.
 

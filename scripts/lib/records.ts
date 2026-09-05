@@ -55,6 +55,12 @@ export interface ArtworkRecord {
    * centre and everything else in the middle.
    */
   heroFocus?: [number, number];
+  /**
+   * How this work is framed, where a rectangle is the wrong answer: 'round'
+   * for a tondo, 'divided' for a pair of panels hung as one object with a
+   * moulded divider between them. Omitted, the museum's own frame is used.
+   */
+  frameShape?: 'round' | 'divided';
   labelText: string;
   extendedNote: string;
   placeholder: PlaceholderSpec;

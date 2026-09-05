@@ -485,6 +485,36 @@
       "kind": "painter",
       "label": "Domenichino",
       "note": "1581–1641"
+    },
+    {
+      "id": "botticelli",
+      "kind": "painter",
+      "label": "Sandro Botticelli",
+      "note": "c.1445–1510"
+    },
+    {
+      "id": "titian",
+      "kind": "painter",
+      "label": "Titian",
+      "note": "c.1488–1576"
+    },
+    {
+      "id": "piero",
+      "kind": "painter",
+      "label": "Piero della Francesca",
+      "note": "c.1415–1492"
+    },
+    {
+      "id": "lippi",
+      "kind": "painter",
+      "label": "Filippo Lippi",
+      "note": "c.1406–1469"
+    },
+    {
+      "id": "urbino",
+      "kind": "place",
+      "label": "Urbino",
+      "note": "A hill court in the Marche that, under Federico da Montefeltro, kept better mathematicians than most universities"
     }
   ],
   "works": {
@@ -537,7 +567,17 @@
     "caravaggio-entombment": "caravaggio",
     "degas-letoile": "degas",
     "bellini-lamentation": "bellini",
-    "domenichino-last-communion-jerome": "domenichino"
+    "domenichino-last-communion-jerome": "domenichino",
+    "botticelli-birth-venus": "botticelli",
+    "botticelli-primavera": "botticelli",
+    "leonardo-annunciation": "leonardo",
+    "michelangelo-doni-tondo": "michelangelo",
+    "titian-venus-urbino": "titian",
+    "caravaggio-medusa": "caravaggio",
+    "raphael-madonna-goldfinch": "raphael",
+    "piero-urbino-diptych": "piero",
+    "lippi-madonna-two-angels": "lippi",
+    "caravaggio-bacchus": "caravaggio"
   },
   "links": [
     {
@@ -1458,6 +1498,84 @@
       "kind": "founded",
       "word": "Venetian",
       "note": "Giorgione and Titian both came out of Bellini’s workshop, and what they took from him first was the sky: he was the painter who decided that the light behind a sacred figure should be the light of the place the picture would hang in."
+    },
+    {
+      "a": "botticelli",
+      "b": "florence",
+      "kind": "worked in",
+      "word": "Florence"
+    },
+    {
+      "a": "lippi",
+      "b": "florence",
+      "kind": "worked in",
+      "word": "Florence"
+    },
+    {
+      "a": "piero",
+      "b": "urbino",
+      "kind": "worked in",
+      "word": "Urbino"
+    },
+    {
+      "a": "titian",
+      "b": "venice",
+      "kind": "worked in",
+      "word": "Venice"
+    },
+    {
+      "a": "botticelli",
+      "b": "high-renaissance",
+      "kind": "of",
+      "word": "Renaissance"
+    },
+    {
+      "a": "titian",
+      "b": "venetian-school",
+      "kind": "of",
+      "word": "Venetian"
+    },
+    {
+      "a": "lippi",
+      "b": "botticelli",
+      "kind": "taught",
+      "word": "Lippi",
+      "note": "Botticelli trained in Lippi's workshop and took the two things that make his pictures his: a contour drawn before it is filled, and a figure that looks out of the picture at you."
+    },
+    {
+      "a": "botticelli",
+      "b": "leonardo",
+      "kind": "worked beside",
+      "word": "Verrocchio",
+      "note": "Both were young in Florence in the 1470s, in workshops a few streets apart, looking at the same models and arriving at opposite conclusions about what a painting is for."
+    },
+    {
+      "a": "michelangelo",
+      "b": "raphael",
+      "kind": "was answered by",
+      "word": "Michelangelo",
+      "note": "Raphael was twenty-three in Florence in 1506 and spent two years watching Michelangelo and Leonardo work. The pyramid composition, the twisted pose and the soft transitions all enter his painting in those two years and never leave it."
+    },
+    {
+      "a": "titian",
+      "b": "bellini",
+      "kind": "trained under",
+      "word": "Bellini",
+      "note": "Titian came out of Bellini's workshop and inherited its two convictions: that colour is built up rather than drawn round, and that the sky behind a sacred figure should be the sky over the room the picture hangs in."
+    },
+    {
+      "a": "caravaggio",
+      "b": "titian",
+      "kind": "looked at",
+      "word": "Venice",
+      "note": "Caravaggio's darkness is often traced to Venice — to what Titian and Giorgione had shown about painting a body out of light alone rather than out of drawing."
+    },
+    {
+      "a": "piero",
+      "b": "urbino",
+      "kind": "measured",
+      "word": "perspective",
+      "note": "Piero wrote two treatises on perspective and one on the five regular solids, and gave up painting for mathematics in his last years. The landscape behind the Urbino portraits is observed from a height with the patience of a surveyor."
     }
   ]
 }

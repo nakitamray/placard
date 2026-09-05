@@ -471,12 +471,106 @@ function PeakedCourt({ style, d }: Props) {
   );
 }
 
+/**
+ * The Uffizi's east corridor: flat, low, and covered in painting.
+ *
+ * There is no vault here at all. The ceiling is a plane of cream plaster
+ * divided into square compartments by heavy dark crossbeams, and every
+ * compartment carries a grotesque — the symmetrical scrollwork, medallions
+ * and small figures that Renaissance decorators took from the excavated
+ * rooms of Nero's palace, which were underground and therefore "grottoes".
+ *
+ * The frescoes themselves are not modelled. Painting a room's worth of
+ * grotesque geometry costs more triangles than the entire rest of the
+ * corridor and is read, from standing height, as a warm patterned field —
+ * so that is what it is: a tinted plane with a moulded border and a
+ * medallion at the centre of each compartment, under beams that are the
+ * thing you actually see.
+ */
+function GrotesqueBeams({ style, d }: Props) {
+  const p = style.palette;
+  const h = d.wallHeight;
+  const w = d.halfWidth * 2;
+  const mid = -d.length / 2;
+  const runLength = d.length + d.bayDepth * 3;
+  /** two compartments to a bay, which is roughly the real rhythm */
+  const perBay = 2;
+  const count = d.bays * perBay + 2;
+  const step = runLength / count;
+
+  return (
+    <group>
+      {/* the painted field */}
+      <mesh position={[0, h, mid]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[w, runLength]} />
+        <meshStandardMaterial color={p.ceiling} roughness={0.94} />
+      </mesh>
+
+      {/* a medallion at the centre of every compartment: the one piece of the
+          grotesque big enough to read from the floor */}
+      <Repeated
+        count={count}
+        place={(i, m) => {
+          // face down, not forward: an unrotated circle hangs off the ceiling
+          // like a paper lantern
+          m.makeRotationX(Math.PI / 2);
+          m.setPosition(0, h - 0.02, mid + (i - count / 2 + 0.5) * step);
+        }}
+      >
+        <ringGeometry args={[Math.min(step, w) * 0.13, Math.min(step, w) * 0.17, 32]} />
+        <meshStandardMaterial
+          color={p.ceilingAccent}
+          roughness={0.9}
+          side={THREE.DoubleSide}
+        />
+      </Repeated>
+
+      {/* the crossbeams. Dark, deep, and the reason the ceiling reads as
+          carpentry rather than as a painted lid. */}
+      <Repeated
+        count={count + 1}
+        place={(i, m) => m.makeTranslation(0, h - 0.14, mid + (i - (count + 1) / 2 + 0.5) * step)}
+      >
+        <boxGeometry args={[w, 0.3, 0.34]} />
+        <meshStandardMaterial color="#4A3524" roughness={0.72} />
+      </Repeated>
+
+      {/* the two long beams down the sides, where the ceiling meets the wall */}
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * (d.halfWidth - 0.17), h - 0.16, mid]}>
+          <boxGeometry args={[0.34, 0.34, runLength]} />
+          <meshStandardMaterial color="#4A3524" roughness={0.72} />
+        </mesh>
+      ))}
+
+      {/* the dentil course under the beams, running the length of both walls */}
+      {[-1, 1].map((side) => (
+        <Repeated
+          key={side}
+          count={Math.round(runLength / 0.38)}
+          place={(i, m) =>
+            m.makeTranslation(
+              side * (d.halfWidth - 0.06),
+              h - 0.42,
+              mid - runLength / 2 + i * 0.38,
+            )
+          }
+        >
+          <boxGeometry args={[0.14, 0.13, 0.19]} />
+          <meshStandardMaterial color={p.molding} roughness={0.8} />
+        </Repeated>
+      ))}
+    </group>
+  );
+}
+
 const CEILINGS = {
   'barrel-skylight': BarrelSkylight,
   'pitched-glass': PitchedGlass,
   'fresco-vault': FrescoVault,
   'steel-glass-arch': SteelGlassArch,
   'peaked-court': PeakedCourt,
+  'grotesque-beams': GrotesqueBeams,
 } as const;
 
 export function Ceiling(props: Props) {

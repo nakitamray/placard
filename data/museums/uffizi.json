@@ -1,0 +1,201 @@
+{
+  "id": "uffizi",
+  "name": "Galleria degli Uffizi",
+  "city": "Florence",
+  "subtitle": "The east corridor",
+  "blurb": "A long flat-ceilinged corridor under grotesque frescoes and dark crossbeams, daylight down one whole side, a checkerboard marble floor and a line of empty plinths.",
+  "corridorNote": "Modelled on the east corridor of the Uffizi: a flat coffered ceiling divided by heavy dark wooden crossbeams with symmetrical grotesque frescoes painted between them in gold, red and muted blue on cream; a continuous frieze of small dark-framed portraits running above the picture rail; off-white plaster on the inner wall carrying large gold-framed paintings; a run of tall rectangular windows down the outer wall flooding the hall with daylight; classical statuary on dark squared plinths down both sides behind brass stanchions and red velvet rope; and a highly polished diagonal checkerboard floor of dark charcoal and pale grey marble that reflects the light from the windows in long streaks.",
+  "style": {
+    "ceiling": "grotesque-beams",
+    "floor": "checkerboard",
+    "wall": "uffizi-corridor",
+    "frame": "uffizi-gilt",
+    "hang": "single",
+    "halfWidth": 3.1,
+    "wallHeight": 5.0,
+    "vaultHeight": 5.4,
+    "bays": 10,
+    "bayDepth": 5.0,
+    "palette": {
+      "wall": "#E4DDCE",
+      "wallDeep": "#CFC5B2",
+      "molding": "#F3EDE0",
+      "gilt": "#C9A227",
+      "ceiling": "#EDE4D0",
+      "ceilingAccent": "#8E6B3A",
+      "floor": "#D6D0C4",
+      "floorInlay": "#4E4A44",
+      "accent": "#7A6A4E",
+      "sky": "#F4F8FC"
+    },
+    "light": {
+      "key": "#FFF6E4",
+      "keyIntensity": 2.6,
+      "keyFrom": [
+        9,
+        12,
+        4
+      ],
+      "sky": "#E4EFFA",
+      "ground": "#8A8378",
+      "ambient": 0.62,
+      "lamp": "#FFE7BE",
+      "lampIntensity": 3.5,
+      "exposure": 1.02,
+      "background": "#3A342A",
+      "fog": [
+        "#4A4235",
+        54,
+        150
+      ]
+    },
+    "fixtures": {
+      "sculpture": "pedestal-figures",
+      "seating": "none",
+      "chandeliers": false,
+      "placards": true,
+      "clock": false,
+      "terraces": false,
+      "ropes": true
+    }
+  },
+  "plan": {
+    "viewBox": "20 20 528 376",
+    "level": "East corridor, second floor",
+    "rooms": [
+      {
+        "id": "r-venus",
+        "name": "Birth of Venus",
+        "svgPath": "M40,44 L152,44 L152,128 L40,128 Z",
+        "centroid": [
+          96,
+          86
+        ],
+        "active": true,
+        "artworkIndex": 0
+      },
+      {
+        "id": "r-primavera",
+        "name": "Primavera",
+        "svgPath": "M162,44 L274,44 L274,128 L162,128 Z",
+        "centroid": [
+          218,
+          86
+        ],
+        "active": true,
+        "artworkIndex": 1
+      },
+      {
+        "id": "r-annunciation",
+        "name": "Annunciation",
+        "svgPath": "M284,44 L396,44 L396,128 L284,128 Z",
+        "centroid": [
+          340,
+          86
+        ],
+        "active": true,
+        "artworkIndex": 2
+      },
+      {
+        "id": "r-tondo",
+        "name": "Doni Tondo",
+        "svgPath": "M406,44 L518,44 L518,128 L406,128 Z",
+        "centroid": [
+          462,
+          86
+        ],
+        "active": true,
+        "artworkIndex": 3
+      },
+      {
+        "id": "r-urbino-venus",
+        "name": "Venus of Urbino",
+        "svgPath": "M40,140 L152,140 L152,224 L40,224 Z",
+        "centroid": [
+          96,
+          182
+        ],
+        "active": true,
+        "artworkIndex": 4
+      },
+      {
+        "id": "r-medusa",
+        "name": "Medusa",
+        "svgPath": "M162,140 L274,140 L274,224 L162,224 Z",
+        "centroid": [
+          218,
+          182
+        ],
+        "active": true,
+        "artworkIndex": 5
+      },
+      {
+        "id": "r-goldfinch",
+        "name": "Goldfinch",
+        "svgPath": "M284,140 L396,140 L396,224 L284,224 Z",
+        "centroid": [
+          340,
+          182
+        ],
+        "active": true,
+        "artworkIndex": 6
+      },
+      {
+        "id": "r-urbino",
+        "name": "The Urbino Pair",
+        "svgPath": "M406,140 L518,140 L518,224 L406,224 Z",
+        "centroid": [
+          462,
+          182
+        ],
+        "active": true,
+        "artworkIndex": 7
+      },
+      {
+        "id": "r-lippi",
+        "name": "Lippi Madonna",
+        "svgPath": "M40,236 L152,236 L152,320 L40,320 Z",
+        "centroid": [
+          96,
+          278
+        ],
+        "active": true,
+        "artworkIndex": 8
+      },
+      {
+        "id": "r-bacchus",
+        "name": "Bacchus",
+        "svgPath": "M162,236 L274,236 L274,320 L162,320 Z",
+        "centroid": [
+          218,
+          278
+        ],
+        "active": true,
+        "artworkIndex": 9
+      },
+      {
+        "id": "r-corridor",
+        "name": "The east corridor",
+        "svgPath": "M40,332 L528,332 L528,376 L40,376 Z",
+        "centroid": [
+          284,
+          354
+        ],
+        "active": false,
+        "artworkIndex": -1
+      }
+    ]
+  },
+  "artworks": [
+    "botticelli-birth-venus",
+    "botticelli-primavera",
+    "leonardo-annunciation",
+    "michelangelo-doni-tondo",
+    "titian-venus-urbino",
+    "caravaggio-medusa",
+    "raphael-madonna-goldfinch",
+    "piero-urbino-diptych",
+    "lippi-madonna-two-angels",
+    "caravaggio-bacchus"
+  ]
+}

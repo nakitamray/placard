@@ -20,6 +20,7 @@ import { glyphRT } from '../glyph/GlyphPrePass';
 import type { LoadedArtwork } from '../glyph/artworkLoader';
 import { revealAnim } from '../transitions/reveal';
 import { lens } from '../transitions/lens';
+import type { FrameShape } from '../types';
 
 const vert = /* glsl */ `
 varying vec2 vUv;
@@ -40,8 +41,19 @@ uniform float uDim;
 uniform vec3  uLens;      // x, y, radius — the artwork's own image pixels
 uniform float uLensAmt;
 uniform vec2  uImageSize;
+uniform float uRound;
 varying vec2 vUv;
 void main() {
+  /*
+   * A tondo is cut out of a square canvas rather than painted on a round one,
+   * so the plane stays square and the fragments outside the circle are
+   * dropped. A little feather at the edge, or the rim reads as a jagged
+   * staircase against the turned moulding around it.
+   */
+  if (uRound > 0.5) {
+    float r = length(vUv - 0.5);
+    if (r > 0.5) discard;
+  }
   vec3 live = texture2D(uGlyph, vUv).rgb;
   vec3 wall = texture2D(uWall, vUv).rgb;
   vec3 base = mix(wall, live, uUseGlyph);
@@ -53,7 +65,8 @@ void main() {
   float d = distance(vec2(vUv.x, 1.0 - vUv.y) * uImageSize, uLens.xy);
   float lens = uLensAmt * (1.0 - smoothstep(uLens.z * 0.5, uLens.z, d));
   vec3 color = mix(base, paint, max(uMix, lens)) * uDim;
-  gl_FragColor = vec4(color, 1.0);
+  float edge = uRound > 0.5 ? 1.0 - smoothstep(0.492, 0.5, length(vUv - 0.5)) : 1.0;
+  gl_FragColor = vec4(color, edge);
   #include <colorspace_fragment>
 }
 `;
@@ -68,19 +81,23 @@ export function ArtworkPlane({
   onLeave,
   onMove,
   onTap,
+  shape,
 }: {
   artwork: LoadedArtwork | null;
   position: [number, number, number];
   height?: number;
   aspect: number;
   active: boolean;
+  /** 'round' cuts the canvas to a circle; a tondo is not a rectangle */
+  shape?: FrameShape;
   onEnter?: () => void;
   onLeave?: () => void;
   /** u,v normalised across the canvas, y-down — image space */
   onMove?: (u: number, v: number) => void;
   onTap?: (u: number, v: number) => void;
 }) {
-  const width = height * aspect;
+  // a tondo is square whatever its scan says, and cut to a circle in the shader
+  const width = shape === 'round' ? height : height * aspect;
   const matRef = useRef<THREE.ShaderMaterial>(null);
 
   const uniforms = useMemo(
@@ -95,12 +112,14 @@ export function ArtworkPlane({
       uLens: { value: new THREE.Vector3(0, 0, 1) },
       uLensAmt: { value: 0 },
       uImageSize: { value: new THREE.Vector2(1, 1) },
+      uRound: { value: 0 },
     }),
     [],
   );
 
   useFrame((_, delta) => {
     const u = uniforms;
+    u.uRound.value = shape === 'round' ? 1 : 0;
     if (artwork) {
       u.uWall.value = artwork.wallTex;
       u.uPaint.value = artwork.fullTex ?? artwork.wallTex;
@@ -148,6 +167,9 @@ export function ArtworkPlane({
           fragmentShader={frag}
           uniforms={uniforms}
           toneMapped={false}
+          // only a tondo needs blending, for the feathered rim; a rectangle
+          // stays opaque so it keeps writing depth as it always has
+          transparent={shape === 'round'}
         />
       </mesh>
     </group>

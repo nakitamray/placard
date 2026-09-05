@@ -31,6 +31,42 @@ interface Props {
 }
 
 /**
+ * Anything repeated down a corridor is one draw call.
+ *
+ * `place` is given the index and a matrix to fill; the children are the
+ * geometry and material every instance shares.
+ */
+function Instanced({
+  count,
+  place,
+  children,
+}: {
+  count: number;
+  place: (i: number, m: THREE.Matrix4) => void;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const m = new THREE.Matrix4();
+    for (let i = 0; i < count; i++) {
+      place(i, m);
+      mesh.setMatrixAt(i, m);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count, place]);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, count]} castShadow>
+      {children}
+    </instancedMesh>
+  );
+}
+
+
+/**
  * Marble, not plastic.
  *
  * A bright flat diffuse at 0.44 roughness is a plastic toy under gallery
@@ -789,6 +825,50 @@ export function Fixtures({ style, d }: Props) {
           </group>,
         );
       }
+    }
+  }
+
+  if (f.ropes) {
+    /*
+     * Brass stanchions and red rope, down both sides in front of the plinths.
+     *
+     * The one piece of furniture in the Uffizi corridor that is not
+     * architecture, and the thing that says most plainly that this is a museum
+     * with visitors in it rather than a hall. The rope between two posts sags,
+     * so it is drawn as a shallow catenary of three segments rather than as a
+     * straight bar — a taut horizontal line at hip height reads as a handrail.
+     */
+    const span = d.bayDepth / 2;
+    const posts = d.bays * 2 + 1;
+    for (const side of [-1, 1]) {
+      const x = side * (d.halfWidth - 1.7);
+      nodes.push(
+        <group key={`rope${side}`}>
+          <Instanced count={posts} place={(i, m) => m.makeTranslation(x, 0.45, -i * span)}>
+            <cylinderGeometry args={[0.032, 0.042, 0.9, 10]} />
+            <meshStandardMaterial color="#B08A3C" metalness={0.85} roughness={0.32} />
+          </Instanced>
+          <Instanced count={posts} place={(i, m) => m.makeTranslation(x, 0.93, -i * span)}>
+            <sphereGeometry args={[0.05, 12, 10]} />
+            <meshStandardMaterial color="#B08A3C" metalness={0.85} roughness={0.28} />
+          </Instanced>
+          {/* the rope: three segments per span, dipping in the middle */}
+          <Instanced
+            count={(posts - 1) * 3}
+            place={(i, m) => {
+              const seg = i % 3;
+              const bay = Math.floor(i / 3);
+              const t = (seg + 0.5) / 3;
+              const dip = 0.09 * Math.sin(t * Math.PI);
+              m.makeRotationX(Math.PI / 2);
+              m.setPosition(x, 0.82 - dip, -(bay + t) * span);
+            }}
+          >
+            <cylinderGeometry args={[0.022, 0.022, span / 3 + 0.01, 8]} />
+            <meshStandardMaterial color="#7A1E22" roughness={0.86} />
+          </Instanced>
+        </group>,
+      );
     }
   }
 

@@ -8,12 +8,12 @@
  *
  * `prefers-reduced-motion` gets a still slideshow instead, because a field of
  * several thousand drifting characters is precisely what that setting is
- * asking us not to render. It crossfades between the same fifty works, using
+ * asking us not to render. It crossfades between the same works, using
  * the reproductions already published per artwork, and holds each one on its
  * own focal point so a tall canvas is not cropped through the face.
  *
- * Only two or three backgrounds are ever in the DOM. Mounting fifty and hiding
- * forty-nine behind `opacity: 0` would not stop the browser fetching them — a
+ * Only two or three backgrounds are ever in the DOM. Mounting them all and
+ * hiding all but one behind `opacity: 0` would not stop the browser fetching them — a
  * `background-image` is honoured whatever the element's opacity — so the
  * entrance costs one picture, and the next arrives during the seconds the
  * first one holds.

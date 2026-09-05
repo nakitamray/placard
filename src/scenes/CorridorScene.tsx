@@ -1,7 +1,7 @@
 /**
  * CorridorScene
  *
- * One procedural machine, five museums. The architecture (ceiling, floor, wall
+ * One procedural machine, six museums. The architecture (ceiling, floor, wall
  * treatment, fixtures, frames), the palette and the entire lighting rig come
  * from the chosen museum's style record; nothing about a particular building
  * is hard-coded here. Adding a sixth museum is a data change.
@@ -197,6 +197,7 @@ function HungWork({
         height={height}
         gilt={museum.style.palette.gilt}
         dark={museum.style.palette.wallDeep}
+        shape={artwork.shape}
         detail={detail}
       />
       <mesh
@@ -211,7 +212,12 @@ function HungWork({
           open();
         }}
       >
-        <planeGeometry args={[width, height]} />
+        {/* a tondo is cut out of a square panel, so the canvas is a disc */}
+        {artwork.shape === 'round' ? (
+          <circleGeometry args={[Math.min(width, height) / 2, 48]} />
+        ) : (
+          <planeGeometry args={[width, height]} />
+        )}
         <meshStandardMaterial
           ref={canvasMat}
           map={texture}
@@ -272,7 +278,11 @@ function Bays({
       // runs into the shaft that is supposed to be separating it from its
       // neighbour.
       const clear = museum.style.wall === 'court-facade' ? 0.6 : 0.78;
-      const main = fitWork(artworks[i].aspect, maxH, d.bayDepth * clear);
+      const main = fitWork(
+        artworks[i].shape === 'round' ? 1 : artworks[i].aspect,
+        maxH,
+        d.bayDepth * clear,
+      );
       // Carving is only legible close up. Past a few bays the bead course and
       // cartouches cost tens of thousands of triangles to render something
       // smaller than a pixel, so distant frames keep the turned courses only.

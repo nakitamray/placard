@@ -10,7 +10,7 @@ import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import type { MuseumStyle } from '../../types';
 import type { Quality } from '../../lib/quality';
-import { bayZ, hangBottom, type Dims } from './dims';
+import { bayZ, hangBottom, hangTop, type Dims } from './dims';
 import { CourtFacade } from './CourtFacade';
 
 interface Props {
@@ -54,6 +54,9 @@ function Instanced({
 
 /* ── floors ─────────────────────────────────────────────────────────────── */
 
+/** one square of the Uffizi's diagonal checkerboard, metres */
+const TILE = 0.9;
+
 export function Floor({ style, d, quality }: Props) {
   const p = style.palette;
   const kind = style.floor;
@@ -64,8 +67,17 @@ export function Floor({ style, d, quality }: Props) {
   // how wet the floor looks. Polished marble and stone throw long specular
   // streaks down a gallery; a courtyard pavement does not.
   const mirror =
-    kind === 'marble-inlay' ? 0.62 : kind === 'court-paving' ? 0.22 : kind === 'parquet' ? 0.4 : 0.5;
-  const roughness = kind === 'court-paving' ? 0.5 : kind === 'parquet' ? 0.3 : 0.18;
+    kind === 'checkerboard'
+      ? 0.72
+      : kind === 'marble-inlay'
+        ? 0.62
+        : kind === 'court-paving'
+          ? 0.22
+          : kind === 'parquet'
+            ? 0.4
+            : 0.5;
+  const roughness =
+    kind === 'court-paving' ? 0.5 : kind === 'parquet' ? 0.3 : kind === 'checkerboard' ? 0.12 : 0.18;
 
   return (
     <group>
@@ -97,6 +109,42 @@ export function Floor({ style, d, quality }: Props) {
           />
         )}
       </mesh>
+
+      {kind === 'checkerboard' && (
+        /*
+         * A diagonal checkerboard, laid as one instanced tile.
+         *
+         * Only the dark squares are drawn — the pale ones are the floor plane
+         * showing through, which halves the instance count and means the
+         * reflection underneath is uninterrupted. The whole field is turned
+         * forty-five degrees, because the Uffizi's is laid on the diagonal and
+         * that is most of what makes it read as that corridor: a square grid
+         * runs parallel with the walls and disappears; a diagonal one drives
+         * every line toward the far window.
+         */
+        <group position={[0, 0.003, mid]} rotation={[0, Math.PI / 4, 0]}>
+          <Instanced
+            count={Math.ceil((w + run) / TILE) ** 2 / 2}
+            place={(i, m) => {
+              const cols = Math.ceil((w + run) / TILE);
+              const row = Math.floor((i * 2) / cols);
+              const col = ((i * 2) % cols) + (row % 2);
+              m.makeTranslation(
+                (col - cols / 2 + 0.5) * TILE,
+                0,
+                (row - cols / 2 + 0.5) * TILE,
+              );
+            }}
+          >
+            <boxGeometry args={[TILE, 0.004, TILE]} />
+            <meshStandardMaterial
+              color={p.floorInlay}
+              roughness={0.2}
+              metalness={0.18}
+            />
+          </Instanced>
+        </group>
+      )}
 
       {kind === 'parquet' && (
         // light polished boards running the length of the room
@@ -229,6 +277,96 @@ export function Walls({ style, d, quality }: Props) {
   );
 
   if (kind === 'court-facade') return <CourtFacade style={style} d={d} quality={quality} />;
+
+  if (kind === 'uffizi-corridor') {
+    /*
+     * The Uffizi's east corridor is asymmetric and that is the whole of its
+     * character: paintings down one side, and down the other a run of tall
+     * windows that is doing all the lighting in the room. Standing in it, the
+     * hang is always on your left and the light is always on your right.
+     *
+     * Above the pictures, on both walls, runs a continuous frieze of small
+     * dark-framed portraits — several hundred of them in the real corridor,
+     * instanced here as one draw of plain dark panels, because from the floor
+     * that is exactly what they are.
+     */
+    // the real bays are wide; a mullion every metre reads as a picket fence
+    const glazing = 2.1;
+    const nWindows = Math.round(run / glazing);
+    const friezeY = hangTop(d, style) + 0.42;
+    return (
+      <group>
+        {/* the hung wall */}
+        {base(-1, p.wall)}
+        {bands(-1, p.molding, 1.0)}
+
+        {/* the glazed wall: a bright plane behind a grid of stone mullions */}
+        <mesh
+          position={[d.halfWidth, d.wallHeight / 2, mid]}
+          rotation={[0, -Math.PI / 2, 0]}
+        >
+          <planeGeometry args={[run, d.wallHeight]} />
+          {/* basic, not standard: this is the light source in the room, and a
+              shaded surface here reads as a painted wall rather than as day */}
+          <meshBasicMaterial color={p.sky} toneMapped={false} />
+        </mesh>
+        {/* the pier between each window */}
+        <Instanced
+          count={nWindows + 1}
+          castShadow
+          place={(i, m) =>
+            m.makeTranslation(
+              d.halfWidth - 0.14,
+              d.wallHeight / 2,
+              mid - run / 2 + i * glazing,
+            )
+          }
+        >
+          <boxGeometry args={[0.36, d.wallHeight, 0.5]} />
+          <meshStandardMaterial color={p.wallDeep} roughness={0.86} />
+        </Instanced>
+        {/* the transom and the sill, which is what makes them windows and not
+            a gap between columns */}
+        {[d.wallHeight * 0.78, 1.05].map((y) => (
+          <mesh key={y} position={[d.halfWidth - 0.13, y, mid]}>
+            <boxGeometry args={[0.32, 0.16, run]} />
+            <meshStandardMaterial color={p.molding} roughness={0.82} />
+          </mesh>
+        ))}
+        {/* below the sill the wall is solid */}
+        <mesh position={[d.halfWidth - 0.06, 0.52, mid]}>
+          <boxGeometry args={[0.14, 1.05, run]} />
+          <meshStandardMaterial color={p.wall} roughness={0.88} />
+        </mesh>
+        {bands(1, p.molding, 1.0)}
+
+        {/* the portrait frieze, both walls */}
+        {[-1, 1].map((side) => (
+          <Instanced
+            key={side}
+            count={Math.round(run / 0.62)}
+            place={(i, m) =>
+              m.makeTranslation(
+                side * (d.halfWidth - 0.07),
+                friezeY,
+                mid - run / 2 + 0.31 + i * 0.62,
+              )
+            }
+          >
+            <boxGeometry args={[0.06, 0.44, 0.36]} />
+            <meshStandardMaterial color="#3A2A1C" roughness={0.72} />
+          </Instanced>
+        ))}
+        {/* the rail the frieze sits on */}
+        {[-1, 1].map((side) => (
+          <mesh key={side} position={[side * (d.halfWidth - 0.05), friezeY - 0.3, mid]}>
+            <boxGeometry args={[0.11, 0.09, run]} />
+            <meshStandardMaterial color={p.gilt} metalness={0.6} roughness={0.45} />
+          </mesh>
+        ))}
+      </group>
+    );
+  }
 
   if (kind === 'fresco-maps') {
     // Painted map panels between gilded pilasters, busts along the base.

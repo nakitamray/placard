@@ -1,5 +1,5 @@
 /**
- * The Atlas — fifty paintings as one shape.
+ * The Atlas — the whole collection as one shape.
  *
  * A museum tells you who painted a thing and when. What it cannot tell you,
  * standing in front of one canvas, is that the man who taught the painter of
@@ -569,7 +569,7 @@ export function AtlasView() {
       <p className="caption corridor-title atlas-level">The atlas</p>
 
       <header className="atlas-head">
-        <h2 className="display atlas-title">How the fifty are joined</h2>
+        <h2 className="display atlas-title">How the collection is joined</h2>
       </header>
 
       <p className="caption atlas-progress">
@@ -704,7 +704,7 @@ function LabelLayer({ graph, focus }: { graph: AtlasGraph; focus: string | null 
    *                     rather than its inventory
    *   something focused that node and everything it touches, and nothing else
    *
-   * Painting nodes never carry a standing label: there are fifty of them and
+   * Painting nodes never carry a standing label: there are sixty of them and
    * their titles are the longest strings in the graph.
    */
   const shown = useMemo(() => {

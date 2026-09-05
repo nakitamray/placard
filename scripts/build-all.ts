@@ -134,6 +134,7 @@ for (const museumId of museums) {
       title: record.title,
       aspect,
       accent: record.accentColor,
+      ...(record.frameShape ? { shape: record.frameShape } : {}),
     });
     exhibition.push({
       id: record.id,
