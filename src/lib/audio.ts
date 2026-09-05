@@ -54,7 +54,7 @@ let enabled = false;
  * How much of the visitor is on the room: 1 is the corridor, with people in
  * it; lower values are the same room heard from further inside your own head.
  */
-const ATTENTION = { room: 1, gallery: 0.62, painting: 0.24 } as const;
+const ATTENTION = { room: 1, gallery: 0.6, painting: 0.2 } as const;
 export type Attention = keyof typeof ATTENTION;
 let attentionLevel: number = ATTENTION.room;
 
@@ -471,7 +471,10 @@ export function attention(where: Attention) {
   setMusicDuck(next);
   if (room && ctx) {
     room.level.cancelScheduledValues(ctx.currentTime);
-    room.level.setTargetAtTime(next, ctx.currentTime, 0.8);
+    // a time constant of 1.1s settles in a little over three seconds, which
+    // is the same length as the music's own duck — the two layers have to
+    // move together or the change is audible as a change
+    room.level.setTargetAtTime(next, ctx.currentTime, 1.1);
   }
 }
 

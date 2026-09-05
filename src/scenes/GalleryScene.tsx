@@ -593,18 +593,6 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
             if (i !== index) return;
             const s = useStore.getState();
             const art = loaded.get(i);
-            if (s.extractionMode) {
-              /*
-               * Keep reporting what is under the cursor even while a passage
-               * is out. Thread mode is a mode you move around inside: stop
-               * updating `hoveredRegion` once something is pulled and the only
-               * way to reach a second passage is to leave the mode and come
-               * back.
-               */
-              const region = art ? regionAt(art.meta.regions ?? [], u, v) : null;
-              if (region?.id !== s.hoveredRegion?.id) s.setHoveredRegion(region);
-              return;
-            }
             /*
              * HOVER LOOKS, CLICK DECIDES.
              *
@@ -614,9 +602,22 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
              * words. The room does not slide, the wall label does not arrive,
              * and the picture does not dissolve out from under you — all of
              * that belongs to the click.
+             *
+             * Thread mode gets the same circle. It is the one thing on this
+             * canvas that says "the cursor is here and the picture is under
+             * the words", and a mode that took it away and drew a rectangle
+             * instead read as a different, worse interface rather than as the
+             * same one doing something else.
              */
             if (!art || !matchMedia('(pointer: fine)').matches) return;
             moveLens(u, v, art.glyphs.imageW, art.glyphs.imageH, LENS_RADIUS);
+
+            if (s.extractionMode) {
+              // and it keeps reporting what is under the cursor even while a
+              // passage is out: thread mode is a mode you move around inside
+              const region = regionAt(art.meta.regions ?? [], u, v);
+              if (region?.id !== s.hoveredRegion?.id) s.setHoveredRegion(region);
+            }
           }}
           onTap={(u, v) => {
             if (i !== index) return;

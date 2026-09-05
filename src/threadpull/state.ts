@@ -8,7 +8,6 @@
  */
 import { useStore } from '../state/store';
 import { endReveal } from '../transitions/reveal';
-import { closeLens } from '../transitions/lens';
 import type { ArtworkRegion } from '../types';
 
 export const threadPullAnim = {
@@ -83,19 +82,17 @@ export function regionAt(regions: ArtworkRegion[], u: number, v: number): Artwor
  * Turn thread mode on or off.
  *
  * One function rather than a bare `setExtractionMode`, because switching in
- * has a precondition that was being missed everywhere it was called from:
- * there is nothing to pull out of a painting that has already dissolved into
- * one. If the work is revealed — clicked open — the glyph field is at full
- * dissolve and every region is invisible, so thread mode looked broken rather
- * than empty. Entering the mode therefore puts the words back first.
+ * has a precondition that is easy to miss at every call site: a work that has
+ * been clicked open is at full dissolve, so every region in it is invisible
+ * and the mode reads as broken rather than as empty.
  */
 export function setThreadMode(on: boolean) {
   const s = useStore.getState();
   if (s.extractionMode === on) return;
-  if (on) {
-    endReveal(s.reducedMotion);
-    closeLens();
-  }
+  // there is nothing to pull out of a painting that has already dissolved
+  // into one, so entering the mode puts the words back first. The lens stays:
+  // it is the same affordance in both modes.
+  if (on) endReveal(s.reducedMotion);
   s.setExtractionMode(on);
   if (!on) s.setPulledRegion(null);
 }

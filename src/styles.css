@@ -42,10 +42,7 @@ body { margin: 0; overflow: hidden; background: var(--ink); }
 .body    { font-size: 16px; line-height: 26px; letter-spacing: 0; text-transform: none; }
 .title   { font-size: 21px; line-height: 28px; font-style: italic; font-weight: 500; }
 .display { font-size: 34px; line-height: 40px; letter-spacing: -0.01em; font-weight: 500; }
-.hero    { font-size: 54px; line-height: 58px; letter-spacing: -0.02em; font-weight: 500; }
-@media (max-width: 720px) { .hero { font-size: 38px; line-height: 42px; } }
 @media (max-height: 780px) {
-  .hero { font-size: 40px; line-height: 44px; }
   .landing-content .museum-row { min-height: 46px; }
 }
 
@@ -164,13 +161,28 @@ button:active { transform: translateY(1px); }
   padding: 4vh 0; overflow-y: auto; scrollbar-width: none;
 }
 .landing-content::-webkit-scrollbar { display: none; }
-.landing-mark { color: var(--gilt); letter-spacing: 0.35em; margin: 0 0 var(--s4); flex: none; }
-.landing-content .hero { margin: 0 0 var(--s4); flex: none; }
-.landing-blurb {
-  margin: 0 0 var(--s4); flex: none; max-width: 40ch;
-  color: var(--stone); opacity: 0.86;
+/* The title page: the name, then the one line under it. Nothing else — the
+   painting behind them is the description. */
+.landing-mark {
+  margin: 0; flex: none; color: var(--bone); font-weight: 500;
+  font-size: 68px; line-height: 74px; letter-spacing: 0.06em;
 }
-.landing-content .hairline { border-color: rgba(216, 205, 186, 0.4); width: 220px; margin-left: 0; }
+.landing-line {
+  margin: var(--s2) 0 0; flex: none; color: var(--gilt);
+  font-size: 22px; line-height: 28px; letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+@media (max-width: 720px) {
+  .landing-mark { font-size: 46px; line-height: 52px; }
+  .landing-line { font-size: 16px; line-height: 22px; letter-spacing: 0.12em; }
+}
+@media (max-height: 780px) {
+  .landing-mark { font-size: 52px; line-height: 58px; }
+  .landing-line { font-size: 18px; }
+}
+.landing-content .hairline {
+  border-color: rgba(216, 205, 186, 0.4); width: 220px; margin: var(--s6) 0 0;
+}
 .landing-choose { color: var(--stone); opacity: 0.85; margin: var(--s4) 0 var(--s2); flex: none; }
 .museum-list { list-style: none; margin: 0; padding: 0; flex: none; }
 .museum-list li { border-bottom: 1px solid rgba(216, 205, 186, 0.28); }
@@ -352,8 +364,12 @@ button:active { transform: translateY(1px); }
 .placard-note p { margin-top: var(--s4) !important; }
 .placard-provenance { font-style: italic; color: var(--taupe) !important; margin-top: var(--s5) !important; }
 
-@media (pointer: coarse), (max-width: 720px) {
-  /* bottom sheet */
+/* A bottom sheet, but only where there is height for one. A phone held
+   sideways is 390 tall: a sheet taking 55% of that leaves a strip of painting
+   above it, which is the opposite of the point. Short screens keep the
+   right-hand column, which at 844 across still leaves the canvas 460. */
+@media (pointer: coarse) and (min-height: 560px),
+       (max-width: 720px) and (min-height: 560px) {
   .placard {
     top: auto; bottom: 0; left: 0; right: 0; width: 100%;
     translate: 0 40px; max-height: 55vh;
@@ -416,11 +432,11 @@ button:active { transform: translateY(1px); }
   position: fixed; inset: 0; z-index: 55;
   background: radial-gradient(
     130% 100% at 50% 42%,
-    rgba(242, 235, 223, 0.42) 0%,
-    rgba(20, 17, 14, 0.66) 100%
+    rgba(242, 235, 223, 0.3) 0%,
+    rgba(20, 17, 14, 0.56) 100%
   );
-  backdrop-filter: blur(11px) saturate(1.06);
-  -webkit-backdrop-filter: blur(11px) saturate(1.06);
+  backdrop-filter: blur(14px) saturate(1.04);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04);
   display: grid; place-items: center; padding: var(--s6);
   animation: credits-in var(--d-base) var(--e-out);
   /* overridden per museum from the room's own palette — see ui/Credits.tsx */
@@ -436,11 +452,14 @@ button:active { transform: translateY(1px); }
 .credits-inner {
   position: relative;
   display: grid; grid-template-columns: 252px minmax(0, 1fr);
-  background: rgba(246, 241, 232, 0.96);
-  backdrop-filter: blur(30px) saturate(1.1);
-  -webkit-backdrop-filter: blur(30px) saturate(1.1);
+  background: rgba(247, 243, 236, 0.97);
+  backdrop-filter: blur(30px) saturate(1.06);
+  -webkit-backdrop-filter: blur(30px) saturate(1.06);
   color: var(--ink);
-  box-shadow: 0 40px 110px rgba(20, 17, 14, 0.5);
+  /* softened: a hard-edged slab reads as a dialog box dropped on a painting.
+     A little radius and a wide, weak shadow make it a page laid over one. */
+  border-radius: 6px;
+  box-shadow: 0 30px 80px rgba(20, 17, 14, 0.38), 0 2px 8px rgba(20, 17, 14, 0.16);
   max-width: 940px; width: 100%; max-height: 86vh;
   overflow: hidden;
   animation: credits-rise var(--d-slow) var(--e-out);
@@ -467,6 +486,7 @@ button:active { transform: translateY(1px); }
     );
   /* the room's own colour, as a hairline down the inside edge */
   box-shadow: inset -3px 0 0 -2px var(--c-gilt);
+  border-radius: 6px 0 0 6px;
 }
 .credits-rail-mark {
   color: var(--c-gilt); letter-spacing: 0.35em; margin: 0 0 var(--s3);
@@ -497,20 +517,44 @@ button:active { transform: translateY(1px); }
 .credits-nav-item.is-on .credits-nav-num { color: var(--c-gilt); opacity: 1; }
 .credits-nav-item.is-on .credits-nav-label { color: var(--c-gilt); }
 
+/* Top right of the page, over the reading column. A close control anywhere
+   else is a close control nobody finds on the first look. */
 .credits-close {
-  align-self: flex-start; margin-top: auto; color: var(--taupe);
-  transition: color var(--d-fast);
+  position: absolute; top: var(--s4); right: var(--s4); z-index: 3;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 13px; line-height: 1;
+  color: var(--umber);
+  background: rgba(36, 31, 26, 0.05);
+  border: 1px solid rgba(36, 31, 26, 0.12);
+  transition: background-color var(--d-fast), color var(--d-fast), transform var(--d-fast);
 }
-.credits-close:hover { color: var(--c-gilt); }
+.credits-close:hover {
+  color: var(--ink); background: rgba(36, 31, 26, 0.1); transform: rotate(90deg);
+}
 
 /* ── the page ── */
 .credits-scroll {
   max-height: 86vh; overflow-y: auto; overscroll-behavior: contain;
-  padding: var(--s7); scrollbar-width: thin;
+  padding: var(--s7); padding-right: calc(var(--s7) - 4px);
+  /* a rule down the margin rather than a browser scrollbar: the panel is a
+     page, and a grey system trough down the side of it is the one part that
+     never looked like the rest */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(110, 91, 74, 0.34) transparent;
   /* the top and bottom of the reading column dissolve rather than being cut */
   mask-image: linear-gradient(to bottom, transparent 0, #000 26px, #000 calc(100% - 26px), transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px, #000 calc(100% - 26px), transparent 100%);
 }
+.credits-scroll::-webkit-scrollbar { width: 10px; }
+.credits-scroll::-webkit-scrollbar-track { background: transparent; }
+.credits-scroll::-webkit-scrollbar-thumb {
+  background: rgba(110, 91, 74, 0.28);
+  border: 3px solid transparent; background-clip: content-box;
+  border-radius: 999px;
+}
+.credits-scroll::-webkit-scrollbar-thumb:hover { background-color: rgba(110, 91, 74, 0.5); }
+
 .credits-section {
   color: var(--c-accent); margin: var(--s6) 0 var(--s3);
   letter-spacing: 0.14em; text-transform: uppercase; font-size: 11px;
@@ -550,19 +594,22 @@ button:active { transform: translateY(1px); }
 }
 .credits-track-where { color: var(--c-accent); letter-spacing: 0.1em; }
 
-/* the design rules — numbered, because they are in an order */
+/* The design rules — numbered, because they are in an order.
+   A hanging indent, NOT a two-column grid: a grid item is created for every
+   child of the <li>, raw text included, so the prose following a <strong>
+   lands in the next cell — which here was the numeral column, thirty pixels
+   wide, one word to a line. */
 .credits-rules { list-style: none; counter-reset: rule; margin: 0; padding: 0; }
 .credits-rules li {
-  counter-increment: rule;
-  display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: var(--s3);
-  padding: var(--s3) 0;
+  counter-increment: rule; position: relative;
+  padding: var(--s3) 0 var(--s3) 34px;
   border-bottom: 1px solid var(--limestone);
   color: rgba(36, 31, 26, 0.84);
 }
 .credits-rules li::before {
   content: counter(rule, decimal-leading-zero);
+  position: absolute; left: 0; top: calc(var(--s3) + 4px);
   font-size: 11px; letter-spacing: 0.09em; color: var(--c-gilt);
-  line-height: 26px;
 }
 .credits-rules li:last-child { border-bottom: 0; }
 .credits-rules strong { color: var(--ink); font-weight: 600; }
@@ -706,9 +753,11 @@ button:active { transform: translateY(1px); }
    floor and a black vault alike, and settles rather than disappearing. */
 .control-hints {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  z-index: 31; display: flex; flex-wrap: wrap; justify-content: center;
+  z-index: 31; display: flex; justify-content: center;
   align-items: center; gap: var(--s2) var(--s5);
   max-width: min(1000px, 94vw);
+  /* closed it is one line and stays one line; opened it wraps, and only then */
+  flex-wrap: nowrap; white-space: nowrap;
   padding: 9px var(--s5);
   /* softened: a hard slab of near-black under the type read as a browser
      chrome bar sitting on the picture. This is a veil — enough to hold the
@@ -724,9 +773,21 @@ button:active { transform: translateY(1px); }
   font-size: 12px; letter-spacing: 0.1em; line-height: 16px;
   opacity: 1;
   transition: opacity 900ms var(--e-both), background-color 900ms var(--e-both);
+  /* the line itself is not a target; only the "more" mark in it is */
   pointer-events: none;
 }
-.control-hints.is-settled { opacity: 0.8; background: rgba(28, 24, 20, 0.22); }
+.control-hints.is-settled { opacity: 0.72; background: rgba(28, 24, 20, 0.2); }
+.control-hints.is-open { max-width: min(700px, 92vw); flex-wrap: wrap; white-space: normal; }
+/* the one thing here you can press */
+.control-more {
+  pointer-events: auto;
+  font: inherit; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gilt); opacity: 0.85;
+  padding: 1px 8px; border-radius: 999px;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  transition: opacity var(--d-fast), background-color var(--d-fast);
+}
+.control-more:hover { opacity: 1; background: rgba(201, 162, 39, 0.16); }
 .control-hint { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .control-hints kbd {
   font: inherit; font-size: 11px;
@@ -735,7 +796,25 @@ button:active { transform: translateY(1px); }
 }
 .hint-sep { padding: 0 5px; opacity: 0.75; }
 @media (max-width: 860px) { .control-hints { font-size: 11px; gap: 6px var(--s4); } }
-@media (max-width: 640px) { .control-hints { display: none; } }
+/* a landscape phone is the narrowest screen the door lets through, and two
+   short hints still fit on one line there */
+@media (max-width: 700px) { .control-hints { font-size: 10px; padding: 7px var(--s4); } }
+
+/* The way to the far end, for screens with no Shift key. Sits opposite the
+   way back, because they are the two ends of the same journey. */
+.walk-end {
+  position: fixed; top: 66px; left: var(--s5); z-index: 32;
+  display: none;
+  padding: 7px 14px; border-radius: 999px;
+  background: rgba(24, 20, 16, 0.46);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(242, 235, 223, 0.12);
+  color: var(--bone); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  opacity: 0.8;
+}
+.walk-end:hover { opacity: 1; color: var(--gilt); }
+@media (pointer: coarse) { .walk-end { display: block; } }
 
 /* museum name, top right of the corridor */
 .corridor-title {
@@ -1136,3 +1215,69 @@ button:active { transform: translateY(1px); }
 .atlas-toast-cue { color: var(--taupe); font-size: 9.5px; margin-top: 3px; }
 .atlas-toast:hover { border-color: var(--gilt); }
 @media (max-width: 640px) { .atlas-toast { display: none; } }
+
+/* ─── turn your device ───────────────────────────────────────────────────
+   Over everything, including the loading bar, because it is a precondition
+   rather than a state of the exhibition. The exhibition stays mounted behind
+   it: turning a phone back and forth must not reload the room. */
+.turn {
+  position: fixed; inset: 0; z-index: 200;
+  display: grid; place-items: center;
+  padding: var(--s6);
+  background: radial-gradient(120% 90% at 50% 30%, #2A2119 0%, #141110 100%);
+  color: var(--bone);
+  animation: credits-in var(--d-base) var(--e-out);
+}
+.turn-inner { max-width: 32ch; text-align: center; }
+.turn-mark { color: var(--gilt); letter-spacing: 0.35em; margin: 0 0 var(--s7); }
+.turn-title {
+  margin: var(--s6) 0 var(--s3); font-weight: 500;
+  font-size: 26px; line-height: 32px; letter-spacing: -0.01em;
+}
+.turn-note { color: var(--stone); opacity: 0.82; margin: 0; }
+
+/* the phone. Two nested boxes and one keyframe: the frame turns a quarter,
+   the screen inside it reproportions on the way round. */
+.turn-anim { display: grid; place-items: center; height: 132px; }
+.turn-device {
+  position: relative;
+  width: 68px; height: 116px;
+  border: 2px solid var(--taupe); border-radius: 10px;
+  animation: turn-device 3.4s var(--e-both) infinite;
+}
+.turn-screen {
+  position: absolute; inset: 7px 5px 11px;
+  background: rgba(201, 162, 39, 0.16);
+  border-radius: 3px;
+}
+.turn-home {
+  position: absolute; left: 50%; bottom: 3px; translate: -50% 0;
+  width: 18px; height: 2px; border-radius: 2px; background: var(--taupe);
+}
+@keyframes turn-device {
+  0%, 22%   { rotate: 0deg; }
+  55%, 78%  { rotate: -90deg; }
+  100%      { rotate: -90deg; }
+}
+/* the arc it travels, drawn once behind it */
+.turn-anim::before {
+  content: ''; position: absolute; width: 132px; height: 132px;
+  border-radius: 50%;
+  border: 1px dashed rgba(185, 168, 143, 0.28);
+  border-right-color: transparent; border-bottom-color: transparent;
+  rotate: 45deg;
+}
+@media (prefers-reduced-motion: reduce) {
+  .turn-device { animation: none; rotate: -90deg; }
+  .turn { animation: none; }
+}
+
+/* On a short landscape screen the wall label holds the right-hand column, and
+   the hint line moves out from under it rather than sitting on top. */
+@media (max-height: 559px) {
+  .placard { width: 42vw; max-width: 380px; }
+  .placard-scroll { max-height: 84vh; padding: var(--s5); }
+  .control-hints { bottom: 12px; left: 0; right: 42vw; transform: none; margin: 0 auto; }
+  .corner-toggles { bottom: 12px; }
+  .rail { display: none; }
+}

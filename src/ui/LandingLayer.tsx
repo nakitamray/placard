@@ -242,13 +242,8 @@ export function LandingLayer() {
         Skip to the list of museums
       </a>
       <div className="landing-content" ref={contentRef}>
-        <p className="landing-mark caption">Placard</p>
-        <h1 className="hero">Read the paintings.</h1>
-        <p className="body landing-blurb">
-          Fifty works from five museums, each one redrawn out of the writing it left behind —
-          letters, reviews, catalogue entries, arguments — moving through the picture in
-          reading order.
-        </p>
+        <h1 className="landing-mark">Placard</h1>
+        <p className="landing-line">Read the canvas</p>
         <hr className="hairline" />
         <p className="meta landing-choose">Choose a museum</p>
         <ul className="museum-list" id="museum-list">

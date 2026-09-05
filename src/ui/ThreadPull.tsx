@@ -38,13 +38,17 @@ import { sfx } from '../lib/audio';
 import { discoverFromText } from '../state/atlas';
 import type { ArtworkRegion, DeviceTier } from '../types';
 
-/** characters that fly individually; the rest of the passage fades in */
-const FLIGHT_CHARS = 320;
+/**
+ * Characters that fly individually; the rest of the passage fades in.
+ *
+ * Every one of these is a positioned DOM node tweened from its own cell on
+ * the canvas, so this number is the cost of the effect. A hundred and twenty
+ * is still a paragraph lifting off a painting and is a third of the work.
+ */
+const FLIGHT_CHARS = 120;
 
-/** the one unprompted demonstration: when it starts, and how long it holds */
-const DEMO_KEY = 'placard.seenThread';
-const DEMO_DELAY_MS = 2200;
-const DEMO_HOLD_MS = 5200;
+/** how long the pointer rests on a passage before it is pulled */
+const SETTLE_MS = 240;
 
 export function ThreadPull({ tier }: { tier: DeviceTier }) {
   const phase = useStore((s) => s.phase);
@@ -57,15 +61,12 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
   const setPulledRegion = useStore((s) => s.setPulledRegion);
 
   const [pinned, setPinned] = useState(false);
-  /** true while the one unprompted demonstration is on screen */
-  const [demo, setDemo] = useState(false);
   /** the region still on screen while its text flies home */
   const [leaving, setLeaving] = useState<ArtworkRegion | null>(null);
 
   const flightRef = useRef<HTMLParagraphElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
-  const outlineRef = useRef<SVGRectElement>(null);
 
   const inGallery = phase === 'gallery';
   const region = pulledRegion ?? leaving;
@@ -132,8 +133,7 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
 
   /*
    * A pulled thread is read for the connections it gives away. This is the
-   * only way the atlas grows, so it runs on every extraction — the visitor's
-   * own and the one demonstration alike.
+   * only way the atlas grows, so it runs on every extraction.
    */
   useEffect(() => {
     if (!pulledRegion) return;
@@ -155,80 +155,6 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
     setPinned(false);
   }, [index, phase, setPulledRegion]);
 
-  /*
-   * Show the trick once, unasked.
-   *
-   * Thread Pull is the most distinctive thing in this exhibition and it is
-   * behind a held modifier key on a target you cannot see, which means almost
-   * nobody finds it. No hint line fixes that — a sentence about holding Shift
-   * is a sentence, and watching a paragraph lift itself off a painting and
-   * assemble into prose is the thing itself. So the first room anyone enters
-   * pulls one thread on its own, holds it long enough to be read as an event
-   * rather than a glitch, and puts it back.
-   *
-   * Once per session, never under reduced motion, and cancelled the instant
-   * the visitor does anything — being demonstrated to while you are already
-   * doing it yourself is worse than not being shown at all.
-   */
-  useEffect(() => {
-    if (!inGallery || reducedMotion) return;
-    if (sessionStorage.getItem(DEMO_KEY) === '1') return;
-    const art = artworks[index];
-    if (!art) return;
-
-    let cancelled = false;
-    let showing = false;
-    const timers: number[] = [];
-    /*
-     * Cancel the demonstration, and retract it if it is already on screen.
-     *
-     * Clearing only the pending timers leaves a demonstration that has just
-     * started running its full five seconds over whatever the visitor did
-     * next — and clicking a canvas during it opens the wall label *behind*
-     * the thread panel, which is two panels at once and neither of them
-     * asked for.
-     */
-    const stop = () => {
-      cancelled = true;
-      timers.forEach(window.clearTimeout);
-      if (showing) {
-        showing = false;
-        setDemo(false);
-        setPulledRegion(null);
-      }
-    };
-    window.addEventListener('keydown', stop, { once: true });
-    window.addEventListener('pointerdown', stop, { once: true });
-
-    timers.push(
-      window.setTimeout(() => {
-        if (cancelled) return;
-        void loadArtwork(art.id, tier).then((a) => {
-          const region = a.meta.regions?.[0];
-          if (cancelled || !region) return;
-          sessionStorage.setItem(DEMO_KEY, '1');
-          showing = true;
-          setDemo(true);
-          setPulledRegion(region);
-          sfx.rustle();
-          timers.push(
-            window.setTimeout(() => {
-              showing = false;
-              setPulledRegion(null);
-              setDemo(false);
-            }, DEMO_HOLD_MS),
-          );
-        });
-      }, DEMO_DELAY_MS),
-    );
-
-    return () => {
-      stop();
-      window.removeEventListener('keydown', stop);
-      window.removeEventListener('pointerdown', stop);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inGallery, index, reducedMotion, tier]);
 
   // extraction-mode cursor
   useEffect(() => {
@@ -391,33 +317,6 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pulledRegion, leaving, reducedMotion]);
 
-  // region outline while hunting in extraction mode
-  useEffect(() => {
-    if (!extractionMode || !inGallery) return;
-    let raf = 0;
-    const tick = () => {
-      const el = outlineRef.current;
-      const r = hoveredRegion;
-      const project = artworkProjector.project;
-      if (el && r && project) {
-        const a = project(r.box[0], r.box[1]);
-        const b = project(r.box[2], r.box[3]);
-        if (a && b) {
-          el.setAttribute('x', String(Math.min(a.x, b.x)));
-          el.setAttribute('y', String(Math.min(a.y, b.y)));
-          el.setAttribute('width', String(Math.abs(b.x - a.x)));
-          el.setAttribute('height', String(Math.abs(b.y - a.y)));
-          el.style.opacity = '1';
-        }
-      } else if (el) {
-        el.style.opacity = '0';
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [extractionMode, inGallery, hoveredRegion]);
-
   if (!inGallery) return null;
 
   const flightText = region ? region.text.slice(0, FLIGHT_CHARS) : '';
@@ -425,12 +324,10 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
 
   return (
     <>
-      {/* extraction-mode affordance over the canvas */}
-      {extractionMode && !pulledRegion && (
-        <svg className="tp-outline" aria-hidden>
-          <rect ref={outlineRef} rx="1" />
-        </svg>
-      )}
+      {/* The affordance over the canvas is the same reading lens as anywhere
+          else — a soft circle under the cursor. A rectangle snapped round the
+          region turns a painting into a diagram of its own boxes, and the
+          boxes are an authoring detail nobody came to see. */}
       {extractionMode && !pulledRegion && (
         <p className="tp-prompt caption">
           {hoveredRegion ? hoveredRegion.label : 'Move over the painting to pull a thread'}
@@ -490,11 +387,7 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
           </div>
 
           <footer className="tp-foot">
-            {demo ? (
-              <span className="caption tp-hint tp-demo">
-                Press <kbd>space</kbd>, then move over the painting to pull your own
-              </span>
-            ) : pinned ? (
+            {pinned ? (
               <span className="caption tp-hint">Pinned · Esc to release</span>
             ) : (
               <button className="caption tp-pin" onClick={() => setPinned(true)}>

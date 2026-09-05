@@ -323,7 +323,7 @@
     "room": "Level 5",
     "accession": "RF 12258",
     "creditLine": "Bequest of Gustave Caillebotte, 1894",
-    "accentColor": "#6B4F55",
+    "accentColor": "#3C4A44",
     "heroFocus": [
       0.56,
       0.52
@@ -334,9 +334,9 @@
       "aspect": 0.72,
       "archetype": "figure-group",
       "palette": [
-        "#3A2C2E",
-        "#6B4F55",
-        "#A8836A",
+        "#2A322E",
+        "#3C4A44",
+        "#8A7A5E",
         "#D9BE96",
         "#F2ECE0",
         "#C46A72"

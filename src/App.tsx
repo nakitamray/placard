@@ -2,7 +2,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { selectArtworks, useStore } from './state/store';
-import { attachPointer, attachZoom, pointer, resetZoom } from './state/motion';
+import { attachPointer, attachZoom, corridor, pointer, resetZoom } from './state/motion';
 import { detectTier, webgl2Supported } from './lib/deviceTier';
 import {
   QUALITY_INFO,
@@ -29,6 +29,7 @@ import { setThreadMode, toggleThreadMode } from './threadpull/state';
 import { ControlHints } from './ui/ControlHints';
 import { CursorRing } from './ui/CursorRing';
 import { LoadingBar } from './ui/LoadingBar';
+import { OrientationGate } from './ui/OrientationGate';
 import { FlashLayer } from './ui/Flash';
 import { endReveal, startReveal } from './transitions/reveal';
 import { asset } from './lib/asset';
@@ -245,6 +246,12 @@ export default function App() {
           <button className="caption gallery-back" onClick={() => setPhase('landing')}>
             ← Entrance
           </button>
+          {/* Shift and Enter hurry you to the far end, and neither exists on a
+              touch screen. Same move, with a face on it, shown only where the
+              keys are not. */}
+          <button className="caption walk-end" onClick={() => (corridor.goal = 1)}>
+            To the end →
+          </button>
           <p className="caption corridor-title">
             {museum?.name}
             <span className="corridor-sub"> · {museum?.subtitle}</span>
@@ -266,17 +273,6 @@ export default function App() {
           <button className="caption atlas-open" onClick={() => useAtlas.getState().setOpen(true)}>
             ✦ The atlas
           </button>
-          {/* The colophon belongs wherever you are standing: its list of corpus
-              sources is the sources of the room you are in, so reaching it only
-              from the entrance — where no museum is loaded — shows nothing. */}
-          {phase !== 'landing' && (
-            <button
-              className="caption atlas-open"
-              onClick={() => useStore.getState().setCreditsOpen(true)}
-            >
-              Colophon
-            </button>
-          )}
         </div>
       )}
       {/* the corner switches, in one row so they can never land on each other */}
@@ -302,6 +298,9 @@ export default function App() {
       <AtlasToast />
       <FlashLayer />
       <CursorRing />
+      {/* a precondition rather than a phase: it sits over everything and the
+          exhibition keeps running underneath it */}
+      <OrientationGate />
 
       {/* screen-reader / keyboard proxies for the canvas artworks */}
       {inGallery && <ArtworkProxies />}

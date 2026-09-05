@@ -73,13 +73,27 @@ export const ATLAS_TRACK: MusicTrack = MUSEUM_TRACKS[3];
 
 export type RoomKind = 'entrance' | 'gallery' | 'atlas';
 
-/** 0–100, YouTube's own scale. The atlas is deliberately far down it. */
-const VOLUME: Record<RoomKind, number> = { entrance: 34, gallery: 42, atlas: 11 };
+/**
+ * 0–100, YouTube's own scale.
+ *
+ * The entrance sits well under the corridors. It plays over type somebody is
+ * reading, before they have chosen anything, and it is the first sound the
+ * site makes — the level at which a corridor is atmosphere is the level at
+ * which a front door is loud.
+ */
+const VOLUME: Record<RoomKind, number> = { entrance: 12, gallery: 34, atlas: 9 };
 
-/** how long one room takes to give way to the next */
-const CROSSFADE_MS = 2400;
-/** how long a duck takes to settle, either way */
-const DUCK_MS = 1400;
+/**
+ * How long one room takes to give way to the next.
+ *
+ * Long. This is a door between two pieces of music, and two seconds of
+ * overlap is short enough that the ear hears the join as an edit. Six is the
+ * length at which the entrance has genuinely thinned out before the corridor
+ * is established, and it is still shorter than the walk in.
+ */
+const CROSSFADE_MS = 6000;
+/** how long a duck takes to settle, either way — slow enough to be a room */
+const DUCK_MS = 3200;
 /** how long the API script gets before we give up and fall back */
 const API_TIMEOUT_MS = 8000;
 

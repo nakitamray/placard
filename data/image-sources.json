@@ -98,6 +98,7 @@
     "note": "One Hundred Famous Views of Edo, no. 58. Many impressions exist and they vary in colour; any clean full-sheet one is right."
   },
   "michelangelo-creation-adam": {
+    "commonsFile": "File:The Creation of Adam perspective fix.jpg",
     "search": "Michelangelo Creation of Adam Sistine Chapel"
   },
   "michelangelo-last-judgment": {
@@ -116,7 +117,8 @@
     "search": "Caravaggio Entombment of Christ Deposizione Vatican"
   },
   "leonardo-st-jerome": {
-    "search": "Leonardo da Vinci Saint Jerome in the Wilderness unfinished"
+    "commonsFile": "File:Saint Jerome Leonardo - image only (Q972196).jpg",
+    "search": "Leonardo da Vinci Saint Jerome in the Wilderness Pinacoteca Vaticana"
   },
   "raphael-madonna-foligno": {
     "search": "Raphael Madonna of Foligno"
@@ -185,9 +187,9 @@
   "velazquez-juan-de-pareja": {
     "search": "Velázquez Portrait of Juan de Pareja 1650"
   },
-  "bellini-pieta": {
-    "search": "Giovanni Bellini Pietà Compianto Cristo morto Pinacoteca Vaticana",
-    "note": "Bellini painted this subject many times; the Vatican panel is the one with the town and hills behind the group. Check the contact sheet before committing the scan."
+  "bellini-lamentation": {
+    "commonsFile": "File:Giovanni Bellini (Venice, c. 1435 - 1516) - Lamentation over the Dead Christ - MV.40290 - Pinacoteca Vaticana.jpg",
+    "search": "Giovanni Bellini Compianto sul Cristo morto Pinacoteca Vaticana"
   },
   "domenichino-last-communion-jerome": {
     "search": "Domenichino Last Communion of Saint Jerome Pinacoteca Vaticana",

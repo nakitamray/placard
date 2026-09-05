@@ -1,7 +1,5 @@
 # Placard
 
-*Fifty paintings, drawn out of the writing about them.*
-
 A painting is the thing everyone has already seen. What nobody sees is the
 weight of writing behind it — the letters, the reviews, the catalogue entries,
 the arguments. So the paintings here are built out of that writing: every

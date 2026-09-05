@@ -129,8 +129,8 @@
         "artworkIndex": 5
       },
       {
-        "id": "r-pieta",
-        "name": "Pietà",
+        "id": "r-lamentation",
+        "name": "Lamentation",
         "svgPath": "M138,179 L228,179 L228,265 L138,265 Z",
         "centroid": [
           183,
@@ -194,7 +194,7 @@
     "leonardo-st-jerome",
     "raphael-madonna-foligno",
     "raphael-coronation-virgin",
-    "bellini-pieta",
+    "bellini-lamentation",
     "domenichino-last-communion-jerome"
   ]
 }

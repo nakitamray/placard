@@ -2,9 +2,20 @@
  * What stands on the floor and hangs from the ceiling.
  *
  * Furniture is what stops a corridor reading as a rendering: the benches,
- * plinths, busts, chandeliers and label stands are how you know the space is
- * meant to be walked through by people. Each museum's style record picks its
- * own set.
+ * plinths, chandeliers and label stands are how you know the space is meant to
+ * be walked through by people. Each museum's style record picks its own set.
+ *
+ * FIGURES ARE OFF.
+ *   The plinths still stand where the sculpture goes, and the sculpture itself
+ *   is not drawn. `Figure` and `Bust` below are abstracted marble forms built
+ *   for their silhouette, and they were the weakest thing in every room —
+ *   close enough to read as a statue at the end of a corridor and wrong from
+ *   any distance a visitor actually stops at. An empty plinth is honest and
+ *   reads as a gallery mid-rehang; a poor statue reads as a mistake.
+ *
+ *   Both functions are kept, and the call sites are commented rather than
+ *   deleted, because what replaces them is a scanned model dropped into the
+ *   same three places — see "Known limits" in the README.
  */
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -732,30 +743,22 @@ export function Fixtures({ style, d }: Props) {
   const nodes: React.ReactNode[] = [];
 
   if (f.sculpture === 'pedestal-figures') {
-    // One figure every other bay, against the wall opposite the light. The
-    // seed is a running count, not the bay number: stepping the bay by two
-    // walks the variant by two as well, so half the types would never appear.
-    let n = 0;
+    // one plinth every other bay, against the wall opposite the light
     for (let b = 1; b < d.bays; b += 2) {
-      const seed = n++;
       nodes.push(
         <group key={`s${b}`} position={[-(d.halfWidth - 1.1), 0, bayZ(d, b)]}>
           <Plinth h={1.05} w={0.58} color={p.floorInlay} />
-          <group position={[0, 1.09, 0]}>
-            <Figure seed={seed} scale={0.95 + ((b * 7) % 11) / 60} />
-          </group>
+          {/* <Figure> — see FIGURES ARE OFF above */}
         </group>,
       );
     }
   }
 
   if (f.sculpture === 'busts') {
-    // busts line the base of both walls, at close intervals
-    let n = 0;
+    // plinths line the base of both walls, at close intervals
     for (let b = 0; b < d.bays; b++) {
-      if (b % 2) continue; // a bust in every bay on both walls reads as fencing
+      if (b % 2) continue; // one in every bay on both walls reads as fencing
       for (const side of [-1, 1]) {
-        const seed = n++;
         nodes.push(
           <group
             key={`bu${b}${side}`}
@@ -764,9 +767,7 @@ export function Fixtures({ style, d }: Props) {
             {/* stone, not gilt: a gold column under every bust turned the
                 wall base into a row of pillars taller than the sculpture */}
             <Plinth h={1.1} w={0.34} color={p.floor} />
-            <group position={[0, 1.14, 0]}>
-              <Bust seed={seed} />
-            </group>
+            {/* <Bust> — see FIGURES ARE OFF above */}
           </group>,
         );
       }
@@ -774,21 +775,17 @@ export function Fixtures({ style, d }: Props) {
   }
 
   if (f.sculpture === 'court-figures') {
-    // the Met court: figures spaced down the paving on both sides of the walk
-    let n = 0;
+    // the Met court: plinths spaced down the paving on both sides of the walk
     for (let b = 0; b < d.bays; b++) {
       for (const side of [-1, 1]) {
         if ((b + (side > 0 ? 1 : 0)) % 2) continue;
-        const seed = n++;
         nodes.push(
           <group
             key={`c${b}${side}`}
             position={[side * (d.halfWidth - 1.6), 0, bayZ(d, b) + (side > 0 ? 1.2 : 0)]}
           >
             <Plinth h={0.85} w={0.66} color={p.molding} />
-            <group position={[0, 0.89, 0]}>
-              <Figure seed={seed} scale={1.05} />
-            </group>
+            {/* <Figure> — see FIGURES ARE OFF above */}
           </group>,
         );
       }

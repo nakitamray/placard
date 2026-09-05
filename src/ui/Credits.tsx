@@ -11,16 +11,17 @@
  * type on bone, because everything on this site you are meant to READ is dark
  * on light and everything you are meant to LOOK AT is light on dark.
  *
- * The colour is not chosen here. The spine, the rules and the links take the
- * palette of whichever museum you are standing in, so the colophon opened in
- * the Orsay is a different green-gold from the one opened in the Louvre, and
- * closing it puts you back in a room you have not left.
+ * It opens from the entrance and nowhere else. A licence page belongs at the
+ * door of an exhibition, not halfway down a corridor, and reaching it from
+ * inside a room only ever raised the question of how to get back to where you
+ * were standing.
  */
 import { useEffect, useState } from 'react';
-import { selectArtworks, useStore } from '../state/store';
+import { useStore } from '../state/store';
 import { asset } from '../lib/asset';
 import { imageUrl } from '../lib/image';
 import { ENTRANCE_TRACK, MUSEUM_TRACKS } from '../lib/music';
+import { exhibitionWorks } from '../state/works';
 import type { ArtworkMeta } from '../types';
 
 type Tab = 'sources' | 'design' | 'technical' | 'about';
@@ -32,29 +33,41 @@ const TABS: Array<{ id: Tab; label: string; blurb: string }> = [
   { id: 'about', label: 'About', blurb: 'Who made it, and how to write' },
 ];
 
-/** the room's own colour, so the colophon belongs to wherever it was opened */
-const DEFAULT_PALETTE = { accent: '#6E5B4A', gilt: '#C9A227', wall: '#2A2119' };
+/** the exhibition's own colours: umber, gilt, and the tone of a dark room */
+const PALETTE = { accent: '#6E5B4A', gilt: '#C9A227', wall: '#2A2119' };
 
 export function Credits() {
   const open = useStore((s) => s.creditsOpen);
   const setOpen = useStore((s) => s.setCreditsOpen);
-  const artworks = useStore(selectArtworks);
-  const museum = useStore((s) => s.museum);
   const [metas, setMetas] = useState<ArtworkMeta[]>([]);
   const [tab, setTab] = useState<Tab>('sources');
 
+  /*
+   * Every work in the exhibition, not the room you are standing in — the
+   * colophon is opened from the entrance, where no museum has been chosen,
+   * and a licence page that lists ten of fifty sources is not a licence page.
+   */
   useEffect(() => {
     if (!open || tab !== 'sources' || metas.length) return;
-    Promise.all(
-      artworks.map((a) =>
-        fetch(asset(`artworks/${a.id}/meta.json`)).then((r) => r.json() as Promise<ArtworkMeta>),
-      ),
-    ).then(setMetas);
-  }, [open, tab, artworks, metas.length]);
+    let alive = true;
+    void exhibitionWorks()
+      .then((works) =>
+        Promise.all(
+          works.map((w) =>
+            fetch(asset(`artworks/${w.id}/meta.json`)).then((r) => r.json() as Promise<ArtworkMeta>),
+          ),
+        ),
+      )
+      .then((all) => alive && setMetas(all))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [open, tab, metas.length]);
 
   if (!open) return null;
 
-  const p = museum?.style.palette ?? DEFAULT_PALETTE;
+  const p = PALETTE;
   const skin = {
     '--c-accent': p.accent,
     '--c-gilt': p.gilt,
@@ -64,13 +77,21 @@ export function Credits() {
   return (
     <div className="credits" role="dialog" aria-label="Credits and sources" style={skin}>
       <div className="credits-inner">
+        {/* top right, over the page rather than down in the spine: that is
+            where a close button is, and it is the first place anyone looks */}
+        <button
+          className="credits-close"
+          onClick={() => setOpen(false)}
+          aria-label="Close the colophon"
+          title="Close (Esc)"
+        >
+          <span aria-hidden>✕</span>
+        </button>
         <aside className="credits-rail">
           <div className="credits-rail-top">
             <p className="caption credits-rail-mark">Placard</p>
             <h2 className="display credits-rail-title">Colophon</h2>
-            <p className="caption credits-rail-where">
-              {museum ? `${museum.name} · ${museum.city}` : 'The entrance'}
-            </p>
+            <p className="caption credits-rail-where">Fifty works · five museums</p>
           </div>
 
           <nav className="credits-nav" role="tablist" aria-label="Colophon sections">
@@ -91,9 +112,6 @@ export function Credits() {
             ))}
           </nav>
 
-          <button className="caption credits-close" onClick={() => setOpen(false)}>
-            Close <span aria-hidden>✕</span>
-          </button>
         </aside>
 
         <div className="credits-scroll">
@@ -105,11 +123,7 @@ export function Credits() {
                   Every painting on this site is drawn out of text. These are the texts, per
                   artwork, with licence and attribution.
                 </p>
-                {!metas.length && (
-                  <p className="caption credits-source">
-                    Enter a museum and reopen this panel to see the texts behind its works.
-                  </p>
-                )}
+                {!metas.length && <p className="caption credits-source">Loading…</p>}
                 <ul className="credits-works">
                   {metas.map((m) => (
                     <li key={m.id} className="credits-work">
@@ -368,7 +382,7 @@ export function Credits() {
               <section>
                 <h3 className="meta credits-section">About</h3>
                 <p className="body credits-note credits-lede">
-                  Placard is made by <strong>Nakita Mray</strong>.
+                  Placard is made by <strong>Nakita Ray</strong>.
                 </p>
                 <p className="body credits-note">
                   I kept coming back to the same thought in galleries: the painting is the part

@@ -60,8 +60,12 @@ export function Placard() {
       if (el && placardAnchor.visible) {
         const w = el.offsetWidth;
         const h = el.offsetHeight;
-        const coarse = matchMedia('(pointer: coarse)').matches;
-        if (!coarse) {
+        // must agree with the media query in styles.css that turns the label
+        // into a bottom sheet, or the two lay it out in different places
+        const sheet =
+          matchMedia('(pointer: coarse) and (min-height: 560px)').matches ||
+          (window.innerWidth <= 720 && window.innerHeight >= 560);
+        if (!sheet) {
           /*
            * Pinned to the right margin, not to the frame.
            *

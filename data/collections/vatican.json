@@ -310,16 +310,16 @@
     }
   },
   {
-    "id": "bellini-pieta",
+    "id": "bellini-lamentation",
     "artist": "Giovanni Bellini",
     "artistDates": "c. 1430–1516",
-    "title": "Pietà",
+    "title": "Lamentation over the Dead Christ",
     "titleOriginal": "Compianto sul Cristo morto",
     "year": "c. 1474",
     "medium": "Tempera on panel",
     "dimensions": "107 × 84 cm",
     "room": "Pinacoteca Vaticana",
-    "accession": "",
+    "accession": "MV.40290",
     "creditLine": "Pinacoteca Vaticana",
     "accentColor": "#4B5A63",
     "heroFocus": [
@@ -328,6 +328,41 @@
     ],
     "labelText": "Four figures and a body, pressed close to the front of the panel against an evening sky. Nicodemus holds Christ upright under the arms; Joseph of Arimathea steadies the legs; the Virgin and John lean in from either side. Nobody gestures and nobody weeps aloud. Bellini's subject is the moment after the noise has stopped, and he paints it in a light that is going — a low gold band on the horizon behind a landscape of real Veneto hills, with the towers of a town standing in for Jerusalem.",
     "extendedNote": "Bellini painted the dead Christ held by mourners perhaps a dozen times across fifty years, and the type is one of the few subjects a Renaissance painter could return to without repeating himself, because everything depends on how close the figures stand and where the light comes from.\n\nHere they are very close indeed — the group fills the panel almost edge to edge, cut at the knees, so a viewer standing in front of it is at the same distance as the mourners. The body is greenish-grey; the living faces around it are warm. Bellini had begun working in oil by this date, and the flesh is built in thin transparent layers over a tempera base, which is what lets a bruise read as being under the skin rather than on it.\n\nThe landscape is the other invention. Behind the heads, a plain runs back to hills and a walled town under a sky draining from blue to gold, painted with the same care as the figures. That is a northern Italian evening, not a Judean one, and it is not carelessness: putting sacred history into the light of the place where the picture will hang was one of the arguments Venetian painting made throughout Bellini's lifetime. Giorgione and Titian both came out of his workshop, and what they took from him first was the sky.",
+    "regions": [
+      {
+        "id": "faces",
+        "label": "The faces",
+        "box": [
+          0.22,
+          0.06,
+          0.82,
+          0.44
+        ],
+        "text": "Nobody in this picture is performing grief. The Virgin's mouth is closed, John's eyes are lowered, and the two men holding the body are concentrating on the weight of it. Bellini's subject is the moment after the noise has stopped — the half hour in which people who have been screaming go quiet and start doing the practical things. It is the hardest register in the whole of religious painting to hit, and he hit it more often than anyone."
+      },
+      {
+        "id": "body",
+        "label": "The body",
+        "box": [
+          0.18,
+          0.36,
+          0.88,
+          0.74
+        ],
+        "text": "The flesh is greenish-grey against four living faces, and the difference between them is the whole argument of the panel. Bellini had begun working in oil by this date and built the skin in thin transparent layers over a tempera base — which is what lets a bruise read as being under the surface rather than painted on it. The hands are the tell: one set holding, one set held."
+      },
+      {
+        "id": "landscape",
+        "label": "The evening behind them",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.34
+        ],
+        "text": "A plain runs back to hills and a walled town, under a sky draining from blue to a low band of gold. That is a northern Italian evening, not a Judean one, and it is not carelessness: putting sacred history into the light of the place where the picture would hang was an argument Venetian painting made for a century. Giorgione and Titian both came out of Bellini's workshop, and what they took from him first was the sky."
+      }
+    ],
     "placeholder": {
       "aspect": 1.27,
       "archetype": "figure-group",
