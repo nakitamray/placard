@@ -7,7 +7,7 @@
  */
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { buildDivider, buildFrame, buildRoundFrame } from './frames';
+import { buildArchedFrame, buildDivider, buildFrame, buildRoundFrame } from './frames';
 import type { FrameKind, FrameShape } from '../types';
 
 export function OrnateFrame({
@@ -30,7 +30,9 @@ export function OrnateFrame({
   /**
    * 'round' turns the whole profile on a lathe, for a tondo; 'divided' keeps
    * the rectangle and runs a moulded bar down the middle, for a pair hung as
-   * one object. Omitted, the frame is the museum's plain rectangle.
+   * one object; 'arched' carries the same profile round a half circle at the
+   * head, for a round-headed altarpiece panel. Omitted, the frame is the
+   * museum's plain rectangle.
    */
   shape,
 }: {
@@ -47,7 +49,9 @@ export function OrnateFrame({
     () =>
       shape === 'round'
         ? buildRoundFrame(kind, Math.min(width, height), detail === 'full')
-        : buildFrame(kind, width, height, detail === 'full'),
+        : shape === 'arched'
+          ? buildArchedFrame(kind, width, height, detail === 'full')
+          : buildFrame(kind, width, height, detail === 'full'),
     [kind, width, height, detail, shape],
   );
   const divider = useMemo(

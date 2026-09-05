@@ -278,6 +278,114 @@ export function Walls({ style, d, quality }: Props) {
 
   if (kind === 'court-facade') return <CourtFacade style={style} d={d} quality={quality} />;
 
+  if (kind === 'pier-alcoves') {
+    /*
+     * The British Museum's sculpture hall: the wall IS a colonnade.
+     *
+     * Both sides are a march of thick square piers stepping back toward the
+     * vanishing point, and the flat spans between them are shallow alcoves —
+     * which, with the sculpture taken out, is what the paintings hang in. The
+     * whole character of the room is that rhythm, so the piers are the only
+     * thing given any depth: everything else is plain pale stone.
+     *
+     * At the mouth stand the two colossal fluted columns that frame the view.
+     * They are round where everything else is square, they are the first thing
+     * in the frame, and they are what makes the hall read as a proscenium
+     * rather than as a corridor.
+     */
+    const pierW = 0.9;
+    const pierD = 0.62;
+    return (
+      <group>
+        {base(-1, p.wallDeep)}
+        {base(1, p.wallDeep)}
+        {[-1, 1].map((side) => (
+          <group key={side}>
+            {/* the alcove face: a pale flat span set between the piers, which
+                is the surface a canvas is actually hung on */}
+            <mesh
+              position={[side * (d.halfWidth - 0.03), d.wallHeight / 2, mid]}
+              rotation={[0, side > 0 ? -Math.PI / 2 : Math.PI / 2, 0]}
+              receiveShadow
+            >
+              <planeGeometry args={[run, d.wallHeight]} />
+              <meshStandardMaterial color={p.wall} roughness={0.9} />
+            </mesh>
+
+            {/* the piers */}
+            <Instanced
+              count={d.bays + 2}
+              castShadow
+              place={(i, m) =>
+                m.makeTranslation(
+                  side * (d.halfWidth - pierD / 2 + 0.02),
+                  d.wallHeight / 2,
+                  d.bayDepth * 0.5 - i * d.bayDepth,
+                )
+              }
+            >
+              <boxGeometry args={[pierD, d.wallHeight, pierW]} />
+              <meshStandardMaterial color={p.molding} roughness={0.86} />
+            </Instanced>
+            {/* their plinths and capitals: two square steps, no curves */}
+            {[0.22, d.wallHeight - 0.22].map((y) => (
+              <Instanced
+                key={y}
+                count={d.bays + 2}
+                place={(i, m) =>
+                  m.makeTranslation(
+                    side * (d.halfWidth - pierD / 2 + 0.02),
+                    y,
+                    d.bayDepth * 0.5 - i * d.bayDepth,
+                  )
+                }
+              >
+                <boxGeometry args={[pierD + 0.16, 0.44, pierW + 0.16]} />
+                <meshStandardMaterial color={p.molding} roughness={0.84} />
+              </Instanced>
+            ))}
+            {/* the skirting, unbroken along the alcove faces */}
+            <mesh position={[side * (d.halfWidth - 0.06), 0.16, mid]} receiveShadow>
+              <boxGeometry args={[0.12, 0.32, run]} />
+              <meshStandardMaterial color={p.molding} roughness={0.82} />
+            </mesh>
+          </group>
+        ))}
+
+        {/* The two colossal fluted columns at the mouth. Round where the rest
+            of the hall is square, and close enough to the camera at the start
+            of the walk to frame the whole view. */}
+        {[-1, 1].map((side) => (
+          <group key={`col${side}`} position={[side * (d.halfWidth - 0.5), 0, d.bayDepth * 1.3]}>
+            <mesh castShadow>
+              <cylinderGeometry args={[0.72, 0.78, d.wallHeight, 24]} />
+              <meshStandardMaterial color={p.molding} roughness={0.8} />
+            </mesh>
+            {/* the flutes: shallow half-round channels round the shaft */}
+            <Instanced
+              count={20}
+              place={(i, m) => {
+                const a = (i / 20) * Math.PI * 2;
+                m.makeTranslation(Math.cos(a) * 0.74, d.wallHeight / 2, Math.sin(a) * 0.74);
+              }}
+            >
+              <boxGeometry args={[0.07, d.wallHeight, 0.07]} />
+              <meshStandardMaterial color={p.wallDeep} roughness={0.88} />
+            </Instanced>
+            <mesh position={[0, d.wallHeight - 0.3, 0]} castShadow>
+              <boxGeometry args={[1.9, 0.6, 1.9]} />
+              <meshStandardMaterial color={p.molding} roughness={0.82} />
+            </mesh>
+            <mesh position={[0, 0.22, 0]}>
+              <boxGeometry args={[1.9, 0.44, 1.9]} />
+              <meshStandardMaterial color={p.molding} roughness={0.82} />
+            </mesh>
+          </group>
+        ))}
+      </group>
+    );
+  }
+
   if (kind === 'uffizi-corridor') {
     /*
      * The Uffizi's east corridor is asymmetric and that is the whole of its

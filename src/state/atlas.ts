@@ -1,7 +1,7 @@
 /**
  * The atlas — the collection as a graph, uncovered rather than given.
  *
- * Fifty paintings in five buildings have, until now, had nothing to do with
+ * Seventy paintings in seven buildings have, until now, had nothing to do with
  * one another: you saw ten, went back to the front door, and saw ten more.
  * They are in fact one story — Velázquez taught Manet how to put paint down,
  * Van Gogh copied Hiroshige in Arles, Ingres was David's pupil and Raphael's

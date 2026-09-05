@@ -828,6 +828,87 @@ export function Fixtures({ style, d }: Props) {
     }
   }
 
+  if (f.vitrines) {
+    /*
+     * The cases, emptied.
+     *
+     * Down the centre line of a sculpture hall stand the plinths, stepped
+     * pedestals and waist-high platforms the objects sat on, and half of them
+     * carry glass. With the sculpture taken out they are geometric monoliths
+     * standing in spotlight — which is a stranger and better thing to walk
+     * past than a poor model of a statue would be.
+     *
+     * The glass is transmissive rather than transparent: a real vitrine at
+     * this angle is mostly reflection and a green edge, and a fully clear box
+     * is invisible and therefore pointless.
+     */
+    for (let b = 0; b < d.bays; b++) {
+      const tall = b % 3 === 1;
+      const x = (b % 2 ? 1 : -1) * (d.halfWidth - 2.5);
+      nodes.push(
+        <group key={`v${b}`} position={[x, 0, bayZ(d, b) + (b % 2 ? 1.1 : -1.1)]}>
+          {/* the block: two stepped courses, the way a museum plinth is built */}
+          <mesh position={[0, 0.09, 0]} castShadow receiveShadow>
+            <boxGeometry args={[1.24, 0.18, 0.94]} />
+            <meshStandardMaterial color={p.floorInlay} roughness={0.84} />
+          </mesh>
+          <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
+            <boxGeometry args={[1.1, 0.74, 0.82]} />
+            <meshStandardMaterial color={p.wallDeep} roughness={0.8} />
+          </mesh>
+          {tall && (
+            <mesh position={[0, 1.32, 0]} castShadow>
+              <boxGeometry args={[0.96, 0.8, 0.72]} />
+              <meshPhysicalMaterial
+                color="#DCE6E4"
+                roughness={0.06}
+                metalness={0}
+                transmission={0.9}
+                thickness={0.4}
+                ior={1.5}
+              />
+            </mesh>
+          )}
+        </group>,
+      );
+    }
+  }
+
+  if (f.spotTrack) {
+    /*
+     * The spots themselves. The heads are drawn by the ceiling; these are the
+     * cones of light they throw, one per bay per wall, aimed at the hang.
+     *
+     * A spotlight is the most expensive kind of light in three.js — it needs
+     * its own shadow frustum — so these do not cast: the room's key light
+     * does that, and what these are for is the hard warm pool on a canvas and
+     * the darkness between.
+     */
+    for (let b = 0; b < d.bays; b++) {
+      for (const side of [-1, 1]) {
+        nodes.push(
+          <spotLight
+            key={`sp${b}${side}`}
+            position={[0, d.wallHeight - 0.8, bayZ(d, b)]}
+            color={style.light.lamp}
+            intensity={style.light.lampIntensity}
+            angle={0.42}
+            penumbra={0.7}
+            distance={d.halfWidth * 3}
+            decay={1.5}
+          >
+            {/* the target has to be IN the scene graph for its world matrix to
+                update, and a light's own child is the simplest place for it */}
+            <object3D
+              attach="target"
+              position={[side * (d.halfWidth - 0.4), hangTop(d, style) - 1.0 - (d.wallHeight - 0.8), 0]}
+            />
+          </spotLight>,
+        );
+      }
+    }
+  }
+
   if (f.ropes) {
     /*
      * Brass stanchions and red rope, down both sides in front of the plinths.

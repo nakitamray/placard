@@ -515,6 +515,60 @@
       "kind": "place",
       "label": "Urbino",
       "note": "A hill court in the Marche that, under Federico da Montefeltro, kept better mathematicians than most universities"
+    },
+    {
+      "id": "van-eyck",
+      "kind": "painter",
+      "label": "Jan van Eyck",
+      "note": "c.1390–1441"
+    },
+    {
+      "id": "turner",
+      "kind": "painter",
+      "label": "J. M. W. Turner",
+      "note": "1775–1851"
+    },
+    {
+      "id": "constable",
+      "kind": "painter",
+      "label": "John Constable",
+      "note": "1776–1837"
+    },
+    {
+      "id": "holbein",
+      "kind": "painter",
+      "label": "Hans Holbein the Younger",
+      "note": "c.1497–1543"
+    },
+    {
+      "id": "seurat",
+      "kind": "painter",
+      "label": "Georges Seurat",
+      "note": "1859–1891"
+    },
+    {
+      "id": "stubbs",
+      "kind": "painter",
+      "label": "George Stubbs",
+      "note": "1724–1806"
+    },
+    {
+      "id": "bruges",
+      "kind": "place",
+      "label": "Bruges",
+      "note": "The richest city in northern Europe in the 1430s, and where oil painting learned what it could do"
+    },
+    {
+      "id": "suffolk",
+      "kind": "place",
+      "label": "Suffolk",
+      "note": "The Stour valley, which Constable painted for forty years and left only to sell the pictures"
+    },
+    {
+      "id": "oil-painting",
+      "kind": "event",
+      "label": "Oil painting",
+      "note": "Not an invention with a date, but a technique that became the default in the north within one generation of the Arnolfini Portrait"
     }
   ],
   "works": {
@@ -577,7 +631,17 @@
     "raphael-madonna-goldfinch": "raphael",
     "piero-urbino-diptych": "piero",
     "lippi-madonna-two-angels": "lippi",
-    "caravaggio-bacchus": "caravaggio"
+    "caravaggio-bacchus": "caravaggio",
+    "van-eyck-arnolfini": "van-eyck",
+    "vangogh-sunflowers": "vangogh",
+    "turner-fighting-temeraire": "turner",
+    "constable-hay-wain": "constable",
+    "leonardo-virgin-rocks": "leonardo",
+    "holbein-ambassadors": "holbein",
+    "titian-bacchus-ariadne": "titian",
+    "velazquez-rokeby-venus": "velazquez",
+    "seurat-bathers-asnieres": "seurat",
+    "stubbs-whistlejacket": "stubbs"
   },
   "links": [
     {
@@ -1576,6 +1640,101 @@
       "kind": "measured",
       "word": "perspective",
       "note": "Piero wrote two treatises on perspective and one on the five regular solids, and gave up painting for mathematics in his last years. The landscape behind the Urbino portraits is observed from a height with the patience of a surveyor."
+    },
+    {
+      "a": "van-eyck",
+      "b": "bruges",
+      "kind": "worked in",
+      "word": "Bruges"
+    },
+    {
+      "a": "constable",
+      "b": "suffolk",
+      "kind": "worked in",
+      "word": "Suffolk"
+    },
+    {
+      "a": "turner",
+      "b": "london",
+      "kind": "worked in",
+      "word": "London"
+    },
+    {
+      "a": "constable",
+      "b": "london",
+      "kind": "worked in",
+      "word": "London"
+    },
+    {
+      "a": "holbein",
+      "b": "london",
+      "kind": "worked in",
+      "word": "London"
+    },
+    {
+      "a": "stubbs",
+      "b": "london",
+      "kind": "worked in",
+      "word": "London"
+    },
+    {
+      "a": "seurat",
+      "b": "paris",
+      "kind": "worked in",
+      "word": "Paris"
+    },
+    {
+      "a": "turner",
+      "b": "romanticism",
+      "kind": "of",
+      "word": "Romanticism"
+    },
+    {
+      "a": "constable",
+      "b": "romanticism",
+      "kind": "of",
+      "word": "Romanticism"
+    },
+    {
+      "a": "seurat",
+      "b": "post-impressionism",
+      "kind": "of",
+      "word": "Post-Impressionism"
+    },
+    {
+      "a": "constable",
+      "b": "delacroix",
+      "kind": "changed",
+      "word": "Constable",
+      "note": "The Hay Wain was refused by London and won a gold medal in Paris in 1824. Delacroix saw it, went back to his studio, and repainted the background of the Massacre at Chios before it was shown."
+    },
+    {
+      "a": "turner",
+      "b": "monet",
+      "kind": "was studied by",
+      "word": "Turner",
+      "note": "Monet and Pissarro spent 1870–71 in London looking hard at Turner's late work, and came back to France with a different idea of what a painted sky could be made of."
+    },
+    {
+      "a": "velazquez",
+      "b": "manet",
+      "kind": "was copied by",
+      "word": "Velázquez",
+      "note": "Manet called Velázquez the painter of painters and went to Madrid to see him. What he took back was the grey, the thin wet flesh, and the nerve to leave a background empty."
+    },
+    {
+      "a": "seurat",
+      "b": "impressionism",
+      "kind": "argued with",
+      "word": "Seurat",
+      "note": "Seurat read Chevreul, Rood and Blanc and tried to turn the impressionists' instinct about light into a method that could be taught. He died at thirty-one, before finding out whether it could."
+    },
+    {
+      "a": "van-eyck",
+      "b": "oil-painting",
+      "kind": "proved",
+      "word": "oil",
+      "note": "Van Eyck did not invent oil paint, but he is the first painter who used it as though it were the only sensible way to describe the world — and every northern workshop for a century afterwards was answering him."
     }
   ]
 }

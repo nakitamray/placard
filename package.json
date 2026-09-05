@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "A digital exhibition of sixty paintings, each one redrawn out of the writing about it.",
+  "description": "A digital exhibition of seventy paintings, each one redrawn out of the writing about it.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

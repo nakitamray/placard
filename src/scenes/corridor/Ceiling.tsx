@@ -564,6 +564,128 @@ function GrotesqueBeams({ style, d }: Props) {
   );
 }
 
+/**
+ * The British Museum's Egyptian gallery: a stone lid, coffered and lit.
+ *
+ * No glass, no vault, no daylight. The ceiling is a grid of deep rectangular
+ * coffers between thick transverse beams, every moulding stepped and square —
+ * there is not a curve anywhere in it, and that hardness is most of why the
+ * hall reads as an Edwardian museum rather than a palace.
+ *
+ * The coffers are built as one instanced sunken panel plus one instanced inner
+ * step, which is what gives the shadow line. A recess drawn as a box would
+ * need six faces each; a plane set back behind a raised border needs two, and
+ * from below the difference is invisible.
+ *
+ * Down the exact centre line runs a thin metal track carrying small
+ * directional spots. It is the only modern object in the room and the only
+ * light source, and it is what puts a hard warm pool on each painting and
+ * leaves the stone between them in shadow.
+ */
+function CofferedTrack({ style, d }: Props) {
+  const p = style.palette;
+  const h = d.wallHeight;
+  const w = d.halfWidth * 2;
+  const mid = -d.length / 2;
+  const runLength = d.length + d.bayDepth * 3;
+  /** two coffers to a bay along the corridor, three across it */
+  const perBay = 2;
+  const rows = d.bays * perBay + 2;
+  const step = runLength / rows;
+  const cols = 3;
+  const colW = w / cols;
+
+  return (
+    <group>
+      {/* the field the coffers are sunk into */}
+      <mesh position={[0, h, mid]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[w, runLength]} />
+        <meshStandardMaterial color={p.ceiling} roughness={0.95} />
+      </mesh>
+
+      {/* the sunken panel of each coffer, dropped above the field and darker:
+          the shadow inside a recess is the whole effect */}
+      <Repeated
+        count={rows * cols}
+        place={(i, m) => {
+          const r = Math.floor(i / cols);
+          const c = i % cols;
+          m.makeRotationX(Math.PI / 2);
+          m.setPosition(
+            (c - (cols - 1) / 2) * colW,
+            h + 0.34,
+            mid + (r - rows / 2 + 0.5) * step,
+          );
+        }}
+      >
+        <planeGeometry args={[colW * 0.74, step * 0.74]} />
+        <meshStandardMaterial color={p.ceilingAccent} roughness={0.96} />
+      </Repeated>
+
+      {/* the inner step round each recess, which is what casts the line */}
+      <Repeated
+        count={rows * cols}
+        place={(i, m) => {
+          const r = Math.floor(i / cols);
+          const c = i % cols;
+          m.makeTranslation(
+            (c - (cols - 1) / 2) * colW,
+            h + 0.17,
+            mid + (r - rows / 2 + 0.5) * step,
+          );
+        }}
+      >
+        <boxGeometry args={[colW * 0.82, 0.34, step * 0.82]} />
+        <meshStandardMaterial color={p.molding} roughness={0.92} side={THREE.BackSide} />
+      </Repeated>
+
+      {/* the transverse beams, thick and square */}
+      <Repeated
+        count={rows + 1}
+        place={(i, m) =>
+          m.makeTranslation(0, h - 0.2, mid + (i - (rows + 1) / 2 + 0.5) * step)
+        }
+      >
+        <boxGeometry args={[w, 0.4, 0.42]} />
+        <meshStandardMaterial color={p.molding} roughness={0.9} />
+      </Repeated>
+
+      {/* and the two ribs running the length, dividing the coffers across */}
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[(side * colW) / 2, h - 0.2, mid]}>
+          <boxGeometry args={[0.34, 0.4, runLength]} />
+          <meshStandardMaterial color={p.molding} roughness={0.9} />
+        </mesh>
+      ))}
+
+      {/* the cornice, both walls */}
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * (d.halfWidth - 0.16), h - 0.44, mid]}>
+          <boxGeometry args={[0.42, 0.5, runLength]} />
+          <meshStandardMaterial color={p.molding} roughness={0.88} />
+        </mesh>
+      ))}
+
+      {/* the lighting track: one thin rail down the centre line */}
+      <mesh position={[0, h - 0.62, mid]}>
+        <boxGeometry args={[0.09, 0.09, runLength]} />
+        <meshStandardMaterial color="#26241F" metalness={0.6} roughness={0.5} />
+      </mesh>
+      {/* and the spot heads on it, a pair to a bay */}
+      <Repeated
+        count={d.bays * 2 + 2}
+        place={(i, m) => {
+          m.makeRotationZ(Math.PI / 2);
+          m.setPosition(0, h - 0.76, mid - runLength / 2 + (i + 0.5) * (runLength / (d.bays * 2 + 2)));
+        }}
+      >
+        <cylinderGeometry args={[0.055, 0.075, 0.2, 10]} />
+        <meshStandardMaterial color="#26241F" metalness={0.5} roughness={0.55} />
+      </Repeated>
+    </group>
+  );
+}
+
 const CEILINGS = {
   'barrel-skylight': BarrelSkylight,
   'pitched-glass': PitchedGlass,
@@ -571,6 +693,7 @@ const CEILINGS = {
   'steel-glass-arch': SteelGlassArch,
   'peaked-court': PeakedCourt,
   'grotesque-beams': GrotesqueBeams,
+  'coffered-track': CofferedTrack,
 } as const;
 
 export function Ceiling(props: Props) {

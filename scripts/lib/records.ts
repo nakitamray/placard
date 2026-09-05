@@ -58,9 +58,10 @@ export interface ArtworkRecord {
   /**
    * How this work is framed, where a rectangle is the wrong answer: 'round'
    * for a tondo, 'divided' for a pair of panels hung as one object with a
-   * moulded divider between them. Omitted, the museum's own frame is used.
+   * moulded divider between them, 'arched' for a round-headed altarpiece
+   * panel. Omitted, the museum's own frame is used.
    */
-  frameShape?: 'round' | 'divided';
+  frameShape?: 'round' | 'divided' | 'arched';
   labelText: string;
   extendedNote: string;
   placeholder: PlaceholderSpec;

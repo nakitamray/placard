@@ -1,12 +1,13 @@
 /**
  * How a work is framed, where a rectangle is the wrong answer.
  *
- * A tondo hung in a rectangular frame is not the same object, and a diptych
- * hung as one picture loses the hinge the whole composition is built across.
- * Set per artwork in the collection record; everything else takes the
- * museum's own frame.
+ * A tondo hung in a rectangular frame is not the same object; a diptych hung
+ * as one picture loses the hinge the whole composition is built across; and an
+ * altarpiece painted for a round-headed panel has its composition built for
+ * that arch. Set per artwork in the collection record; everything else takes
+ * the museum's own frame.
  */
-export type FrameShape = 'round' | 'divided';
+export type FrameShape = 'round' | 'divided' | 'arched';
 
 export interface ArtworkIndexEntry {
   id: string;
@@ -112,7 +113,9 @@ export type CeilingKind =
   /** Met sculpture court: peaked triangular skylight over an indoor courtyard */
   | 'peaked-court'
   /** Uffizi: a flat ceiling of dark crossbeams with grotesque frescoes between */
-  | 'grotesque-beams';
+  | 'grotesque-beams'
+  /** British Museum: deep stepped coffers with a lighting track down the centre */
+  | 'coffered-track';
 
 export type FloorKind =
   /** pale reflective stone */
@@ -140,7 +143,9 @@ export type WallKind =
   /** asymmetric court: pale stone one side, red brick and white arches the other */
   | 'court-facade'
   /** Uffizi: plaster and a portrait frieze one side, tall windows the other */
-  | 'uffizi-corridor';
+  | 'uffizi-corridor'
+  /** British Museum: a colonnade of square piers with shallow alcoves between */
+  | 'pier-alcoves';
 
 export type FrameKind =
   /** deep gilt salon frame, corner cartouches, bead course */
@@ -154,7 +159,9 @@ export type FrameKind =
   /** broad flat-topped American gilt */
   | 'met-broad'
   /** Florentine cassetta: a flat gilt bed between two carved courses */
-  | 'uffizi-gilt';
+  | 'uffizi-gilt'
+  /** dark stained hardwood with a thin gilt sight edge — the museum standard */
+  | 'museum-plain';
 
 export interface MuseumStyle {
   ceiling: CeilingKind;
@@ -211,6 +218,10 @@ export interface MuseumStyle {
     glazedEnd?: boolean;
     /** brass stanchions and red rope down both sides, in front of the plinths */
     ropes?: boolean;
+    /** waist-high stone platforms with glass cases on them, stripped of contents */
+    vitrines?: boolean;
+    /** a lighting track down the centre line, with directional spots on it */
+    spotTrack?: boolean;
   };
 }
 

@@ -1,7 +1,7 @@
 /**
  * CorridorScene
  *
- * One procedural machine, six museums. The architecture (ceiling, floor, wall
+ * One procedural machine, seven museums. The architecture (ceiling, floor, wall
  * treatment, fixtures, frames), the palette and the entire lighting rig come
  * from the chosen museum's style record; nothing about a particular building
  * is hard-coded here. Adding a sixth museum is a data change.
@@ -29,7 +29,7 @@ import { corridor, warp, pointer, resetCorridor } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
 import { flash } from '../ui/Flash';
 import { OrnateFrame } from './OrnateFrame';
-import { frameReach } from './frames';
+import { archOutline, frameReach } from './frames';
 import { fitWork } from './fit';
 import { fallbackUrl, imageUrl } from '../lib/image';
 import { Ceiling } from './corridor/Ceiling';
@@ -212,9 +212,12 @@ function HungWork({
           open();
         }}
       >
-        {/* a tondo is cut out of a square panel, so the canvas is a disc */}
+        {/* a tondo is cut out of a square panel and a round-headed altarpiece
+            out of a rectangular one, so neither canvas is a rectangle */}
         {artwork.shape === 'round' ? (
           <circleGeometry args={[Math.min(width, height) / 2, 48]} />
+        ) : artwork.shape === 'arched' ? (
+          <shapeGeometry args={[archOutline(width, height)]} />
         ) : (
           <planeGeometry args={[width, height]} />
         )}

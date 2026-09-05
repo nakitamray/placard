@@ -45,7 +45,7 @@ export function Credits() {
   /*
    * Every work in the exhibition, not the room you are standing in — the
    * colophon is opened from the entrance, where no museum has been chosen,
-   * and a licence page that lists ten of sixty sources is not a licence page.
+   * and a licence page that lists ten of seventy sources is not a licence page.
    */
   useEffect(() => {
     if (!open || tab !== 'sources' || metas.length) return;
@@ -91,7 +91,7 @@ export function Credits() {
           <div className="credits-rail-top">
             <p className="caption credits-rail-mark">Placard</p>
             <h2 className="display credits-rail-title">Colophon</h2>
-            <p className="caption credits-rail-where">Sixty works · six museums</p>
+            <p className="caption credits-rail-where">Seventy works · seven museums</p>
           </div>
 
           <nav className="credits-nav" role="tablist" aria-label="Colophon sections">
@@ -391,7 +391,7 @@ export function Credits() {
                   of them — and then built the museum to walk it in.
                 </p>
                 <p className="body credits-note">
-                  Sixty works, six corridors, and every letter on every canvas taken from
+                  Seventy works, seven corridors, and every letter on every canvas taken from
                   something written about that painting. If you find a bug, or a work that
                   should be here, the form below reaches me.
                 </p>

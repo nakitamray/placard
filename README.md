@@ -7,7 +7,7 @@ stroke on every canvas is a character from a text about that work, moving
 through the corpus in reading order. Hold the cursor still and the picture
 resolves out of its own words.
 
-Six museums, ten works each, each corridor modelled on the real room it is
+Seven museums, ten works each, each corridor modelled on the real room it is
 named after. Navigation is spatial: **entrance → corridor → floor plan →
 gallery rail → one painting**.
 
@@ -17,23 +17,25 @@ Requires WebGL2. Sound is off until you turn it on.
 
 # Visiting
 
-## The six rooms
+## The seven rooms
 
 | Museum | The corridor |
 |---|---|
 | **Musée du Louvre** | white barrel vault pierced by arched skylights, thick classical moulding, deep blue-grey walls, salon hang stacked to the cornice |
-| **The British Museum** | crimson walls under a pitched glass lantern on gilded archways, polished light wood, tufted leather seating |
+| **The British Museum** | a coffered stone hall between two colossal fluted columns, walls made of a marching colonnade of square piers with alcoves between them, spotlights on a track down the centre line |
+| **The National Gallery** | crimson walls under a pitched glass lantern on gilded archways, polished light wood, tufted leather seating |
 | **Vatican Museums** | frescoed vault in deeply carved gilded stucco, map panels between gilded pilasters, marble inlay, crystal chandeliers |
 | **Galleria degli Uffizi** | a flat ceiling of dark crossbeams over grotesque frescoes, daylight down one whole side, a diagonal checkerboard floor, brass stanchions and red rope |
 | **Musée d'Orsay** | the colossal arched steel-and-glass nave, stone terraces behind glass railings, the great gilded clock closing the far end |
 | **The Metropolitan Museum of Art** | a sunlit court under a peaked skylight: red brick and white voussoired arches one side, marble ashlar the other, a glass wall at the end |
 
-The British Museum corridor follows **Room 32 at the National Gallery,
-London** — the Julia and Hans Rausing Room — rather than a British Museum
-gallery. The collection hung in it is the British Museum's own painted
-holdings, which are prints, frescoes, scrolls and painted papyri rather than
-gallery canvases, and no British Museum room shows them the way this one does.
-`corridorNote` in `data/museums/british-museum.json` says so too.
+The British Museum room is its **Egyptian sculpture gallery, Room 4**, with
+the sculpture taken out: the plinths, stepped pedestals and glass vitrines
+stand empty down both sides, and what hangs on the piers is the museum's
+painted and printed holdings — woodblock prints, a tomb fresco, a painted
+papyrus, a scroll — which have no permanent room of their own. Every corridor
+carries a `corridorNote` in `data/museums/{id}.json` saying which real room it
+follows and where it departs from it.
 
 ## Moving through it
 
@@ -66,7 +68,7 @@ not dissolve out from under you. Clicking is the decision.
 
 **The corridor lights one work at a time.** Bringing the cursor onto a canvas
 drops the room's exposure and brings a narrow warm spot up on that painting,
-which is how a gallery is actually lit, and what makes a wall of sixty
+which is how a gallery is actually lit, and what makes a wall of seventy
 rectangles resolve into one thing worth looking at.
 
 ## Thread Pull
@@ -124,7 +126,7 @@ pnpm dev
 Node ≥ 20. `pnpm approve-builds` may be needed once so `sharp` can install its
 prebuilt binaries. `public/artworks/` and `public/museums/` are generated and
 not committed, so `build:assets` has to run once after install; it takes a few
-minutes, because sixty works are each analysed into a glyph field twice.
+minutes, because seventy works are each analysed into a glyph field twice.
 
 `fetch:images` is optional — skip it and any work without a scan renders a
 procedural stand-in, which is honest and obvious and not what you want on a
@@ -194,9 +196,11 @@ a tall work is held a little above centre and everything else in the middle.
 
 `frameShape` handles the works a rectangle is wrong for. `'round'` turns the
 museum's own moulding on a lathe and cuts the canvas to a circle, for a tondo;
-`'divided'` keeps the rectangle and runs a moulded bar down the centre, for a
-pair of panels hung as one object. Omitted, a work takes the museum's plain
-frame.
+`'arched'` gives it a round-headed top, straight sides and a flat foot, for a
+panel cut for an altarpiece; `'divided'` keeps the rectangle and runs a moulded
+bar down the centre, for a pair of panels hung as one object. In every case the
+canvas is cut to the same silhouette in the shader, so the words stop where the
+panel does. Omitted, a work takes the museum's plain frame.
 
 `data/artworks/{id}/` is optional and exists only to override generated assets:
 
@@ -277,8 +281,8 @@ next month is not one you can point people at.
 
 **Then open `data/.cache/contact-sheet.html`.** Every run builds it: one page
 showing every picture with the file it came from, the catalogued
-dimensions and how it was resolved. Sixty works is too many to check by
-clicking through sixty Commons pages, and not checking is how an exhibition
+dimensions and how it was resolved. Seventy works is too many to check by
+clicking through seventy Commons pages, and not checking is how an exhibition
 ends up hanging a photograph of a frame. Each card carries a **pin this** block
 to paste straight into `data/image-sources.json`:
 

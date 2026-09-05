@@ -241,5 +241,47 @@
   "caravaggio-bacchus": {
     "commonsFile": "File:Bacchus by Caravaggio 1.jpg",
     "search": "Caravaggio Bacco Uffizi"
+  },
+  "van-eyck-arnolfini": {
+    "commonsFile": "File:Van Eyck - Arnolfini PortraitFXD.jpg",
+    "search": "Jan van Eyck Arnolfini Portrait National Gallery"
+  },
+  "vangogh-sunflowers": {
+    "commonsFile": "File:Vincent van Gogh - Sunflowers - VGM F458.jpg",
+    "search": "Van Gogh Sunflowers National Gallery London",
+    "note": "The London canvas — the fourth version, with fifteen flowers on a yellow ground. Munich, Tokyo, Philadelphia and Amsterdam hold the others and search returns all five."
+  },
+  "turner-fighting-temeraire": {
+    "commonsFile": "File:Turner, J. M. W. - The Fighting Téméraire tugged to her last Berth to be broken.jpg",
+    "search": "Turner Fighting Temeraire National Gallery"
+  },
+  "constable-hay-wain": {
+    "commonsFile": "File:John-constable-the-hay-wain.jpg",
+    "search": "Constable The Hay Wain National Gallery"
+  },
+  "leonardo-virgin-rocks": {
+    "commonsFile": "File:Leonardo da Vinci Virgin of the Rocks (National Gallery London).jpg",
+    "search": "Leonardo Virgin of the Rocks National Gallery London",
+    "note": "The London version, not the Louvre one. The panel is round-headed and hangs in an arched frame here; a scan cropped square at the top is the wrong shape for it."
+  },
+  "holbein-ambassadors": {
+    "commonsFile": "File:Hans Holbein the Younger - The Ambassadors - Google Art Project.jpg",
+    "search": "Holbein The Ambassadors National Gallery"
+  },
+  "titian-bacchus-ariadne": {
+    "commonsFile": "File:Titian Bacchus and Ariadne.jpg",
+    "search": "Titian Bacchus and Ariadne National Gallery"
+  },
+  "velazquez-rokeby-venus": {
+    "commonsFile": "File:Venus del espejo, by Diego Velázquez.jpg",
+    "search": "Velazquez Rokeby Venus Venus del espejo National Gallery"
+  },
+  "seurat-bathers-asnieres": {
+    "commonsFile": "File:Baigneurs a Asnieres.jpg",
+    "search": "Seurat Bathers at Asnieres National Gallery"
+  },
+  "stubbs-whistlejacket": {
+    "commonsFile": "File:Whistlejacket by George Stubbs edit.jpg",
+    "search": "George Stubbs Whistlejacket National Gallery"
   }
 }

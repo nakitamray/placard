@@ -42,18 +42,32 @@ uniform vec3  uLens;      // x, y, radius — the artwork's own image pixels
 uniform float uLensAmt;
 uniform vec2  uImageSize;
 uniform float uRound;
+uniform float uArch;
 varying vec2 vUv;
-void main() {
-  /*
-   * A tondo is cut out of a square canvas rather than painted on a round one,
-   * so the plane stays square and the fragments outside the circle are
-   * dropped. A little feather at the edge, or the rim reads as a jagged
-   * staircase against the turned moulding around it.
-   */
-  if (uRound > 0.5) {
-    float r = length(vUv - 0.5);
-    if (r > 0.5) discard;
+
+/*
+ * How far outside its own outline a fragment is, in uv.
+ *
+ * A tondo is cut out of a square canvas and a round-headed panel is cut out of
+ * a rectangular one, so in both cases the plane keeps its shape and the shader
+ * throws the corners away. Returning a signed distance rather than a boolean
+ * is what lets the rim be feathered — a hard cut reads as a jagged staircase
+ * against the turned moulding around it.
+ */
+float outside(vec2 uv) {
+  if (uRound > 0.5) return length(uv - 0.5) - 0.5;
+  if (uArch > 0.5) {
+    // the arch springs where the half-circle of radius 0.5 (in x) begins
+    float spring = 1.0 - 0.5 * uArch;
+    if (uv.y >= spring) return abs(uv.x - 0.5) - 0.5;
+    return length(vec2(uv.x - 0.5, (uv.y - spring) * uArch)) - 0.5;
   }
+  return -1.0;
+}
+
+void main() {
+  float cut = outside(vUv);
+  if (cut > 0.0) discard;
   vec3 live = texture2D(uGlyph, vUv).rgb;
   vec3 wall = texture2D(uWall, vUv).rgb;
   vec3 base = mix(wall, live, uUseGlyph);
@@ -65,7 +79,7 @@ void main() {
   float d = distance(vec2(vUv.x, 1.0 - vUv.y) * uImageSize, uLens.xy);
   float lens = uLensAmt * (1.0 - smoothstep(uLens.z * 0.5, uLens.z, d));
   vec3 color = mix(base, paint, max(uMix, lens)) * uDim;
-  float edge = uRound > 0.5 ? 1.0 - smoothstep(0.492, 0.5, length(vUv - 0.5)) : 1.0;
+  float edge = uRound > 0.5 || uArch > 0.5 ? smoothstep(0.0, -0.008, cut) : 1.0;
   gl_FragColor = vec4(color, edge);
   #include <colorspace_fragment>
 }
@@ -113,6 +127,7 @@ export function ArtworkPlane({
       uLensAmt: { value: 0 },
       uImageSize: { value: new THREE.Vector2(1, 1) },
       uRound: { value: 0 },
+      uArch: { value: 0 },
     }),
     [],
   );
@@ -120,6 +135,12 @@ export function ArtworkPlane({
   useFrame((_, delta) => {
     const u = uniforms;
     u.uRound.value = shape === 'round' ? 1 : 0;
+    /*
+     * For an arch the uniform carries the aspect as well as the flag: the head
+     * is a half circle of radius half the WIDTH, and the shader works in uv,
+     * where that circle is an ellipse unless the y axis is scaled by w/h.
+     */
+    u.uArch.value = shape === 'arched' ? width / height : 0;
     if (artwork) {
       u.uWall.value = artwork.wallTex;
       u.uPaint.value = artwork.fullTex ?? artwork.wallTex;
@@ -169,7 +190,7 @@ export function ArtworkPlane({
           toneMapped={false}
           // only a tondo needs blending, for the feathered rim; a rectangle
           // stays opaque so it keeps writing depth as it always has
-          transparent={shape === 'round'}
+          transparent={shape === 'round' || shape === 'arched'}
         />
       </mesh>
     </group>

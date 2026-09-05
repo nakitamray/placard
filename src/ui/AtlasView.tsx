@@ -704,7 +704,7 @@ function LabelLayer({ graph, focus }: { graph: AtlasGraph; focus: string | null 
    *                     rather than its inventory
    *   something focused that node and everything it touches, and nothing else
    *
-   * Painting nodes never carry a standing label: there are sixty of them and
+   * Painting nodes never carry a standing label: there are seventy of them and
    * their titles are the longest strings in the graph.
    */
   const shown = useMemo(() => {

@@ -116,6 +116,19 @@ const MEASURED: Record<FrameKind, FrameSpec> = {
     bead: { offset: 0.03, radius: 0.007, spacing: 0.036, role: 'gilt' },
   },
 
+  // The modern museum frame: a deep box of dark stained hardwood with a thin
+  // gilt lip at the sight edge and nothing else. It is what a curator puts a
+  // print, a papyrus or a scroll into when the object is the subject and the
+  // frame is furniture — and against pale stone it is a hard dark rectangle,
+  // which is exactly what a spotlit wall needs.
+  'museum-plain': {
+    courses: [
+      { offset: 0.0, width: 0.008, depth: 0.026, z: 0.026, bevel: 0.002, role: 'gilt' },
+      { offset: 0.008, width: 0.052, depth: 0.05, z: 0.05, bevel: 0.008, role: 'dark' },
+      { offset: 0.06, width: 0.014, depth: 0.062, z: 0.062, bevel: 0.005, role: 'dark' },
+    ],
+  },
+
   // Broad, flat-topped, stepped: the American gilt frame, generous and plain,
   // reading well under the Met court's warm spotlights.
   'met-broad': {
@@ -333,6 +346,115 @@ export function buildRoundFrame(
     for (let i = 0; i < n; i++) {
       const a = (i / n) * Math.PI * 2;
       beads.push(new THREE.Vector3(Math.cos(a) * br, Math.sin(a) * br, spec.bead.radius * s));
+    }
+  }
+
+  return {
+    gilt: merge(parts.gilt),
+    dark: merge(parts.dark),
+    beads,
+    beadRadius: (spec.bead?.radius ?? 0.008) * s,
+    beadRole: spec.bead?.role ?? 'gilt',
+  };
+}
+
+/**
+ * The outline of a round-headed panel: straight sides and foot, a half circle
+ * of radius half the width at the head.
+ *
+ * Exported because the corridor draws its small canvases as flat geometry
+ * rather than through the gallery's shader, and a square canvas inside an
+ * arched frame is the one thing that would give the whole device away.
+ */
+export function archOutline(width: number, height: number): THREE.Shape {
+  const hw = width / 2;
+  const spring = height / 2 - hw;
+  const shape = new THREE.Shape();
+  shape.moveTo(-hw, -height / 2);
+  shape.lineTo(hw, -height / 2);
+  shape.lineTo(hw, spring);
+  shape.absarc(0, spring, hw, 0, Math.PI, false);
+  shape.lineTo(-hw, -height / 2);
+  return shape;
+}
+
+/**
+ * A round-headed frame, for a panel that was painted for one.
+ *
+ * The sides and foot are the museum's own straight courses; the head is the
+ * same profile turned through a half circle whose radius is half the panel's
+ * width. Altarpieces of this shape have their composition built for the arch —
+ * a figure's head placed exactly where the curve begins — and squaring the top
+ * off moves every relationship in the picture.
+ */
+export function buildArchedFrame(
+  kind: FrameKind,
+  width: number,
+  height: number,
+  ornament = true,
+): FrameGeometry {
+  const spec = SPECS[kind] ?? SPECS['louvre-salon'];
+  const s = height;
+  const r0 = width / 2;
+  /** where the arch springs from: the straight run below it stops here */
+  const spring = height / 2 - r0;
+  const parts: Record<Role, THREE.BufferGeometry[]> = { gilt: [], dark: [] };
+  const mat = new THREE.Matrix4();
+
+  for (const c of spec.courses) {
+    const off = c.offset * s;
+    const band = c.width * s;
+    const depth = c.depth * s;
+    const bevel = c.bevel * s;
+
+    /*
+     * One closed outline round the whole opening, holed by the opening
+     * itself, extruded once. Building it as three separate pieces — two jambs
+     * and an arch — leaves mitres that never quite meet on a curve.
+     */
+    const outline = (grow: number) => {
+      const hw = r0 + grow;
+      const path = new THREE.Path();
+      path.moveTo(-hw, -height / 2 - grow);
+      path.lineTo(hw, -height / 2 - grow);
+      path.lineTo(hw, spring);
+      path.absarc(0, spring, hw, 0, Math.PI, false);
+      path.lineTo(-hw, -height / 2 - grow);
+      return path;
+    };
+
+    const shape = new THREE.Shape(outline(off + band).getPoints(64));
+    const hole = new THREE.Path(outline(off).getPoints(64).reverse());
+    shape.holes.push(hole);
+
+    const geo = new THREE.ExtrudeGeometry(shape, {
+      depth,
+      bevelEnabled: true,
+      bevelSize: bevel,
+      bevelThickness: bevel,
+      bevelSegments: 2,
+      curveSegments: 24,
+    });
+    mat.makeTranslation(0, 0, c.z * s - depth);
+    parts[c.role].push(transformed(geo, mat));
+  }
+
+  const beads: THREE.Vector3[] = [];
+  if (spec.bead && ornament) {
+    const off = spec.bead.offset * s;
+    const step = spec.bead.spacing * s;
+    const hw = r0 + off;
+    // up one jamb, round the head, down the other
+    for (let y = -height / 2 + step; y < spring; y += step) {
+      beads.push(new THREE.Vector3(-hw, y, spec.bead.radius * s));
+      beads.push(new THREE.Vector3(hw, y, spec.bead.radius * s));
+    }
+    const n = Math.max(8, Math.round((Math.PI * hw) / step));
+    for (let i = 0; i <= n; i++) {
+      const a = (i / n) * Math.PI;
+      beads.push(
+        new THREE.Vector3(Math.cos(a) * hw, spring + Math.sin(a) * hw, spec.bead.radius * s),
+      );
     }
   }
 
