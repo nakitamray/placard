@@ -35,10 +35,10 @@ export interface MusicTrack {
 
 /** what plays over the entrance, before a museum has been chosen */
 export const ENTRANCE_TRACK: MusicTrack = {
-  id: 'IYd1-cPwQCk',
+  id: '4iMCv3Bt3wU',
   title: 'Entrance',
   channel: 'YouTube',
-  url: 'https://youtu.be/IYd1-cPwQCk',
+  url: 'https://youtu.be/4iMCv3Bt3wU',
 };
 
 /** the corridor set, shuffled fresh on every entry */
