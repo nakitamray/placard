@@ -67,6 +67,22 @@ export interface ArtworkRecord {
    */
   heroSkip?: boolean;
   /**
+   * What is actually reproduced, when it is not the catalogued object.
+   *
+   * Some works cannot be shown as themselves. The Geese of Meidum is in Cairo
+   * and what museums outside it hang is a nineteenth-century facsimile; a
+   * handscroll is shown as one section of itself; a diptych is photographed as
+   * a pair. In every one of those cases the picture on the wall has different
+   * proportions from the object in the catalogue, and `pnpm check` is right to
+   * say so — once. This is the sentence that answers it: state what the
+   * reproduction is, and the proportions check stops asking.
+   *
+   * IT IS NOT A SILENCER. Anything written here is printed on the colophon
+   * beside the image credit, because a visitor looking at a facsimile is owed
+   * the same sentence the check was owed.
+   */
+  reproduction?: string;
+  /**
    * How this work is framed, where a rectangle is the wrong answer: 'round'
    * for a tondo, 'divided' for a pair of panels hung as one object with a
    * moulded divider between them. Omitted, the museum's own frame is used.

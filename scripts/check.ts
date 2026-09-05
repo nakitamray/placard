@@ -24,11 +24,44 @@ import { loadMuseumWithWorks, museumOrder, regionsFor } from './lib/records.ts';
 import { aspectError, expectedAspect, keywords, scoreCandidate } from './fetch-images.ts';
 import type { ArtworkRecord } from './lib/records.ts';
 
+/** the pins, so the check can tell a stale scan from a wrong one */
+const PINS: Record<string, { commonsFile?: string }> = JSON.parse(
+  fs.readFileSync(path.join('data', 'image-sources.json'), 'utf8'),
+);
+
 const failures: string[] = [];
 const warnings: string[] = [];
+/** things worth stating rather than fixing — a record that has already
+    explained itself, and says so in the run so nobody re-investigates it */
+const notes: string[] = [];
 
 const fail = (msg: string) => failures.push(msg);
 const warn = (msg: string) => warnings.push(msg);
+const note = (msg: string) => notes.push(msg);
+
+/**
+ * Museums whose name in a file title means the object belongs to them.
+ *
+ * Only the ones this exhibition can actually confuse: a Fayum portrait, a
+ * Dunhuang banner or a Book of the Dead exists in a dozen collections, and
+ * the best-photographed one on Commons is very often not the one whose room
+ * you are standing in.
+ */
+const OTHER_MUSEUMS: Array<{ id: string; name: string; re: RegExp }> = [
+  { id: 'louvre', name: 'the Louvre', re: /\blouvre\b/ },
+  { id: 'british-museum', name: 'the British Museum', re: /\bbritish museum\b/ },
+  { id: 'national-gallery', name: 'the National Gallery, London', re: /\bnational gallery\b/ },
+  { id: 'vatican', name: 'the Vatican Museums', re: /\b(vatican|musei vaticani)\b/ },
+  { id: 'uffizi', name: 'the Uffizi', re: /\buffizi\b/ },
+  { id: 'orsay', name: "the Musée d'Orsay", re: /\b(orsay)\b/ },
+  { id: 'met', name: 'the Metropolitan Museum', re: /\b(metropolitan museum|\bmet\b db|met dt|met dp)/ },
+  { id: '-', name: 'the Altes Museum, Berlin', re: /\baltes museum\b/ },
+  { id: '-', name: 'the Rijksmuseum', re: /\brijksmuseum\b/ },
+  { id: '-', name: 'the Hermitage', re: /\bhermitage\b/ },
+  { id: '-', name: 'the Prado', re: /\bprado\b/ },
+  { id: '-', name: 'the National Gallery of Art, Washington', re: /\bnational gallery of art\b/ },
+  { id: '-', name: 'the Egyptian Museum, Cairo', re: /\begyptian museum\b/ },
+];
 
 /* ── the records ────────────────────────────────────────────────────────── */
 
@@ -77,11 +110,11 @@ for (const museumId of museumOrder()) {
   for (const record of records) {
     if (seen.has(record.id)) fail(`${record.id} is hung in more than one museum`);
     seen.add(record.id);
-    checkRecord(museumId, record);
+    checkRecord(museumId, museum.name, record);
   }
 }
 
-function checkRecord(museumId: string, r: ArtworkRecord) {
+function checkRecord(museumId: string, museumName: string, r: ArtworkRecord) {
   const where = `${museumId}/${r.id}`;
   for (const field of ['artist', 'title', 'year', 'medium', 'dimensions', 'labelText'] as const) {
     if (!String(r[field] ?? '').trim()) fail(`${where}: "${field}" is empty`);
@@ -115,20 +148,98 @@ function checkRecord(museumId: string, r: ArtworkRecord) {
     warn(`${where}: no scan — it will render a procedural stand-in (pnpm fetch:images)`);
     return;
   }
-  // the scan's proportions against the catalogue: a frame or a gallery wall
-  // around the canvas shows up here as a number long before anyone sees it
+  /*
+   * What is actually hanging, against what the placard says is hanging.
+   *
+   * Three questions, all answerable offline from the credit file the fetcher
+   * wrote, and all of them things a visitor would notice before anybody else
+   * did:
+   *
+   *   1. Are the proportions the catalogued object's? A frame, a gallery wall
+   *      or a different version shows up here as a number.
+   *   2. Does the file name a DIFFERENT MUSEUM from the one hanging it? This
+   *      is the quiet one. Commons is full of the same subject held in four
+   *      cities, search picks the best-photographed of them, and the result is
+   *      Berlin's panel under a British Museum placard — correct proportions,
+   *      correct subject, wrong object.
+   *   3. Does the file say it is a facsimile, a copy or a replica while the
+   *      record does not?
+   *
+   * Every one of them is a warning rather than a failure: the answer may be
+   * that the record needs a `reproduction` line, and only a person can say.
+   */
   const credit = path.join(artworkData(r.id), 'image-credit.json');
-  if (fs.existsSync(credit)) {
-    const c = JSON.parse(fs.readFileSync(credit, 'utf8')) as { width?: number; height?: number };
-    const err = aspectError(expectedAspect(r.dimensions), c.width ?? 0, c.height ?? 0);
-    if (err > 0.1) {
+  if (!fs.existsSync(credit)) return;
+  const c = JSON.parse(fs.readFileSync(credit, 'utf8')) as {
+    width?: number;
+    height?: number;
+    commonsFile?: string;
+  };
+  const file = (c.commonsFile ?? '').replace(/^File:/, '');
+  const lower = file.toLowerCase();
+
+  /*
+   * The pin against what is actually on disk.
+   *
+   * This is the first question, because when the answer is "they differ" every
+   * other answer is about a file that is already on its way out. Pinning a
+   * work does not fetch it — the fetcher only re-downloads a work whose pin
+   * has changed, next time it runs — so between pinning and fetching there is
+   * a window where the exhibition is still hanging whatever search found
+   * months ago, and every proportions warning is about that ghost.
+   */
+  const pinned = PINS[r.id]?.commonsFile;
+  if (pinned) {
+    const want = pinned.startsWith('File:') ? pinned : `File:${pinned}`;
+    if (c.commonsFile && c.commonsFile !== want) {
       warn(
-        `${where}: the scan is ${(err * 100).toFixed(0)}% off the catalogued proportions — ` +
-          `check it is not framed or cropped`,
+        `${where}: the scan on disk is not the pinned file\n` +
+          `      pinned: ${want.replace(/^File:/, '')}\n` +
+          `      on disk: ${file}\n` +
+          `      run \`pnpm fetch:images\` — it re-fetches any work whose pin has changed`,
       );
+      return;
     }
   }
+
+  if (r.reproduction) {
+    // the record has already said the picture is not the object; the checks
+    // below would only be asking a question it has answered
+    note(`${where}: reproduction — ${r.reproduction}`);
+    return;
+  }
+
+  const err = aspectError(expectedAspect(r.dimensions), c.width ?? 0, c.height ?? 0);
+  if (err > 0.1) {
+    warn(
+      `${where}: the scan is ${(err * 100).toFixed(0)}% off the catalogued proportions ` +
+        `(${c.width}×${c.height}) — ${file}\n` +
+        `      either the file is framed, cropped or the wrong version — re-fetch it with ` +
+        `\`pnpm fetch:images --force --only ${r.id}\` and pin a better one — or the ` +
+        `catalogue is measuring something other than what is shown, in which case give the ` +
+        `record a "reproduction" line`,
+    );
+  }
+
+  const elsewhere = OTHER_MUSEUMS.filter(
+    (m) => m.re.test(lower) && m.id !== museumId,
+  );
+  if (elsewhere.length) {
+    warn(
+      `${where}: the file names ${elsewhere[0].name}, not this museum — ${file}\n` +
+        `      search found the right subject in the wrong collection; pin ` +
+        `${museumName}'s own object in data/image-sources.json`,
+    );
+  }
+
+  if (/(facsimile|copy after|replica|nachbildung|fac-simile)/.test(lower)) {
+    warn(
+      `${where}: the file describes itself as a copy — ${file}\n` +
+        `      pin the original, or say so in the record's "reproduction" line`,
+    );
+  }
 }
+
 
 /* ── the atlas graph ────────────────────────────────────────────────────── */
 
@@ -205,6 +316,7 @@ if (aspectError(expectedAspect('92 × 73 cm'), 1600, 2000) > 0.02) {
 /* ── the verdict ────────────────────────────────────────────────────────── */
 
 console.log(`\nchecked ${seen.size} works across ${museumOrder().length} museums\n`);
+for (const n of notes) console.log(`  · ${n}`);
 for (const w of warnings) console.log(`  ⚠ ${w}`);
 for (const f of failures) console.log(`  ✗ ${f}`);
 if (warnings.length) console.log(`\n${warnings.length} warning${warnings.length === 1 ? '' : 's'}`);

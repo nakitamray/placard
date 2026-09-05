@@ -226,7 +226,7 @@ console.log('\ndone.');
  * reproduction it is showing and under what terms, and a hand-waved
  * "PD-Art" is not that.
  */
-function imageProvenance(id: string, authentic: boolean) {
+function imageProvenance(id: string, authentic: boolean, reproduction?: string) {
   const creditPath = path.join(artworkData(id), 'image-credit.json');
   if (authentic && fs.existsSync(creditPath)) {
     const c = JSON.parse(fs.readFileSync(creditPath, 'utf8'));
@@ -237,7 +237,9 @@ function imageProvenance(id: string, authentic: boolean) {
       url: c.descriptionUrl ?? '',
       license: c.license || 'see Commons',
       photoCredit: c.author || '',
-      note: c.crop ?? '',
+      // a work whose record says the picture is not the object says it here
+      // too, where the licence is: it is provenance, not a footnote
+      note: [reproduction, c.crop].filter(Boolean).join(' · '),
     };
   }
   return {
@@ -282,7 +284,7 @@ function buildMeta(
         'Wall label and extended note written for Placard; catalogue details stated from published museum records',
       url: '',
     },
-    image: imageProvenance(record.id, images.authentic),
+    image: imageProvenance(record.id, images.authentic, record.reproduction),
     images: imageManifest(images.bytes),
     accentColor: record.accentColor,
     regions: regionsFor(record),

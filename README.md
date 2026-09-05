@@ -279,6 +279,12 @@ on the real pixels after the download, so a hand-pinned photograph of a frame
 is refused as firmly as a search result would be. Anything that clears neither
 is left on its stand-in.
 
+It cuts both ways: a pin that fails the proportions test is usually the pin
+being right and the *catalogue* being wrong about what is in the picture. The
+Urbino diptych is measured panel by panel — 47 × 33 cm each — and photographed
+as a pair, so the file is twice as wide as the record expected and was refused
+until the record said `47 × 66 cm as hung`.
+
 | Flag | |
 |---|---|
 | `--dry` | resolve and print the table, download nothing |
@@ -311,10 +317,47 @@ treated as stale and re-fetched without `--force`. `pnpm fetch:images --check`
 lists every work in that state.
 
 A few entries need judgement rather than search: the Fayum portrait and John
-White's album are whole classes of object rather than one work, the Admonitions
-Scroll is long enough that you want a specific section, and several Van Gogh
-and Monet subjects exist in many versions. Each of those carries a `note` in
-`data/image-sources.json`.
+White's album are whole classes of object rather than one work, the Dunhuang
+banners come in two shapes depending on whether the streamers are attached, the
+Admonitions Scroll is long enough that you want a specific section, and several
+Van Gogh and Monet subjects exist in many versions. Each of those carries a
+`note` in `data/image-sources.json` saying what to look for.
+
+### When a scan disagrees with its catalogue
+
+`pnpm check` compares what is hanging against what the placard says is hanging,
+offline, and there are only four things it can mean. The message names which:
+
+**The pin has not been fetched yet.** *the scan on disk is not the pinned file*
+— pinning a work does not download it. Run `pnpm fetch:images`, which
+re-fetches every work whose pin has changed since its scan. Until then the room
+is still showing whatever search found last time, and any other complaint about
+that work is about a file already on its way out. Fix this one first.
+
+**The file is the right subject in the wrong collection.** *the file names the
+Altes Museum, Berlin, not this museum* — a Fayum portrait, a Dunhuang banner or
+a Book of the Dead exists in a dozen museums, and search reaches for the
+best-photographed one rather than the one whose room you are standing in. Pin
+this museum's own object.
+
+**The file is a copy.** *the file describes itself as a copy* — a facsimile or
+a replica. Pin the original, or say so in the record (below).
+
+**The proportions are wrong.** *the scan is 33% off the catalogued proportions*
+— the file is framed, cropped, a detail, or a different version. Re-fetch it
+with `pnpm fetch:images --force --only <id>` and pin a better one. But check
+the other possibility first: that the catalogue is measuring something the
+picture is not. A diptych photographed as a pair is not one panel; a handscroll
+is shown as a section; the Geese of Meidum is in Cairo and what every other
+museum hangs is a facsimile. Where that is the case, say so in the record:
+
+```json
+"reproduction": "The original painted plaster is in the Egyptian Museum, Cairo …"
+```
+
+That sentence is printed on the colophon beside the image credit, and the
+proportions check stops asking. It is a statement, not a silencer — a visitor
+looking at a facsimile is owed the same sentence the check was owed.
 
 To supply a scan by hand instead, save it as `data/artworks/{id}/source.jpg`
 and run `pnpm build:assets`. `data/.cache/previews/{id}.png` shows the glyph

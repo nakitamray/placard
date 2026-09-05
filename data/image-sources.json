@@ -72,26 +72,28 @@
     "note": "A handscroll: pick a section, not the full 3.4m strip, or it hangs as a sliver."
   },
   "fayum-mummy-portraits": {
-    "search": "Fayum mummy portrait young man encaustic Roman Egypt",
-    "note": "Generic subject — search will pick some Fayum portrait, not a specific one. Pin the one you want."
+    "search": "British Museum mummy portrait Hawara Roman Egypt encaustic limewood panel",
+    "note": "The British Museum's own Fayum portraits, from Petrie's Hawara excavations — not the Berlin, Louvre or Metropolitan panels, which search reaches for first because they are better photographed."
   },
   "geese-of-meidum": {
-    "search": "Meidum geese painting Itet tomb",
-    "note": "Original panel is in Cairo; the British Museum holds facsimiles. See the placard."
+    "search": "Meidum geese facsimile painting Nefermaat Itet",
+    "note": "The original panel is in Cairo and every museum outside it shows a facsimile, so a facsimile is what this hangs — see the record's \"reproduction\" line."
   },
   "white-the-flyer": {
     "search": "John White The Flyer Secotan conjuror Roanoke watercolour British Museum",
     "note": "White's album is many sheets; search cannot know which. Pin one."
   },
   "schouman-birds": {
-    "search": "Aert Schouman bird watercolour drawing"
+    "search": "Aert Schouman bird studies watercolour British Museum prints and drawings",
+    "note": "A sheet from the British Museum's Department of Prints and Drawings, landscape format — not one of the many Schouman bird sheets in Dutch collections."
   },
   "durer-rhinoceros": {
     "search": "Dürer Rhinocerus 1515 woodcut",
     "note": "The 1515 woodcut itself, not a later re-cut or a photograph of the sheet in its mount."
   },
   "dunhuang-cave-17": {
-    "search": "Dunhuang silk painting banner Stein collection bodhisattva"
+    "search": "British Museum Stein collection Dunhuang silk painting bodhisattva banner Cave 17",
+    "note": "A Stein-collection silk painting from Cave 17 in the British Museum. Several of these are banners two metres long with their streamers attached, whose proportions are nothing like the painted panel the placard measures — check which one a candidate is before pinning it."
   },
   "hiroshige-sudden-shower": {
     "search": "Hiroshige Sudden shower over Shin-Ohashi bridge and Atake",
@@ -130,7 +132,8 @@
     "search": "Van Gogh Starry Night Over the Rhone 1888"
   },
   "renoir-moulin-galette": {
-    "search": "Renoir Bal du moulin de la Galette 1876 Orsay"
+    "search": "Renoir Bal du moulin de la Galette Musee d'Orsay Google Art Project",
+    "note": "The flat reproduction, not a photograph taken in the gallery: a 3:2 file is a camera's shape, not a canvas's."
   },
   "manet-olympia": {
     "search": "Édouard Manet Olympia 1863 Orsay"
