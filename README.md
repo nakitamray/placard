@@ -496,37 +496,78 @@ The bundle is split so the renderer caches separately from the exhibition:
 
 ## Deploying
 
-`.github/workflows/deploy.yml` fetches the paintings, builds the assets and
-publishes on every push to `main`. Turn it on with **Settings → Pages →
-Source: GitHub Actions**; the site lands at `https://<user>.github.io/<repo>/`.
+The exhibition is a static site. Everything it serves — the glyph fields, the
+pictures in three sizes and three formats, the manifests — is produced by
+`pnpm build:assets` from the records, and the scans those are built from are
+committed, so a build host needs no network access to Wikimedia and no secrets
+to produce the whole thing.
+
+### Vercel
+
+`vercel.json` holds the whole configuration:
+
+```json
+{ "buildCommand": "pnpm check && pnpm build:assets && pnpm build",
+  "outputDirectory": "dist",
+  "framework": "vite" }
+```
+
+Import the repository at vercel.com/new and it needs no other settings. What
+to expect, measured from a clean checkout:
+
+| | |
+|---|---|
+| Build | about six and a half minutes, nearly all of it the glyph fields |
+| Output | 90 MB, of which 88 MB is pictures |
+| Node | 20 or newer; `packageManager` pins pnpm so the host resolves the same one |
+
+`pnpm check` runs first deliberately: a record that points at a work which is
+not there, or a floor plan with a room too many, fails the deploy rather than
+publishing a broken room. Warnings — a work still on a stand-in, a scan whose
+proportions do not match its catalogue — do not.
+
+Two things worth setting in the project's environment variables, both optional:
+`VITE_CONTACT_EMAIL` if the form should reach an address other than the one in
+the source, and `VITE_CONTACT_ENDPOINT` if it should POST rather than open a
+mail client. Neither is a secret; both are compiled into the bundle, which is
+why the address is never rendered anywhere in the interface.
+
+**If six minutes a deploy becomes annoying**, the fix is to stop rebuilding
+what did not change: commit `public/artworks` and `public/museums` (they are
+in `.gitignore` for a reason — they are generated — but they are also
+deterministic), and set the build command to `pnpm build` alone. That trades
+90 MB of repository for a twenty-second deploy. Do it when the exhibition
+stops changing, not before.
+
+### GitHub Pages
+
+`.github/workflows/deploy.yml` does the same on every push to `main`. Turn it
+on with **Settings → Pages → Source: GitHub Actions**; the site lands at
+`https://<user>.github.io/<repo>/`.
 
 Two caches carry the cost across runs:
 
 | Cache | Keyed on | Effect |
 |---|---|---|
 | Fetched scans | `data/image-sources.json`, `data/collections/*` | Wikimedia is hit once, not on every deploy |
-| Built assets | `data/**`, `scripts/**`, `shared/**` | editing one placard rebuilds that work and reuses the other 49 |
+| Built assets | `data/**`, `scripts/**`, `shared/**` | editing one placard rebuilds that work and reuses the other sixty-nine |
 
-A cold first run is around ten minutes; later ones are usually under two.
 `workflow_dispatch` has a **refetch** checkbox for pulling the paintings again
 deliberately. The image fetch is `continue-on-error`, so an unreachable Commons
 falls back to stand-ins rather than failing the deploy.
 
-**Serving from a subpath.** Every generated-asset URL goes through
-`src/lib/asset.ts`, which prefixes Vite's `BASE_URL`:
+### Serving from a subpath
+
+Every generated-asset URL goes through `src/lib/asset.ts`, which prefixes
+Vite's `BASE_URL`:
 
 ```bash
-BASE_PATH=/placard/ pnpm build   # GitHub Pages project site
-pnpm build                        # domain root — Vercel, Netlify, S3
+pnpm build                        # a domain root — Vercel, Netlify, S3
+BASE_PATH=/placard/ pnpm build    # a GitHub Pages project site
 ```
 
 The workflow sets it from the repository name; override it with a `BASE_PATH`
-repository variable for a custom domain (use `/`).
-
-`vercel.json` also works — its build command runs `build:assets && build`. Add
-`fetch:images` to it if you want Vercel to pull the paintings too, but it has
-no persistent `data/artworks` cache between builds, so it re-downloads every
-time.
+repository variable for a custom domain (use `/`). On Vercel, leave it alone.
 
 ## Contact form
 
