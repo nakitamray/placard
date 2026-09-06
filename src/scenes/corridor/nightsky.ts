@@ -27,30 +27,34 @@
 import * as THREE from 'three';
 
 let cached: THREE.Texture | null = null;
+let cachedWall: THREE.Texture | null = null;
 
 /** how many times the sky repeats down the length of the vault */
 export const SKY_REPEAT = 7;
 
-export function duskSkyTexture(): THREE.Texture | null {
-  if (cached) return cached;
-  if (typeof document === 'undefined') return null;
+/**
+ * Which way up the sky is.
+ *
+ * The vault wants it across the arc — horizon, zenith, horizon — because that
+ * is the way a half-cylinder's u runs. A window in a wall wants the ordinary
+ * one: dark at the top of the frame, the afterglow at the bottom, one horizon
+ * rather than two. Same paint, different axis.
+ */
+type SkyAxis = 'arc' | 'upright';
 
-  const W = 1024;
-  const H = 512;
-  const canvas = document.createElement('canvas');
-  canvas.width = W;
-  canvas.height = H;
-  const g = canvas.getContext('2d');
-  if (!g) return null;
-
+function paintSky(g: CanvasRenderingContext2D, W: number, H: number, axis: SkyAxis) {
   /*
    * The gradient, horizon to zenith to horizon. Symmetric, because both ends
    * of the vault's arc land on a horizon and the sun is long enough gone that
    * neither is much brighter than the other — this is the blue hour, not the
    * sunset, and its colour is nearly all in the top of the sky.
    */
-  const grad = g.createLinearGradient(0, 0, W, 0);
-  const stops: Array<[number, string]> = [
+  const arc = axis === 'arc';
+  const grad = arc
+    ? g.createLinearGradient(0, 0, W, 0)
+    : g.createLinearGradient(0, 0, 0, H);
+  const stops: Array<[number, string]> = arc
+    ? [
     [0.0, '#4A3A46'],
     [0.06, '#3A3350'],
     [0.16, '#2A2C52'],
@@ -59,8 +63,17 @@ export function duskSkyTexture(): THREE.Texture | null {
     [0.68, '#161C3A'],
     [0.84, '#2A2C52'],
     [0.94, '#3A3350'],
-    [1.0, '#4A3A46'],
-  ];
+        [1.0, '#4A3A46'],
+      ]
+    : // upright: the top of the window is the top of the sky
+      [
+        [0.0, '#0B1029'],
+        [0.3, '#111838'],
+        [0.58, '#22254C'],
+        [0.78, '#3A3350'],
+        [0.92, '#4E3A46'],
+        [1.0, '#6B4438'],
+      ];
   for (const [at, c] of stops) grad.addColorStop(at, c);
   g.fillStyle = grad;
   g.fillRect(0, 0, W, H);
@@ -70,8 +83,10 @@ export function duskSkyTexture(): THREE.Texture | null {
    * the gradient rather than mixed into it, so it stays warm against the blue
    * instead of turning the whole edge muddy.
    */
-  for (const side of [0, 1]) {
-    const ember = g.createLinearGradient(side ? W : 0, 0, side ? W * 0.82 : W * 0.18, 0);
+  for (const side of arc ? [0, 1] : [1]) {
+    const ember = arc
+      ? g.createLinearGradient(side ? W : 0, 0, side ? W * 0.82 : W * 0.18, 0)
+      : g.createLinearGradient(0, H, 0, H * 0.62);
     ember.addColorStop(0, 'rgba(216,120,70,0.46)');
     ember.addColorStop(0.4, 'rgba(140,80,72,0.12)');
     ember.addColorStop(1, 'rgba(0,0,0,0)');
@@ -109,8 +124,8 @@ export function duskSkyTexture(): THREE.Texture | null {
   for (let i = 0; i < 1500; i++) {
     const x = rnd() * W;
     const y = rnd() * H;
-    // 1 overhead, 0 at either horizon
-    const up = Math.sin((x / W) * Math.PI);
+    // 1 overhead, 0 at the horizon — two of them across the arc, one up a wall
+    const up = arc ? Math.sin((x / W) * Math.PI) : 1 - y / H;
     if (rnd() > up * up * 0.92 + 0.04) continue;
 
     // most are barely there; a few are worth looking at
@@ -120,15 +135,45 @@ export function duskSkyTexture(): THREE.Texture | null {
 
     dot(x, y, r, a);
     // and again across the seam, so the repeat down the vault does not show
-    if (y < r) dot(x, y + H, r, a);
-    else if (y > H - r) dot(x, y - H, r, a);
+    if (arc && y < r) dot(x, y + H, r, a);
+    else if (arc && y > H - r) dot(x, y - H, r, a);
   }
+}
 
+export function duskSkyTexture(): THREE.Texture | null {
+  if (cached) return cached;
+  if (typeof document === 'undefined') return null;
+  const W = 1024;
+  const H = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const g = canvas.getContext('2d');
+  if (!g) return null;
+  paintSky(g, W, H, 'arc');
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.ClampToEdgeWrapping;
   tex.wrapT = THREE.RepeatWrapping;
   tex.repeat.set(1, SKY_REPEAT);
   tex.colorSpace = THREE.SRGBColorSpace;
   cached = tex;
+  return tex;
+}
+
+/** the same sky seen through a window in a wall rather than a roof */
+export function duskWallSkyTexture(): THREE.Texture | null {
+  if (cachedWall) return cachedWall;
+  if (typeof document === 'undefined') return null;
+  const W = 1024;
+  const H = 768;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const g = canvas.getContext('2d');
+  if (!g) return null;
+  paintSky(g, W, H, 'upright');
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  cachedWall = tex;
   return tex;
 }

@@ -14,6 +14,7 @@ import { bayZ, hangBottom, hangTop, type Dims } from './dims';
 import { CourtFacade } from './CourtFacade';
 import { glowTexture } from './glow';
 import { mapPanelTexture } from './fresco';
+import { parquetTexture } from './parquet';
 
 interface Props {
   style: MuseumStyle;
@@ -62,6 +63,8 @@ const TILE = 0.9;
 const BAND = 1.35;
 /** one square of the Gallery of Maps' floor labyrinth, metres */
 const MAZE = 3.2;
+/** the side of one oak square in the Grande Galerie's floor, in metres */
+const PARQUET = 1.6;
 
 export function Floor({ style, d, quality }: Props) {
   const p = style.palette;
@@ -81,7 +84,7 @@ export function Floor({ style, d, quality }: Props) {
           ? 0.22
           : kind === 'stone-bands'
             ? 0.18
-            : kind === 'parquet'
+            : kind === 'parquet' || kind === 'parquet-check'
               ? 0.4
               : 0.5;
   const roughness =
@@ -89,7 +92,7 @@ export function Floor({ style, d, quality }: Props) {
       ? 0.5
       : kind === 'stone-bands'
         ? 0.62
-        : kind === 'parquet'
+        : kind === 'parquet' || kind === 'parquet-check'
           ? 0.3
           : kind === 'checkerboard'
             ? 0.12
@@ -171,6 +174,35 @@ export function Floor({ style, d, quality }: Props) {
           <boxGeometry args={[0.02, 0.004, run]} />
           <meshStandardMaterial color={p.floorInlay} roughness={0.45} />
         </Instanced>
+      )}
+
+      {kind === 'parquet-check' && (
+        /*
+         * The Grande Galerie's floor: big oak squares in two tones, the grain
+         * of each running across its neighbour's.
+         *
+         * Drawn rather than built. A checker of this size is a couple of
+         * hundred panels and each one wants its own boards, its own grain and
+         * its own joints — several thousand meshes for a surface most of the
+         * room only sees at a glancing angle. One texture, tiled, holds the
+         * lot, and the reflection underneath is left unbroken because nothing
+         * stands on the floor plane at all.
+         *
+         * The tile is laid square to the walls, not on the diagonal: the
+         * Uffizi's diagonal drives every line toward its far window, and the
+         * Louvre's does the opposite — a long slow grid the room recedes
+         * along.
+         */
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, mid]}>
+          <planeGeometry args={[w, run]} />
+          <meshStandardMaterial
+            map={parquetTexture(Math.round(w / PARQUET), Math.round(run / PARQUET))}
+            roughness={0.34}
+            metalness={0.1}
+            transparent
+            opacity={0.94}
+          />
+        </mesh>
       )}
 
       {kind === 'marble-inlay' && (
@@ -1068,21 +1100,70 @@ export function Walls({ style, d, quality }: Props) {
             </mesh>
           )}
           {!crimson && (
-            // shallow pilasters dividing the salon hang into bays
-            <Instanced
-              count={d.bays + 1}
-              castShadow
-              place={(i, m) =>
-                m.makeTranslation(
-                  side * (d.halfWidth - 0.07),
-                  d.wallHeight / 2,
-                  -i * d.bayDepth,
-                )
-              }
-            >
-              <boxGeometry args={[0.14, d.wallHeight, 0.36]} />
-              <meshStandardMaterial color={p.molding} roughness={0.78} />
-            </Instanced>
+            <>
+              {/* shallow pilasters dividing the salon hang into bays */}
+              <Instanced
+                count={d.bays + 1}
+                castShadow
+                place={(i, m) =>
+                  m.makeTranslation(
+                    side * (d.halfWidth - 0.07),
+                    d.wallHeight / 2,
+                    -i * d.bayDepth,
+                  )
+                }
+              >
+                <boxGeometry args={[0.16, d.wallHeight, 0.44]} />
+                <meshStandardMaterial color={p.molding} roughness={0.78} />
+              </Instanced>
+              {/*
+               * A gilded Corinthian capital on each, and a marble dado to
+               * stand on.
+               *
+               * A plain white pilaster is a rectangle: it divides the wall and
+               * says nothing. What makes the Grande Galerie grand is that
+               * every one of these is dark marble with gold on top, so the
+               * room is punctuated in gold twice a bay for its whole length —
+               * and the eye reads a row of receding highlights rather than a
+               * row of stripes. The capital is three stacked pieces because
+               * one box is a block and three are a capital.
+               */}
+              <Instanced
+                count={d.bays + 1}
+                place={(i, m) =>
+                  m.makeTranslation(side * (d.halfWidth - 0.07), d.wallHeight - 0.34, -i * d.bayDepth)
+                }
+              >
+                <boxGeometry args={[0.19, 0.3, 0.5]} />
+                <meshStandardMaterial color={p.gilt} metalness={0.72} roughness={0.36} />
+              </Instanced>
+              <Instanced
+                count={d.bays + 1}
+                place={(i, m) =>
+                  m.makeTranslation(side * (d.halfWidth - 0.07), d.wallHeight - 0.13, -i * d.bayDepth)
+                }
+              >
+                <boxGeometry args={[0.23, 0.12, 0.58]} />
+                <meshStandardMaterial color={p.gilt} metalness={0.78} roughness={0.32} />
+              </Instanced>
+              <Instanced
+                count={d.bays + 1}
+                place={(i, m) =>
+                  m.makeTranslation(side * (d.halfWidth - 0.07), d.wallHeight - 0.56, -i * d.bayDepth)
+                }
+              >
+                <boxGeometry args={[0.185, 0.07, 0.48]} />
+                <meshStandardMaterial color={p.gilt} metalness={0.7} roughness={0.4} />
+              </Instanced>
+              {/* the marble plinth each one stands on */}
+              <Instanced
+                count={d.bays + 1}
+                place={(i, m) => m.makeTranslation(side * (d.halfWidth - 0.07), 0.34, -i * d.bayDepth)}
+              >
+                <boxGeometry args={[0.21, 0.68, 0.54]} />
+                <meshStandardMaterial color={p.accent} roughness={0.35} metalness={0.1} />
+              </Instanced>
+            </>
           )}
         </group>
       ))}

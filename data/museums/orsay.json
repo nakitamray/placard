@@ -58,7 +58,8 @@
       "clock": true,
       "terraces": true,
       "dusk": true,
-      "spotTrack": true
+      "spotTrack": true,
+      "glazedEnd": true
     }
   },
   "plan": {

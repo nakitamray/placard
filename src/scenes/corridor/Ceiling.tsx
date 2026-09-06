@@ -86,41 +86,98 @@ function BarrelSkylight({ style, d }: Props) {
         </group>
       ))}
 
-      {/* the skylights: an arched opening at the crown of every bay */}
-      {Array.from({ length: d.bays }, (_, b) => {
-        const z = bayZ(d, b);
-        return (
-          <group key={b} position={[0, 0, z]}>
-            <mesh position={[0, springing + r - 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <planeGeometry args={[r * 0.92, d.bayDepth * 0.62]} />
-              <meshBasicMaterial color={p.sky} toneMapped={false} />
-            </mesh>
-            {/* glazing bars across the opening */}
-            {[-0.28, 0, 0.28].map((f) => (
-              <mesh key={f} position={[0, springing + r - 0.08, f * d.bayDepth]}>
-                <boxGeometry args={[r * 0.94, 0.07, 0.07]} />
-                <meshStandardMaterial color={p.molding} roughness={0.8} />
-              </mesh>
-            ))}
-            {/* the coffered surround of the opening */}
-            {[-1, 1].map((s) => (
-              <mesh key={s} position={[s * r * 0.48, springing + r - 0.12, 0]}>
-                <boxGeometry args={[0.14, 0.24, d.bayDepth * 0.68]} />
-                <meshStandardMaterial color={p.molding} roughness={0.75} />
-              </mesh>
-            ))}
-          </group>
-        );
-      })}
+      {/*
+       * The skylights.
+       *
+       * One long opening at the crown rather than a punched hole per bay: the
+       * Grande Galerie is roofed in glass down its whole length, and what
+       * makes that read is an unbroken strip of sky with the ribs crossing
+       * it, not a row of separate windows with ceiling between them. The
+       * frame is iron and thin — a glazing bar every third of a metre — so
+       * the sky is most of what is up there and the bars are the drawing on
+       * it.
+       */}
+      <mesh
+        position={[0, springing + r - 0.04, mid]}
+        rotation={[Math.PI / 2, 0, 0]}
+      >
+        <planeGeometry args={[r * 0.86, d.length + d.bayDepth * 3]} />
+        <meshBasicMaterial color={p.sky} toneMapped={false} />
+      </mesh>
+      {/* the glazing bars across it, and the two light purlins along */}
+      <Repeated
+        count={Math.round((d.length + d.bayDepth * 3) / 0.34)}
+        place={(i, m) => m.makeTranslation(0, springing + r - 0.07, mid + (d.length + d.bayDepth * 3) / 2 - i * 0.34)}
+      >
+        <boxGeometry args={[r * 0.88, 0.022, 0.022]} />
+        <meshStandardMaterial color={p.ceilingAccent} roughness={0.5} metalness={0.4} />
+      </Repeated>
+      {[-0.28, 0.28].map((f) => (
+        <mesh key={f} position={[f * r, springing + r - 0.075, mid]}>
+          <boxGeometry args={[0.035, 0.035, d.length + d.bayDepth * 3]} />
+          <meshStandardMaterial color={p.ceilingAccent} roughness={0.5} metalness={0.4} />
+        </mesh>
+      ))}
+      {/* the moulded kerb the glazing sits in, both sides, all the way down */}
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * r * 0.45, springing + r - 0.16, mid]}>
+          <boxGeometry args={[0.13, 0.3, d.length + d.bayDepth * 3]} />
+          <meshStandardMaterial color={p.molding} roughness={0.72} />
+        </mesh>
+      ))}
 
-      {/* transverse ribs at every bay division */}
+      {/*
+       * And the light it lets in, on the floor. A glazed roof whose only
+       * evidence is a bright strip overhead reads as a lit panel; what says
+       * roof is the pool arriving underneath it.
+       */}
+      {Array.from({ length: d.bays }, (_, b) => (
+        <mesh
+          key={`pool${b}`}
+          position={[0, 0.02, bayZ(d, b)]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <planeGeometry args={[d.halfWidth * 1.5, d.bayDepth * 0.95]} />
+          <meshBasicMaterial
+            map={glowTexture()}
+            color={p.sky}
+            transparent
+            opacity={0.12}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+
+      {/* transverse ribs at every bay division, and the gilt bead on each —
+          the vault in the reference is grey marble with gold at every edge,
+          and it is the gold that makes it read as the Louvre rather than as a
+          white tunnel */}
       <Repeated
         count={d.bays + 1}
         place={(i, m) => m.makeTranslation(0, springing, -i * d.bayDepth)}
       >
-        <torusGeometry args={[r - 0.04, 0.085, 8, 26, Math.PI]} />
-        <meshStandardMaterial color={p.molding} roughness={0.74} />
+        <torusGeometry args={[r - 0.04, 0.14, 8, 30, Math.PI]} />
+        <meshStandardMaterial color={p.ceilingAccent} roughness={0.6} />
       </Repeated>
+      {[-0.17, 0.17].map((off) => (
+        <Repeated
+          key={off}
+          count={d.bays + 1}
+          place={(i, m) => m.makeTranslation(0, springing, -i * d.bayDepth + off)}
+        >
+          <torusGeometry args={[r - 0.02, 0.035, 6, 30, Math.PI]} />
+          <meshStandardMaterial color={p.gilt} metalness={0.8} roughness={0.34} />
+        </Repeated>
+      ))}
+      {/* and the gilt line running the length at the springing */}
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * (r - 0.02), springing + 0.02, mid]}>
+          <boxGeometry args={[0.05, 0.05, d.length + d.bayDepth * 3]} />
+          <meshStandardMaterial color={p.gilt} metalness={0.8} roughness={0.34} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -507,7 +564,7 @@ function PeakedCourt({ style, d }: Props) {
                 map={glowTexture()}
                 color={style.light.key}
                 transparent
-                opacity={0.028}
+                opacity={0.016}
                 blending={THREE.AdditiveBlending}
                 depthWrite={false}
                 side={THREE.DoubleSide}

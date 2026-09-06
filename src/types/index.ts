@@ -131,6 +131,8 @@ export type FloorKind =
   | 'stone'
   /** polished light wood boards */
   | 'parquet'
+  /** oak parquet in two tones, laid as large squares with the grain crossed */
+  | 'parquet-check'
   /** geometric marble inlay in white, red and green */
   | 'marble-inlay'
   /** wide pale promenade with a darker central runner */

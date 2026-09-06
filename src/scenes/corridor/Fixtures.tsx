@@ -25,6 +25,7 @@ import { useStore } from '../../state/store';
 import type { MuseumStyle } from '../../types';
 import { bayZ, hangTop, type Dims } from './dims';
 import { glowTexture } from './glow';
+import { clockFaceTexture, DIAL_Y, FACE_ASPECT } from './clockface';
 
 interface Props {
   style: MuseumStyle;
@@ -800,23 +801,14 @@ function Placard() {
  * walking there by hand does.
  */
 function GreatClock({ style, y, z }: { style: MuseumStyle; y: number; z: number }) {
-  const p = style.palette;
   const R = 2.4;
   const setHovered = useStore((s) => s.setHoveredWork);
-  const ticks = useRef<THREE.InstancedMesh>(null);
-  useLayoutEffect(() => {
-    const mesh = ticks.current;
-    if (!mesh) return;
-    const m = new THREE.Matrix4();
-    for (let i = 0; i < 12; i++) {
-      const a = (i / 12) * Math.PI * 2;
-      m.makeRotationZ(a);
-      m.setPosition(Math.sin(a) * R * 0.78, Math.cos(a) * R * 0.78, 0.06);
-      mesh.setMatrixAt(i, m);
-    }
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.computeBoundingSphere();
-  }, []);
+  const face = clockFaceTexture();
+  /* the plate carries crown and apron as well as the dial, so it is taller
+     than it is wide, and the dial's centre is not the plate's centre */
+  const plateW = R * 2.28;
+  const plateH = plateW / FACE_ASPECT;
+  const dialOffset = plateH * (0.5 - DIAL_Y);
 
   const walkToTheEnd = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
@@ -830,7 +822,7 @@ function GreatClock({ style, y, z }: { style: MuseumStyle; y: number; z: number 
     <group position={[0, y, z]}>
       {/* the clock is the way out of the nave: one target over the whole face */}
       <mesh
-        position={[0, 0, 0.14]}
+        position={[0, 0, 0.2]}
         onPointerOver={(e) => {
           e.stopPropagation();
           document.body.style.cursor = 'pointer';
@@ -842,40 +834,61 @@ function GreatClock({ style, y, z }: { style: MuseumStyle; y: number; z: number 
         }}
         onClick={walkToTheEnd}
       >
-        <circleGeometry args={[R * 1.28, 48]} />
+        <circleGeometry args={[R * 1.2, 40]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-      {/* glazed face — daylight comes through the clock from outside */}
-      <mesh>
-        <circleGeometry args={[R * 0.86, 48]} />
-        <meshBasicMaterial color={p.sky} toneMapped={false} />
+
+      {/*
+       * The case, drawn. Unlit and alpha-tested rather than blended: the plate
+       * is mostly empty, and a blended transparent plane this size would have
+       * to be sorted against the glazing behind it every frame and would still
+       * pick the wrong order at some angles. An alpha test writes depth like
+       * any solid surface and the ornament occludes correctly.
+       */}
+      <mesh position={[0, dialOffset, 0.06]}>
+        <planeGeometry args={[plateW, plateH]} />
+        <meshBasicMaterial
+          map={face}
+          transparent
+          alphaTest={0.35}
+          toneMapped={false}
+          side={THREE.DoubleSide}
+        />
       </mesh>
-      {/* gilded surround, heavily ornamented */}
-      <mesh position={[0, 0, 0.03]} castShadow>
-        <torusGeometry args={[R * 0.9, 0.16, 10, 48]} />
-        <meshStandardMaterial color={p.gilt} metalness={0.82} roughness={0.32} />
+
+      {/*
+       * Two real rings over the drawn ones. The plate has all the ornament but
+       * no relief, and the clock is the one object in the room the camera
+       * approaches head-on for thirty seconds — so the outermost torus and the
+       * bezel around the glazing are geometry, and catch the light as the
+       * walk brings them nearer.
+       */}
+      <mesh position={[0, 0, 0.09]} castShadow>
+        <torusGeometry args={[R * 0.99, 0.075, 8, 56]} />
+        <meshStandardMaterial color={style.palette.gilt} metalness={0.85} roughness={0.28} />
       </mesh>
-      <mesh position={[0, 0, 0.01]}>
-        <torusGeometry args={[R * 1.12, 0.3, 10, 48]} />
-        <meshStandardMaterial color={p.gilt} metalness={0.7} roughness={0.4} />
+      <mesh position={[0, 0, 0.1]}>
+        <torusGeometry args={[R * 0.395, 0.05, 8, 48]} />
+        <meshStandardMaterial color={style.palette.gilt} metalness={0.85} roughness={0.3} />
       </mesh>
-      {/* radiating ornament between the two rings */}
-      <mesh position={[0, 0, -0.02]}>
-        <circleGeometry args={[R * 1.28, 48]} />
-        <meshStandardMaterial color={p.molding} roughness={0.75} />
-      </mesh>
-      <instancedMesh ref={ticks} args={[undefined, undefined, 12]}>
-        <boxGeometry args={[0.09, 0.3, 0.06]} />
-        <meshStandardMaterial color={p.gilt} metalness={0.8} roughness={0.3} />
-      </instancedMesh>
+
       {/* hands, stopped — a museum clock in a station that stopped being one */}
-      <mesh position={[0, R * 0.2, 0.08]} rotation={[0, 0, 0.35]}>
-        <boxGeometry args={[0.07, R * 0.62, 0.03]} />
-        <meshStandardMaterial color="#2A241C" roughness={0.6} />
+      <mesh position={[0, R * 0.17, 0.13]} rotation={[0, 0, 0.32]}>
+        <boxGeometry args={[0.055, R * 0.56, 0.025]} />
+        <meshStandardMaterial color="#241F18" roughness={0.55} />
       </mesh>
-      <mesh position={[R * 0.14, R * 0.1, 0.08]} rotation={[0, 0, -1.1]}>
-        <boxGeometry args={[0.06, R * 0.42, 0.03]} />
-        <meshStandardMaterial color="#2A241C" roughness={0.6} />
+      <mesh position={[R * 0.11, R * 0.08, 0.13]} rotation={[0, 0, -1.12]}>
+        <boxGeometry args={[0.05, R * 0.38, 0.025]} />
+        <meshStandardMaterial color="#241F18" roughness={0.55} />
+      </mesh>
+      {/* the seconds hand and the boss it turns on */}
+      <mesh position={[-R * 0.1, -R * 0.05, 0.14]} rotation={[0, 0, 0.9]}>
+        <boxGeometry args={[0.022, R * 0.5, 0.02]} />
+        <meshStandardMaterial color="#241F18" roughness={0.55} />
+      </mesh>
+      <mesh position={[0, 0, 0.15]}>
+        <cylinderGeometry args={[0.09, 0.09, 0.05, 12]} />
+        <meshStandardMaterial color={style.palette.gilt} metalness={0.85} roughness={0.25} />
       </mesh>
     </group>
   );
