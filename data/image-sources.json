@@ -76,10 +76,6 @@
     "search": "John White The Flyer Secotan conjuror Roanoke watercolour British Museum",
     "note": "White's album is many sheets; search cannot know which. Pin one."
   },
-  "durer-rhinoceros": {
-    "search": "Dürer Rhinocerus 1515 woodcut",
-    "note": "The 1515 woodcut itself, not a later re-cut or a photograph of the sheet in its mount."
-  },
   "hiroshige-sudden-shower": {
     "search": "Hiroshige Sudden shower over Shin-Ohashi bridge and Atake",
     "note": "One Hundred Famous Views of Edo, no. 58. Many impressions exist and they vary in colour; any clean full-sheet one is right."
@@ -291,5 +287,10 @@
     "commonsFile": "File:A Lady, called Anne Boleyn, by Hans Holbein the Younger.jpg",
     "search": "Holbein \"A Lady, called Anne Boleyn\" chalk drawing British Museum",
     "note": "The British Museum's sheet, 1975,0621.22 — not one of the eighty Holbein court drawings at Windsor, which are a different collection and a different room."
+  },
+  "shahnama-bijan-farud": {
+    "commonsFile": "File:Bijan and Farud. Shahnama, 1435-1440, Shiraz (British Museum, 1948,1009,0.50).jpg",
+    "search": "Bijan Farud Shahnama Shiraz British Museum",
+    "note": "British Museum 1948,1009,0.50. The size is not stated on the placard because a folio is cropped differently by every photographer — see the record's \"reproduction\" line."
   }
 }

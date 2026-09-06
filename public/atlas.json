@@ -581,6 +581,24 @@
       "kind": "place",
       "label": "Tibet",
       "note": ""
+    },
+    {
+      "id": "shiraz-painters",
+      "kind": "painter",
+      "label": "The Shiraz workshops",
+      "note": "Timurid Iran, 15th century"
+    },
+    {
+      "id": "shiraz",
+      "kind": "place",
+      "label": "Shiraz",
+      "note": "Fars, southern Iran"
+    },
+    {
+      "id": "shahnama",
+      "kind": "event",
+      "label": "The Shahnama",
+      "note": "Firdausi, completed c. 1010"
     }
   ],
   "works": {
@@ -605,7 +623,7 @@
     "gu-kaizhi-admonitions": "gu-kaizhi",
     "white-the-flyer": "john-white",
     "holbein-anne-boleyn": "holbein",
-    "durer-rhinoceros": "durer",
+    "shahnama-bijan-farud": "shiraz-painters",
     "vrindavani-vastra": "assam-weavers",
     "leutze-washington-delaware": "leutze",
     "monet-water-lilies-bridge": "monet",
@@ -1810,6 +1828,33 @@
       "kind": "after",
       "word": "Northern",
       "note": "The northern portrait as a piece of evidence rather than a compliment: a face recorded at close range with everything the light does to it left in. Van Eyck established it a century earlier in oil; Holbein arrived at the same austerity in chalk, and in England it had no precedent at all — before him, Tudor portraiture is heraldry with a head on it."
+    },
+    {
+      "a": "shiraz-painters",
+      "b": "shiraz",
+      "kind": "worked in",
+      "word": "Shiraz"
+    },
+    {
+      "a": "shiraz-painters",
+      "b": "shahnama",
+      "kind": "illustrating",
+      "word": "Shahnama",
+      "note": "Copying and illustrating Firdausi was a trade rather than a commission. Shiraz in the 1430s produced Shahnamas at volume and more or less to a pattern — the gold sky, the lobed pink rocks, the shallow band of tall small-headed figures — which is why a page like this can be placed to within a few years by its conventions alone, and why nobody signed it."
+    },
+    {
+      "a": "shahnama",
+      "b": "gu-kaizhi",
+      "kind": "the same surface",
+      "word": "the page",
+      "note": "Two traditions in which the writing and the painting share one sheet and one ink, and the words are not a caption. On the Admonitions Scroll the columns of the poem stand in the empty silk between the figures; in a Persian manuscript the scribe rules the page and writes the verse first, and the painter works into the gap he is left. In both, the picture is a widening of the text."
+    },
+    {
+      "a": "shiraz",
+      "b": "venice",
+      "kind": "the same stone",
+      "word": "lapis",
+      "note": "The blue in a Persian manuscript and the blue in a Venetian altarpiece come out of the same mountain: lapis lazuli from Badakhshan, in what is now Afghanistan, the only source anybody had. It travelled west by land and reached Venice by sea, which is how it got the name — ultramarine, from over the sea — and why it cost more than gold by weight at the far end of the journey and merely a great deal at the near one."
     }
   ]
 }

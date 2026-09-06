@@ -236,9 +236,18 @@ function checkRecord(museumId: string, museumName: string, r: ArtworkRecord) {
     );
   }
 
-  const elsewhere = OTHER_MUSEUMS.filter(
-    (m) => m.re.test(lower) && m.id !== museumId,
-  );
+  /*
+   * The longest match wins.
+   *
+   * "National Gallery of Art" contains "National Gallery", and taking these in
+   * list order named the wrong institution: a Washington scan was reported as
+   * London's. Whichever pattern matched more of the text is the one that
+   * actually names the collection.
+   */
+  const elsewhere = OTHER_MUSEUMS.map((m) => ({ m, hit: lower.match(m.re)?.[0] ?? '' }))
+    .filter(({ m, hit }) => hit && m.id !== museumId)
+    .sort((x, y) => y.hit.length - x.hit.length)
+    .map(({ m }) => m);
   if (elsewhere.length) {
     warn(
       `${where}: the scan credits ${elsewhere[0].name}, not this museum — ${file}\n` +

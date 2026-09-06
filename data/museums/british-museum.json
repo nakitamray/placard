@@ -144,8 +144,8 @@
         "artworkIndex": 6
       },
       {
-        "id": "r-durer",
-        "name": "Dürer",
+        "id": "r-shahnama",
+        "name": "Bijan and Farud",
         "svgPath": "M100,285 L200,285 L200,310 L100,310 Z",
         "centroid": [
           150,
@@ -197,7 +197,7 @@
     "rubens-isabella-brant",
     "white-the-flyer",
     "holbein-anne-boleyn",
-    "durer-rhinoceros",
+    "shahnama-bijan-farud",
     "vrindavani-vastra",
     "hiroshige-sudden-shower"
   ]
