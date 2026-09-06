@@ -344,18 +344,29 @@
     "title": "A Lady, called Anne Boleyn",
     "year": "c. 1532–36",
     "medium": "Black and coloured chalks on pale pink prepared paper",
-    "dimensions": "about 28 × 20 cm",
+    "dimensions": "32.1 × 23.5 cm",
     "room": "Prints and Drawings",
-    "accession": "",
-    "creditLine": "Department of Prints and Drawings",
+    "accession": "1975,0621.22",
+    "creditLine": "Department of Prints and Drawings, acquired 1975",
     "accentColor": "#A85E52",
     "heroFocus": [
       0.5,
       0.38
     ],
-    "labelText": "A woman in an undercap and a plain gown, drawn from life in black and coloured chalks on paper the colour of skin. Holbein has done the eyes, the mouth and the line of the jaw and left almost everything else — the cap is a few strokes, the shoulders barely stated, the pink of the paper doing the work of the flesh. It is a working drawing, made at close range and quickly, of the kind he used as the record to paint from later. The title is the interesting part: called Anne Boleyn. Not is. Nobody can prove who this is.",
-    "extendedNote": "Holbein came to England in 1526 with a letter from Erasmus, went home to Basel, came back in 1532 and stayed. By 1536 he was the King's Painter, and the way he worked was this: one sitting with the subject, an hour or two, a sheet of paper prepared with a pale pink ground, black chalk for the structure and coloured chalks for the eyes and the mouth — then the sitter left, and the painting was made in the workshop from the drawing. Around eighty of these sheets survive. Most of the paintings they were made for do not.\n\nSo the drawings are not studies in the ordinary sense. They are the primary record — the only place a good many Tudor faces still exist — and they were drawn to be sufficient on their own: measured, unflattering, and made in one pass because there was no second sitting to be had. What looks like modern economy is a working constraint. Holbein put down what he would need and nothing he would not.\n\nThe names came later. Somebody in the sixteenth century went through the sheets and wrote a name on each in a hand that is not Holbein's, working from memory, hearsay and, by then, a court that had every reason to be vague about Anne Boleyn. She was executed in May 1536 and comprehensively removed afterwards: her badges chiselled out, her portraits taken down, her daughter's mother made into a subject one did not raise. There is no undisputed likeness of her from life. The famous image — the gable hood, the pearl B at the throat — comes from Elizabethan copies of a lost original, made half a century on, when it had become safe to have one again. Which leaves this sheet: a face drawn from life by the best draughtsman in England, in the right years, with the right name attached to it by the wrong hand. It is either the only thing we have of her, or it is somebody else entirely, and the drawing is not going to say.",
+    "labelText": "A woman in an undercap and a plain gown, drawn from life in black and coloured chalks on paper the colour of skin. Holbein has done the eyes, the mouth and the line of the jaw and left almost everything else — the cap is a few strokes, the shoulders barely stated, the pink of the paper doing the work of the flesh. It is a working drawing, made at close range and quickly, of the kind he used as the record to paint from later. To the left of her, a hand a century younger has written in brown ink: Anna Bullen decollata fuit Londini 19 May 1536. Anne Boleyn was beheaded in London, the 19th of May 1536. That sentence is the only reason anyone calls this her, and it was written by somebody who was not born when she died.",
+    "extendedNote": "Holbein came to England in 1526 with a letter from Erasmus, went home to Basel, came back in 1532 and stayed. By 1536 he was the King's Painter, and the way he worked was this: one sitting with the subject, an hour or two, a sheet of paper prepared with a pale pink ground, black chalk for the structure and coloured chalks for the eyes and the mouth — then the sitter left, and the painting was made in the workshop from the drawing. Around eighty of these sheets survive. Most of the paintings they were made for do not.\n\nSo the drawings are not studies in the ordinary sense. They are the primary record — the only place a good many Tudor faces still exist — and they were drawn to be sufficient on their own: measured, unflattering, and made in one pass because there was no second sitting to be had. What looks like modern economy is a working constraint. Holbein put down what he would need and nothing he would not. The sitter here is in a linen undercap, the thing worn beneath a hood, which is to say she is drawn undressed by court standards — an argument used on both sides: a queen does not sit like this, or a queen who has known the painter for four years might.\n\nThe name came later, and not by much less than a century. The inscription is in a seventeenth-century hand, in brown ink, and it does not simply name her — it records the execution and the date, the way you would label a relic. Anne Boleyn was beheaded in May 1536 and comprehensively removed afterwards: her badges chiselled out, her portraits taken down, her daughter's mother made into a subject one did not raise. There is no undisputed likeness of her from life. The famous image — the gable hood, the pearl B at the throat — comes from Elizabethan copies of a lost original, made half a century on, when it had become safe to have one again. Which leaves this sheet: a face drawn from life by the best draughtsman in England, in the right years, in the right city, with the right name attached to it a hundred years too late by somebody working from what he had been told. It is either the only thing we have of her, or it is somebody else entirely, and the drawing is not going to say.",
     "regions": [
+      {
+        "id": "inscription",
+        "label": "The inscription",
+        "box": [
+          0.0,
+          0.14,
+          0.28,
+          0.6
+        ],
+        "text": "Anna Bullen decollata fuit Londini 19 May 1536 — Anne Boleyn was beheaded in London, the 19th of May 1536. Brown ink, a seventeenth-century hand, added to the left of the sitter by somebody a hundred years after the fact. It is the whole attribution, and notice what it is interested in: not who she was, but how she ended. Somebody labelling a drawing as evidence of a death."
+      },
       {
         "id": "eyes",
         "label": "The eyes",
@@ -368,22 +379,11 @@
         "text": "Coloured chalk, and the only part of the sheet Holbein finishes. He is drawing against a clock — one sitting, then the sitter is gone — so the order of work is the order of what he cannot reconstruct later. A cap can be remembered. The set of somebody's eyelids cannot."
       },
       {
-        "id": "cap",
-        "label": "The cap",
-        "box": [
-          0.12,
-          0.02,
-          0.9,
-          0.28
-        ],
-        "text": "Four or five lines and a wash of chalk. This is a linen undercap, the thing worn beneath a hood — which is to say the sitter is drawn undressed, by court standards, and part of the doubt about the identification rests on it. A queen does not usually sit like this. A queen who has known the painter for four years might."
-      },
-      {
         "id": "paper",
         "label": "The pink ground",
         "box": [
           0.0,
-          0.55,
+          0.6,
           1.0,
           1.0
         ],
@@ -391,7 +391,7 @@
       }
     ],
     "placeholder": {
-      "aspect": 0.714,
+      "aspect": 0.732,
       "archetype": "portrait",
       "palette": [
         "#2A1E1C",
@@ -402,6 +402,10 @@
         "#3A4452"
       ],
       "seed": 27
+    },
+    "link": {
+      "label": "The sheet, at the British Museum",
+      "url": "https://www.britishmuseum.org/collection/object/P_1975-0621-22"
     }
   },
   {
