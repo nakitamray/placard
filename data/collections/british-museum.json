@@ -409,30 +409,71 @@
     }
   },
   {
-    "id": "durer-rhinoceros",
-    "artist": "Albrecht Dürer",
-    "artistDates": "1471–1528",
-    "title": "The Rhinoceros",
-    "titleOriginal": "Rhinocerus",
-    "year": "1515",
-    "medium": "Woodcut on paper",
-    "dimensions": "21.4 × 29.8 cm",
-    "room": "Prints and Drawings",
-    "accession": "1895,0122.714",
-    "creditLine": "British Museum, London",
-    "accentColor": "#4A3B2A",
-    "labelText": "Dürer never saw a rhinoceros. One had arrived in Lisbon in 1515, the first in Europe since the Roman empire, and a sketch and a written description travelled north to Nuremberg. From those he cut this: armour-plated, riveted, scaled at the shoulder, with a small twisted horn on its back that no rhinoceros has ever had. It is wrong, and it was believed. For two hundred and fifty years European schoolbooks drew the rhinoceros from this woodcut rather than from the animal.",
-    "extendedNote": "The block is cut with the confidence of something observed. Dürer gives the hide the logic of plate armour — gorget, pauldron, tasset — because armour was the closest thing in his workshop's visual vocabulary to a skin arranged in overlapping folds. The engraved-looking texture that covers the legs is a shorthand for reptile scale, and the whole animal is drawn standing on a shallow strip of ground with no landscape at all behind it, so that nothing competes with the description.\n\nThe text block above it repeats what Dürer had been told: the date of the animal's arrival, its Indian origin, its supposed enmity with the elephant. It is a news report as much as a picture, and it sold in that spirit — impressions were still being pulled from the block in the eighteenth century. The British Museum's impression comes from the first edition, before the block cracked.",
+    "id": "shahnama-bijan-farud",
+    "artist": "Unknown painter, Shiraz",
+    "artistDates": "Timurid Iran, 15th century",
+    "title": "Bijan and Farud",
+    "titleOriginal": "بیژن و فرود · a folio from the Shahnama, the Book of Kings",
+    "year": "1435–1440",
+    "medium": "Opaque watercolour, ink and gold on paper",
+    "dimensions": "a single folio from a dispersed manuscript",
+    "room": "The Islamic world",
+    "accession": "1948,1009,0.50",
+    "creditLine": "Acquired 1948",
+    "accentColor": "#33528F",
+    "heroSkip": true,
+    "reproduction": "A Shahnama picture is not a picture on its own: it sits in a page, among ruled panels of verse, and photographers crop it in different places — some at the painted edge, some at the edge of the folio. Its proportions here are the photographer's decision rather than the book's.",
+    "link": {
+      "label": "The folio, at the British Museum",
+      "url": "https://www.britishmuseum.org/collection/object/W_1948-1009-0-50"
+    },
+    "labelText": "A duel on a mountainside, painted in Shiraz about 1437. Farud, in his father's fortress above, has shot the horse out from under Bijan, and Bijan is coming up the slope on foot with his sword out. The rocks are lobed and pink and stacked like clouds; the sky is a flat sheet of gold; the figures are the same size whether they are near or far, because distance in this tradition is height on the page rather than size. Above and below the painting, ruled in panels, the verse this illustrates goes on in six columns. The picture is not an illustration set beside the text — it is a widening of the text, made in the same ink, on the same sheet.",
+    "extendedNote": "The Shahnama is Firdausi's, finished about 1010: some fifty thousand couplets carrying Iran from the first king to the Arab conquest, written in a Persian that deliberately kept out as much Arabic as it could. It is the founding book of the language, and for five hundred years afterwards copying and illustrating it was an industry. There are hundreds of illustrated Shahnamas. This is a page out of one of them.\n\nShiraz in the 1430s was the place that made them at volume. Ibrahim Sultan, the Timurid prince who governed the city, kept a workshop of real ambition until his death in 1435; what followed was a commercial trade in manuscripts produced more or less to a pattern, and the pattern is what you are looking at. A high horizon with a band of gold sky. Rocks drawn as lobed, overlapping outcrops in pink and mauve. Figures tall, small-headed, arranged in a shallow band with no overlap you have to work out. No perspective, no cast shadow, no modelling — because none of it is wanted. A page of a book is a flat thing and the painting agrees to stay flat.\n\nThe episode is one of the cruellest in the poem. Farud is the son of Siyavush and the half-brother of Kay Khusraw, the king the Iranian army is marching for. He comes out onto the mountain above Kalat to watch that army pass, meaning to join it. Tus, who commands it and who is proud and stupid, takes the watching as an insult and sends men up to kill him. Farud kills two of them. Then Bijan, son of Giv, goes up; Farud shoots his horse; Bijan keeps climbing on foot, and Farud falls back into the fortress — where, shortly, he is cut down. The Iranians have killed the king's brother out of nothing but temper, and the poem knows it. What the painter has chosen is not the death. It is the moment before it, with the horse already down and everybody still alive.\n\nThe blue is lapis lazuli, ground from stone quarried in Badakhshan and carried west along the same roads that took it to Venice, where it was called ultramarine because it came from over the sea. The gold is leaf, laid down and burnished with an agate until it holds the light.",
+    "regions": [
+      {
+        "id": "horse",
+        "label": "The fallen horse",
+        "box": [
+          0.08,
+          0.5,
+          0.62,
+          0.88
+        ],
+        "text": "Farud's arrow has gone into the horse rather than the man, and that is the whole of his position in the story: he is defending himself against people he came to join, and he keeps aiming low. The painter draws the animal's collapse with the same even outline he gives everything else — no strain in the line, no drama in the handling. The event is dramatic; the drawing declines to be."
+      },
+      {
+        "id": "rocks",
+        "label": "The rocks",
+        "box": [
+          0.0,
+          0.06,
+          1.0,
+          0.5
+        ],
+        "text": "Lobed, overlapping outcrops in pink and mauve, stacked up the page like a cloudbank. This is the Shiraz convention of the 1430s and it is doing two jobs at once: it is a mountain, and it is the device that lets figures be placed higher on the sheet to mean further away, without any of them getting smaller."
+      },
+      {
+        "id": "text",
+        "label": "The verse",
+        "box": [
+          0.0,
+          0.86,
+          1.0,
+          1.0
+        ],
+        "text": "Six ruled columns of Firdausi, in a hand that was on the page before the painting was. The scribe wrote the manuscript first and left the gaps; the painter worked into the space he was given. That is the order of authority in a Persian book, and it is why the pictures are almost always as wide as the written surface and never wider."
+      }
+    ],
     "placeholder": {
-      "aspect": 1.394,
-      "archetype": "still-life",
+      "aspect": 0.68,
+      "archetype": "register",
       "palette": [
-        "#241C12",
-        "#4A3A26",
-        "#7C6743",
-        "#AD9668",
-        "#DCCCA6",
-        "#F0E7D2"
+        "#1E2A4A",
+        "#33528F",
+        "#6E86C4",
+        "#C9A227",
+        "#E8D9B4",
+        "#A63A2E"
       ],
       "seed": 28
     }
