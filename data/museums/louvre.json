@@ -30,24 +30,24 @@
       "sky": "#EDF4FB"
     },
     "light": {
-      "key": "#FFF8EC",
-      "keyIntensity": 2.1,
+      "key": "#FFEFCE",
+      "keyIntensity": 1.35,
       "keyFrom": [
         -3,
         16,
         5
       ],
-      "sky": "#DCEAF6",
-      "ground": "#6A6459",
-      "ambient": 0.58,
-      "lamp": "#FFE2B4",
-      "lampIntensity": 5,
-      "exposure": 1.06,
-      "background": "#2B303A",
+      "sky": "#B9C4D2",
+      "ground": "#4A4438",
+      "ambient": 0.3,
+      "lamp": "#FFCE8A",
+      "lampIntensity": 12,
+      "exposure": 1.0,
+      "background": "#171A22",
       "fog": [
-        "#3A414E",
-        52,
-        150
+        "#232833",
+        38,
+        128
       ]
     },
     "fixtures": {

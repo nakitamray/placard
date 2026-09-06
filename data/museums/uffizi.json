@@ -27,19 +27,19 @@
       "floor": "#DED6C6",
       "floorInlay": "#5A5348",
       "accent": "#8A7350",
-      "sky": "#FFF3DC"
+      "sky": "#AFCDEA"
     },
     "light": {
-      "key": "#FFEFD2",
-      "keyIntensity": 3.4,
+      "key": "#FFE9C4",
+      "keyIntensity": 3.2,
       "keyFrom": [
         11,
         9,
         3
       ],
-      "sky": "#FFF0D8",
+      "sky": "#F2E6CE",
       "ground": "#A2917A",
-      "ambient": 0.86,
+      "ambient": 0.82,
       "lamp": "#FFDFB0",
       "lampIntensity": 3.0,
       "exposure": 1.12,

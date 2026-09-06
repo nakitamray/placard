@@ -165,6 +165,19 @@ function Graph({
   const { camera, size } = useThree();
 
   const bodies = useMemo(() => seedBodies(graph), [graph]);
+  /*
+   * The node meshes, so the frame loop can move them.
+   *
+   * THIS IS NOT OPTIONAL. `position={b.p}` hands r3f a Vector3 whose identity
+   * never changes, and r3f writes props into the object on a React commit —
+   * so a node drawn that way sits wherever it was at the last render while the
+   * simulation carries on mutating `b.p` underneath it. The edges are rewritten
+   * from those same live vectors every frame, so the two disagree, and what you
+   * see is a web of lines floating away from the dots they are supposed to
+   * join. It looked fine for as long as the layout happened to settle during a
+   * render; adding nodes made it settle later, and the whole graph came apart.
+   */
+  const nodeRefs = useRef<Array<THREE.Mesh | null>>([]);
   const index = useMemo(() => new Map(bodies.map((b, i) => [b.id, i])), [bodies]);
   const energy = useRef(1);
   const quietRef = useRef<THREE.LineSegments>(null);
@@ -267,6 +280,11 @@ function Graph({
         moved += b.v.lengthSq();
       }
       energy.current = moved / bodies.length;
+    }
+
+    // the nodes themselves, moved from the simulation rather than from React
+    for (let i = 0; i < bodies.length; i++) {
+      nodeRefs.current[i]?.position.copy(bodies[i].p);
     }
 
     // edges — the found ones, sorted into the quiet web and the lit
@@ -375,7 +393,7 @@ function Graph({
       <lineSegments geometry={hotGeo} frustumCulled={false}>
         <lineBasicMaterial color="#F2EBDF" transparent opacity={0.95} depthWrite={false} />
       </lineSegments>
-      {bodies.map((b) => {
+      {bodies.map((b, bi) => {
         const node = graph.byId.get(b.id)!;
         const known = found.has(b.id);
         const lit = !near || near.nodes.has(b.id);
@@ -388,6 +406,9 @@ function Graph({
         return (
           <mesh
             key={b.id}
+            ref={(el) => {
+              nodeRefs.current[bi] = el;
+            }}
             position={b.p}
             onPointerOver={(e) => {
               e.stopPropagation();

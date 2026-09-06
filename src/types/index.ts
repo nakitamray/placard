@@ -200,6 +200,11 @@ export interface MuseumStyle {
   vaultHeight: number;
   bays: number;
   bayDepth: number;
+  /**
+   * The height every painting in this corridor is centred on, in metres.
+   * Omitted, it is a bit under head height — see `dimsFor`.
+   */
+  hangHeight?: number;
   palette: {
     wall: string;
     wallDeep: string;

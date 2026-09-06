@@ -55,11 +55,11 @@ const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v
 
 const CAM_Z = 5.2;
 /** the height a work is hung at unless it is too wide to allow it */
-export const PLANE_H = 2.55;
+const PLANE_H = 2.55;
 /** widest a work may be drawn before its height gives way (spec: fit.ts) */
 const MAX_W = 6.2;
 /** height every canvas is centred on */
-export const HANG_Y = 2.15;
+const HANG_Y = 2.15;
 const WALL_H = 6.2;
 
 /**

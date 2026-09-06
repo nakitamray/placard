@@ -27,27 +27,27 @@
       "floor": "#A08F76",
       "floorInlay": "#4E4436",
       "accent": "#6A5C46",
-      "sky": "#FF9E4A"
+      "sky": "#E07A3C"
     },
     "light": {
-      "key": "#FF9A48",
-      "keyIntensity": 1.15,
+      "key": "#E8834A",
+      "keyIntensity": 0.85,
       "keyFrom": [
         -18,
         4,
         5
       ],
-      "sky": "#C99A62",
+      "sky": "#A8794E",
       "ground": "#3A2E20",
-      "ambient": 0.16,
-      "lamp": "#FFA858",
-      "lampIntensity": 16,
+      "ambient": 0.15,
+      "lamp": "#FFA65A",
+      "lampIntensity": 18,
       "exposure": 1.0,
-      "background": "#160F09",
+      "background": "#120C07",
       "fog": [
-        "#2A1E12",
-        34,
-        120
+        "#241A10",
+        32,
+        115
       ]
     },
     "fixtures": {

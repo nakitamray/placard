@@ -132,7 +132,7 @@ export interface GlyphConfig {
 }
 
 /** Sensible defaults for every artwork; data/artworks/{id}/config.json wins. */
-export const DEFAULT_GLYPH_CONFIG: GlyphConfig = {
+const DEFAULT_GLYPH_CONFIG: GlyphConfig = {
   workingWidth: 1200,
   minCell: 5,
   maxCell: 16,
@@ -169,7 +169,7 @@ export function loadMuseum(id: string): MuseumRecord {
   return readJson<MuseumRecord>(museumData(id));
 }
 
-export function loadCollection(museumId: string): ArtworkRecord[] {
+function loadCollection(museumId: string): ArtworkRecord[] {
   return readJson<ArtworkRecord[]>(collectionData(museumId));
 }
 
