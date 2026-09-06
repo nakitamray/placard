@@ -563,7 +563,16 @@ export function Credits() {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      The source on GitHub
+                      GitHub Repo
+                    </a>
+                  </li>
+                  <li className="caption credits-source">
+                    <a
+                      href="https://www.linkedin.com/in/nakita-ray/"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Linkedin
                     </a>
                   </li>
                 </ul>
