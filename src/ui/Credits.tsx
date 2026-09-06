@@ -582,30 +582,30 @@ export function Credits() {
 /**
  * The contact form.
  *
- * The address itself is never shown — see CONTACT_EMAIL below. Two ways it
- * can deliver, and it picks whichever is configured:
+ * Two ways it can deliver, and it picks whichever is configured:
  *
- *   1. An HTTP endpoint in `VITE_CONTACT_ENDPOINT` — a Formspree / Getform /
- *      Basin form URL, or a serverless function of your own. The message is
- *      POSTed as JSON and the visitor never leaves the exhibition.
- *   2. Nothing configured: the form composes a `mailto:` and hands it to the
- *      visitor's own mail client, addressed to `VITE_CONTACT_EMAIL`.
+ *   1. `VITE_CONTACT_ENDPOINT` — a Formspree / Getform / Basin form URL, or a
+ *      serverless function of your own. The message is POSTed as JSON, the
+ *      visitor never leaves the exhibition, and the address stays with the
+ *      form service. This is the private option and the one to use.
+ *   2. `VITE_CONTACT_EMAIL` — the form composes a `mailto:` and hands it to
+ *      the visitor's own mail client.
  *
- * (2) is the default because it works the moment this ships, with no account
- * anywhere and no third party in the middle. Set the endpoint when you want
- * messages to arrive without the visitor having a mail client set up.
+ * Neither is set by default, and that is deliberate. Vite substitutes these
+ * at build time, so whatever is in them becomes a plain string in the shipped
+ * JavaScript: an address put here is not hidden from anybody who opens the
+ * bundle, and a crawler reading .js files finds it as easily as one reading
+ * HTML. (2) therefore publishes the address by definition — twice over, since
+ * the mail client shows it to the visitor as well. (1) does not publish it at
+ * all.
  *
- * The form is deliberately three fields. Every extra one costs replies.
+ * With neither configured the form is not rendered. A form that silently goes
+ * nowhere is worse than no form.
+ *
+ * It is deliberately three fields. Every extra one costs replies.
  */
 const CONTACT_ENDPOINT = (import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined) ?? '';
-/*
- * Never rendered. A mail address printed on a public page is scraped within
- * days, so this is only ever used as the target of a mailto: the browser
- * hands to the visitor's own mail client — where they see it, and no crawler
- * does. Nothing in the interface says what it is, including the errors.
- */
-const CONTACT_EMAIL =
-  (import.meta.env.VITE_CONTACT_EMAIL as string | undefined) ?? 'nakitamray@gmail.com';
+const CONTACT_EMAIL = (import.meta.env.VITE_CONTACT_EMAIL as string | undefined) ?? '';
 
 function ContactForm() {
   const [name, setName] = useState('');
@@ -617,7 +617,7 @@ function ContactForm() {
     e.preventDefault();
     if (!message.trim()) return;
 
-    if (!CONTACT_ENDPOINT) {
+    if (!CONTACT_ENDPOINT && CONTACT_EMAIL) {
       const subject = `Placard — a note from ${name.trim() || 'a visitor'}`;
       const body = `${message}\n\n— ${name.trim() || 'anonymous'}${
         email.trim() ? ` <${email.trim()}>` : ''
@@ -645,6 +645,9 @@ function ContactForm() {
       setState('failed');
     }
   };
+
+  /* Nowhere to send it: say so rather than collect words into a void. */
+  if (!CONTACT_ENDPOINT && !CONTACT_EMAIL) return null;
 
   return (
     /* The one dark panel on a bone page. Everything above it is a document to
