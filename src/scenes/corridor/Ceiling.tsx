@@ -683,9 +683,11 @@ function GrotesqueBeams({ style, d }: Props) {
  * is darkest of all. It is exactly what the light would do, and it costs
  * nothing.
  *
- * The fixtures are small and tucked into the beams, not slung under them: in
- * the real hall you notice the pools of warm light long before you find what
- * is making them.
+ * NOTHING IS MOUNTED ON IT. An earlier version recessed little dark cans into
+ * the beam soffits, and from the floor a dark disc on a pale ceiling reads as
+ * one thing only: a vent. The light in this room comes from the walls and from
+ * the windows, which is both what the room does and the reason you look at the
+ * hang rather than at the roof.
  */
 function DeepCoffers({ style, d }: Props) {
   const p = style.palette;
@@ -822,22 +824,6 @@ function DeepCoffers({ style, d }: Props) {
         </mesh>
       ))}
 
-      {/* the fixtures: small dark cans recessed into the beam soffits, two to
-          a bay, aimed down the walls rather than at the floor */}
-      <Repeated
-        count={(d.bays + 1) * 2}
-        place={(i, m) => {
-          const bay = Math.floor(i / 2);
-          m.makeTranslation(
-            (i % 2 ? 1 : -1) * (colW / 2),
-            h - 0.44,
-            d.bayDepth / 2 - bay * d.bayDepth,
-          );
-        }}
-      >
-        <cylinderGeometry args={[0.075, 0.075, 0.1, 12]} />
-        <meshStandardMaterial color="#1E1C18" metalness={0.4} roughness={0.6} />
-      </Repeated>
     </group>
   );
 }

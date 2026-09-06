@@ -22,7 +22,7 @@ Requires WebGL2. Sound is off until you turn it on.
 | Museum | The corridor |
 |---|---|
 | **Musée du Louvre** | white barrel vault pierced by arched skylights, thick classical moulding, deep blue-grey walls, salon hang stacked to the cornice |
-| **The British Museum** | a stone hall under a deep grid of stepped coffers, engaged fluted pilasters with plain square capitals, tall screened windows high on one side, wide bands of grey and charcoal underfoot |
+| **The British Museum** | a sand-walled hall at sunset under a deep grid of stepped coffers, two colonnades of fluted columns standing clear of the walls, low sun through tall windows on one side, carved marble benches down the centre |
 | **The National Gallery** | crimson walls under a pitched glass lantern on gilded archways, polished light wood, tufted leather seating |
 | **Vatican Museums** | a barrel vault of gilded stucco and painted compartments lit from the cornice upward, walls of painted map panels in ocean blue and forest green, a black and white labyrinth polished to a mirror |
 | **Galleria degli Uffizi** | warm brown crossbeams over painted grotesque compartments, the hang down one side and a run of tall windows down the other, a diagonal checkerboard floor with the day lying on it |
@@ -30,10 +30,10 @@ Requires WebGL2. Sound is off until you turn it on.
 | **The Metropolitan Museum of Art** | a sunlit court under a peaked skylight: red brick and white voussoired arches one side, marble ashlar the other, a glass wall at the end |
 
 The British Museum room is its **Egyptian sculpture gallery, Room 4**, with
-the sculpture taken out: the plinths, stepped pedestals and glass vitrines
-stand empty down both sides, and what hangs on the piers is the museum's
-painted and printed holdings — woodblock prints, a tomb fresco, a painted
-papyrus, a scroll — which have no permanent room of their own. Every corridor
+the sculpture taken out and benches where the plinths were. What hangs between
+its columns is the museum's painted and printed holdings — woodblock prints, a
+tomb fresco, a papyrus, a scroll, a Rubens drawing — which have no permanent
+room of their own. Every corridor
 carries a `corridorNote` in `data/museums/{id}.json` saying which real room it
 follows and where it departs from it.
 
