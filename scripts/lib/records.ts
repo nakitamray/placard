@@ -44,6 +44,55 @@ export interface ArtworkRecord {
   creditLine: string;
   /** the painter's identifying colour — the whole artwork room takes it */
   accentColor: string;
+  /**
+   * Where to hold the picture when it is cropped to fill a window, as
+   * normalised image coordinates with y down: [0.5, 0.5] is the middle,
+   * [0.5, 0.3] keeps a head near the top of a tall canvas in frame.
+   *
+   * Only the entrance crops a painting — everything inside a museum is hung
+   * whole — so this is the one place it matters, and only works whose subject
+   * sits well off centre need it. Omitted, a tall work is held a little above
+   * centre and everything else in the middle.
+   */
+  heroFocus?: [number, number];
+  /**
+   * Keep this work off the entrance.
+   *
+   * The entrance is the one screen that crops a painting to whatever shape
+   * the window happens to be, and some works cannot survive it: a scroll six
+   * times wider than it is tall, a hanging banner, a small watercolour whose
+   * best available scan is soft at full bleed. They are perfectly good on a
+   * wall, where they are hung whole and at their own size, and this is the
+   * flag that says so.
+   */
+  heroSkip?: boolean;
+  /**
+   * What is actually reproduced, when it is not the catalogued object.
+   *
+   * Some works cannot be shown as themselves. The Geese of Meidum is in Cairo
+   * and what museums outside it hang is a nineteenth-century facsimile; a
+   * handscroll is shown as one section of itself; a diptych is photographed as
+   * a pair. In every one of those cases the picture on the wall has different
+   * proportions from the object in the catalogue, and `pnpm check` is right to
+   * say so — once. This is the sentence that answers it: state what the
+   * reproduction is, and the proportions check stops asking.
+   *
+   * IT IS NOT A SILENCER. Anything written here is printed on the colophon
+   * beside the image credit, because a visitor looking at a facsimile is owed
+   * the same sentence the check was owed.
+   */
+  reproduction?: string;
+  /**
+   * A label and a URL shown on the placard, for a work reproduced as a
+   * fragment of itself: "The whole scroll, at the British Museum".
+   */
+  link?: { label: string; url: string };
+  /**
+   * How this work is framed, where a rectangle is the wrong answer: 'round'
+   * for a tondo, 'divided' for a pair of panels hung as one object with a
+   * moulded divider between them. Omitted, the museum's own frame is used.
+   */
+  frameShape?: 'round' | 'divided';
   labelText: string;
   extendedNote: string;
   placeholder: PlaceholderSpec;
@@ -54,6 +103,8 @@ export interface MuseumRecord {
   id: string;
   name: string;
   city: string;
+  /** the museum's own site, which the corridor title and the colophon link to */
+  homepage: string;
   subtitle: string;
   blurb: string;
   corridorNote: string;
@@ -81,7 +132,7 @@ export interface GlyphConfig {
 }
 
 /** Sensible defaults for every artwork; data/artworks/{id}/config.json wins. */
-export const DEFAULT_GLYPH_CONFIG: GlyphConfig = {
+const DEFAULT_GLYPH_CONFIG: GlyphConfig = {
   workingWidth: 1200,
   minCell: 5,
   maxCell: 16,
@@ -96,12 +147,11 @@ export const DEFAULT_GLYPH_CONFIG: GlyphConfig = {
 /**
  * The low device tier's variant of the same painting.
  *
- * This used to be `minCell × 2` alone, which did almost nothing: the quadtree
- * bottoms out on `maxCell` long before it reaches the floor, so glyphs-lo.bin
- * came out within two percent of glyphs.bin — 128KB either way, sixteen
- * thousand instances either way. The tier existed in the file names and
- * nowhere else. Doubling the ceiling as well as the floor is what actually
- * quarters it.
+ * Both cell bounds double, not just the floor: the quadtree bottoms out on
+ * `maxCell` long before it reaches `minCell`, so raising the floor alone
+ * changes the output by about two percent — the same 128KB and the same
+ * sixteen thousand instances under a different file name. Doubling the ceiling
+ * is what actually quarters it.
  */
 export const LOW_TIER_GLYPHS = (cfg: GlyphConfig): Partial<GlyphConfig> => ({
   minCell: cfg.minCell * 2,
@@ -119,7 +169,7 @@ export function loadMuseum(id: string): MuseumRecord {
   return readJson<MuseumRecord>(museumData(id));
 }
 
-export function loadCollection(museumId: string): ArtworkRecord[] {
+function loadCollection(museumId: string): ArtworkRecord[] {
   return readJson<ArtworkRecord[]>(collectionData(museumId));
 }
 

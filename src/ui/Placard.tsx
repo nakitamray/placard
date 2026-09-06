@@ -1,17 +1,16 @@
 /**
- * Placard — spec §10.7 / §10C.5.
+ * The wall label.
  *
- * DOM element positioned by projecting the plane's world position; two tiers
- * (wall label shown immediately, extended note on expand). Provenance gets
- * two treatments: housing prominent and plain; text origin in small italics
- * where a real credit line sits.
+ * A DOM card positioned by projecting the canvas's world position, in two
+ * tiers: the label everyone reads, and the extended note behind "Read more".
+ * Provenance gets two treatments — the housing plain and prominent, because it
+ * is the load-bearing fact, and the text's own origin in small italics where a
+ * credit line sits on a real placard.
  *
- * The card stays up once a work is revealed. It used to be tied to the
- * cursor being over the canvas, which meant reading it required holding the
- * mouse somewhere other than where you were reading — and scrolling to reach
- * the end of the note dismissed it outright. It now behaves like a wall
- * label: it appears when you look at the work, it stays while you read it,
- * and it goes when you say so.
+ * It behaves like a wall label and not like a tooltip: it arrives when you
+ * click a work, it stays while you read it, and it goes when you say so.
+ * Anything tied to the cursor being over the canvas would mean holding the
+ * mouse somewhere other than where you are reading.
  */
 import { useEffect, useRef, useState } from 'react';
 import { selectArtworks, useStore } from '../state/store';
@@ -52,18 +51,41 @@ export function Placard() {
     };
   }, [artworks, index, phase]);
 
-  // track the projected plane edge (spec §10.7: offset 40px right of frame,
-  // clamped 24px from the viewport edge)
+  // track the projected plane edge, clamped 24px from the viewport edge
   useEffect(() => {
     if (phase !== 'gallery' || !revealed || !latched) return;
     let raf = 0;
+    /*
+     * The card's size, measured when it changes rather than when it is
+     * drawn.
+     *
+     * `offsetWidth` and `offsetHeight` are synchronous layout: asking for
+     * them inside a frame callback makes the browser lay out the whole page
+     * before it can answer, and this was asking twice a frame for a card
+     * whose size only changes when the window does. Cleared on resize, and
+     * on the first frame after the card's own content changes.
+     */
+    let w = 0;
+    let h = 0;
+    const remeasure = () => {
+      w = 0;
+      h = 0;
+    };
+    window.addEventListener('resize', remeasure);
+    const coarse = matchMedia('(pointer: coarse) and (min-height: 560px)');
+    let last = '';
     const tick = () => {
       const el = cardRef.current;
       if (el && placardAnchor.visible) {
-        const w = el.offsetWidth;
-        const h = el.offsetHeight;
-        const coarse = matchMedia('(pointer: coarse)').matches;
-        if (!coarse) {
+        if (!w) {
+          w = el.offsetWidth;
+          h = el.offsetHeight;
+        }
+        // must agree with the media query in styles.css that turns the label
+        // into a bottom sheet, or the two lay it out in different places
+        const sheet =
+          coarse.matches || (window.innerWidth <= 720 && window.innerHeight >= 560);
+        if (!sheet) {
           /*
            * Pinned to the right margin, not to the frame.
            *
@@ -76,15 +98,25 @@ export function Placard() {
            */
           const x = Math.max(24, window.innerWidth - w - 24);
           const y = Math.max(24, Math.min(placardAnchor.y - h / 2, window.innerHeight - h - 24));
-          el.style.transform = `translate(${x}px, ${y}px)`;
-        } else {
+          // only touch the style when the answer has actually changed: an
+          // identical write still costs a composited layer update
+          const next = `translate(${x}px, ${y}px)`;
+          if (next !== last) {
+            el.style.transform = next;
+            last = next;
+          }
+        } else if (last !== '') {
           el.style.transform = '';
+          last = '';
         }
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      window.removeEventListener('resize', remeasure);
+      cancelAnimationFrame(raf);
+    };
   }, [phase, revealed, latched]);
 
   if (phase !== 'gallery' || !meta) return null;
@@ -134,6 +166,18 @@ export function Placard() {
         <hr className="hairline" />
 
         <p className="body placard-label">{meta.labelText}</p>
+
+        {/* a work shown as one scene of itself says where the rest is */}
+        {meta.link && (
+          <a
+            className="caption placard-link"
+            href={meta.link.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {meta.link.label} <span aria-hidden>↗</span>
+          </a>
+        )}
 
         <button
           className="caption placard-more"

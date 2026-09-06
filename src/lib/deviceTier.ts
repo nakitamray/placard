@@ -1,4 +1,4 @@
-/** Device tiering — spec §14.2 (renderer string + memory + cores heuristic). */
+/** Device tiering (renderer string + memory + cores heuristic). */
 import type { DeviceTier } from '../types';
 
 export function detectTier(): DeviceTier {

@@ -2,14 +2,14 @@
  * ArtworkPlane — the painting surface in the gallery.
  *
  * Active plane samples the shared glyph render target; inactive planes show
- * their 512px corridor texture, dimmed (spec §7.4 LOD). The reveal crossfades
+ * their 512px corridor texture, dimmed. The reveal crossfades
  * to the authentic painting. Fidelity path: tone mapping is skipped so the
  * reproduction stays faithful.
  *
  * The reproduction is fetched only once a reveal asks for it, so for the first
  * moment of a reveal there is nothing to cross-fade to yet. `uHasPaint` is
  * that moment: it holds at 0 while the only picture in hand is the 512px
- * texture — which is exactly the blur-up the spec wants, at no extra request —
+ * texture — which is the blur-up, at no extra request —
  * and eases to 1 over a third of a second when the reproduction lands. Without
  * it the painting snaps into focus mid-dissolve on a slow connection.
  */
@@ -20,6 +20,7 @@ import { glyphRT } from '../glyph/GlyphPrePass';
 import type { LoadedArtwork } from '../glyph/artworkLoader';
 import { revealAnim } from '../transitions/reveal';
 import { lens } from '../transitions/lens';
+import type { FrameShape } from '../types';
 
 const vert = /* glsl */ `
 varying vec2 vUv;
@@ -40,8 +41,24 @@ uniform float uDim;
 uniform vec3  uLens;      // x, y, radius — the artwork's own image pixels
 uniform float uLensAmt;
 uniform vec2  uImageSize;
+uniform float uRound;
 varying vec2 vUv;
+
+/*
+ * How far outside its own outline a fragment is, in uv.
+ *
+ * A tondo is cut out of a square canvas, so the plane keeps its shape and the
+ * shader throws the corners away. Returning a signed distance rather than a
+ * boolean is what lets the rim be feathered — a hard cut reads as a jagged
+ * staircase against the turned moulding around it.
+ */
+float outside(vec2 uv) {
+  return uRound > 0.5 ? length(uv - 0.5) - 0.5 : -1.0;
+}
+
 void main() {
+  float cut = outside(vUv);
+  if (cut > 0.0) discard;
   vec3 live = texture2D(uGlyph, vUv).rgb;
   vec3 wall = texture2D(uWall, vUv).rgb;
   vec3 base = mix(wall, live, uUseGlyph);
@@ -53,7 +70,8 @@ void main() {
   float d = distance(vec2(vUv.x, 1.0 - vUv.y) * uImageSize, uLens.xy);
   float lens = uLensAmt * (1.0 - smoothstep(uLens.z * 0.5, uLens.z, d));
   vec3 color = mix(base, paint, max(uMix, lens)) * uDim;
-  gl_FragColor = vec4(color, 1.0);
+  float edge = uRound > 0.5 ? smoothstep(0.0, -0.008, cut) : 1.0;
+  gl_FragColor = vec4(color, edge);
   #include <colorspace_fragment>
 }
 `;
@@ -68,19 +86,23 @@ export function ArtworkPlane({
   onLeave,
   onMove,
   onTap,
+  shape,
 }: {
   artwork: LoadedArtwork | null;
   position: [number, number, number];
   height?: number;
   aspect: number;
   active: boolean;
+  /** 'round' cuts the canvas to a circle; a tondo is not a rectangle */
+  shape?: FrameShape;
   onEnter?: () => void;
   onLeave?: () => void;
   /** u,v normalised across the canvas, y-down — image space */
   onMove?: (u: number, v: number) => void;
   onTap?: (u: number, v: number) => void;
 }) {
-  const width = height * aspect;
+  // a tondo is square whatever its scan says, and cut to a circle in the shader
+  const width = shape === 'round' ? height : height * aspect;
   const matRef = useRef<THREE.ShaderMaterial>(null);
 
   const uniforms = useMemo(
@@ -95,12 +117,14 @@ export function ArtworkPlane({
       uLens: { value: new THREE.Vector3(0, 0, 1) },
       uLensAmt: { value: 0 },
       uImageSize: { value: new THREE.Vector2(1, 1) },
+      uRound: { value: 0 },
     }),
     [],
   );
 
   useFrame((_, delta) => {
     const u = uniforms;
+    u.uRound.value = shape === 'round' ? 1 : 0;
     if (artwork) {
       u.uWall.value = artwork.wallTex;
       u.uPaint.value = artwork.fullTex ?? artwork.wallTex;
@@ -120,12 +144,12 @@ export function ArtworkPlane({
       u.uUseGlyph.value = 0;
       u.uMix.value = 0;
       u.uLensAmt.value = 0;
-      u.uDim.value = 0.62; // neighbours read dimmed but legible (spec §10.6)
+      u.uDim.value = 0.62; // neighbours read dimmed but legible
     }
   });
 
-  // The frame is no longer drawn here: the surrounding scene mounts an
-  // OrnateFrame around this position, so the plane is only ever the canvas.
+  // The plane is only ever the canvas — the surrounding scene mounts an
+  // OrnateFrame around this position.
   return (
     <group position={position}>
       <mesh
@@ -148,6 +172,9 @@ export function ArtworkPlane({
           fragmentShader={frag}
           uniforms={uniforms}
           toneMapped={false}
+          // only a tondo needs blending, for the feathered rim; a rectangle
+          // stays opaque so it keeps writing depth as it always has
+          transparent={shape === 'round'}
         />
       </mesh>
     </group>

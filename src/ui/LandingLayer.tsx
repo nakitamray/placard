@@ -1,33 +1,29 @@
 /**
- * Landing — spec §10.1 / §10C.3.
+ * The entrance, as type.
  *
- * The background is the exhibition's own trick, running live: one painting
- * drawn out of its corpus at full bleed (see LandingScene), with the reading
- * lens under the cursor. This layer is the type over the top of it — headline,
- * museum list, and a scrim dark enough to read against.
+ * The background is the exhibition's own trick running live — one painting
+ * drawn out of its corpus at full bleed, see scenes/LandingScene — and this
+ * layer is everything over the top of it: the headline, the list of museums,
+ * and a scrim dark enough to read against.
  *
- * The still-photograph slideshow this page used to carry is still here, and is
- * what `prefers-reduced-motion` gets: a field of several thousand drifting
- * characters is precisely the thing that setting is asking us not to render.
- * Everything below that touches `images`, `current` or `warm` is that path. Choosing a museum fetches its
- * manifest — corridor style, floor plan and works — and then plays T1: the
- * landing layers push outward while the corridor, already rendering behind,
- * dollies in from the mouth (spec §11.1).
+ * `prefers-reduced-motion` gets a still slideshow instead, because a field of
+ * several thousand drifting characters is precisely what that setting is
+ * asking us not to render. It crossfades between the same works, using
+ * the reproductions already published per artwork, and holds each one on its
+ * own focal point so a tall canvas is not cropped through the face.
  *
- * Only two backgrounds are ever in the DOM: the one showing and the one about
- * to. Mounting all ten and hiding nine behind `opacity: 0` does not stop the
- * browser fetching them — a `background-image` is honoured whatever the
- * element's opacity — so the landing page used to pull ten full-bleed
- * paintings before anyone had chosen anything, on the slowest connection in
- * the visit. It now pulls one, in AVIF or WebP where the browser takes them,
- * and the next arrives during the seconds the first one holds.
+ * Only two or three backgrounds are ever in the DOM. Mounting them all and
+ * hiding all but one behind `opacity: 0` would not stop the browser fetching them — a
+ * `background-image` is honoured whatever the element's opacity — so the
+ * entrance costs one picture, and the next arrives during the seconds the
+ * first one holds.
  */
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { loadMuseum, useStore } from '../state/store';
 import { pointer } from '../state/motion';
-import { asset } from '../lib/asset';
-import { bestFormat } from '../lib/image';
+import { imageUrl } from '../lib/image';
+import { exhibitionWorks, heroWorks, shuffled, type ExhibitionWork } from '../state/works';
 
 const HOLD_MS = 7000;
 /* Long, and linear. A short crossfade between two full-bleed paintings reads
@@ -36,12 +32,6 @@ const HOLD_MS = 7000;
    incoming one fades in over it at a constant rate, so there is no dip and no
    moment where the change announces itself. */
 const FADE_MS = 2600;
-
-/** what build-all.ts writes to public/landing/manifest.json */
-interface LandingManifest {
-  files: string[];
-  formats: string[];
-}
 
 export function LandingLayer() {
   const phase = useStore((s) => s.phase);
@@ -60,18 +50,14 @@ export function LandingLayer() {
    * full-bleed JPEGs it will never show.
    */
   const stills = reducedMotion;
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<ExhibitionWork[]>([]);
   /*
-   * The slide showing and the one it came from, moved together in a single
-   * update.
+   * The slide showing and the one it came from, in one piece of state.
    *
-   * The outgoing slide used to be remembered in a ref written by an effect
-   * after commit, which meant the very next render — and there is always one,
-   * because changing slides also resets the preload timer — found the ref
-   * already pointing at the new slide and unmounted the old one. The
-   * "crossfade" was therefore a fade up from black every time, which is
-   * exactly what it looked like. Holding both indices in one piece of state
-   * means the pair can never disagree.
+   * A crossfade needs both indices to be true at the same instant, and there
+   * is always a render between changing the slide and any effect that could
+   * record the old one — changing slides also resets the preload timer. Two
+   * values that must agree cannot be kept in two places.
    */
   const [slide, setSlide] = useState<{ cur: number; prev: number | null }>({
     cur: 0,
@@ -91,21 +77,9 @@ export function LandingLayer() {
   useEffect(() => {
     if (!stills) return;
     let alive = true;
-    void (async () => {
-      try {
-        const [manifest, format] = await Promise.all([
-          fetch(asset('landing/manifest.json')).then((r) => r.json() as Promise<LandingManifest>),
-          bestFormat(),
-        ]);
-        if (!alive) return;
-        // the manifest names which formats were actually published, so a build
-        // run with PLACARD_SKIP_AVIF=1 does not leave the page asking for them
-        const ext = manifest.formats.includes(format) ? format : manifest.formats.at(-1) ?? 'jpg';
-        setImages(manifest.files.map((f) => asset(`landing/${f}.${ext}`)));
-      } catch {
-        if (alive) setImages([]);
-      }
-    })();
+    void exhibitionWorks().then((all) => {
+      if (alive) setImages(shuffled(heroWorks(all)));
+    });
     return () => {
       alive = false;
     };
@@ -121,17 +95,24 @@ export function LandingLayer() {
     return () => window.clearTimeout(t);
   }, [current, images, stills]);
 
-  // slideshow (spec §10.1). No explicit preload of the one after next: the
-  // next slide is already mounted and fetching, and reaching further ahead is
-  // how this page ended up downloading the whole set.
+  /*
+   * The slideshow.
+   *
+   * It runs under reduced motion, because this path only exists under reduced
+   * motion — and a cross-dissolve between two stills is not the thing that
+   * setting is protecting anyone from. The Ken Burns creep is what is, and the
+   * stylesheet turns that off. No explicit preload of the one after next: the
+   * next slide is already mounted and fetching, and reaching further ahead is
+   * how this page ends up downloading the whole set.
+   */
   useEffect(() => {
-    if (images.length < 2 || reducedMotion) return;
+    if (images.length < 2) return;
     const id = setInterval(
       () => setSlide((s) => ({ cur: (s.cur + 1) % images.length, prev: s.cur })),
       HOLD_MS,
     );
     return () => clearInterval(id);
-  }, [images, reducedMotion]);
+  }, [images]);
 
   // The hero says what to do only until it has been done. One deliberate
   // pointer move across the painting and the line is never seen again.
@@ -145,7 +126,7 @@ export function LandingLayer() {
     return () => window.removeEventListener('pointermove', onMove);
   }, [stills, moved]);
 
-  // pointer parallax: background inverse 24px, title direct 6px (spec §10B.3)
+  // pointer parallax: background inverse 24px, title direct 6px
   useEffect(() => {
     if (reducedMotion) return;
     let raf = 0;
@@ -179,7 +160,7 @@ export function LandingLayer() {
             (i) => i !== null,
           ),
         ),
-      ].map((i) => ({ i: i as number, src: images[i as number] }))
+      ].map((i) => ({ i: i as number, work: images[i as number] }))
     : [];
 
   if (phase !== 'landing' && !leaving) return null;
@@ -214,7 +195,7 @@ export function LandingLayer() {
     }
 
     // T1 push-through: landing layers scale outward at differing rates
-    // (foreground fastest) while the corridor dollies in behind (spec §11.1)
+    // (foreground fastest) while the corridor dollies in behind
     el.classList.add('is-chosen');
     const finish = () => {
       setLeaving(false);
@@ -238,14 +219,17 @@ export function LandingLayer() {
   return (
     <div className={`landing ${leaving ? 'is-leaving' : ''}`} ref={rootRef}>
       <div className="landing-bg" ref={bgRef} aria-hidden>
-        {mounted.map(({ src, i }) => (
+        {mounted.map(({ work, i }) => (
           <div
-            key={src}
+            key={work.id}
             className={`landing-img ${i === current ? 'is-active' : ''} ${
               i === prevIndex && i !== current ? 'is-prev' : ''
             }`}
             style={{
-              backgroundImage: `url(${src})`,
+              backgroundImage: `url(${imageUrl(work.id, 'view')})`,
+              // the work's own focal point, so a tall canvas is not cropped
+              // through the face — see scripts/build-all.ts
+              backgroundPosition: `${work.focus[0] * 100}% ${work.focus[1] * 100}%`,
               transitionDuration: `${FADE_MS}ms`,
               animationDuration: `${HOLD_MS + FADE_MS}ms`,
             }}
@@ -258,12 +242,8 @@ export function LandingLayer() {
         Skip to the list of museums
       </a>
       <div className="landing-content" ref={contentRef}>
-        <p className="landing-mark caption">Placard</p>
-        <h1 className="hero">
-          Paintings drawn
-          <br />
-          out of text
-        </h1>
+        <h1 className="landing-mark">Placard</h1>
+        <p className="landing-line">Read the canvas</p>
         <hr className="hairline" />
         <p className="meta landing-choose">Choose a museum</p>
         <ul className="museum-list" id="museum-list">
@@ -295,11 +275,11 @@ export function LandingLayer() {
         {error && <p className="caption landing-error">{error}</p>}
         {!stills && (
           <p className={`caption landing-lenshint ${moved ? 'is-gone' : ''}`} aria-hidden>
-            Every stroke here is a letter. Move the cursor over the painting.
+            Move the cursor across the painting.
           </p>
         )}
         <button className="caption credits-link" onClick={() => setCreditsOpen(true)}>
-          Credits &amp; sources
+          Sources &amp; about me
         </button>
       </div>
     </div>

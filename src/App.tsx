@@ -2,7 +2,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { selectArtworks, useStore } from './state/store';
-import { attachPointer, attachZoom, pointer, resetZoom } from './state/motion';
+import { attachPointer, attachZoom, corridor, pointer, resetZoom } from './state/motion';
 import { detectTier, webgl2Supported } from './lib/deviceTier';
 import {
   QUALITY_INFO,
@@ -27,13 +27,17 @@ import { AtlasToast } from './ui/AtlasToast';
 import { ThreadPull } from './ui/ThreadPull';
 import { setThreadMode, toggleThreadMode } from './threadpull/state';
 import { ControlHints } from './ui/ControlHints';
+import { HelpBubble } from './ui/HelpBubble';
 import { CursorRing } from './ui/CursorRing';
 import { LoadingBar } from './ui/LoadingBar';
+import { OrientationGate } from './ui/OrientationGate';
 import { FlashLayer } from './ui/Flash';
-import { endReveal } from './transitions/reveal';
+import { endReveal, startReveal } from './transitions/reveal';
 import { asset } from './lib/asset';
-import { roomTone, setSound, sfx, soundEnabled, soundStored } from './lib/audio';
+import { attention, roomTone, setSound, sfx, soundEnabled, soundStored } from './lib/audio';
 import { loadAtlas, useAtlas } from './state/atlas';
+import { FrameGovernor } from './render/frameGovernor';
+import { useCanvasLive } from './render/canvasGate';
 import type { MuseumIndexEntry } from './types';
 
 export default function App() {
@@ -56,30 +60,56 @@ export default function App() {
 
   const [sound, setSoundOn] = useState(false);
   const atlasOpen = useAtlas((s) => s.open);
+  /* nothing is drawn while something opaque is over the canvas — see canvasGate */
+  const canvasLive = useCanvasLive();
+  /** the wall label is up: revealed by a click, not by a passing cursor */
+  const placardOpen = useStore((s) => s.revealed && s.revealLatched);
+  const wasPlacardOpen = useRef(false);
 
   /*
-   * The room tone follows the room, and the atlas is a different room — no
-   * walls, nothing arriving, just something very large a long way off. Open
-   * the map from inside a gallery and the gallery's murmurs and footsteps
-   * stop, which is most of what makes the map feel like somewhere else.
+   * The ambience follows the room. The entrance has its own piece, each museum
+   * shuffles the corridor set, and the atlas is a different room again — no
+   * walls, nothing arriving, just something very large a long way off. Moving
+   * between them is a crossfade, so choosing a museum is a door rather than a
+   * cut.
    *
-   * `roomTone` is idempotent per id, so this can run on every render without
-   * restarting the graph.
+   * `roomTone` is idempotent per room, so this can run on every render without
+   * restarting anything.
    */
   useEffect(() => {
     if (!sound) return roomTone(null);
     if (atlasOpen) return roomTone('atlas', 'atlas');
-    roomTone(phase === 'boot' || phase === 'landing' ? null : (museum?.id ?? null));
+    if (phase === 'boot') return roomTone(null);
+    if (phase === 'landing') return roomTone('entrance', 'entrance');
+    roomTone(museum?.id ?? null);
   }, [sound, phase, museum, atlasOpen]);
 
-  // the two events worth marking: walking through the end wall, and a
-  // painting resolving out of its own text
+  /*
+   * How much room the visitor wants around them. Walking a corridor is the
+   * museum at full; standing in a gallery is quieter; a painting open in front
+   * of you leaves an ambient bed and nothing else — no murmurs, no footsteps
+   * behind you. Every step of that is a ramp, in both directions.
+   */
+  useEffect(() => {
+    // the atlas already plays a long way down; ducking it as well is silence
+    if (atlasOpen) return attention('room');
+    if (phase === 'gallery') return attention(revealed ? 'painting' : 'gallery');
+    attention('room');
+  }, [phase, revealed, atlasOpen]);
+
+  // the events worth marking: walking through the end wall, a painting
+  // resolving out of its own text, and the wall label arriving
   useEffect(() => {
     if (phase === 'warp') sfx.warp();
   }, [phase]);
   useEffect(() => {
     if (revealed) sfx.chime();
   }, [revealed]);
+  useEffect(() => {
+    if (placardOpen) sfx.placardOpen();
+    else if (wasPlacardOpen.current) sfx.placardClose();
+    wasPlacardOpen.current = placardOpen;
+  }, [placardOpen]);
 
   // a stored preference is honoured, but only once the visitor has clicked
   // something — the audio graph may not be created before a gesture
@@ -104,7 +134,8 @@ export default function App() {
   }, []);
 
   useEffect(() => attachPointer(), []);
-  useEffect(() => attachZoom(), []);
+  // zoom is a gallery gesture; see attachZoom
+  useEffect(() => attachZoom(() => useStore.getState().phase === 'gallery'), []);
   // a new room is seen at the distance it was composed for
   useEffect(() => resetZoom(), [phase]);
 
@@ -134,7 +165,7 @@ export default function App() {
     };
   }, [webgl, setMuseums, setPhase]);
 
-  // global Esc: exits reveal, gallery→map, map→corridor (spec §9)
+  // global Esc: exits reveal, gallery→map, map→corridor
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
@@ -183,15 +214,29 @@ export default function App() {
     <>
       <div className={`canvas-wrap ${phase === 'map' ? 'is-blurred' : ''}`}>
         <Canvas
+          /* the loop is FrameGovernor's: see src/render/frameGovernor.tsx */
+          frameloop="never"
           dpr={[1, quality.dprCap]}
-          gl={{ antialias: true, powerPreference: 'high-performance' }}
+          gl={{
+            antialias: quality.antialias,
+            powerPreference: quality.powerPreference,
+          }}
           shadows={quality.shadows ? { type: THREE.PCFSoftShadowMap } : false}
           camera={{ fov: 48, position: [0, 1.6, 4], near: 0.1, far: 160 }}
           onCreated={({ gl }) => {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
             gl.outputColorSpace = THREE.SRGBColorSpace;
+            /*
+             * Shadows are redrawn on demand, not every frame. The only caster
+             * in either room is the key light, and it moves when the visitor
+             * walks — which is a small fraction of the frames they are here
+             * for. The scenes ask for a refresh when they move it.
+             */
+            gl.shadowMap.autoUpdate = false;
+            gl.shadowMap.needsUpdate = true;
           }}
         >
+          <FrameGovernor maxFps={quality.maxFps} running={canvasLive} />
           <ExposureRig exposure={exposure} />
           <FrameWatchdog quality={qualityName} onStruggling={setQualityName} />
           <color attach="background" args={[bg]} />
@@ -207,7 +252,7 @@ export default function App() {
         </Canvas>
       </div>
 
-      {/* reveal vignette — generous radius, 18% max (spec §10.6) */}
+      {/* reveal vignette — generous radius, 18% max */}
       <div className={`reveal-vignette ${revealed ? 'is-on' : ''}`} aria-hidden />
 
       {phase === 'boot' && <LoadingBar progress={progress} />}
@@ -221,10 +266,26 @@ export default function App() {
           <button className="caption gallery-back" onClick={() => setPhase('landing')}>
             ← Entrance
           </button>
-          <p className="caption corridor-title">
+          {/* Shift hurries you to the far end, and there is no Shift on a
+              touch screen. Same move, with a face on it. */}
+          <button className="caption walk-end" onClick={() => (corridor.goal = 1)}>
+            To the end →
+          </button>
+          {/* the room's name, and the way out of the exhibition to the real
+              museum it is named after — the one link on this site that leaves it */}
+          <a
+            className="caption corridor-title"
+            href={museum?.homepage}
+            target="_blank"
+            rel="noreferrer"
+            title={`${museum?.name} — the museum's own site`}
+          >
             {museum?.name}
             <span className="corridor-sub"> · {museum?.subtitle}</span>
-          </p>
+            <span className="corridor-out" aria-hidden>
+              ↗
+            </span>
+          </a>
           <WorkLabel />
         </>
       )}
@@ -238,9 +299,11 @@ export default function App() {
         <QualityToggle value={qualityName} onChange={chooseQuality} />
       )}
       {phase !== 'boot' && (
-        <button className="caption atlas-open" onClick={() => useAtlas.getState().setOpen(true)}>
-          ✦ The atlas
-        </button>
+        <div className="top-links">
+          <button className="caption atlas-open" onClick={() => useAtlas.getState().setOpen(true)}>
+            ✦ The atlas
+          </button>
+        </div>
       )}
       {/* the corner switches, in one row so they can never land on each other */}
       {phase !== 'boot' && (
@@ -265,8 +328,11 @@ export default function App() {
       <AtlasToast />
       <FlashLayer />
       <CursorRing />
+      {/* a precondition rather than a phase: it sits over everything and the
+          exhibition keeps running underneath it */}
+      <OrientationGate />
 
-      {/* screen-reader / keyboard proxies for the canvas artworks (spec §15) */}
+      {/* screen-reader / keyboard proxies for the canvas artworks */}
       {inGallery && <ArtworkProxies />}
     </>
   );
@@ -318,6 +384,11 @@ function ExposureRig({ exposure }: { exposure: number }) {
  * oscillating between budgets is worse than sitting on the lower one; and it
  * never overrides a visitor who has picked a level, because being second-
  * guessed by the page is more annoying than a slow frame.
+ *
+ * The frames it measures are the ones FrameGovernor let through, so a capped
+ * room reads as 30 or 60 rather than as whatever the machine could manage.
+ * That is the right thing to measure — it is what the visitor is looking at —
+ * and 24 sits below every cap, so a budget can never trip its own watchdog.
  */
 function FrameWatchdog({
   quality,
@@ -394,6 +465,7 @@ function QualityToggle({
           <p className="quality-summary">{info.summary}</p>
         </div>
       )}
+      <HelpBubble />
       <div className="quality-toggle caption" role="group" aria-label="Rendering quality">
         {order.map((name) => (
           <button
@@ -428,9 +500,19 @@ function WorkLabel() {
     let raf = 0;
     const cur = { x: 0, y: 0 };
     let first = true;
+    /*
+     * The label's own width, measured once.
+     *
+     * Reading `offsetWidth` inside a frame callback forces the browser to lay
+     * the page out again on the spot, every frame, to answer a question whose
+     * answer only changes when the label's text does — and its text is fixed
+     * for as long as this effect is mounted.
+     */
+    let width = 0;
     const tick = () => {
       const el = ref.current;
       if (el) {
+        if (!width) width = el.offsetWidth;
         const tx = pointer.x * (window.innerWidth / 2) + window.innerWidth / 2 + 22;
         const ty = pointer.y * (window.innerHeight / 2) + window.innerHeight / 2 + 20;
         if (first) {
@@ -441,8 +523,7 @@ function WorkLabel() {
           cur.x += (tx - cur.x) * 0.24;
           cur.y += (ty - cur.y) * 0.24;
         }
-        const w = el.offsetWidth;
-        const x = Math.min(cur.x, window.innerWidth - w - 20);
+        const x = Math.min(cur.x, window.innerWidth - width - 20);
         el.style.transform = `translate(${x}px, ${cur.y}px)`;
       }
       raf = requestAnimationFrame(tick);
@@ -456,7 +537,9 @@ function WorkLabel() {
     <div className="work-label" ref={ref} aria-hidden>
       <p className="work-label-artist caption">{work.artist}</p>
       <p className="work-label-title">{work.title}</p>
-      <p className="work-label-cue caption">Click to enter this room</p>
+      <p className="work-label-cue caption">
+        {work.index < 0 ? 'Click to walk to the end' : 'Click to enter this room'}
+      </p>
     </div>
   );
 }
@@ -474,11 +557,9 @@ function ArtworkProxies() {
           onFocus={() => setIndex(i)}
           onClick={() => {
             const s = useStore.getState();
-            if (i === index) {
-              void import('./transitions/reveal').then((m) =>
-                s.revealed ? m.endReveal(s.reducedMotion) : m.startReveal(s.reducedMotion),
-              );
-            }
+            if (i !== index) return;
+            if (s.revealed) endReveal(s.reducedMotion);
+            else startReveal(s.reducedMotion);
           }}
         />
       ))}

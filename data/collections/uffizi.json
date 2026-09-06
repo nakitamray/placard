@@ -1,0 +1,686 @@
+[
+  {
+    "id": "botticelli-birth-venus",
+    "artist": "Sandro Botticelli",
+    "artistDates": "c. 1445–1510",
+    "title": "The Birth of Venus",
+    "titleOriginal": "La nascita di Venere",
+    "year": "c. 1485",
+    "medium": "Tempera on canvas",
+    "dimensions": "172.5 × 278.9 cm",
+    "room": "Room 10–14",
+    "accession": "Inv. 1890 n. 878",
+    "creditLine": "Galleria degli Uffizi, Florence",
+    "accentColor": "#4A6B72",
+    "heroFocus": [
+      0.5,
+      0.44
+    ],
+    "labelText": "A woman stands on a scallop shell at the edge of the sea, blown ashore by two winged winds while a nymph runs to cover her. Nothing in the picture is trying to be real: the shell could not hold her, the shoreline goes nowhere, and her neck and left shoulder are drawn longer than a body allows. Botticelli is after a contour, not a place. The line round the figure is the most famous line in European painting, and everything else — the gold-tipped hair, the flat green sea, the falling roses — is arranged to keep it clear.",
+    "extendedNote": "The picture belongs to the Medici circle and to the Neoplatonic reading of antiquity that went with it: Venus arriving from the sea is beauty arriving in the world, and the viewer is expected to know the difference between the earthly Venus and the heavenly one. That reading was the picture's licence. A life-size naked woman in fifteenth-century Florence needed one.\n\nWhat survives the theory is the drawing. Botticelli was trained by Filippo Lippi and never stopped being a draughtsman: he builds the figure out of an outline first and fills it afterwards, which is why the modelling is so shallow and the silhouette so exact. The anatomy is not a failure of observation — the elongated neck, the sloping shoulders, the impossible pivot of the standing leg are choices, made so the whole figure can be read as one continuous curve from the crown of the head to the foot.\n\nIt is painted in tempera on canvas rather than on panel, which was unusual and cheap, and kept for country villas rather than city palaces. The surface has a chalky, matt lightness that oil could not have given it. Within twenty years Savonarola had come and gone, Botticelli's manner had gone out of fashion with him, and the painter died out of favour; the picture was barely mentioned for three hundred years and is now among the two or three most looked-at objects in Italy.",
+    "regions": [
+      {
+        "id": "venus",
+        "label": "The contour",
+        "box": [
+          0.34,
+          0.08,
+          0.62,
+          0.96
+        ],
+        "text": "The line round this figure is the most famous line in European painting, and everything else in the picture is arranged to keep it clear. The neck is longer than a neck, the shoulders slope further than shoulders, and the standing leg pivots in a way no leg does — none of it is a failure of observation. Botticelli was trained as a draughtsman and builds a figure out of its outline first, so the whole body can be read as one unbroken curve from the crown of the head to the foot."
+      },
+      {
+        "id": "winds",
+        "label": "The winds",
+        "box": [
+          0.0,
+          0.05,
+          0.34,
+          0.62
+        ],
+        "text": "Zephyr and Aura, tangled together, blowing her to shore in a shower of roses. They are the picture's only real movement and they are painted almost as one body — legs braided, cloak snapping — against a flat green sea that has no waves in it at all. The sea is the tell: this is not a coast, it is a stage for an arrival."
+      },
+      {
+        "id": "hora",
+        "label": "The waiting nymph",
+        "box": [
+          0.66,
+          0.06,
+          1.0,
+          0.98
+        ],
+        "text": "One of the Horae, running in to cover her with a flowered cloak. She is the only figure with her feet on land, and her dress and the cloak she carries are drawn with the same gold-touched line as the hair — Botticelli laid actual gold into the picture, in the hair, in the wings and along the folds, which is a medieval habit surviving inside a wholly Renaissance painting."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.62,
+      "archetype": "figure-group",
+      "palette": [
+        "#2C4148",
+        "#4A6B72",
+        "#8FA79E",
+        "#C8B48E",
+        "#EFE3CE",
+        "#B5544A"
+      ],
+      "seed": 51
+    }
+  },
+  {
+    "id": "botticelli-primavera",
+    "artist": "Sandro Botticelli",
+    "artistDates": "c. 1445–1510",
+    "title": "Primavera",
+    "titleOriginal": "La Primavera",
+    "year": "c. 1480",
+    "medium": "Tempera on panel",
+    "dimensions": "202 × 314 cm",
+    "room": "Room 10–14",
+    "accession": "Inv. 1890 n. 8360",
+    "creditLine": "Galleria degli Uffizi, Florence",
+    "accentColor": "#2F4436",
+    "heroFocus": [
+      0.5,
+      0.46
+    ],
+    "labelText": "Nine figures in an orange grove, read from the right: the wind seizes a nymph, who turns into Flora and scatters flowers; Venus presides at the centre; the three Graces dance; Mercury pushes the clouds off the top of the picture with his staff. Nobody has ever settled what the whole thing means. Five hundred species of plant have been identified in the grass, most of them flowering in Florence in spring, and every one of them is painted with more care than a decorative panel needs.",
+    "extendedNote": "It is the same size as a wall and was made for one, in a Medici townhouse, and it has resisted a single explanation for as long as anyone has tried. The figures are certainly from Ovid and Lucretius; the arrangement is certainly deliberate; whether it maps onto a particular Neoplatonic argument, a particular marriage, or a particular season is still open, and the literature is enormous.\n\nRead it right to left and there is at least a sequence. Zephyr, blue and cold, comes through the trees and takes hold of the nymph Chloris; flowers spill from her mouth; a step along she has become Flora, walking towards us in a dress printed with the whole spring. Venus stands in the middle under a break in the branches, with Cupid blindfolded above her. To the left the Graces turn in a ring, and Mercury, at the very edge, has his back to all of it and is reaching into the canopy.\n\nThe botany is the part that never gets less astonishing. Specialists have counted around five hundred identifiable plant species in the flowered ground and the grove, the great majority of which do flower in Tuscany between March and May. Nothing in the picture's subject required that. Botticelli did it anyway, in tempera, on a panel three metres wide, with a brush fine enough to draw a single petal against a dark green that is nearly black.",
+    "regions": [
+      {
+        "id": "flora",
+        "label": "Flora",
+        "box": [
+          0.6,
+          0.16,
+          0.82,
+          0.92
+        ],
+        "text": "Read the picture right to left and it has a sequence in it. The cold blue wind at the edge takes hold of the nymph Chloris; flowers spill out of her mouth; and one step along she has become Flora, walking towards us in a dress printed with the whole of spring and scattering it by the handful. It is a transformation shown as three adjacent figures rather than as one moment, which is a medieval way of telling a story surviving inside a Renaissance picture."
+      },
+      {
+        "id": "graces",
+        "label": "The Graces",
+        "box": [
+          0.16,
+          0.16,
+          0.44,
+          0.9
+        ],
+        "text": "Three women turning in a ring, hands raised and joined, in gowns thin enough to be drawn rather than modelled. This is Botticelli doing the thing he does better than anyone: three overlapping contours that stay separate at every point, so the group reads as one figure seen from three sides. Cupid is above them, blindfolded, aiming."
+      },
+      {
+        "id": "ground",
+        "label": "The flowered ground",
+        "box": [
+          0.0,
+          0.74,
+          1.0,
+          1.0
+        ],
+        "text": "Specialists have counted around five hundred identifiable species of plant in this grass and the grove above it, and the great majority of them do flower in Tuscany between March and May. Nothing about the subject required that. Botticelli painted it anyway, in tempera, with a brush fine enough to draw a single petal against a green that is nearly black."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.55,
+      "archetype": "figure-group",
+      "palette": [
+        "#16241C",
+        "#2F4436",
+        "#6B7A54",
+        "#C7B48A",
+        "#EFE6D2",
+        "#9A4A3C"
+      ],
+      "seed": 52
+    }
+  },
+  {
+    "id": "leonardo-annunciation",
+    "artist": "Leonardo da Vinci",
+    "artistDates": "1452–1519",
+    "title": "The Annunciation",
+    "titleOriginal": "Annunciazione",
+    "year": "c. 1472–1476",
+    "medium": "Oil and tempera on panel",
+    "dimensions": "98 × 217 cm",
+    "room": "Room 35",
+    "accession": "Inv. 1890 n. 1618",
+    "creditLine": "Galleria degli Uffizi, Florence",
+    "accentColor": "#3F4A3A",
+    "heroFocus": [
+      0.5,
+      0.5
+    ],
+    "labelText": "Leonardo's earliest surviving painting, made in his early twenties in Verrocchio's workshop. An angel kneels on a lawn of named flowers; Mary looks up from a book at a marble reading desk; behind them a walled garden opens onto a harbour and a range of hazy blue mountains. The wings are drawn from a bird rather than from other paintings of angels, and the distance behind the wall is the first appearance of the atmosphere Leonardo spent the rest of his life on.",
+    "extendedNote": "Attribution took a long time to settle. The picture came to the Uffizi in 1867 as a Ghirlandaio, and the case for Leonardo was made on drawings — a study for the angel's sleeve, another for the drapery over Mary's knees — and on the parts of the panel that are unmistakably beyond a workshop hand.\n\nIt also has visible faults, which is part of why it is interesting. Mary's right arm is too long, and reaches the desk at an angle her body does not support; the desk itself is copied from the marble tomb Verrocchio had recently carved for Piero de' Medici and is drawn in a perspective that fights the rest of the space. A twenty-year-old is solving several problems at once and not all of them come out.\n\nWhat does come out is the distance. Past the garden wall the land runs to a harbour with ships in it and then to mountains that dissolve into the sky, painted in thin blue glazes with no drawn edge anywhere — the effect he would later name and theorise. The flowers on the lawn are identifiable species, the wings are studied from a real bird before someone later extended them, and the whole picture is the first evidence of a painter who intended to check everything against the world.",
+    "regions": [
+      {
+        "id": "angel",
+        "label": "The angel",
+        "box": [
+          0.02,
+          0.18,
+          0.36,
+          0.94
+        ],
+        "text": "The wings are drawn from a bird rather than from other paintings of angels — studied from a real specimen, with the primaries laid over each other the way they actually lie. A later hand extended them, which is why they look slightly grafted on. The sleeve was worked out in a separate drapery study, one of the sheets that eventually settled the attribution of the whole panel."
+      },
+      {
+        "id": "distance",
+        "label": "The distance",
+        "box": [
+          0.3,
+          0.16,
+          0.72,
+          0.5
+        ],
+        "text": "Past the garden wall the land runs to a harbour with ships in it, and then to mountains that dissolve into the sky with no drawn edge anywhere. Thin blue glazes, laid one over another, standing in for kilometres of air. He was in his early twenties. He spent the next forty years on this problem and gave it a name."
+      },
+      {
+        "id": "desk",
+        "label": "The reading desk",
+        "box": [
+          0.6,
+          0.42,
+          0.94,
+          0.92
+        ],
+        "text": "The marble desk is copied from the tomb Verrocchio had recently carved for Piero de' Medici, and it is drawn in a perspective that fights the rest of the space. Mary's right arm reaches it at an angle her body does not support. A very young painter is solving four problems at once here and not all of them come out — which is exactly why the picture is worth standing in front of."
+      }
+    ],
+    "placeholder": {
+      "aspect": 2.21,
+      "archetype": "landscape",
+      "palette": [
+        "#232B22",
+        "#3F4A3A",
+        "#7C8B72",
+        "#BCC4B0",
+        "#E8E2CE",
+        "#8A5A3C"
+      ],
+      "seed": 53
+    }
+  },
+  {
+    "id": "michelangelo-doni-tondo",
+    "artist": "Michelangelo Buonarroti",
+    "artistDates": "1475–1564",
+    "title": "The Doni Tondo",
+    "titleOriginal": "Tondo Doni",
+    "year": "c. 1505–1506",
+    "medium": "Tempera grassa on panel",
+    "dimensions": "120 × 120 cm",
+    "room": "Room 35",
+    "accession": "Inv. 1890 n. 1456",
+    "creditLine": "Galleria degli Uffizi, Florence",
+    "accentColor": "#6B5A2E",
+    "heroFocus": [
+      0.5,
+      0.5
+    ],
+    "frameShape": "round",
+    "labelText": "The only finished panel painting by Michelangelo that anyone agrees is entirely his. Mary sits on the ground and twists to take the child from Joseph over her own shoulder — a movement no earlier Holy Family had attempted, and one that only works if you accept the whole group as a piece of sculpture seen from the front. Behind a low wall, five nude youths lean and stretch with no clear purpose at all. The colours are the shock: acid orange, sharp green, violet shot with yellow, laid on hard and dry.",
+    "extendedNote": "It was painted for Agnolo Doni, a Florentine cloth merchant, probably around his marriage to Maddalena Strozzi, and it comes with a story: Michelangelo asked seventy ducats, Doni offered forty, and Michelangelo doubled the price to a hundred and forty and refused to negotiate. Doni paid.\n\nThe picture is a sculptor's argument made in paint. The Holy Family is one interlocking mass, built to be read as volume from a single viewpoint, with every limb turning around a central axis; the twist through Mary's shoulders is the same twist he would use in marble for the rest of his life. Nothing is soft. The contours are cut rather than blended and the flesh is modelled in hatched strokes that behave like chisel marks.\n\nThe colour is what makes the panel look modern and made it look strange in 1506. These are not the muted harmonies of Florentine tempera; they are shot colours, changing hue across a fold — orange to yellow, green to blue — laid on dry and bright. When the Sistine ceiling was cleaned in the 1980s and came back in exactly these colours, the Doni Tondo was the evidence that the restorers had not invented them.\n\nWho the five nudes behind the wall are has never been settled: the age before the Law, unbaptised humanity, or simply Michelangelo putting the male body in a picture that did not call for it, because that is what he did.",
+    "regions": [
+      {
+        "id": "twist",
+        "label": "The twist",
+        "box": [
+          0.24,
+          0.3,
+          0.76,
+          0.86
+        ],
+        "text": "Mary sits on the ground and turns to take the child over her own shoulder — a movement no earlier Holy Family had attempted, and one that only works if you accept the group as a single piece of sculpture seen from the front. Every limb turns around one central axis. It is the same twist Michelangelo used in marble for the rest of his life, and it is here first, in paint."
+      },
+      {
+        "id": "colour",
+        "label": "The colour",
+        "box": [
+          0.2,
+          0.42,
+          0.8,
+          1.0
+        ],
+        "text": "Acid orange, sharp green, violet shot with yellow, changing hue across a single fold and laid on dry and hard. Not the muted harmonies of Florentine tempera at all. When the Sistine ceiling was cleaned in the 1980s and came back in exactly these colours, this panel was the evidence that the restorers had not invented them."
+      },
+      {
+        "id": "nudes",
+        "label": "The figures behind the wall",
+        "box": [
+          0.0,
+          0.12,
+          1.0,
+          0.46
+        ],
+        "text": "Five nude youths lean and stretch behind a low wall, with no clear purpose. The age before the Law, unbaptised humanity, or simply Michelangelo putting the male body into a picture that did not call for one — five centuries of argument and no agreement. What is not in doubt is that they are the part of the panel he most wanted to paint."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.0,
+      "archetype": "figure-group",
+      "palette": [
+        "#3A2E18",
+        "#6B5A2E",
+        "#B98A3A",
+        "#D9A05B",
+        "#EFE0BE",
+        "#4E7A5E"
+      ],
+      "seed": 54
+    }
+  },
+  {
+    "id": "titian-venus-urbino",
+    "artist": "Titian",
+    "artistDates": "c. 1488–1576",
+    "title": "Venus of Urbino",
+    "titleOriginal": "Venere di Urbino",
+    "year": "1534",
+    "medium": "Oil on canvas",
+    "dimensions": "119 × 165 cm",
+    "room": "Room 83",
+    "accession": "Inv. 1890 n. 1437",
+    "creditLine": "Galleria degli Uffizi, Florence",
+    "accentColor": "#6B3A34",
+    "heroFocus": [
+      0.42,
+      0.46
+    ],
+    "labelText": "A woman lies on a bed in a Venetian palace, looking directly out. A dog sleeps at her feet; two servants dig in a chest at the back of the room; a curtain divides the picture in two and a plant sits on the sill behind. It was painted for Guidobaldo della Rovere, later Duke of Urbino, who called it simply 'the naked woman'. The title Venus was attached afterwards, and does a certain amount of work.",
+    "extendedNote": "The composition is borrowed openly from Giorgione's Sleeping Venus, which Titian had helped finish twenty-five years earlier — the same pose, the same diagonal. Everything that matters is what he changed. Giorgione's figure is asleep in a landscape and belongs to myth. Titian's is awake, indoors, on rumpled sheets in a room with servants in it, and she is looking at you.\n\nThe room is the argument. A hard vertical divides the canvas: on the left a black curtain and nothing, on the right a receding interior in one-point perspective with a chest, two figures and a window. The perspective pushes back and the figure comes forward, and she sits on the seam between the two. The dog is asleep, which in the iconography of the period usually means fidelity and here mostly means the dog is asleep.\n\nThe picture has been read as a marriage painting — an instruction in domestic love for a young bride, the chest at the back being a wedding chest — and as high-end erotica for a duke's private room, and both readings hold. Mark Twain called it the foulest picture in the world, which is one measure of how directly it still works. Manet's Olympia is a deliberate answer to it, made three hundred and thirty years later.",
+    "regions": [
+      {
+        "id": "gaze",
+        "label": "The look",
+        "box": [
+          0.14,
+          0.14,
+          0.42,
+          0.5
+        ],
+        "text": "Giorgione's Venus, which Titian helped finish twenty-five years earlier, is asleep in a landscape and belongs to myth. This one is awake, indoors, on rumpled sheets in a room with servants in it, and she is looking at you. Everything that separates the two pictures is in that one change."
+      },
+      {
+        "id": "perspective",
+        "label": "The room behind",
+        "box": [
+          0.5,
+          0.1,
+          1.0,
+          0.72
+        ],
+        "text": "A hard vertical divides the canvas. On the left, a black curtain and nothing. On the right, a receding interior in one-point perspective — a chest, two servants digging in it, a window with a plant on the sill. The perspective pushes back, the figure comes forward, and she lies on the seam between them. The chest is the kind a bride brought to a marriage, which is one of the readings this picture has never shaken off."
+      },
+      {
+        "id": "dog",
+        "label": "The dog",
+        "box": [
+          0.56,
+          0.6,
+          0.82,
+          0.92
+        ],
+        "text": "Asleep at her feet. In the iconography of the period a dog usually means fidelity, and it is entirely possible that is what it means here. It is also a small warm animal painted from life by a man who could paint fur better than almost anyone, put where the eye needs somewhere to rest."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.39,
+      "archetype": "interior",
+      "palette": [
+        "#2A1A16",
+        "#6B3A34",
+        "#A87A5E",
+        "#D8C4A8",
+        "#F0E6D4",
+        "#3C4A5E"
+      ],
+      "seed": 55
+    }
+  },
+  {
+    "id": "caravaggio-medusa",
+    "artist": "Caravaggio",
+    "artistDates": "1571–1610",
+    "title": "Medusa",
+    "titleOriginal": "Scudo con testa di Medusa",
+    "year": "c. 1597",
+    "medium": "Oil on canvas over a poplar shield",
+    "dimensions": "60 × 55 cm",
+    "room": "Room 90",
+    "accession": "Inv. 1890 n. 1351",
+    "creditLine": "Galleria degli Uffizi, Florence",
+    "accentColor": "#243830",
+    "heroFocus": [
+      0.5,
+      0.5
+    ],
+    "frameShape": "round",
+    "labelText": "A parade shield, convex, with a severed head painted on it — mouth open, eyes wide, snakes still moving, blood still leaving the neck. The head is Medusa's and the face is Caravaggio's own. The trick is that the shield curves outward while the painting is lit and modelled as though it curves inward, so the head appears to sit in a hollow and lift away from the surface at the same time.",
+    "extendedNote": "It was made for Cardinal Francesco Maria del Monte, Caravaggio's first serious patron, as a gift for Ferdinando I de' Medici, and it is a courtly object before it is a picture: a ceremonial shield for an armoury, in the tradition of Perseus using the head itself as a weapon. The recipient's collection already contained Medici armour, and the joke — a shield that turns its enemies to stone — is the whole reason for the commission.\n\nCaravaggio takes the joke and makes it horrible. He paints the instant after the blade, not the trophy: the eyes are still focused, the mouth is open on a sound, and the blood comes off the neck in three heavy ropes that are drawn, not suggested. The snakes are studied and individually lit. And the face is his — a self-portrait, using a mirror, which is also how Perseus is supposed to have managed the killing.\n\nThe illusion depends on the object. On a convex surface, painting the shadow as though the surface were concave makes the head read as sunk into a hollow while the physical shield pushes it toward you. Photographs of it, flat, lose most of that. It is one of the few paintings in this exhibition that is genuinely a different thing in the room.",
+    "regions": [
+      {
+        "id": "face",
+        "label": "The face",
+        "box": [
+          0.28,
+          0.24,
+          0.72,
+          0.7
+        ],
+        "text": "It is his own face, painted with a mirror — which is also how Perseus is supposed to have managed the killing. He paints the instant after the blade rather than the trophy: the eyes are still focused, the mouth is open on a sound, and the expression is not horror at the viewer but the last half-second of a person who has understood something."
+      },
+      {
+        "id": "snakes",
+        "label": "The snakes",
+        "box": [
+          0.16,
+          0.06,
+          0.9,
+          0.36
+        ],
+        "text": "Studied and individually lit, each one modelled with its own highlight, coiling out of the scalp in every direction. This is a young painter proving he can do the hardest kind of description on a curved surface for a patron who collected armour — and doing it well enough that the object was still being shown to visitors as a curiosity a century later."
+      },
+      {
+        "id": "blood",
+        "label": "The neck",
+        "box": [
+          0.24,
+          0.62,
+          0.78,
+          0.98
+        ],
+        "text": "Three heavy ropes of blood, drawn rather than suggested, leaving the neck on the diagonal. The shield is convex and the painting is lit as though it were concave, so the head appears to sit in a hollow and lift away from the surface at once. A photograph, flat, loses most of it."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.09,
+      "archetype": "portrait",
+      "palette": [
+        "#101815",
+        "#243830",
+        "#4E6250",
+        "#8A6A4A",
+        "#C9B48E",
+        "#8E2A20"
+      ],
+      "seed": 56
+    }
+  },
+  {
+    "id": "raphael-madonna-goldfinch",
+    "artist": "Raphael",
+    "artistDates": "1483–1520",
+    "title": "Madonna of the Goldfinch",
+    "titleOriginal": "Madonna del cardellino",
+    "year": "c. 1506",
+    "medium": "Oil on panel",
+    "dimensions": "107 × 77 cm",
+    "room": "Room 66",
+    "accession": "Inv. 1890 n. 1447",
+    "creditLine": "Galleria degli Uffizi, Florence",
+    "accentColor": "#43566B",
+    "heroFocus": [
+      0.5,
+      0.42
+    ],
+    "labelText": "Mary sits with a book; John the Baptist offers a goldfinch to the infant Christ, who reaches to stroke it. The three heads sit inside a triangle so exact that the picture is used to teach the device. Raphael was twenty-three, in Florence, looking hard at Leonardo — the pyramid, the soft transitions and the blue distance are all learned in that city, in those two years.",
+    "extendedNote": "It was a wedding present, painted for Raphael's friend Lorenzo Nasi. In 1548 the Nasi house on the hill above Florence collapsed in a landslide and the panel was recovered in seventeen pieces. It was reassembled with nails and heavy overpaint and stayed that way for four and a half centuries, dark and hard to read, until a ten-year restoration finished in 2008 took the repairs down and put the colour back.\n\nThe composition is the reason the picture is famous. Three figures are locked into an isosceles triangle, apex at Mary's head, and inside it every limb is set against another: John's outstretched arms answer Christ's, the two children's legs cross in opposite directions, and Mary's knees turn the group toward us. It is Leonardo's device, learned from the Virgin of the Rocks and the cartoon for the Virgin and Child with St Anne, and Raphael has made it look effortless, which is what he did to everything he borrowed.\n\nThe goldfinch is a Passion emblem — the bird was said to have pulled a thorn from Christ's brow, and its red mark to be the blood — so the picture holds a crucifixion inside a garden afternoon. That double register, entirely calm on the surface, is very close to the centre of what Raphael was for.",
+    "regions": [
+      {
+        "id": "triangle",
+        "label": "The triangle",
+        "box": [
+          0.14,
+          0.06,
+          0.9,
+          0.98
+        ],
+        "text": "Three figures locked into an isosceles triangle with its apex at Mary's head, and inside it every limb set against another: John's outstretched arms answer Christ's, the children's legs cross in opposite directions, Mary's knees turn the group toward us. The device is Leonardo's, learned in Florence in those two years, and Raphael has made it look like nothing at all — which is what he did to everything he borrowed."
+      },
+      {
+        "id": "bird",
+        "label": "The goldfinch",
+        "box": [
+          0.3,
+          0.44,
+          0.58,
+          0.68
+        ],
+        "text": "A Passion emblem. The bird was said to have pulled a thorn from Christ's brow, and the red mark on its head to be the blood. So a crucifixion is being handed from one child to another in the middle of a garden afternoon, and nothing in the faces acknowledges it. That double register, entirely calm on the surface, is close to the centre of what Raphael was for."
+      },
+      {
+        "id": "landscape",
+        "label": "The distance",
+        "box": [
+          0.0,
+          0.06,
+          1.0,
+          0.44
+        ],
+        "text": "In 1548 the house this panel hung in collapsed in a landslide and it was recovered in seventeen pieces, reassembled with nails and heavy overpaint, and left dark for four and a half centuries. A restoration finished in 2008 took the repairs down. The blue distance behind the heads is one of the things that came back."
+      }
+    ],
+    "placeholder": {
+      "aspect": 0.72,
+      "archetype": "portrait",
+      "palette": [
+        "#1E2A34",
+        "#43566B",
+        "#8494A2",
+        "#C4A882",
+        "#EBE0C8",
+        "#A03830"
+      ],
+      "seed": 57
+    }
+  },
+  {
+    "id": "piero-urbino-diptych",
+    "artist": "Piero della Francesca",
+    "artistDates": "c. 1415–1492",
+    "title": "The Duke and Duchess of Urbino",
+    "titleOriginal": "Doppio ritratto dei duchi di Urbino",
+    "year": "c. 1473–1475",
+    "medium": "Oil and tempera on panel, a pair",
+    "dimensions": "47 × 66 cm as hung — two panels of 47 × 33 cm",
+    "room": "Room 8",
+    "accession": "Inv. 1890 nn. 1615, 3342",
+    "creditLine": "Galleria degli Uffizi, Florence",
+    "accentColor": "#4C5E52",
+    "heroSkip": true,
+    "heroFocus": [
+      0.5,
+      0.44
+    ],
+    "frameShape": "divided",
+    "labelText": "Two panels, hinged as a diptych, facing each other across the join: Battista Sforza on the left, Federico da Montefeltro on the right, both in strict profile against a landscape that runs continuously behind both of them. Federico is shown from the left because he had lost his right eye and the bridge of his nose in a tournament — the profile is not a convention here, it is the only view there was.",
+    "extendedNote": "Federico da Montefeltro was a mercenary commander who turned Urbino into one of the sharpest courts in Europe, and the two panels are exactly the sort of object that court produced: Flemish oil technique, Italian geometry, classical medal profiles, and a landscape observed from a height with the patience of a surveyor.\n\nThe profiles come from Roman coins and are meant to. A profile is unarguable — no expression, no appeal to the viewer, no negotiation — and it is also, in Federico's case, the only face he had left to give. He lost his right eye and part of the bridge of his nose in a tournament in 1450, and afterwards had the surgeons cut away more of the nose so that his remaining eye could see to the right. The profile records the notch.\n\nBattista Sforza is very pale, wearing the pearls and the plucked hairline of the period. She died at twenty-six, shortly after giving birth to the heir Federico had wanted, and it is likely that her portrait was painted after her death, from a memorial mask; her stillness is of a different order from his.\n\nBehind them the country runs back to water and hazy blue hills, painted with the aerial perspective Piero handled better than anyone south of the Alps, and it runs on across both panels — so the two heads are in one landscape, at one moment, looking at each other. The reverses carry triumphal chariots and Latin verses. They were meant to be turned over.",
+    "regions": [
+      {
+        "id": "federico",
+        "label": "The Duke",
+        "box": [
+          0.52,
+          0.1,
+          1.0,
+          0.9
+        ],
+        "text": "Federico is shown from the left because there was no other view. He lost his right eye and part of the bridge of his nose in a tournament in 1450, and afterwards had the surgeons cut away more of the nose so his remaining eye could see to the right. The panel records the notch exactly. A profile from a Roman coin is unarguable — no expression, no appeal to the viewer — and it is also the only face he had left to give."
+      },
+      {
+        "id": "battista",
+        "label": "The Duchess",
+        "box": [
+          0.0,
+          0.1,
+          0.48,
+          0.9
+        ],
+        "text": "Battista Sforza, very pale, in the pearls and plucked hairline of the period. She died at twenty-six, shortly after giving birth to the heir Federico had wanted, and it is likely this panel was painted after her death from a memorial mask. Her stillness is of a different order from his: he is a man holding a pose, she is a face being remembered."
+      },
+      {
+        "id": "land",
+        "label": "The country behind",
+        "box": [
+          0.0,
+          0.44,
+          1.0,
+          1.0
+        ],
+        "text": "The landscape runs on across both panels — water, low hills, blue distance — so the two heads are in one country at one moment, looking at each other across the hinge. Piero handled aerial perspective better than anyone south of the Alps, and he observed this from a height with the patience of a surveyor. He also wrote two treatises on perspective and one on solid geometry, and gave up painting for mathematics."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.4,
+      "archetype": "portrait",
+      "palette": [
+        "#26302A",
+        "#4C5E52",
+        "#8A9686",
+        "#C4B08A",
+        "#EDE4CE",
+        "#8E3A30"
+      ],
+      "seed": 58
+    }
+  },
+  {
+    "id": "lippi-madonna-two-angels",
+    "artist": "Filippo Lippi",
+    "artistDates": "c. 1406–1469",
+    "title": "Madonna and Child with Two Angels",
+    "titleOriginal": "Madonna col Bambino e due angeli",
+    "year": "c. 1460–1465",
+    "medium": "Tempera on panel",
+    "dimensions": "92 × 63.5 cm",
+    "room": "Room 8",
+    "accession": "Inv. 1890 n. 1598",
+    "creditLine": "Galleria degli Uffizi, Florence",
+    "accentColor": "#5C6E7A",
+    "heroFocus": [
+      0.5,
+      0.4
+    ],
+    "labelText": "A young woman in a Florentine window seat, hands together, with a child held up to her by two angels — one of whom has turned round and is grinning straight out of the picture. It is the first time a painted Madonna sits in a real room in front of a real view, and the first time one of the attendant figures behaves like a child in a room. Botticelli was in the workshop while it was painted.",
+    "extendedNote": "Filippo Lippi was a Carmelite friar who ran off with a nun, Lucrezia Buti, and had two children by her; the Medici got them both released from their vows. His Madonnas after that point are widely taken to be her, and the model here is at least the same face he kept using.\n\nWhat is new in the panel is the ordinariness. The setting is not a gold ground or a throne but a window seat with a stone frame round it, and beyond the frame a landscape of rock and water drawn with genuine distance. Mary is a girl in the fashion of her decade — pearls, gauze veil, a plucked forehead — sitting on a real chair. The gesture is prayer; the pose is somebody being drawn from life.\n\nThe grinning angel is the part everyone remembers, and it is a genuine invention: an attendant figure in a devotional picture, breaking the frame, looking out with the expression of a boy who has been told to hold still and has decided not to. Lippi's pupil was Botticelli, and the drawn contour, the transparent veils and the sideways glance out of the picture all come down through him into the Primavera hanging a few rooms away.",
+    "regions": [
+      {
+        "id": "angel",
+        "label": "The grinning angel",
+        "box": [
+          0.4,
+          0.5,
+          0.74,
+          0.92
+        ],
+        "text": "An attendant figure in a devotional picture, breaking the frame and looking out with the expression of a boy who has been told to hold still and has decided not to. Nothing quite like it exists earlier. Lippi's pupil was Botticelli, and this sideways glance out of the picture comes down through him into the Primavera hanging a few rooms away."
+      },
+      {
+        "id": "mary",
+        "label": "Mary",
+        "box": [
+          0.06,
+          0.06,
+          0.5,
+          0.86
+        ],
+        "text": "A girl in the fashion of her decade — pearls, a gauze veil, a plucked forehead — sitting on a real chair in a window seat with a stone frame round it. The gesture is prayer; the pose is somebody being drawn from life. Lippi was a Carmelite friar who ran off with a nun, and his Madonnas after that are widely taken to be her."
+      },
+      {
+        "id": "view",
+        "label": "The view",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.42
+        ],
+        "text": "Beyond the window frame, rock and water drawn with genuine distance. This is the first time a painted Madonna sits in a real room in front of a real view rather than on a gold ground, and the whole later history of the domestic Holy Family — Raphael's included — starts about here."
+      }
+    ],
+    "placeholder": {
+      "aspect": 0.69,
+      "archetype": "portrait",
+      "palette": [
+        "#2A3640",
+        "#5C6E7A",
+        "#9AA8AE",
+        "#D0B896",
+        "#F0E8D8",
+        "#8A4A3E"
+      ],
+      "seed": 59
+    }
+  },
+  {
+    "id": "caravaggio-bacchus",
+    "artist": "Caravaggio",
+    "artistDates": "1571–1610",
+    "title": "Bacchus",
+    "titleOriginal": "Bacco",
+    "year": "c. 1596–1598",
+    "medium": "Oil on canvas",
+    "dimensions": "95 × 85 cm",
+    "room": "Room 90",
+    "accession": "Inv. 1890 n. 5312",
+    "creditLine": "Galleria degli Uffizi, Florence",
+    "accentColor": "#4A3A2C",
+    "heroFocus": [
+      0.5,
+      0.46
+    ],
+    "labelText": "A Roman boy in a bedsheet, wearing a wreath, holding out a glass of red wine with dirty fingernails and an unsteady hand — the surface of the wine is still moving. In front of him a bowl of fruit, half of it going over: a split pomegranate, a wormed apple, a brown-edged quince. The god of wine painted as somebody's model on a hot afternoon, slightly drunk, and not enjoying it as much as the picture pretends.",
+    "extendedNote": "Caravaggio was in his mid-twenties, in Cardinal del Monte's household, painting for a collector's cabinet rather than a church. The subject is classical and the treatment is flatly, deliberately not: this is a studio, a model, a sheet, a real glass and real fruit on a real table, all of it lit from a high left window with nothing invented.\n\nThe decay is the point. Painters put fruit in pictures to show they could paint fruit; Caravaggio puts in a wormhole, a bruise, and a leaf turning brown at the edge, and dares the collector to say it is a fault. Everything in the picture is ripe and just past — the wine, the fruit, the boy — which is either a memento mori or a very good joke about hangovers, and the painting is comfortable being both.\n\nThere is one more thing in it. In the glass carafe at the lower left, cleaning in the 1920s and again with modern imaging revealed a tiny reflection: a figure at an easel, painting. It is generally taken to be Caravaggio himself, put into a still-life reflection two centimetres across, in a picture that otherwise refuses to admit that anybody made it.",
+    "regions": [
+      {
+        "id": "hand",
+        "label": "The glass",
+        "box": [
+          0.02,
+          0.32,
+          0.42,
+          0.72
+        ],
+        "text": "Held out toward you in dirty fingernails, on a hand that is not quite steady — the surface of the wine is still moving. The god of wine painted as somebody's model on a hot afternoon, slightly drunk, and not enjoying it as much as the picture pretends."
+      },
+      {
+        "id": "fruit",
+        "label": "The fruit",
+        "box": [
+          0.1,
+          0.66,
+          0.72,
+          1.0
+        ],
+        "text": "A split pomegranate, a wormed apple, a quince going brown at the edge. Painters put fruit in pictures to prove they could paint fruit; Caravaggio puts in the wormhole and the bruise and dares the collector to call it a fault. Everything here is ripe and just past — the wine, the fruit, the boy — which is either a memento mori or a very good joke about hangovers."
+      },
+      {
+        "id": "carafe",
+        "label": "The carafe",
+        "box": [
+          0.0,
+          0.5,
+          0.24,
+          0.86
+        ],
+        "text": "Cleaning in the 1920s, and modern imaging since, found a reflection in the glass two centimetres across: a figure at an easel, painting. It is generally taken to be Caravaggio himself, hidden in a still-life reflection inside a picture that otherwise refuses to admit anybody made it."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.12,
+      "archetype": "still-life",
+      "palette": [
+        "#22190F",
+        "#4A3A2C",
+        "#8A6A44",
+        "#C4A06A",
+        "#EAD9B4",
+        "#7A2A24"
+      ],
+      "seed": 60
+    }
+  }
+]

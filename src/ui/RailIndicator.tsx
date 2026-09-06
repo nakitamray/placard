@@ -1,4 +1,4 @@
-/** Rail indicator — spec §10C.6. Hairline ticks; clicking a tick jumps the rail. */
+/** Rail indicator Hairline ticks; clicking a tick jumps the rail. */
 import { selectArtworks, useStore } from '../state/store';
 
 export function RailIndicator() {

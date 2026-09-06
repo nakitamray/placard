@@ -189,12 +189,11 @@ function Arch({
  * Engaged column: plinth, base, shaft, necking, echinus, abacus.
  *
  * Every member is stacked on the top of the one below it, with a couple of
- * centimetres of overlap so no joint can open up. The shaft used to be
- * positioned by its own centre — `height / 2 + 0.3` — which put its foot at
- * 0.60 while the base finished at 0.33, and left every column in the court
- * standing a hand's width clear of its own plinth with daylight under it.
- * Nothing here is placed by its centre any more: each piece is given the y it
- * starts at and the y it stops at, so the stack cannot come apart again.
+ * centimetres of overlap so no joint can open up. Nothing here is positioned
+ * by its own centre — each piece is given the y it starts at and the y it
+ * stops at — because a centre-placed member drifts off the one under it the
+ * moment any height changes, and a column standing clear of its own plinth
+ * with daylight under it is the most obvious wrong thing in a room.
  */
 function Column({
   x,
@@ -406,10 +405,9 @@ export function CourtFacade({ style, d, quality }: Props) {
               />
             ))}
 
-            {/* Engaged columns on the bay DIVISIONS — they are what separates
-                one painting from the next. They used to be placed at `bayZ`,
-                the bay centre, which is precisely where the canvas hangs: the
-                shaft came down the middle of every picture in the court. */}
+            {/* Engaged columns on the bay DIVISIONS, not at `bayZ` — the bay
+                centre is precisely where a canvas hangs, and a shaft there
+                comes down the middle of every picture in the court. */}
             {Array.from({ length: d.bays + 1 }, (_, i) => (
               <Column
                 key={i}

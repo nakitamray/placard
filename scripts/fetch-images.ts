@@ -1,6 +1,7 @@
 /**
  * fetch-images.ts — pull the real paintings from Wikimedia Commons.
  *
+ *   pnpm fetch:images --check         say which scans disagree with their pins
  *   pnpm fetch:images --dry           resolve everything, download nothing
  *   pnpm fetch:images                 fetch every work that has no scan yet
  *   pnpm fetch:images --force         re-fetch works that already have one
@@ -453,9 +454,12 @@ async function resolveFile(
     titleOriginal?: string;
     dimensions: string;
     medium: string;
+    reproduction?: string;
   },
 ): Promise<{ chosen: Omit<Resolved, 'id' | 'museum'>; how: string } | null> {
   const { artist, title, dimensions } = work;
+  // see `reproduction` in the records: a fragment is not the whole object, and
+  // scoring candidates against the whole object's shape buries the right file
   /*
    * Match against the work's names in every form it is catalogued under, not
    * just the English one. Commons files the Mona Lisa under "Mona Lisa" but
@@ -466,7 +470,7 @@ async function resolveFile(
   const wanted = keywords(
     [artist, title, work.titleOriginal ?? '', hint.search ?? ''].join(' '),
   );
-  const expected = expectedAspect(dimensions);
+  const expected = work.reproduction ? null : expectedAspect(dimensions);
 
   const build = (page: any, score: number) => {
     const info = page?.imageinfo?.[0];
@@ -490,18 +494,26 @@ async function resolveFile(
     };
   };
 
-  // 1. an exact file, pinned by hand in data/image-sources.json.
-  //    Used as given: a human has looked at this one.
+  /*
+   * 1. An exact file, pinned by hand in data/image-sources.json.
+   *
+   * A pin is a decision, not a hint: somebody opened the work on Commons and
+   * said "this one". So a pin that cannot be resolved fails the work outright
+   * rather than falling through to search. Falling through was silent, and
+   * what it produced was the pinned work still hanging whatever search had
+   * found last time — which looks exactly like the pin having no effect.
+   */
   if (hint.commonsFile) {
     const file = hint.commonsFile.startsWith('File:')
       ? hint.commonsFile
       : `File:${hint.commonsFile}`;
     const page = await fileInfo(file);
-    if (page) {
-      const chosen = build(page, 999);
-      if (chosen) return { chosen, how: 'pinned' };
-    }
-    console.warn(`    pinned file not found: ${file} — falling back`);
+    const chosen = page && build(page, 999);
+    if (chosen) return { chosen, how: 'pinned' };
+    throw new Error(
+      `pinned file not found on Commons: ${file} — check the exact title on ` +
+        `commons.wikimedia.org and correct "commonsFile" in data/image-sources.json`,
+    );
   }
 
   // 2. Wikidata's own answer to "which picture is this work" (P18).
@@ -565,10 +577,30 @@ async function resolveFile(
       return build(page, score);
     })
     .filter((c): c is NonNullable<typeof c> => !!c)
+    /*
+     * Proportions are a veto here, not a penalty.
+     *
+     * Scoring can be outvoted: a very large file whose name happens to carry
+     * the artist's name outscores its own shape, and what that produced was a
+     * portrait sheet from a Dutch collection hanging under a landscape
+     * British Museum placard. A search candidate has nothing but its name to
+     * recommend it, so a candidate whose shape is already known to be wrong is
+     * refused outright and the work keeps its stand-in. A pinned file is
+     * exempt because pinning is a person saying they have looked.
+     */
+    .filter((c) => aspectError(expected, c.width, c.height) <= MAX_ASPECT_ERROR)
     .sort((a, b) => b.score - a.score);
 
   const best = scored[0];
-  if (!best) return null;
+  if (!best) {
+    if (expected && pages.length) {
+      throw new Error(
+        `${pages.length} candidates found, none with the catalogued proportions ` +
+          `(${expected.toFixed(3)}) — pin a commonsFile for this work`,
+      );
+    }
+    return null;
+  }
   /*
    * Refuse rather than hang something wrong.
    *
@@ -622,7 +654,12 @@ async function download(
   // Last gate, on the real pixels rather than on the API's reported size. A
   // pinned file skips scoring entirely, so this is the only thing standing
   // between a hand-pinned photograph-of-a-frame and the exhibition wall.
-  const err = aspectError(expected, meta.width ?? 0, meta.height ?? 0);
+  //
+  // Unless the record has already said the picture is not the catalogued
+  // object. A scroll shown as one of its nine scenes has nothing to do with
+  // the proportions of the whole scroll, and holding a `reproduction` work to
+  // them refuses the only file that could ever be right.
+  const err = expected === null ? 0 : aspectError(expected, meta.width ?? 0, meta.height ?? 0);
   if (err > MAX_ASPECT_ERROR) {
     const got = ((meta.width ?? 1) / (meta.height ?? 1)).toFixed(3);
     throw new Error(
@@ -663,7 +700,7 @@ async function download(
 
 /* ── CLI ────────────────────────────────────────────────────────────────── */
 
-// importing this module (the scorer is unit-tested) must not start a run
+// scripts/check.ts imports the scorer; importing must not start a fetch
 const invokedDirectly =
   !!process.argv[1] && path.basename(process.argv[1]).startsWith('fetch-images');
 
@@ -675,6 +712,7 @@ const value = (name: string) => {
 };
 
 const dry = flag('dry');
+const check = flag('check');
 const force = flag('force');
 const pin = flag('pin');
 const onlyIds = value('only')?.split(',').map((s) => s.trim());
@@ -682,7 +720,7 @@ const onlyMuseum = value('museum');
 const sheet = flag('sheet');
 const concurrency = Math.max(1, Math.min(8, Number(value('concurrency') ?? DEFAULT_CONCURRENCY)));
 
-if (invokedDirectly) await run();
+if (invokedDirectly) await (check ? runCheck() : run());
 
 interface Job {
   id: string;
@@ -693,6 +731,8 @@ interface Job {
   year: string;
   dimensions: string;
   medium: string;
+  /** set when the record says the picture is not the catalogued object */
+  reproduction?: string;
 }
 
 interface Outcome {
@@ -704,6 +744,82 @@ interface Outcome {
   /** how it was resolved: pinned, wikidata, or a search score */
   how?: string;
   entry: Record<string, unknown>;
+}
+
+/**
+ * What is actually on disk, without asking Commons anything.
+ *
+ * Editing a pin and re-running is supposed to replace the picture, and when it
+ * does not — an interrupted run, a network that was down, a pin with a typo in
+ * it — nothing on the page says so: the exhibition just goes on hanging the
+ * old file. This lists every work whose scan came from somewhere other than
+ * the file its record now pins, and every work with no scan at all, offline
+ * and in a second.
+ */
+async function runCheck() {
+  const hints: Record<string, SourceHint> = JSON.parse(
+    fs.readFileSync(path.join(DATA, 'image-sources.json'), 'utf8'),
+  );
+
+  const stale: string[] = [];
+  const missing: string[] = [];
+  const unpinned: string[] = [];
+  let ok = 0;
+
+  for (const museumId of museumOrder()) {
+    for (const w of loadMuseumWithWorks(museumId).works) {
+      const hint = hints[w.id] ?? {};
+      const scan = path.join(artworkData(w.id), 'source.jpg');
+      if (!fs.existsSync(scan)) {
+        missing.push(`${w.id} — ${w.artist}, ${w.title}`);
+        continue;
+      }
+      if (!hint.commonsFile) {
+        unpinned.push(w.id);
+        continue;
+      }
+      if (changedPin(w.id, hint)) {
+        const credit = path.join(artworkData(w.id), 'image-credit.json');
+        const have = fs.existsSync(credit)
+          ? (JSON.parse(fs.readFileSync(credit, 'utf8')).commonsFile ?? '?')
+          : 'no image-credit.json';
+        stale.push(`${w.id}
+      pinned: ${hint.commonsFile}
+      on disk: ${have}`);
+        continue;
+      }
+      ok++;
+    }
+  }
+
+  console.log(`
+${ok} work${ok === 1 ? '' : 's'} match their pin.`);
+  if (unpinned.length) {
+    console.log(
+      `
+${unpinned.length} not pinned — whatever search finds is what hangs:
+  ` +
+        unpinned.join('\n  ') +
+        '\n  run `pnpm fetch:images --pin` once and commit what it writes.',
+    );
+  }
+  if (missing.length) {
+    console.log(`
+${missing.length} with no scan at all:
+  ` + missing.join('\n  '));
+  }
+  if (stale.length) {
+    console.log(
+      `
+${stale.length} hanging a different file from the one pinned:
+  ` +
+        stale.join('\n  ') +
+        `\n\n  fix with:  pnpm fetch:images --only ${stale
+          .map((l) => l.split('\n')[0])
+          .join(',')}`,
+    );
+  }
+  if (!missing.length && !stale.length) console.log('\nNothing to do.');
 }
 
 async function run() {
@@ -725,6 +841,7 @@ async function run() {
         year: w.year,
         dimensions: w.dimensions,
         medium: w.medium,
+        reproduction: w.reproduction,
       });
     }
   }
@@ -825,7 +942,13 @@ async function one(job: Job, hint: SourceHint): Promise<Outcome> {
         ` · ${target.license}`,
     );
 
-    const expected = expectedAspect(job.dimensions);
+    /*
+     * A work reproduced as a fragment of itself has no catalogued
+     * proportions to be measured against — one scene of a nine-scene scroll
+     * is not 24 × 344 cm — so the record's own sentence turns the test off
+     * rather than the file being refused for being what it says it is.
+     */
+    const expected = job.reproduction ? null : expectedAspect(job.dimensions);
     if (expected) {
       const err = aspectError(expected, target.width, target.height);
       lines.push(

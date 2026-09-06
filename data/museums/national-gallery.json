@@ -1,0 +1,201 @@
+{
+  "id": "national-gallery",
+  "name": "The National Gallery",
+  "city": "London",
+  "homepage": "https://www.nationalgallery.org.uk",
+  "subtitle": "Room 32",
+  "blurb": "Deep crimson walls under a pitched glass lantern, gilded archways, polished light wood underfoot.",
+  "corridorNote": "Modelled on Room 32 at the National Gallery, London — the Julia and Hans Rausing Room: deep crimson walls under a pitched glass lantern carried on gilded archways, warm red and gold coving, a polished light wood floor, tufted leather seating down the centre, and a small number of very large works hung singly in heavy swept gilt frames.",
+  "style": {
+    "ceiling": "pitched-glass",
+    "floor": "parquet",
+    "wall": "crimson-enfilade",
+    "frame": "gallery-swept",
+    "hang": "single",
+    "halfWidth": 4.6,
+    "wallHeight": 5.6,
+    "vaultHeight": 9.8,
+    "bays": 9,
+    "bayDepth": 5.6,
+    "palette": {
+      "wall": "#7C1D23",
+      "wallDeep": "#5C1319",
+      "molding": "#E9DEC6",
+      "gilt": "#CBA13A",
+      "ceiling": "#F1EEE6",
+      "ceilingAccent": "#8E2A26",
+      "floor": "#C9A97C",
+      "floorInlay": "#8B6C46",
+      "accent": "#8E2F2C",
+      "sky": "#F3F7FC"
+    },
+    "light": {
+      "key": "#FFF9F0",
+      "keyIntensity": 2.3,
+      "keyFrom": [
+        -1,
+        18,
+        3
+      ],
+      "sky": "#E8F0F8",
+      "ground": "#70503E",
+      "ambient": 0.5,
+      "lamp": "#FFDCA6",
+      "lampIntensity": 7,
+      "exposure": 1.02,
+      "background": "#2C1517",
+      "fog": [
+        "#3C1B1D",
+        48,
+        140
+      ]
+    },
+    "fixtures": {
+      "sculpture": "none",
+      "seating": "ottoman",
+      "chandeliers": false,
+      "placards": true,
+      "clock": false,
+      "terraces": false
+    }
+  },
+  "plan": {
+    "viewBox": "20 20 528 366",
+    "level": "Main floor, west wing",
+    "rooms": [
+      {
+        "id": "r-arnolfini",
+        "name": "Arnolfini",
+        "svgPath": "M40,40 L152,40 L152,122 L40,122 Z",
+        "centroid": [
+          96,
+          81
+        ],
+        "active": true,
+        "artworkIndex": 0
+      },
+      {
+        "id": "r-sunflowers",
+        "name": "Sunflowers",
+        "svgPath": "M162,40 L274,40 L274,122 L162,122 Z",
+        "centroid": [
+          218,
+          81
+        ],
+        "active": true,
+        "artworkIndex": 1
+      },
+      {
+        "id": "r-temeraire",
+        "name": "Temeraire",
+        "svgPath": "M284,40 L396,40 L396,122 L284,122 Z",
+        "centroid": [
+          340,
+          81
+        ],
+        "active": true,
+        "artworkIndex": 2
+      },
+      {
+        "id": "r-hay-wain",
+        "name": "Hay Wain",
+        "svgPath": "M406,40 L518,40 L518,122 L406,122 Z",
+        "centroid": [
+          462,
+          81
+        ],
+        "active": true,
+        "artworkIndex": 3
+      },
+      {
+        "id": "r-virgin-rocks",
+        "name": "Virgin of the Rocks",
+        "svgPath": "M40,134 L152,134 L152,216 L40,216 Z",
+        "centroid": [
+          96,
+          175
+        ],
+        "active": true,
+        "artworkIndex": 4
+      },
+      {
+        "id": "r-ambassadors",
+        "name": "Ambassadors",
+        "svgPath": "M162,134 L274,134 L274,216 L162,216 Z",
+        "centroid": [
+          218,
+          175
+        ],
+        "active": true,
+        "artworkIndex": 5
+      },
+      {
+        "id": "r-bacchus",
+        "name": "Bacchus and Ariadne",
+        "svgPath": "M284,134 L396,134 L396,216 L284,216 Z",
+        "centroid": [
+          340,
+          175
+        ],
+        "active": true,
+        "artworkIndex": 6
+      },
+      {
+        "id": "r-rokeby",
+        "name": "Rokeby Venus",
+        "svgPath": "M406,134 L518,134 L518,216 L406,216 Z",
+        "centroid": [
+          462,
+          175
+        ],
+        "active": true,
+        "artworkIndex": 7
+      },
+      {
+        "id": "r-bathers",
+        "name": "Bathers",
+        "svgPath": "M40,228 L152,228 L152,310 L40,310 Z",
+        "centroid": [
+          96,
+          269
+        ],
+        "active": true,
+        "artworkIndex": 8
+      },
+      {
+        "id": "r-whistlejacket",
+        "name": "Whistlejacket",
+        "svgPath": "M162,228 L274,228 L274,310 L162,310 Z",
+        "centroid": [
+          218,
+          269
+        ],
+        "active": true,
+        "artworkIndex": 9
+      },
+      {
+        "id": "r-rausing",
+        "name": "The Rausing Room",
+        "svgPath": "M40,322 L528,322 L528,366 L40,366 Z",
+        "centroid": [
+          284,
+          344
+        ],
+        "active": false,
+        "artworkIndex": -1
+      }
+    ]
+  },
+  "artworks": [
+    "van-eyck-arnolfini",
+    "vangogh-sunflowers",
+    "turner-fighting-temeraire",
+    "constable-hay-wain",
+    "caravaggio-supper-emmaus",
+    "holbein-ambassadors",
+    "titian-bacchus-ariadne",
+    "velazquez-rokeby-venus",
+    "seurat-bathers-asnieres",
+    "stubbs-whistlejacket"
+  ]
+}

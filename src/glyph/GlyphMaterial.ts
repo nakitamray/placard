@@ -1,10 +1,10 @@
 /**
- * Glyph material — spec §7.2 / §8, adapted from MSDF to mipmapped-alpha atlas.
+ * Glyph material, adapted from MSDF to mipmapped-alpha atlas.
  *
  * Every per-glyph attribute is uploaded once; animation is driven purely by
  * uniforms (uCharOffset, uBreathe, uDissolve). The character occupying a slot
  * advances through the corpus texture over time — positions never move
- * (spec §4.3: "characters advance, positions do not").
+ * Characters advance; positions do not.
  *
  * The corpus → metrics → palette lookups run in the FRAGMENT stage (the
  * spec sketches them in the vertex shader): per-instance values (slot,
@@ -108,7 +108,7 @@ varying float vInBox;
 varying float vLens;
 
 void main() {
-  // --- which character occupies this slot right now (spec §4.3) ---
+  // --- which character occupies this slot right now ---
   // glyphs inside an extracted region hold the character they had at the
   // moment of extraction, so the reading text stays stable
   float offset = mix(uCharOffset, uCharOffsetFrozen, vInBox * step(0.001, uDetachAmt));
@@ -118,7 +118,7 @@ void main() {
   vec2 cuv = (vec2(tcx, tcy) + 0.5) / uCorpusSize;
   float ch = floor(texture2D(uCorpus, cuv).r * 255.0 + 0.5);
 
-  // --- atlas UV rect for that character (metrics texture, spec §5.1) ---
+  // --- atlas UV rect for that character (metrics texture) ---
   vec4 rect = texture2D(uMetrics, vec2((ch + 0.5) / 256.0, 0.5));
   vec2 uv = mix(rect.xy, rect.zw, vec2(vQuad.x, 1.0 - vQuad.y));
 
@@ -141,7 +141,7 @@ void main() {
   a *= mix(1.0, vBreathe, 0.6);
 
   /*
-   * Staggered dissolve — each glyph has its own threshold (spec §8.2). The
+   * Staggered dissolve — each glyph has its own threshold. The
    * lens is simply a local dissolve: whichever is asking for more, the
    * whole-canvas reveal or the circle under the cursor, wins here.
    */

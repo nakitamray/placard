@@ -11,11 +11,22 @@ export interface Dims {
   length: number;
   /** z of the terminal wall, which is where the map transition fires */
   apseZ: number;
+  /** the height every painting in the corridor is centred on */
+  hangY: number;
 }
 
 export function dimsFor(style: MuseumStyle): Dims {
   const length = style.bays * style.bayDepth;
   return {
+    /*
+     * A gallery hangs to a line, and the line belongs to the room.
+     *
+     * The default is the usual museum answer — a bit under head height, or
+     * proportional in a low room — but a hall with a five-metre wall and its
+     * pictures at 2.1 m has them sitting in the bottom third of a panel and
+     * looking like they have slipped. Such a room says where its own line is.
+     */
+    hangY: style.hangHeight ?? Math.min(2.1, style.wallHeight * 0.44),
     halfWidth: style.halfWidth,
     wallHeight: style.wallHeight,
     vaultHeight: style.vaultHeight,
@@ -37,7 +48,7 @@ export const bayZ = (d: Dims, b: number) => -(b * d.bayDepth + d.bayDepth / 2);
  * behind each work is centred on the same line, so a painting always sits in
  * the middle of its moulding rather than sinking to the bottom of it.
  */
-export const hangHeight = (d: Dims) => Math.min(2.1, d.wallHeight * 0.44);
+export const hangHeight = (d: Dims) => d.hangY;
 
 /**
  * The tallest a corridor work is allowed to be, per hang pattern. `Bays` in

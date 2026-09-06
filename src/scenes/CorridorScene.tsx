@@ -1,7 +1,7 @@
 /**
- * CorridorScene — spec §10.2 / §10A.
+ * CorridorScene
  *
- * One procedural machine, five museums. The architecture (ceiling, floor, wall
+ * One procedural machine, seven museums. The architecture (ceiling, floor, wall
  * treatment, fixtures, frames), the palette and the entire lighting rig come
  * from the chosen museum's style record; nothing about a particular building
  * is hard-coded here. Adding a sixth museum is a data change.
@@ -39,6 +39,7 @@ import { bayZ, dimsFor, hangHeight, workMaxHeight, type Dims } from './corridor/
 import { Atmosphere } from './corridor/Atmosphere';
 import type { ArtworkIndexEntry, MuseumData } from '../types';
 import type { Quality } from '../lib/quality';
+import { useShadowRefresh } from '../render/shadows';
 
 /**
  * Wall textures, cached by artwork id for the life of the page.
@@ -197,6 +198,7 @@ function HungWork({
         height={height}
         gilt={museum.style.palette.gilt}
         dark={museum.style.palette.wallDeep}
+        shape={artwork.shape}
         detail={detail}
       />
       <mesh
@@ -211,7 +213,13 @@ function HungWork({
           open();
         }}
       >
-        <planeGeometry args={[width, height]} />
+        {/* a tondo is cut out of a square panel, so its canvas is not a
+            rectangle either */}
+        {artwork.shape === 'round' ? (
+          <circleGeometry args={[Math.min(width, height) / 2, 48]} />
+        ) : (
+          <planeGeometry args={[width, height]} />
+        )}
         <meshStandardMaterial
           ref={canvasMat}
           map={texture}
@@ -238,6 +246,9 @@ const ARCH_HANG_Y = 1.66;
  *             stacked above it — the Louvre's densely packed wall
  * single      one large work per bay, both walls
  * alternating one work per bay, sides alternating
+ * one-wall    one work per bay, all on the left — for a corridor glazed down
+ *             the other side, where a hang opposite the windows would be a
+ *             painting in permanent silhouette
  */
 function Bays({
   museum,
@@ -258,10 +269,16 @@ function Bays({
 
   for (let bay = 0; bay < d.bays; bay++) {
     const z = bayZ(d, bay);
-    const sides: Array<1 | -1> = hang === 'alternating' ? [bay % 2 === 0 ? 1 : -1] : [1, -1];
+    const sides: Array<1 | -1> =
+      hang === 'one-wall'
+        ? [-1]
+        : hang === 'alternating'
+          ? [bay % 2 === 0 ? 1 : -1]
+          : [1, -1];
 
     for (const side of sides) {
-      const slot = hang === 'alternating' ? bay : bay * 2 + (side > 0 ? 0 : 1);
+      const slot =
+        hang === 'alternating' || hang === 'one-wall' ? bay : bay * 2 + (side > 0 ? 0 : 1);
       const i = slot % artworks.length;
       const x = side * (d.halfWidth - 0.09);
       const ry = side > 0 ? -Math.PI / 2 : Math.PI / 2;
@@ -272,7 +289,11 @@ function Bays({
       // runs into the shaft that is supposed to be separating it from its
       // neighbour.
       const clear = museum.style.wall === 'court-facade' ? 0.6 : 0.78;
-      const main = fitWork(artworks[i].aspect, maxH, d.bayDepth * clear);
+      const main = fitWork(
+        artworks[i].shape === 'round' ? 1 : artworks[i].aspect,
+        maxH,
+        d.bayDepth * clear,
+      );
       // Carving is only legible close up. Past a few bays the bead course and
       // cartouches cost tens of thousands of triangles to render something
       // smaller than a pixel, so distant frames keep the turned courses only.
@@ -483,6 +504,103 @@ function Lamps({
 }) {
   const l = museum.style.light;
   const lights: React.ReactNode[] = [];
+
+  /*
+   * A daylit room is lit from the side, not from overhead.
+   *
+   * The lights sit just inside the glazed wall at the height of the window
+   * heads and are thrown ACROSS the corridor, so the hang opposite is raked
+   * rather than washed and the mouldings on it cast the short shadows that
+   * make them read as mouldings. A row of lamps down the centre line would
+   * flatten exactly the wall the room exists to show.
+   */
+  if (museum.style.fixtures.daylight) {
+    /*
+     * Which side the windows are on is a fact about the wall treatment, so it
+     * is read from the wall treatment. The Uffizi is glazed to the right of
+     * the hang; the British Museum's Egyptian gallery is lit from the left,
+     * high up, through screens.
+     */
+    const daySide = museum.style.wall === 'stone-colonnade' ? -1 : 1;
+    const step = Math.max(2, Math.ceil(d.bays / quality.maxLamps));
+    for (let b = 0; b < d.bays; b += step) {
+      lights.push(
+        <pointLight
+          key={`day${b}`}
+          position={[daySide * (d.halfWidth - 0.5), d.wallHeight * 0.66, bayZ(d, b)]}
+          color={l.sky}
+          intensity={l.lampIntensity * 1.2}
+          distance={d.bayDepth * 3.4}
+          decay={1.7}
+        />,
+      );
+      /*
+       * The room's own lamps, warm, and against the WALLS rather than down the
+       * centre line.
+       *
+       * A lamp on the centre line lights the floor, flattens the columns and
+       * leaves the hang in its own shade. Set behind the colonnade at picture
+       * height, the same lamp washes the canvas it stands beside, rakes the
+       * column in front of it into relief, and throws the shadow of that
+       * column across the wall — which is most of what makes a hall of
+       * columns look like a hall of columns.
+       */
+      for (const side of [-1, 1]) {
+        lights.push(
+          <pointLight
+            key={`warm${b}${side}`}
+            position={[side * (d.halfWidth - 1.7), d.wallHeight * 0.5, bayZ(d, b)]}
+            color={l.lamp}
+            intensity={l.lampIntensity * 0.5}
+            distance={d.bayDepth * 2.4}
+            decay={2}
+          />,
+        );
+      }
+    }
+    return (
+      <>
+        {lights}
+        <pointLight
+          position={[0, d.wallHeight * 0.6, d.apseZ + 2.4]}
+          color={l.lamp}
+          intensity={l.lampIntensity * 2 + 6}
+          distance={d.bayDepth * 3}
+          decay={1.7}
+        />
+      </>
+    );
+  }
+
+  /*
+   * A room lit from its cornice, upward.
+   *
+   * The Gallery of Maps has a continuous warm source hidden at the top of
+   * both walls, and everything about how that ceiling looks follows from it:
+   * the light climbs the vault, the raised stucco casts its shadows
+   * downward, and the gold is brightest where the carving is deepest. Lamps
+   * hung in the middle of the room — which is what a chandelier is — light
+   * the floor and flatten the vault, so where a museum asks for a cove the
+   * chandeliers are only jewellery and the cove does the work.
+   */
+  if (museum.style.fixtures.cove) {
+    const step = Math.max(2, Math.ceil(d.bays / Math.max(2, quality.maxLamps - 1)));
+    for (let b = 0; b < d.bays; b += step) {
+      for (const side of [-1, 1]) {
+        lights.push(
+          <pointLight
+            key={`cove${b}${side}`}
+            position={[side * (d.halfWidth - 0.35), d.wallHeight + 0.15, bayZ(d, b)]}
+            color={l.lamp}
+            intensity={l.lampIntensity * 0.85}
+            distance={d.bayDepth * 2.8}
+            decay={1.8}
+          />,
+        );
+      }
+    }
+  }
+
   // Every point light is evaluated per fragment across every lit surface in
   // the room, so the count is a budget rather than a look: they are spread
   // evenly down the corridor and thinned rather than truncated.
@@ -516,11 +634,10 @@ function Lamps({
 }
 
 /* ─── how far one press of an arrow key walks you ──────────────────────────
-   A single tap used to hand the visitor a fifth of the corridor, which made
-   the whole rail feel like it was on castors. A tap is now a step: a fixed
-   small nudge on keydown, then — only if the key stays down — a walk that
-   eases up to speed. Distance is measured in rail units, where 1 is the
-   whole corridor. */
+   A tap is a step and a hold is a walk: a fixed small nudge on keydown, then —
+   only if the key stays down — a stride that eases up to speed. A tap that
+   hands over a fifth of the corridor makes the whole rail feel like it is on
+   castors. Distance is in rail units, where 1 is the whole corridor. */
 /** one short press */
 const TAP_STEP = 0.012;
 /** grace before a press counts as a hold, in seconds */
@@ -543,8 +660,19 @@ export function CorridorScene({ quality }: { quality: Quality }) {
   const heldSince = useRef(0);
   const sprint = useRef<gsap.core.Tween | null>(null);
   const sunRef = useRef<THREE.DirectionalLight>(null);
+  const refreshShadows = useShadowRefresh();
+  /**
+   * Where the key light stood when the shadow map was last drawn. Infinity,
+   * not NaN: every comparison against NaN is false, so a NaN here would mean
+   * the test below never once passed and the room kept the shadow map it was
+   * given on the frame it mounted.
+   */
+  const shadowZ = useRef(Number.POSITIVE_INFINITY);
 
   const d = useMemo(() => (museum ? dimsFor(museum.style) : null), [museum]);
+
+  // a change of room, of budget or of hang is a new shadow map
+  useEffect(refreshShadows, [refreshShadows, museum, quality.shadows, quality.shadowMapSize]);
 
   // returning from the map drops you back short of the end, so the transition
   // does not immediately re-fire
@@ -597,7 +725,10 @@ export function CorridorScene({ quality }: { quality: Quality }) {
         }
         keys.current.add(e.key);
       }
-      if (e.key === 'Enter' || e.key === 'Shift') {
+      // Shift, and only Shift. Two keys for one move meant the hint line had
+      // to say "⇧ or ⏎" where it could have said "⇧", and the second one was
+      // never the one anybody reached for.
+      if (e.key === 'Shift') {
         e.preventDefault();
         accelerate();
       }
@@ -648,7 +779,7 @@ export function CorridorScene({ quality }: { quality: Quality }) {
     }
   }, [phase, reducedMotion]);
 
-  // T3 warp: map → gallery, straight through the end wall (spec §11)
+  // T3 warp: map → gallery, straight through the end wall
   useEffect(() => {
     if (phase !== 'warp') return;
     warp.p = 0;
@@ -720,6 +851,17 @@ export function CorridorScene({ quality }: { quality: Quality }) {
       t.updateMatrixWorld();
       sunRef.current.position.set(from[0], from[1], z - 6 + from[2]);
       sunRef.current.updateMatrixWorld();
+      /*
+       * ...and the shadow map is redrawn only when it has. Standing still in
+       * the corridor — which is most of the time anyone spends in it — the
+       * bars on the floor are already correct, and a third pass over the room
+       * to arrive at the same picture is the frame's most expensive no-op.
+       * The threshold is well under a pixel of movement at this scale.
+       */
+      if (Math.abs(z - shadowZ.current) > 0.01) {
+        shadowZ.current = z;
+        refreshShadows();
+      }
     }
   });
 

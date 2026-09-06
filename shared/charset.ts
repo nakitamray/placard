@@ -1,11 +1,11 @@
 /**
  * The glyph charset, shared between the build pipeline and the runtime.
  *
- * Corpus binaries store *indices into this string* (spec §5.2) — not
+ * Corpus binaries store *indices into this string* — not
  * codepoints — so the order here is a binary-format contract. Appending is
  * safe; reordering requires regenerating every corpus.bin.
  *
- * ASCII printable (spaces are stripped at corpus build, §4.4) plus the
+ * ASCII printable (spaces are stripped at corpus build) plus the
  * Latin-1 letters and typographic marks that art-history text is full of.
  */
 
@@ -32,7 +32,7 @@ export const CHAR_INDEX: ReadonlyMap<string, number> = new Map(
 
 /**
  * Best-effort fold of out-of-charset characters to a near ASCII equivalent
- * (spec §5.2 step 4). Returns -1 when the character should be dropped.
+ *. Returns -1 when the character should be dropped.
  */
 export function foldToCharset(ch: string): number {
   const direct = CHAR_INDEX.get(ch);

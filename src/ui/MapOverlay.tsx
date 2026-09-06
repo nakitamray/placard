@@ -1,5 +1,5 @@
 /**
- * Map overlay — spec §10.3 / §10C.4.
+ * Map overlay
  *
  * The wing's index: one line per painting, in the order they hang. It was a
  * drawn floor plan — a grid of boxes with a room name in each — and it read
@@ -93,13 +93,9 @@ export function MapOverlay() {
       role="dialog"
       aria-label={`${museum.name} — choose a painting`}
     >
-      {/*
-       * The back control and the room name sit exactly where they sit in the
-       * corridor and the gallery — fixed to the top corners, not floated in
-       * the column of type. They used to be inside the centred panel, which
-       * put "back" in a different place on every screen and made leaving a
-       * room a small hunt.
-       */}
+      {/* The back control and the room name sit exactly where they sit in the
+          corridor and the gallery: fixed to the top corners, not floated in
+          the column of type, so leaving a room is never a hunt. */}
       <button className="caption gallery-back" onClick={() => setPhase('corridor')}>
         ← {museum.name}
       </button>

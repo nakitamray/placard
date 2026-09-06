@@ -2,60 +2,64 @@
   "id": "british-museum",
   "name": "The British Museum",
   "city": "London",
-  "subtitle": "Crimson skylit room",
-  "blurb": "Deep crimson walls under a pitched glass lantern, gilded archways, polished light wood underfoot.",
-  "corridorNote": "The reference photograph for this corridor is Room 32 at the National Gallery, London — the Julia and Hans Rausing Room — not a British Museum gallery; the corridor follows it faithfully. Deep crimson walls behind large gold-framed works, a pitched arched glass skylight running the length of the room on white ribs, vaulted ceiling sections in warm red and gold divided by intricate gilded archways, polished light wood floor, dark tufted leather seating down the centre. The collection hung here is the British Museum's own painted holdings, which are prints, frescoes, scrolls and painted papyri rather than gallery canvases.",
+  "homepage": "https://www.britishmuseum.org",
+  "subtitle": "The Egyptian sculpture gallery",
+  "blurb": "A coffered stone hall at the end of the day, its walls the colour of sand, lit low and warm between two colonnades of fluted columns standing clear of the wall from floor to ceiling.",
+  "corridorNote": "Modelled on the Egyptian sculpture gallery at the British Museum — Room 4: a strictly symmetrical one-point hall under a deeply coffered ceiling of thick square beams, every recess stepping upward in receding treads with no curve anywhere in it. Down each side runs a colonnade of colossal fluted columns standing a full drum clear of the wall, from floor to ceiling, on the bay divisions rather than in front of the hang. The walls behind them are sand-coloured plaster over a heavy plinth course; tall windows high on one side take a low sun across the room; the sculpture has been taken out, so what stands on the centre line is carved marble benches; and the floor is wide courses of matte stone crossing the hall, chalky grey against charcoal.",
   "style": {
-    "ceiling": "pitched-glass",
-    "floor": "parquet",
-    "wall": "crimson-enfilade",
-    "frame": "gallery-swept",
-    "hang": "single",
+    "ceiling": "deep-coffers",
+    "floor": "stone-bands",
+    "wall": "stone-colonnade",
+    "frame": "museum-plain",
+    "hang": "alternating",
     "halfWidth": 4.6,
-    "wallHeight": 5.6,
-    "vaultHeight": 9.8,
-    "bays": 9,
-    "bayDepth": 5.6,
+    "wallHeight": 7.0,
+    "vaultHeight": 7.4,
+    "bays": 10,
+    "bayDepth": 5.2,
     "palette": {
-      "wall": "#7C1D23",
-      "wallDeep": "#5C1319",
-      "molding": "#E9DEC6",
-      "gilt": "#CBA13A",
-      "ceiling": "#F1EEE6",
-      "ceilingAccent": "#8E2A26",
-      "floor": "#C9A97C",
-      "floorInlay": "#8B6C46",
-      "accent": "#8E2F2C",
-      "sky": "#F3F7FC"
+      "wall": "#D2BE99",
+      "wallDeep": "#B09873",
+      "molding": "#DFCDA8",
+      "gilt": "#C9922E",
+      "ceiling": "#D8C6A2",
+      "ceilingAccent": "#8A7452",
+      "floor": "#A08F76",
+      "floorInlay": "#4E4436",
+      "accent": "#6A5C46",
+      "sky": "#E07A3C"
     },
     "light": {
-      "key": "#FFF9F0",
-      "keyIntensity": 2.3,
+      "key": "#E8834A",
+      "keyIntensity": 0.75,
       "keyFrom": [
-        -1,
-        18,
-        3
+        -18,
+        4,
+        5
       ],
-      "sky": "#E8F0F8",
-      "ground": "#70503E",
-      "ambient": 0.5,
-      "lamp": "#FFDCA6",
-      "lampIntensity": 7,
-      "exposure": 1.02,
-      "background": "#2C1517",
+      "sky": "#A8794E",
+      "ground": "#3A2E20",
+      "ambient": 0.15,
+      "lamp": "#FFA65A",
+      "lampIntensity": 18,
+      "exposure": 1.0,
+      "background": "#120C07",
       "fog": [
-        "#3C1B1D",
-        48,
-        140
+        "#241A10",
+        32,
+        115
       ]
     },
     "fixtures": {
       "sculpture": "none",
-      "seating": "ottoman",
+      "seating": "marble-benches",
       "chandeliers": false,
       "placards": true,
       "clock": false,
-      "terraces": false
+      "terraces": false,
+      "vitrines": false,
+      "spotTrack": false,
+      "daylight": true
     }
   },
   "plan": {
@@ -96,8 +100,8 @@
         "artworkIndex": 2
       },
       {
-        "id": "r-fayum",
-        "name": "Fayum",
+        "id": "r-ani",
+        "name": "Papyrus of Ani",
         "svgPath": "M30,105 L95,105 L95,185 L30,185 Z",
         "centroid": [
           62,
@@ -107,8 +111,8 @@
         "artworkIndex": 3
       },
       {
-        "id": "r-meidum",
-        "name": "Meidum",
+        "id": "r-rubens",
+        "name": "Rubens",
         "svgPath": "M30,195 L95,195 L95,275 L30,275 Z",
         "centroid": [
           62,
@@ -129,8 +133,8 @@
         "artworkIndex": 5
       },
       {
-        "id": "r-schouman",
-        "name": "Schouman",
+        "id": "r-holbein",
+        "name": "Holbein",
         "svgPath": "M425,195 L490,195 L490,275 L425,275 Z",
         "centroid": [
           457,
@@ -140,8 +144,8 @@
         "artworkIndex": 6
       },
       {
-        "id": "r-ani",
-        "name": "Book of Ani",
+        "id": "r-shahnama",
+        "name": "Bijan and Farud",
         "svgPath": "M100,285 L200,285 L200,310 L100,310 Z",
         "centroid": [
           150,
@@ -151,8 +155,8 @@
         "artworkIndex": 7
       },
       {
-        "id": "r-dunhuang",
-        "name": "Dunhuang",
+        "id": "r-vastra",
+        "name": "Vrindavani Vastra",
         "svgPath": "M210,285 L310,285 L310,310 L210,310 Z",
         "centroid": [
           260,
@@ -189,12 +193,12 @@
     "hokusai-great-wave",
     "nebamun-marshes",
     "gu-kaizhi-admonitions",
-    "fayum-mummy-portraits",
-    "geese-of-meidum",
-    "white-portrait-lady",
-    "schouman-birds",
-    "durer-rhinoceros",
-    "dunhuang-cave-17",
+    "ani-book-of-the-dead",
+    "rubens-isabella-brant",
+    "white-the-flyer",
+    "holbein-anne-boleyn",
+    "shahnama-bijan-farud",
+    "vrindavani-vastra",
     "hiroshige-sudden-shower"
   ]
 }

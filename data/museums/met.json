@@ -2,6 +2,7 @@
   "id": "met",
   "name": "The Metropolitan Museum of Art",
   "city": "New York",
+  "homepage": "https://www.metmuseum.org",
   "subtitle": "Petrie Sculpture Court",
   "blurb": "A sunlit indoor courtyard: a peaked glass roof over pale stone and red brick, and light off every surface.",
   "corridorNote": "Modelled on the Carroll and Milton Petrie European Sculpture Court by day. A great peaked skylight of white steel and glass roofs what reads as an outdoor courtyard wedged between two buildings, with a lower run of flat glazing along the eaves; daylight floods the room and lies in bars across the paving. One wall is smooth pale stone with arched openings and illuminated panels, the other a facade of dark red brick set with white stone arches and circular medallions. A floor-to-ceiling glass wall closes the far end. The court's own sculpture is left out here: this exhibition is about the paintings.",
@@ -21,22 +22,22 @@
       "wallDeep": "#8E4034",
       "molding": "#EFEADD",
       "gilt": "#C0982E",
-      "ceiling": "#DCEAF7",
+      "ceiling": "#C9DCEF",
       "ceilingAccent": "#F4F2EC",
       "floor": "#C2BAA9",
       "floorInlay": "#ADA595",
       "accent": "#8A5B4C",
-      "sky": "#DEEBF8"
+      "sky": "#8FB6DC"
     },
     "light": {
-      "key": "#FFF4E2",
-      "keyIntensity": 1.25,
+      "key": "#FFF2DE",
+      "keyIntensity": 1.15,
       "keyFrom": [
         -4,
         20,
         7
       ],
-      "sky": "#D6E4F2",
+      "sky": "#E4E2DA",
       "ground": "#6E6558",
       "ambient": 0.3,
       "lamp": "#FFB268",

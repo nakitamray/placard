@@ -3,39 +3,41 @@
  *
  * Nothing in this exhibition is labelled — that is the point of it — so the
  * controls have to be stated somewhere, and the only honest place is quietly,
- * at the bottom, in the smallest type in the system. They start legible and
- * settle to a whisper after the first input rather than disappearing: someone
- * who looks down thirty seconds in should still find them, and someone who
- * never looks down should never notice them.
+ * at the bottom, in the smallest type in the system.
+ *
+ * EVERYTHING, ONCE. An earlier version kept two moves on the line and put the
+ * rest behind a "more" mark, which is worse than either extreme: the visitor
+ * cannot see what they are missing, so they never press it, and the controls
+ * they need are one click away in a place they have no reason to look. So the
+ * whole set is here — but written as short as it can be said, four items to a
+ * room, each one a key and a verb. Anything longer than a verb belongs in the
+ * help card behind the ? in the corner, not on the floor of the gallery.
  */
 import { useEffect, useState } from 'react';
 import { useStore } from '../state/store';
 
 interface Hint {
   keys?: string[];
-  /** joins the keys, e.g. "or" between ⇧ and ⏎ */
-  sep?: string;
   text: string;
 }
 
 const CORRIDOR: Hint[] = [
   { keys: ['↑', '↓'], text: 'walk' },
-  { keys: ['⇧', '⏎'], sep: 'or', text: 'hurry to the end' },
-  { text: 'move the mouse to look around · click a painting to enter' },
-  { keys: ['+', '−'], text: 'zoom' },
+  { keys: ['⇧'], text: 'hurry to the end' },
+  { text: 'move the mouse to look' },
+  { text: 'click a painting' },
   { keys: ['esc'], text: 'back' },
 ];
 
 const GALLERY: Hint[] = [
-  { keys: ['←', '→'], text: 'move between paintings' },
-  { text: 'move over a canvas: the reading lens · click: the whole painting' },
-  { keys: ['space'], text: 'thread mode: hover any part to read its text' },
-  { keys: ['+', '−'], text: 'lean in' },
-  { keys: ['esc'], text: 'close · back' },
+  { keys: ['←', '→'], text: 'move' },
+  { text: 'click for the placard' },
+  { keys: ['space'], text: 'thread mode' },
+  { keys: ['esc'], text: 'back' },
 ];
 
 const MAP: Hint[] = [
-  { text: 'click any painting in the list to walk into its room' },
+  { text: 'click a room to walk into it' },
   { keys: ['esc'], text: 'back to the corridor' },
 ];
 
@@ -65,17 +67,11 @@ export function ControlHints() {
   if (!hints) return null;
 
   return (
-    <div
-      className={`control-hints caption ${settled ? 'is-settled' : ''}`}
-      aria-hidden
-    >
+    <div className={`control-hints caption ${settled ? 'is-settled' : ''}`}>
       {hints.map((h, i) => (
-        <span key={i} className="control-hint">
-          {h.keys?.map((k, j) => (
-            <span key={k}>
-              {j > 0 && <span className="hint-sep">{h.sep ?? ''}</span>}
-              <kbd>{k}</kbd>
-            </span>
+        <span key={i} className="control-hint" aria-hidden>
+          {h.keys?.map((k) => (
+            <kbd key={k}>{k}</kbd>
           ))}
           {h.text}
         </span>

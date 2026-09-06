@@ -1,11 +1,19 @@
 /**
- * Artwork reveal choreography — spec §10.6.
+ * Artwork reveal choreography.
  *
- * Focus is created by ADDING light to the artwork, not by removing light
- * from the room: environment settles to 0.78, never a blackout.
+ * A painting in a gallery is made of its own words. The reproduction under
+ * them is reached in exactly one way — a deliberate click, or Enter — and it
+ * is put back the moment that decision is undone. There is no other route in.
+ *
+ * Focus is created by ADDING light to the artwork, not by removing light from
+ * the room: environment settles to 0.78, never a blackout.
  *
  * Tweened values live in a mutable object read inside useFrame, so the
- * animation never causes React re-renders.
+ * animation never causes React re-renders. That is also the one hazard here:
+ * the shader reads `revealAnim`, the interface reads the store, and anything
+ * that changes one without the other leaves a work standing fully dissolved
+ * with nothing open. The subscription at the foot of this file is what makes
+ * that impossible — see it before adding another way to clear a reveal.
  */
 import gsap from 'gsap';
 import { useStore } from '../state/store';
@@ -60,6 +68,22 @@ export function startReveal(reducedMotion: boolean, latched = false) {
   tl.to(revealAnim, { env: 0.78, duration: 0.7, ease: 'power2.out' }, 0.2);
 }
 
+/**
+ * Back to words, with no animation and no questions.
+ *
+ * Used when the reveal is not on screen to be animated away — leaving the
+ * gallery, changing works — where a tween would only be a tween nobody sees
+ * that can still be interrupted half-finished.
+ */
+function rest() {
+  tl?.kill();
+  tl = null;
+  revealAnim.dissolve = 0;
+  revealAnim.spot = 12;
+  revealAnim.env = 1.0;
+  revealAnim.latched = false;
+}
+
 export function endReveal(reducedMotion: boolean) {
   tl?.kill();
   revealAnim.latched = false;
@@ -80,4 +104,31 @@ export function endReveal(reducedMotion: boolean) {
     ease: 'power2.in',
     onUpdate: () => useStore.getState().setDissolve(revealAnim.dissolve),
   });
+}
+
+/*
+ * The words are the default, and this is what guarantees it.
+ *
+ * `revealAnim.dissolve` is what the shader samples; `revealed` is what the
+ * interface reads. Every deliberate route through this file moves both, but
+ * the store also clears `revealed` on its own — changing phase, changing the
+ * work on the rail, a screen-reader proxy taking focus — and those routes
+ * cannot be expected to know about a mutable object in a transitions module.
+ *
+ * So the animation follows the store rather than trusting its callers: any
+ * moment the store says no work is open, the glyphs come back. Walk out of a
+ * gallery with a painting open and walk in again and it is made of text, as
+ * it should be.
+ */
+if (typeof window !== 'undefined') {
+  useStore.subscribe(
+    (s) => (s.phase === 'gallery' && s.revealed ? 'open' : s.phase === 'gallery' ? 'closed' : 'away'),
+    (state) => {
+      if (state === 'open') return;
+      if (state === 'away') return rest();
+      if (revealAnim.dissolve !== 0 || revealAnim.latched) {
+        endReveal(useStore.getState().reducedMotion);
+      }
+    },
+  );
 }

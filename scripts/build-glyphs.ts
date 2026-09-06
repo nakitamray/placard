@@ -1,8 +1,8 @@
 /**
- * build-glyphs.ts — spec §4.2 / §5.3
+ * build-glyphs.ts
  *
  * Quadtree variance subdivision over the source image, emitting glyphs.bin
- * (format in §6 / shared/glyphFormat.ts) plus a preview PNG for fast
+ * (format in shared/glyphFormat.ts) plus a preview PNG for fast
  * art-direction iteration.
  *
  * Chosen over Poisson-disk or rejection sampling because it is deterministic,
@@ -24,7 +24,7 @@ interface Emitted {
   b: number;
 }
 
-// ---------- colour helpers (averaging happens in LINEAR space, spec §4.2) ----------
+// ---------- colour helpers (averaging happens in LINEAR space) ----------
 
 const srgbToLinearLUT = new Float32Array(256);
 for (let i = 0; i < 256; i++) {
@@ -187,7 +187,7 @@ export async function buildGlyphs(
     const emit = (x0: number, y0: number, x1: number, y1: number) => {
       const n = (x1 - x0) * (y1 - y0);
       if (n <= 0) return;
-      // mean colour in LINEAR space, then re-encode (spec §4.2)
+      // mean colour in LINEAR space, then re-encode
       let r = satR.sum(x0, y0, x1, y1) / n;
       let g = satG.sum(x0, y0, x1, y1) / n;
       let b = satB.sum(x0, y0, x1, y1) / n;
@@ -211,7 +211,7 @@ export async function buildGlyphs(
       });
     };
 
-    // quadtree — iterative queue (spec §4.2)
+    // quadtree — iterative queue
     const queue: Array<[number, number, number, number]> = [[0, 0, W, H]];
     while (queue.length) {
       const [x0, y0, x1, y1] = queue.pop()!;
@@ -281,7 +281,7 @@ export async function buildGlyphs(
     passes++;
   }
 
-  // sort row-major: y band (by maxCell), then x — CORPUS READING ORDER (spec §4.2)
+  // sort row-major: y band (by maxCell), then x — CORPUS READING ORDER
   const band = maxCell;
   emitted.sort((a, b) => {
     const ba = Math.floor(a.y / band);
@@ -289,14 +289,14 @@ export async function buildGlyphs(
     return ba !== bb ? ba - bb : a.x - b.x;
   });
 
-  // palette: quantise emitted colours via median-cut (spec §4.2 step 7)
+  // palette: quantise emitted colours via median-cut
   const palette = medianCut(
     emitted.map((e) => [e.r, e.g, e.b] as [number, number, number]),
     conf.paletteSize,
   );
   const paletteSize = palette.length / 3;
 
-  // emit binary (spec §6)
+  // emit binary
   const buf = Buffer.alloc(HEADER_BYTES + paletteSize * 3 + emitted.length * RECORD_BYTES);
   buf.write(GLYPH_MAGIC, 0, 'ascii');
   buf.writeUInt16LE(GLYPH_VERSION, 4);
@@ -311,7 +311,7 @@ export async function buildGlyphs(
     buf.writeUInt16LE(Math.round((e.x / W) * 65535), o);
     buf.writeUInt16LE(Math.round((e.y / H) * 65535), o + 2);
     buf.writeUInt8(Math.min(255, Math.round(e.size * 4)), o + 4);
-    buf.writeUInt8(0, o + 5); // rotation — flow fields deferred (spec §18.2)
+    buf.writeUInt8(0, o + 5); // rotation — flow fields deferred
     buf.writeUInt8(nearestPaletteIndex(palette, e.r, e.g, e.b), o + 6);
     buf.writeUInt8(0, o + 7);
     o += RECORD_BYTES;
@@ -322,7 +322,7 @@ export async function buildGlyphs(
   const outFile = path.join(outDir, `glyphs${suffix}.bin`);
   fs.writeFileSync(outFile, buf);
 
-  // preview PNG (spec §5.3) — coloured rects standing in for glyphs; the
+  // preview PNG — coloured rects standing in for glyphs; the
   // fastest iteration loop for tuning config.json before touching the runtime
   if (!suffix) {
     const rects = emitted

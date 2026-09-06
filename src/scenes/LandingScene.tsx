@@ -1,22 +1,23 @@
 /**
- * The landing hero — the whole idea, in the first second.
+ * The entrance — the whole idea, in the first second.
  *
  * The exhibition's one claim is that these paintings are made out of the words
- * written about them, and until now a visitor met that claim four decisions
- * deep: choose a museum, walk a corridor, open the index, choose a work, hover
- * a canvas. By then most of them have gone.
+ * written about them, and a visitor should not have to go four decisions deep
+ * to meet it. So the entrance background is a painting, live, drawn out of its
+ * own corpus at full bleed behind the headline, with the reading lens under
+ * the cursor: move the mouse and the words give way to paint, and the picture
+ * leans very slightly toward you as you go.
  *
- * So the landing background is not a photograph any more. It is a painting,
- * live, drawn out of its own corpus at full bleed behind the headline, with
- * the reading lens under the cursor — move the mouse and the words give way to
- * paint, and the picture leans very slightly toward you as you go.
+ * IT CHANGES. Every fifteen seconds it crossfades to another work — drawn from
+ * every work in the exhibition, in an order shuffled per visit — which is why
+ * there are two of everything here: two glyph pre-passes writing into two
+ * render targets, two planes, and an opacity ramp between them.
  *
- * IT CHANGES. Every fifteen seconds it crossfades to another work, which is
- * why there are two of everything here: two glyph pre-passes writing into two
- * render targets, two planes, and an opacity ramp between them. The single
- * shared render target the gallery uses can only hold one field at a time, so
- * a crossfade was impossible until the pass learned to publish somewhere of
- * its own.
+ * FILLING A WINDOW WITHOUT LOSING THE PICTURE. A painting cropped to whatever
+ * shape the browser happens to be is the one place this exhibition cuts a work
+ * down, and a centred crop of a tall canvas throws away the face. Each work
+ * carries a focal point, and the plane is slid — never past its own edge, so
+ * no gap can open — to hold that point in the middle of the window.
  *
  * It reuses the gallery's machinery exactly: the same pass, the same shader,
  * the same lens. The only new things are a plane sized to cover the viewport
@@ -30,27 +31,31 @@ import { loadArtwork, loadReveal, type LoadedArtwork } from '../glyph/artworkLoa
 import { lens } from '../transitions/lens';
 import { pointer } from '../state/motion';
 import { useStore } from '../state/store';
+import { exhibitionWorks, heroWorks, shuffled, type ExhibitionWork } from '../state/works';
 import type { DeviceTier } from '../types';
-
-/**
- * Works that hold up at full bleed: a strong single subject, a composition
- * that survives being cropped to whatever shape the window happens to be, and
- * a corpus with something to say.
- */
-const HEROES = [
-  'leonardo-mona-lisa',
-  'vangogh-starry-night-rhone',
-  'hokusai-great-wave',
-  'vermeer-lacemaker',
-  'renoir-moulin-galette',
-  'el-greco-view-toledo',
-  'michelangelo-creation-adam',
-  'whistler-mother',
-];
 
 /** how long each work holds, and how long the change takes */
 const HOLD_MS = 15000;
 const FADE_MS = 3200;
+
+/** how far the picture leans against the pointer, as a fraction of the window */
+const LEAN = 0.035;
+
+/**
+ * Over-scale, so both the framing shift and the lean have somewhere to move
+ * without opening a gap at the edge of the window.
+ *
+ * It has to cover BOTH. An earlier version gave the lean its 3.5% and then
+ * spent the same slack again holding the focal point in frame, and a work
+ * whose framing was already against the stop showed a band of empty
+ * background as soon as the cursor moved toward it. Every percent here is
+ * picture thrown away, so it is exactly twice the lean and not a percent more.
+ */
+const OVERSCALE = 1 + LEAN * 4;
+
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+/** eased at both ends, so a change starts and stops rather than switching on */
+const smoothstep = (t: number) => t * t * (3 - 2 * t);
 
 const vert = /* glsl */ `
 varying vec2 vUv;
@@ -99,23 +104,36 @@ void main() {
 
 /** one hero: its own pre-pass, its own target, its own full-bleed plane */
 function Hero({
-  id,
+  work,
   tier,
   rtSize,
-  opacity,
+  fade,
+  role,
   live,
-  drift,
 }: {
-  id: string;
+  work: ExhibitionWork;
   tier: DeviceTier;
   rtSize: number;
-  /** 0..1, driven by the crossfade */
-  opacity: number;
+  /**
+   * The crossfade, as mutable state read inside the frame loop rather than as
+   * a prop. Setting it through React meant a re-render of the whole entrance
+   * sixty times a second for three seconds, which is exactly the stutter the
+   * fade was there to avoid.
+   */
+  fade: React.MutableRefObject<{ mix: number }>;
+  /**
+   * Which side of the fade this is.
+   *
+   * The outgoing work stays FULLY OPAQUE and the incoming one fades up over
+   * it. Fading both — one down, one up — leaves the two alphas summing to
+   * less than one in the middle of the cross, and what shows through the gap
+   * is the empty background: a dark flash halfway through every change.
+   */
+  role: 'in' | 'out';
   /** whether this pass should keep rendering; a faded-out one need not */
   live: boolean;
-  /** a small per-hero offset so the two do not sit exactly on top of each other */
-  drift: number;
 }) {
+  const id = work.id;
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
   const size = useThree((s) => s.size);
   const viewport = useThree((s) => s.viewport);
@@ -124,6 +142,7 @@ function Hero({
   const meshRef = useRef<THREE.Mesh>(null);
   const target = useMemo(() => ({ current: null as THREE.WebGLRenderTarget | null }), []);
   const forward = useMemo(() => new THREE.Vector3(), []);
+  const right = useMemo(() => new THREE.Vector3(), []);
   const lean = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -172,9 +191,27 @@ function Hero({
     const vw = vp.width;
     const vh = vp.height;
     const artAspect = iw / ih;
-    // a little over-scale, so there is room for the picture to move
-    const scale = Math.max(vw / artAspect, vh) * 1.14;
-    mesh.scale.set(scale * artAspect, scale, 1);
+    const scale = Math.max(vw / artAspect, vh) * OVERSCALE;
+    const planeW = scale * artAspect;
+    const planeH = scale;
+    mesh.scale.set(planeW, planeH, 1);
+
+    /*
+     * Hold the focal point in the middle of the window.
+     *
+     * The plane is bigger than the viewport in at least one axis; the slack is
+     * how far it can slide before an edge comes into view. Ask for the shift
+     * that would centre the work's focal point, then clamp it to that slack —
+     * so a portrait's face comes up out of the bottom of the frame, and a
+     * window that happens to fit the picture exactly does not move at all.
+     */
+    const slackX = Math.max(0, (planeW - vw) / 2);
+    const slackY = Math.max(0, (planeH - vh) / 2);
+    // the lean's half of the slack is reserved before the framing takes its own
+    const leanX = Math.min(vw * LEAN, slackX / 2);
+    const leanY = Math.min(vh * LEAN, slackY / 2);
+    const shiftX = clamp((0.5 - work.focus[0]) * planeW, -(slackX - leanX), slackX - leanX);
+    const shiftY = clamp((work.focus[1] - 0.5) * planeH, -(slackY - leanY), slackY - leanY);
 
     /*
      * The picture leans against the pointer. Not a lot — a couple of per cent
@@ -183,24 +220,27 @@ function Hero({
      */
     if (!reducedMotion) {
       const k = 1 - Math.pow(0.001, Math.min(delta, 0.1) / 0.55);
-      lean.current.x += (-pointer.x * vw * 0.035 - lean.current.x) * k;
-      lean.current.y += (pointer.y * vh * 0.035 - lean.current.y) * k;
-      mesh.position.addScaledVector(
-        new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion),
-        lean.current.x + drift,
-      );
-      mesh.position.y += lean.current.y;
+      lean.current.x += (-pointer.x * leanX - lean.current.x) * k;
+      lean.current.y += (pointer.y * leanY - lean.current.y) * k;
     }
+
+    // clamped again against the full slack: whatever the two of them ask for
+    // between them, an edge of this plane never comes into the window
+    const offsetX = clamp(shiftX + (reducedMotion ? 0 : lean.current.x), -slackX, slackX);
+    const offsetY = clamp(shiftY + (reducedMotion ? 0 : lean.current.y), -slackY, slackY);
+    mesh.position.addScaledVector(
+      right.set(1, 0, 0).applyQuaternion(camera.quaternion),
+      offsetX,
+    );
+    mesh.position.y += offsetY;
 
     // the cursor, in the artwork's own pixels: undo the cover fit
     if (!reducedMotion && live) {
-      const planeW = scale * artAspect;
-      const planeH = scale;
-      const wx = (pointer.x * vw) / 2 - lean.current.x - drift;
-      const wy = (-pointer.y * vh) / 2 - lean.current.y;
+      const wx = (pointer.x * vw) / 2 - offsetX;
+      const wy = (-pointer.y * vh) / 2 - offsetY;
       lens.x = (wx / planeW + 0.5) * iw;
       lens.y = (0.5 - wy / planeH) * ih;
-      lens.r = Math.min(iw, ih) * 0.28;
+      lens.r = Math.min(iw, ih) * 0.21;
       lens.want = 1;
     }
 
@@ -212,7 +252,7 @@ function Hero({
 
     const k = 1 - Math.pow(0.001, Math.min(delta, 0.1) / 0.4);
     u.uHasPaint.value += ((art.fullTex ? 1 : 0) - u.uHasPaint.value) * k;
-    u.uFade.value = opacity;
+    u.uFade.value = role === 'out' ? 1 : smoothstep(fade.current.mix);
   });
 
   return (
@@ -220,7 +260,7 @@ function Hero({
       <GlyphPrePass
         artwork={art}
         rtSize={rtSize}
-        active={!!art && (live || opacity > 0.01)}
+        active={!!art}
         target={target}
         wash={0.3}
         inkLift={0.9}
@@ -228,7 +268,8 @@ function Hero({
         sizeScale={0.68}
         clearAlpha={0}
       />
-      <mesh ref={meshRef} frustumCulled={false} renderOrder={-1}>
+      {/* the outgoing work is drawn first; both are behind everything else */}
+      <mesh ref={meshRef} frustumCulled={false} renderOrder={role === 'out' ? -2 : -1}>
         <planeGeometry args={[1, 1]} />
         <shaderMaterial
           vertexShader={vert}
@@ -245,42 +286,57 @@ function Hero({
 }
 
 export function LandingScene({ tier }: { tier: DeviceTier }) {
-  const reducedMotion = useStore((s) => s.reducedMotion);
   const heroRT = useMemo(() => (tier.name === 'low' ? tier.rtSize : 2048), [tier]);
 
-  /** the order the heroes are shown in, shuffled once so a visit is its own */
-  const order = useMemo(() => {
-    const pinned = new URLSearchParams(window.location.search).get('hero');
-    if (pinned) return [pinned];
-    const a = [...HEROES];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
+  /**
+   * Every work in the exhibition, in an order shuffled per visit, so nobody
+   * arrives twice to the same entrance. `?hero=<id>` pins one, which is how a
+   * single work's framing is checked without waiting for it to come round.
+   */
+  const [order, setOrder] = useState<ExhibitionWork[]>([]);
+  useEffect(() => {
+    let alive = true;
+    void exhibitionWorks().then((all) => {
+      if (!alive || !all.length) return;
+      const pinned = new URLSearchParams(window.location.search).get('hero');
+      const one = pinned && all.find((w) => w.id === pinned);
+      setOrder(one ? [one] : shuffled(heroWorks(all)));
+    });
+    return () => {
+      alive = false;
+    };
   }, []);
 
   /*
    * Which two works are on screen, and how far between them we are. Both move
-   * in one piece of state for the same reason the still slideshow's did: two
-   * values that must agree cannot be kept in two places.
+   * in one piece of state because two values that must agree cannot be kept in
+   * two places.
    */
   const [pair, setPair] = useState({ from: 0, to: 0 });
-  const [mix, setMix] = useState(1);
+  /** true only while two works are on screen at once */
+  const [crossing, setCrossing] = useState(false);
+  const fade = useRef({ mix: 1 });
 
   useEffect(() => {
-    if (order.length < 2 || reducedMotion) return;
+    if (order.length < 2) return;
     let raf = 0;
     let timer = 0;
     const advance = () => {
       setPair((p) => ({ from: p.to, to: (p.to + 1) % order.length }));
-      setMix(0);
+      fade.current.mix = 0;
+      setCrossing(true);
       const started = performance.now();
       const step = () => {
         const t = Math.min(1, (performance.now() - started) / FADE_MS);
-        setMix(t);
-        if (t < 1) raf = requestAnimationFrame(step);
-        else timer = window.setTimeout(advance, HOLD_MS);
+        fade.current.mix = t;
+        if (t < 1) {
+          raf = requestAnimationFrame(step);
+        } else {
+          // the only render in the whole change: the outgoing work leaves the
+          // tree, and its pre-pass and its target go with it
+          setCrossing(false);
+          timer = window.setTimeout(advance, HOLD_MS);
+        }
       };
       raf = requestAnimationFrame(step);
     };
@@ -289,7 +345,7 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
       window.clearTimeout(timer);
       cancelAnimationFrame(raf);
     };
-  }, [order, reducedMotion]);
+  }, [order]);
 
   /*
    * The lens belongs to this page, so this page puts it away. It is module
@@ -305,29 +361,32 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
     [],
   );
 
-  const showOutgoing = mix < 1 && pair.from !== pair.to;
+  if (!order.length) return null;
+
+  const outgoing = crossing && pair.from !== pair.to ? order[pair.from] : null;
+  const incoming = order[pair.to];
 
   return (
     <group>
-      {showOutgoing && (
+      {outgoing && (
         <Hero
-          key={`out-${pair.from}`}
-          id={order[pair.from]}
+          key={`out-${outgoing.id}`}
+          work={outgoing}
           tier={tier}
           rtSize={heroRT}
-          opacity={1 - mix}
+          fade={fade}
+          role="out"
           live={false}
-          drift={0}
         />
       )}
       <Hero
-        key={`in-${pair.to}`}
-        id={order[pair.to]}
+        key={`in-${incoming.id}`}
+        work={incoming}
         tier={tier}
         rtSize={heroRT}
-        opacity={mix}
+        fade={fade}
+        role="in"
         live
-        drift={0}
       />
     </group>
   );

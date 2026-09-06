@@ -1,5 +1,5 @@
 /**
- * Application state machine — spec §9.
+ * Application state machine
  *
  * BOOT → LANDING →(T1 portal)→ CORRIDOR →(T2)→ MAP →(T3 warp)→ GALLERY
  * ARTWORK is a sub-state of GALLERY (the camera does not move), so it is
@@ -10,7 +10,7 @@
  */
 import type { Phase } from '../types';
 
-export const ALLOWED: Record<Phase, Phase[]> = {
+const ALLOWED: Record<Phase, Phase[]> = {
   boot: ['landing'],
   landing: ['corridor'],
   // a painting in the corridor can be opened directly — you should not

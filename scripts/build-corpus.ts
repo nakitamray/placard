@@ -1,8 +1,8 @@
 /**
- * build-corpus.ts — spec §5.2
+ * build-corpus.ts
  *
  * Cleans and concatenates the texts an artwork is made of, folds every
- * character into the atlas charset, strips ALL whitespace (spec §4.4 — spaces
+ * character into the atlas charset, strips ALL whitespace ( spaces
  * would read as luminance holes) and emits:
  *
  *   public/artworks/{id}/corpus.bin — Uint8 charset INDICES (not codepoints)
@@ -111,7 +111,7 @@ export function buildCorpus(record: ArtworkRecord): CorpusResult {
     const cleaned = cleanText(raw);
     const offset = indices.length;
     for (const ch of cleaned) {
-      if (/\s/.test(ch)) continue; // remove ALL whitespace (spec §5.2 step 5)
+      if (/\s/.test(ch)) continue; // remove ALL whitespace
       const idx = foldToCharset(ch);
       if (idx >= 0) indices.push(idx);
     }

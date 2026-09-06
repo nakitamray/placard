@@ -1,21 +1,22 @@
 /**
  * Runtime glyph atlas.
  *
- * The spec (§5.1) generates an MSDF atlas at build time with msdf-bmfont-xml.
- * This implementation draws the charset once into an offscreen canvas at
- * 48px/cell and uploads it a single time with mipmaps — a deliberate
- * substitution documented in the README: identical runtime cost profile
- * (zero per-frame uploads), no native font tooling required, and at the
- * project's 4–24px glyph sizes mipmapped alpha is visually indistinguishable
- * from SDF. The metrics texture contract (per-char UV rect, sampled directly
- * in the vertex shader) is exactly the spec's.
+ * The charset is drawn once into an offscreen canvas at 48px a cell and
+ * uploaded a single time with mipmaps — no per-frame uploads, and no native
+ * font tooling in the build.
+ *
+ * A signed-distance-field atlas would be the textbook answer, and at the sizes
+ * a glyph is actually drawn here — four to twenty-four pixels — mipmapped
+ * alpha is indistinguishable from it. The metrics texture is what the shader
+ * cares about either way: one UV rect per character, sampled in the vertex
+ * shader, which is the part that has to be exact.
  */
 import * as THREE from 'three';
 import { CHARSET } from '../../shared/charset';
 
 export interface GlyphAtlas {
   atlas: THREE.CanvasTexture;
-  /** 256×1 RGBA float — u0,v0,u1,v1 per char index (spec §5.1) */
+  /** 256×1 RGBA float — u0,v0,u1,v1 per char index */
   metrics: THREE.DataTexture;
 }
 

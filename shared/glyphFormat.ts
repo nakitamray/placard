@@ -1,5 +1,5 @@
 /**
- * glyphs.bin — binary format (spec §6). Little-endian.
+ * glyphs.bin — binary format. Little-endian.
  *
  * Header (16 bytes):
  *   0  char[4]  magic "PLCD"

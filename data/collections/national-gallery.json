@@ -1,0 +1,681 @@
+[
+  {
+    "id": "van-eyck-arnolfini",
+    "artist": "Jan van Eyck",
+    "artistDates": "c. 1390–1441",
+    "title": "The Arnolfini Portrait",
+    "titleOriginal": "Het Arnolfini portret",
+    "year": "1434",
+    "medium": "Oil on oak panel",
+    "dimensions": "82.2 × 60 cm",
+    "room": "Room 63",
+    "accession": "NG186",
+    "creditLine": "Bought, 1842",
+    "accentColor": "#4A2F32",
+    "heroFocus": [
+      0.5,
+      0.42
+    ],
+    "labelText": "A man and a woman stand in a Bruges bedroom holding hands. Between and behind them a convex mirror shows the whole room from the other side, including two figures standing where you are standing. Above it, on the wall, in the script of a legal document: Johannes de eyck fuit hic — Jan van Eyck was here. Nobody has ever agreed what the picture is a record of, and the signature is the reason the argument never ends.",
+    "extendedNote": "Van Eyck did not invent oil paint, but he is the first painter who used it as though it were the only sensible way to describe the world. Every material in this room is given its own behaviour: brass reflects, fur absorbs, the dog's coat separates into individual hairs, the window glass is thicker at the bottom of each pane, the oranges on the chest have the dull pitted skin of real fruit. This is what thin transparent layers over a white ground can do and what tempera cannot.\n\nThe convex mirror is the picture's argument about itself. It is the size of a coin, and inside it the entire room appears in reverse — the couple from behind, the window, and two more people in the doorway, one of them in blue. Round its frame run ten roundels of the Passion, each a few millimetres across, each legible. The painting includes its own witness.\n\nWhat is being witnessed is unsettled. The nineteenth-century reading — a secret marriage, with the signature as testimony and the single lit candle as a vow — is elegant and has been picked apart for a hundred years. It may be a memorial to a dead wife; it may be a record of a betrothal, or of a legal power granted to a woman to act in her husband's business. She is not pregnant: that is the fashion, and the fold of cloth is held. The one thing certain is that a wealthy Italian merchant living in Bruges wanted a room, a marriage and a moment fixed in a medium that had never fixed anything so exactly before.",
+    "regions": [
+      {
+        "id": "mirror",
+        "label": "The mirror",
+        "box": [
+          0.38,
+          0.3,
+          0.64,
+          0.52
+        ],
+        "text": "A convex mirror the size of a coin, and inside it the whole room in reverse: the couple from behind, the window, and two more people standing in the doorway — where you are standing. Round its frame run ten roundels of the Passion, each a few millimetres across and each legible. Above it, in the script of a legal document: Johannes de eyck fuit hic. Jan van Eyck was here. The painting includes its own witness."
+      },
+      {
+        "id": "hands",
+        "label": "The hands",
+        "box": [
+          0.28,
+          0.5,
+          0.72,
+          0.72
+        ],
+        "text": "The whole reading of this picture turns on this gesture and on the single lit candle in the chandelier above it. The nineteenth-century answer — a secret marriage, with the signature as testimony — is elegant and has been picked apart for a century. It may be a memorial to a dead wife, or a record of a legal power granted to a woman to act in her husband's business. She is not pregnant: that is the fashion, and the fold of cloth is held."
+      },
+      {
+        "id": "dog",
+        "label": "The dog",
+        "box": [
+          0.28,
+          0.74,
+          0.62,
+          1.0
+        ],
+        "text": "Van Eyck did not invent oil paint but he is the first painter who used it as though it were the only sensible way to describe the world. Look at what happens here: the coat separates into individual hairs, each lying in its own direction, each catching a different amount of the light from the window. Brass reflects, fur absorbs, glass is thicker at the bottom of every pane. This is what thin transparent layers over a white ground can do and what tempera cannot."
+      }
+    ],
+    "placeholder": {
+      "aspect": 0.73,
+      "archetype": "interior",
+      "palette": [
+        "#241618",
+        "#4A2F32",
+        "#7A5C46",
+        "#B49A6E",
+        "#E4D6B8",
+        "#2E4A38"
+      ],
+      "seed": 71
+    }
+  },
+  {
+    "id": "vangogh-sunflowers",
+    "artist": "Vincent van Gogh",
+    "artistDates": "1853–1890",
+    "title": "Sunflowers",
+    "titleOriginal": "Vaas met vijftien zonnebloemen",
+    "year": "1888",
+    "medium": "Oil on canvas",
+    "dimensions": "92.1 × 73 cm",
+    "room": "Room 43",
+    "accession": "NG3863",
+    "creditLine": "Bought, Courtauld Fund, 1924",
+    "accentColor": "#8A6A1E",
+    "heroFocus": [
+      0.5,
+      0.46
+    ],
+    "labelText": "Fifteen sunflowers in an earthenware pot, painted in Arles in the week before Gauguin arrived, to hang in the room he would sleep in. Yellow on yellow on yellow: the flowers, the pot, the table and the wall are all the same family of colour, separated only by temperature and by the weight of the paint. Van Gogh worked fast, in the heat, in the morning light, and finished four canvases of them in a week.",
+    "extendedNote": "He was trying to make a room. The Yellow House in Arles was to be a studio of the South and Gauguin was coming to share it, so Van Gogh decorated the guest bedroom himself with sunflowers — a decoration, in his own word, and a welcome. He wrote to his brother that he was painting with the gusto of a Marseillais eating bouillabaisse, and that the whole thing would be a symphony in blue and yellow.\n\nThe technical problem he set himself is the one the picture is famous for: a painting in which almost everything is yellow, and in which nothing goes flat. He solves it by temperature and by texture. The background is a cool greenish yellow laid thin; the table is warmer and flatter; the pot is divided by a hard line into a paler upper half and an ochre lower one; and the flower heads are built up in ridges of impasto thick enough to cast their own shadows under a gallery light. The seed heads are almost sculpture.\n\nThey are also not decorative flowers. Several are past their best, going brown at the edges, petals dropping, and one has gone over entirely. He painted a bouquet at every stage of its life at once, which is what stops the picture being wallpaper. There are five versions in this arrangement; this is the one he chose to repeat, and the repetitions are in Philadelphia, Tokyo, Munich and Amsterdam.",
+    "regions": [
+      {
+        "id": "heads",
+        "label": "The seed heads",
+        "box": [
+          0.14,
+          0.06,
+          0.9,
+          0.5
+        ],
+        "text": "Built up in ridges of impasto thick enough to cast their own shadows under a gallery light — the seed heads are almost sculpture. And they are not decorative flowers: several are past their best, going brown at the edges, petals dropping, one gone over entirely. He painted a bouquet at every stage of its life at once, which is what stops the picture being wallpaper."
+      },
+      {
+        "id": "pot",
+        "label": "The pot",
+        "box": [
+          0.22,
+          0.56,
+          0.8,
+          0.9
+        ],
+        "text": "Divided by a hard line into a paler upper half and an ochre lower one, and signed on it. The technical problem of the whole canvas is here: a painting in which almost everything is yellow and in which nothing goes flat. It is solved by temperature and by texture — cool greenish yellow laid thin behind, warmer and flatter on the table, thick ridges on the flowers themselves."
+      },
+      {
+        "id": "ground",
+        "label": "The yellow ground",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.3
+        ],
+        "text": "He was making a room, not a picture. The Yellow House in Arles was to be a studio of the South, Gauguin was coming to share it, and Van Gogh decorated the guest bedroom himself with sunflowers — a decoration, in his own word, and a welcome. He wrote that he was painting with the gusto of a Marseillais eating bouillabaisse, and that the whole thing would be a symphony in blue and yellow."
+      }
+    ],
+    "placeholder": {
+      "aspect": 0.79,
+      "archetype": "still-life",
+      "palette": [
+        "#4A3A0E",
+        "#8A6A1E",
+        "#C8A02E",
+        "#E6C452",
+        "#F5E7A8",
+        "#6A5A2A"
+      ],
+      "seed": 72
+    }
+  },
+  {
+    "id": "turner-fighting-temeraire",
+    "artist": "J. M. W. Turner",
+    "artistDates": "1775–1851",
+    "title": "The Fighting Temeraire",
+    "titleOriginal": "The Fighting Temeraire tugged to her last berth to be broken up",
+    "year": "1839",
+    "medium": "Oil on canvas",
+    "dimensions": "90.7 × 121.6 cm",
+    "room": "Room 34",
+    "accession": "NG524",
+    "creditLine": "Turner Bequest, 1856",
+    "accentColor": "#8A5A2E",
+    "heroFocus": [
+      0.44,
+      0.5
+    ],
+    "labelText": "A ninety-eight-gun ship of the line, pale as a ghost and still carrying her masts, towed up the Thames by a small black steam tug to be broken for timber. She fought at Trafalgar. The tug is squat, dark and belching, and it is in front. Behind them the sun goes down in a sky that takes up half the canvas, and on the other side a thin moon is already up. Turner called it his darling and would not sell it.",
+    "extendedNote": "Almost nothing in it is accurate. The Temeraire was towed by two tugs, not one; her masts and rigging had already been stripped before she left Sheerness; the tow went west, so the sun would have been ahead of her rather than behind; and no sunset of that colour was involved. Turner watched the tow, or was told about it, and then made the picture the event deserved instead of the one that happened.\n\nThe argument is in the drawing. The warship is built out of light — pale ochre and white, her hull barely separated from the water, her masts drawn as though remembered. The tug is the only hard-edged thing in the painting: black, low, close, with a red glare in its funnel and a plume of smoke crossing the sky. One is described with love and the other with precision, and the precision is what is doing the towing.\n\nTurner was sixty-four and had spent his life painting the sea under sail. He never sold this picture, refused every offer for it, and left it to the nation with the rest of the work in his studio. Ruskin wrote that the sun would never rise on the Temeraire again. It was voted the greatest painting in Britain in 2005, which is a strange fate for a picture about the end of something.",
+    "regions": [
+      {
+        "id": "ship",
+        "label": "The Temeraire",
+        "box": [
+          0.04,
+          0.14,
+          0.5,
+          0.78
+        ],
+        "text": "Built out of light — pale ochre and white, the hull barely separated from the water, the masts drawn as though remembered rather than observed. Almost nothing about her here is accurate: she was stripped of masts and rigging before she left Sheerness, and she was towed by two tugs, not one. Turner made the picture the event deserved instead of the one that happened."
+      },
+      {
+        "id": "tug",
+        "label": "The tug",
+        "box": [
+          0.14,
+          0.48,
+          0.46,
+          0.88
+        ],
+        "text": "The only hard-edged thing in the painting: black, low, close, with a red glare in its funnel and a plume of smoke crossing the sky. One vessel is described with love and the other with precision, and the precision is what is doing the towing. That is the whole argument, and Turner does not state it anywhere else on the canvas."
+      },
+      {
+        "id": "sun",
+        "label": "The sunset",
+        "box": [
+          0.5,
+          0.04,
+          1.0,
+          0.76
+        ],
+        "text": "Half the canvas is sky. The tow actually went west, so the sun would have been ahead of the ship rather than behind her — this sunset is invented, and there is a thin new moon already up on the other side of the picture. Turner was sixty-four, had spent his life painting the sea under sail, refused every offer for this canvas, called it his darling, and left it to the nation."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.34,
+      "archetype": "landscape",
+      "palette": [
+        "#2A1E14",
+        "#8A5A2E",
+        "#C88A3E",
+        "#E8C070",
+        "#F6E4C0",
+        "#4A5A6A"
+      ],
+      "seed": 73
+    }
+  },
+  {
+    "id": "constable-hay-wain",
+    "artist": "John Constable",
+    "artistDates": "1776–1837",
+    "title": "The Hay Wain",
+    "titleOriginal": "Landscape: Noon",
+    "year": "1821",
+    "medium": "Oil on canvas",
+    "dimensions": "130.2 × 185.4 cm",
+    "room": "Room 34",
+    "accession": "NG1207",
+    "creditLine": "Presented by Henry Vaughan, 1886",
+    "accentColor": "#3F5340",
+    "heroFocus": [
+      0.5,
+      0.52
+    ],
+    "labelText": "A hay cart standing in the shallows of the Stour outside Flatford Mill, with a dog on the bank, a cottage in the trees, and a sky doing most of the work. Constable grew up two hundred yards from this spot and painted it from studies in a London studio. It sold to nobody in London and won a gold medal in Paris three years later, where Delacroix saw it and went home to repaint the background of his own Massacre at Chios.",
+    "extendedNote": "Constable's ambition was almost aggressively unfashionable: to paint one specific English valley, in specific weather, at a specific hour, with no ruins, no myth and no Italy in it. He said that the sound of water escaping from mill dams, willows, old rotten planks and brickwork made him a painter, and that he was grateful.\n\nThe sky is the engine. He made hundreds of oil studies of cloud outdoors — dated, timed, and annotated with the wind direction — and called the sky the chief organ of sentiment in a landscape. Here it is a moving mass of cumulus with real weight and real edges, and every value in the ground below is pitched against it.\n\nThe other thing people notice is the flecking. Across the greens and the water there are small touches of pure white and pale ochre — Constable's snow, as his critics called it — which do not describe anything in particular and are there to keep the surface alive at the distance a big landscape is actually looked at. English buyers thought it unfinished. The French thought it was the future, and it was.",
+    "regions": [
+      {
+        "id": "sky",
+        "label": "The sky",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.44
+        ],
+        "text": "The engine of the picture. Constable made hundreds of oil studies of cloud outdoors — dated, timed, annotated with the wind direction — and called the sky the chief organ of sentiment in a landscape. Here it is a moving mass of cumulus with real weight and real edges, and every value in the ground below is pitched against it."
+      },
+      {
+        "id": "wain",
+        "label": "The cart",
+        "box": [
+          0.24,
+          0.44,
+          0.62,
+          0.82
+        ],
+        "text": "A hay cart standing in the shallows of the Stour outside Flatford Mill. Constable grew up two hundred yards from this spot and painted it from studies, in a London studio. He said the sound of water escaping from mill dams, willows, old rotten planks and brickwork made him a painter, and that he was grateful."
+      },
+      {
+        "id": "water",
+        "label": "The water",
+        "box": [
+          0.0,
+          0.64,
+          1.0,
+          1.0
+        ],
+        "text": "Small touches of pure white and pale ochre are scattered across the greens and the river — Constable's snow, as his critics called it. They do not describe anything in particular. They are there to keep the surface alive at the distance a big landscape is actually looked at. English buyers thought the picture unfinished; it went to Paris, won a gold medal, and Delacroix went home and repainted the background of his Massacre at Chios."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.42,
+      "archetype": "landscape",
+      "palette": [
+        "#1E2A1C",
+        "#3F5340",
+        "#7A8A5E",
+        "#C4BC92",
+        "#E8E2CA",
+        "#8A6A4A"
+      ],
+      "seed": 74
+    }
+  },
+  {
+    "id": "caravaggio-supper-emmaus",
+    "artist": "Caravaggio",
+    "artistDates": "1571–1610",
+    "title": "The Supper at Emmaus",
+    "titleOriginal": "Cena in Emmaus",
+    "year": "1601",
+    "medium": "Oil and tempera on canvas",
+    "dimensions": "141 × 196.2 cm",
+    "room": "Room 32",
+    "accession": "NG172",
+    "creditLine": "Presented by Lord Vernon, 1839",
+    "accentColor": "#7A3B24",
+    "heroFocus": [
+      0.5,
+      0.46
+    ],
+    "labelText": "Two disciples are eating with a stranger they met on the road. He blesses the bread, and in that second they realise who he is. Caravaggio paints the second: one man grips the arms of his chair as though about to stand, the other throws his arms wide, and the innkeeper standing over them sees nothing at all. The table is pushed to the very front of the picture and a basket of fruit sits on the edge of it, tipped past the point where it should fall.",
+    "extendedNote": "It was painted for Ciriaco Mattei, whose family were among Caravaggio's most important Roman patrons, and it belongs to the years just after the Contarelli Chapel made him famous overnight. The subject is Luke 24: two of Christ's followers walk to Emmaus on the evening of the resurrection with a stranger who explains the scriptures to them, and only recognise him when he breaks the bread at supper — at which moment he vanishes.\n\nEverything in the painting is arranged around that instant of recognition. The Christ is beardless and young, which shocked contemporaries and is the point: he is not immediately knowable, and the disciples have spent a whole day failing to know him. The gestures are the recognition itself. The outflung arms of the disciple on the right come straight out of the canvas toward the viewer in violent foreshortening; the other man's chair is coming up off the floor. The innkeeper, standing, sees a meal.\n\nThe still life is doing theological work as well as showing off. The fruit is out of season and some of it is going over — a wormhole in an apple, split figs, spotted leaves — and it sits in a basket balanced over the edge of the table, in our space rather than theirs. Caravaggio's early biographer Bellori complained that he painted a basket of fruit with as much care as a figure. That was meant as an insult and reads now as the description of what makes him modern: the light falls on the bread, the shoulder and the wormhole with exactly the same attention.",
+    "regions": [
+      {
+        "id": "hands",
+        "label": "The hands",
+        "box": [
+          0.52,
+          0.2,
+          0.98,
+          0.62
+        ],
+        "text": "The disciple on the right throws his arms open straight out of the canvas, foreshortened so hard that one hand is nearly a circle. It is the recognition happening — not a reaction to it, but the thing itself. Caravaggio composes so that the viewer is standing where the arms are heading, which puts you at the table rather than in front of a picture of one."
+      },
+      {
+        "id": "christ",
+        "label": "The blessing",
+        "box": [
+          0.3,
+          0.1,
+          0.66,
+          0.56
+        ],
+        "text": "The Christ is beardless and young, which shocked contemporaries and is exactly the point: he has walked with these men all day without being known. His hand is over the bread, and his face is the only calm thing in the painting. The shadow it casts on the wall behind is doing the work an aureole would have done in an altarpiece a generation earlier."
+      },
+      {
+        "id": "basket",
+        "label": "The basket",
+        "box": [
+          0.28,
+          0.6,
+          0.62,
+          0.94
+        ],
+        "text": "Out of season, and some of it going over: a wormhole in the apple, split figs, spotted leaves. The basket sits balanced past the edge of the table, in the viewer's space rather than the disciples'. Bellori complained that Caravaggio painted fruit with as much care as a figure. He did, and the light falls on the bread, the shoulder and the wormhole with exactly the same attention."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.39,
+      "archetype": "figure-group",
+      "palette": [
+        "#14100C",
+        "#3A2416",
+        "#7A3B24",
+        "#B98A52",
+        "#E4D2AE",
+        "#5C6B4A"
+      ],
+      "seed": 41
+    }
+  },
+  {
+    "id": "holbein-ambassadors",
+    "artist": "Hans Holbein the Younger",
+    "artistDates": "c. 1497–1543",
+    "title": "The Ambassadors",
+    "titleOriginal": "Jean de Dinteville and Georges de Selve",
+    "year": "1533",
+    "medium": "Oil on oak panel",
+    "dimensions": "207 × 209.5 cm",
+    "room": "Room 4",
+    "accession": "NG1314",
+    "creditLine": "Bought, 1890",
+    "accentColor": "#2F4038",
+    "heroFocus": [
+      0.5,
+      0.44
+    ],
+    "labelText": "Two young men in their finest clothes lean on a shelf loaded with instruments — globes, sundials, a torquetum, a lute, a hymn book, a case of flutes. Across the floor at their feet lies a long grey smear that resolves, if you stand at the right-hand edge of the picture and look back along it, into a human skull. Almost every object on the shelf can be dated to a particular day in April 1533, and several of them are broken.",
+    "extendedNote": "Jean de Dinteville was the French ambassador to Henry VIII; Georges de Selve, on the right, was a bishop who visited him that spring. The picture is a double portrait, an inventory and an argument, and the argument is about a Europe coming apart. The lute has a snapped string. The hymn book is open at a Lutheran translation. The instruments on the upper shelf measure the heavens and the ones below measure the earth, and the dials are set to a date some weeks after Henry's break with Rome.\n\nThe skull is the reason the painting is famous, and it is a genuine piece of optics rather than a trick of drawing. It is an anamorphosis: the image is stretched along one axis so severely that from the front it is unreadable, and correct only from a raking angle a few feet to the right — roughly where a visitor climbing a staircase past the picture would have been. A memento mori that only exists when you stop looking at the picture properly.\n\nEverything else is described with the precision Holbein brought from Basel: the tiled floor is a copy of the Cosmati pavement in Westminster Abbey, the fur is fur, the velvet is velvet, and there is a small silver crucifix half hidden behind the curtain at the top left which almost nobody sees.",
+    "regions": [
+      {
+        "id": "skull",
+        "label": "The skull",
+        "box": [
+          0.14,
+          0.72,
+          0.86,
+          1.0
+        ],
+        "text": "A genuine piece of optics rather than a trick of drawing. It is an anamorphosis: the image is stretched along one axis so severely that from the front it is unreadable, and correct only from a raking angle a few feet to the right — roughly where a visitor climbing a staircase past the picture would have stood. A memento mori that only exists when you stop looking at the painting properly."
+      },
+      {
+        "id": "shelf",
+        "label": "The instruments",
+        "box": [
+          0.28,
+          0.28,
+          0.74,
+          0.72
+        ],
+        "text": "Globes, sundials, a torquetum, a lute, a hymn book, a case of flutes. The instruments above measure the heavens and the ones below measure the earth, and the dials are set to a date some weeks after Henry's break with Rome. The lute has a snapped string. The hymn book is open at a Lutheran translation. This is a picture about a Europe coming apart, stated entirely in objects."
+      },
+      {
+        "id": "curtain",
+        "label": "The curtain",
+        "box": [
+          0.0,
+          0.0,
+          0.34,
+          0.4
+        ],
+        "text": "Behind the green damask at the top left there is a small silver crucifix, half hidden, which almost nobody sees. Everything else in the panel is described with the precision Holbein brought from Basel: the tiled floor is a copy of the Cosmati pavement in Westminster Abbey, the fur is fur, the velvet is velvet."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.01,
+      "archetype": "portrait",
+      "palette": [
+        "#151E1A",
+        "#2F4038",
+        "#6A5A4A",
+        "#A88A5E",
+        "#DED0B4",
+        "#8A2A24"
+      ],
+      "seed": 76
+    }
+  },
+  {
+    "id": "titian-bacchus-ariadne",
+    "artist": "Titian",
+    "artistDates": "c. 1488–1576",
+    "title": "Bacchus and Ariadne",
+    "titleOriginal": "Bacco e Arianna",
+    "year": "1520–1523",
+    "medium": "Oil on canvas",
+    "dimensions": "176.5 × 191 cm",
+    "room": "Room 12",
+    "accession": "NG35",
+    "creditLine": "Bought, 1826",
+    "accentColor": "#2A4A78",
+    "heroFocus": [
+      0.5,
+      0.46
+    ],
+    "labelText": "Ariadne, abandoned on Naxos, turns as a god leaps out of his chariot toward her, mid-air, cloak flying. Behind him comes his procession: cymbals, a man wrapped in snakes, a drunk on a donkey, a child dragging a calf's head. Above her head eight stars make the crown he will throw into the sky. The blue behind them is ultramarine — ground lapis lazuli, more expensive than gold — laid on at full strength across a third of the canvas.",
+    "extendedNote": "One of a set of mythologies painted for Alfonso d'Este's camerino in Ferrara, from a programme drawn out of Ovid and Catullus. Bellini painted one of them, Titian three, and this is the one where he decided to do something no Venetian picture had done: to build the whole composition on a diagonal and catch every figure in the middle of a movement.\n\nBacchus is genuinely airborne. His weight is nowhere, his cloak is behind him, and the line from Ariadne's raised arm through his body to his trailing leg runs corner to corner across the canvas. On the right the procession is a knot of overlapping bodies with no still point in it. On the left there is only sky, sea, and a woman turning. The picture divides straight down the middle into noise and quiet, and the story is the moment the noise arrives.\n\nThe blue is the other thing everyone notices. Ultramarine at full strength was reserved for the Virgin's robe and used by the thimbleful; Titian had a duke paying for it and covered a third of a two-metre canvas in it, so the sky is a shade of blue almost nobody in 1523 had ever seen at that scale. It has barely faded. Everything else in the picture is pitched against it.",
+    "regions": [
+      {
+        "id": "leap",
+        "label": "The leap",
+        "box": [
+          0.32,
+          0.12,
+          0.62,
+          0.7
+        ],
+        "text": "Bacchus is genuinely airborne. His weight is nowhere, his cloak is behind him, and the line from Ariadne's raised arm through his body to his trailing leg runs corner to corner across the canvas. No Venetian picture had built a whole composition on a diagonal like this, or caught every figure in the middle of a movement."
+      },
+      {
+        "id": "sky",
+        "label": "The blue",
+        "box": [
+          0.0,
+          0.0,
+          0.46,
+          0.4
+        ],
+        "text": "Ultramarine — ground lapis lazuli, more expensive than gold, normally reserved for the Virgin's robe and used by the thimbleful. Titian had a duke paying for it and covered a third of a two-metre canvas in it, so this is a blue almost nobody in 1523 had ever seen at that scale. It has barely faded. The eight stars above Ariadne's head are the crown he will throw into the sky."
+      },
+      {
+        "id": "procession",
+        "label": "The procession",
+        "box": [
+          0.54,
+          0.18,
+          1.0,
+          0.96
+        ],
+        "text": "Cymbals, a man wrapped in snakes, a drunk asleep on a donkey, a child dragging a calf's head on a string. A knot of overlapping bodies with no still point anywhere in it. The picture divides straight down the middle into noise and quiet — sky, sea and a woman turning on the left; all of this on the right — and the story is the moment the noise arrives."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.08,
+      "archetype": "figure-group",
+      "palette": [
+        "#12203A",
+        "#2A4A78",
+        "#6A8AB8",
+        "#C4A47A",
+        "#EFE0C4",
+        "#A03028"
+      ],
+      "seed": 77
+    }
+  },
+  {
+    "id": "velazquez-rokeby-venus",
+    "artist": "Diego Velázquez",
+    "artistDates": "1599–1660",
+    "title": "The Rokeby Venus",
+    "titleOriginal": "La Venus del espejo",
+    "year": "1647–1651",
+    "medium": "Oil on canvas",
+    "dimensions": "122.5 × 177 cm",
+    "room": "Room 30",
+    "accession": "NG2057",
+    "creditLine": "Bought with contributions from the National Art Collections Fund, 1906",
+    "accentColor": "#5A2A30",
+    "heroFocus": [
+      0.46,
+      0.5
+    ],
+    "labelText": "A woman lies with her back to us on grey silk, looking into a mirror held up by a winged child. The face in the mirror is out of focus and does not belong to the geometry — from where we stand we should be seeing her chest, not her eyes. Velázquez painted it for a Spanish court where the Inquisition prohibited the nude, and it is the only surviving female nude by him. In 1914 a suffragette walked into this room and cut it open with a meat cleaver.",
+    "extendedNote": "The mirror is doing something impossible and doing it deliberately. Held at that angle, it would reflect her body; instead it returns a soft, unspecific face turned out toward the viewer. It is not a mistake — Velázquez was the most exact observer of optics in Europe — but a choice, sometimes called the Venus effect, and its result is that the picture watches you back without ever quite being a portrait of anybody.\n\nThe paint handling is what painters come for. The flesh is laid in thin and wet, with almost no drawing, and the whole figure is built out of the relationship between three greys — the sheet, the silk hanging and the skin — with one crimson curtain to hold the picture up. Seen close it dissolves into loaded strokes; at four feet it is a body in a room.\n\nOn 10 March 1914 Mary Richardson slashed the canvas seven times with a meat cleaver, in protest at the arrest of Emmeline Pankhurst. She said afterwards that she had tried to destroy the picture of the most beautiful woman in mythological history as a protest against the government destroying Mrs Pankhurst, who was the most beautiful character in modern history. The repairs are visible in raking light and nowhere else.",
+    "regions": [
+      {
+        "id": "mirror",
+        "label": "The mirror",
+        "box": [
+          0.52,
+          0.1,
+          0.86,
+          0.5
+        ],
+        "text": "It is doing something impossible and doing it deliberately. Held at that angle it would reflect her body; instead it returns a soft, unspecific face turned out toward the viewer. Velázquez was the most exact observer of optics in Europe, so this is a choice rather than a mistake — and its result is that the picture watches you back without ever quite being a portrait of anybody."
+      },
+      {
+        "id": "back",
+        "label": "The back",
+        "box": [
+          0.06,
+          0.4,
+          0.66,
+          0.9
+        ],
+        "text": "The flesh is laid in thin and wet with almost no drawing, and the whole figure is built out of the relationship between three greys — the sheet, the silk hanging and the skin — with one crimson curtain to hold the picture up. Seen close it dissolves into loaded strokes; at four feet it is a body in a room. This is the only surviving female nude by Velázquez, painted for a court where the Inquisition prohibited them."
+      },
+      {
+        "id": "curtain",
+        "label": "The curtain",
+        "box": [
+          0.6,
+          0.0,
+          1.0,
+          0.72
+        ],
+        "text": "On 10 March 1914 Mary Richardson walked into this room and slashed the canvas seven times with a meat cleaver, in protest at the arrest of Emmeline Pankhurst. She said afterwards that she had tried to destroy the picture of the most beautiful woman in mythological history as a protest against the government destroying Mrs Pankhurst, the most beautiful character in modern history. The repairs are visible in raking light and nowhere else."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.44,
+      "archetype": "interior",
+      "palette": [
+        "#2A1418",
+        "#5A2A30",
+        "#8A7A76",
+        "#C4BCB4",
+        "#EDE6DC",
+        "#3A4450"
+      ],
+      "seed": 78
+    }
+  },
+  {
+    "id": "seurat-bathers-asnieres",
+    "artist": "Georges Seurat",
+    "artistDates": "1859–1891",
+    "title": "Bathers at Asnières",
+    "titleOriginal": "Une baignade, Asnières",
+    "year": "1884",
+    "medium": "Oil on canvas",
+    "dimensions": "201 × 300 cm",
+    "room": "Room 44",
+    "accession": "NG3908",
+    "creditLine": "Bought, Courtauld Fund, 1924",
+    "accentColor": "#3E5E6E",
+    "heroFocus": [
+      0.5,
+      0.5
+    ],
+    "labelText": "Working men and boys on the bank of the Seine at Asnières on a hot afternoon, with the factory chimneys of Clichy smoking on the far bank behind them. Nobody is talking. Nobody is moving much. Seurat was twenty-four, and he made fourteen oil panels and ten drawings on the spot before painting a canvas three metres wide in the studio — a scale reserved for history painting, given to a Sunday afternoon.",
+    "extendedNote": "It was refused by the Salon in 1884 and shown instead at the first Salon des Indépendants, which Seurat helped found in response. The subject was the provocation: a monumental canvas of unremarkable people doing nothing in particular, in a suburb, in front of industry, composed with the stillness of a fresco.\n\nThe handling is not yet the dotted technique he is famous for. Most of the picture is laid in with balayé — small crosshatched strokes dragged in one direction — and the dots came later: Seurat reworked parts of the canvas around 1887, after developing pointillism, so the hat of the boy in the water and passages of the bank carry small dots of contrasting colour added years after the rest.\n\nWhat holds it is the drawing underneath. Every figure is a simple, weighted silhouette, placed on a horizontal that runs the length of the canvas, and the intervals between them are as considered as the figures. Seurat read colour theory — Chevreul, Rood, Blanc — and was building a method for painting light that could be taught. He died at thirty-one.",
+    "regions": [
+      {
+        "id": "boy",
+        "label": "The boy in the water",
+        "box": [
+          0.66,
+          0.42,
+          0.94,
+          0.82
+        ],
+        "text": "His hat carries small dots of contrasting colour that are not on the rest of the canvas. Seurat reworked passages of this painting around 1887, after developing pointillism, so parts of it are three years younger than the rest — the picture contains the moment its own method changed."
+      },
+      {
+        "id": "bank",
+        "label": "The bank",
+        "box": [
+          0.0,
+          0.44,
+          0.62,
+          1.0
+        ],
+        "text": "Most of this is laid in with balayé — small crosshatched strokes dragged in one direction — not with dots. What holds the picture is the drawing underneath: every figure a simple weighted silhouette on a horizontal that runs the length of the canvas, with intervals between them as considered as the figures themselves."
+      },
+      {
+        "id": "chimneys",
+        "label": "The far bank",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.4
+        ],
+        "text": "The factory chimneys of Clichy, smoking, behind a row of men on a riverbank doing nothing at all. The Salon refused this in 1884 and Seurat showed it instead at the first Salon des Indépendants, which he helped found in response. The subject was the provocation: three metres of canvas, a scale reserved for history painting, given to a Sunday afternoon in a suburb."
+      }
+    ],
+    "placeholder": {
+      "aspect": 1.49,
+      "archetype": "figure-group",
+      "palette": [
+        "#1E3038",
+        "#3E5E6E",
+        "#8A9A8E",
+        "#C8BC94",
+        "#EFE8D2",
+        "#B8763A"
+      ],
+      "seed": 79
+    }
+  },
+  {
+    "id": "stubbs-whistlejacket",
+    "artist": "George Stubbs",
+    "artistDates": "1724–1806",
+    "title": "Whistlejacket",
+    "year": "c. 1762",
+    "medium": "Oil on canvas",
+    "dimensions": "292 × 246.4 cm",
+    "room": "Room 34",
+    "accession": "NG6569",
+    "creditLine": "Bought with the assistance of the Heritage Lottery Fund, 1997",
+    "accentColor": "#6A5236",
+    "heroFocus": [
+      0.5,
+      0.44
+    ],
+    "labelText": "A chestnut stallion rearing, life size, against nothing at all. No landscape, no groom, no sky, no ground — just a plain warm field the colour of the wall it was painted for. Stubbs had spent eighteen months in a Lincolnshire farmhouse dissecting horses and drawing what was under the skin, and this is what that knowledge bought: an animal that stands in the room with you and has nowhere to be.",
+    "extendedNote": "Whistlejacket was a racehorse owned by the Marquess of Rockingham, twice Prime Minister, who commissioned the picture for Wentworth Woodhouse. The story that a landscape and a rider were planned and abandoned — because the horse saw the painting and attacked it — is a good story and probably not true; the plain ground is most likely what was wanted, for a room where the picture was to hang between two others.\n\nThe anatomy is why it works. Between 1756 and 1758 Stubbs rented a farmhouse and dissected horses, suspending each carcass from the ceiling on hooks and drawing it layer by layer over weeks as it decayed. The result was The Anatomy of the Horse, which he etched himself because no engraver would take it on, and which was still in use as a veterinary reference a century later. Every muscle here is one he had held.\n\nWithout a setting the picture becomes a portrait in the full sense. The head turns, the eye shows white, the ears are back — this is a specific animal in a specific mood, at three metres high, on a ground that gives you nothing to look at instead. It is the most unsentimental great animal painting there is.",
+    "regions": [
+      {
+        "id": "head",
+        "label": "The head",
+        "box": [
+          0.42,
+          0.04,
+          0.86,
+          0.34
+        ],
+        "text": "The head turns, the eye shows white, the ears are back. Without a setting the picture becomes a portrait in the full sense: a specific animal in a specific mood, at three metres high, on a ground that gives you nothing to look at instead. It is the most unsentimental great animal painting there is."
+      },
+      {
+        "id": "body",
+        "label": "The anatomy",
+        "box": [
+          0.12,
+          0.28,
+          0.9,
+          0.8
+        ],
+        "text": "Between 1756 and 1758 Stubbs rented a Lincolnshire farmhouse and dissected horses, suspending each carcass from the ceiling on hooks and drawing it layer by layer over weeks as it decayed. The result was The Anatomy of the Horse, which he etched himself because no engraver would take it on, and which was still in use as a veterinary reference a century later. Every muscle here is one he had held."
+      },
+      {
+        "id": "ground",
+        "label": "The empty ground",
+        "box": [
+          0.0,
+          0.0,
+          0.34,
+          1.0
+        ],
+        "text": "No landscape, no groom, no sky, no ground — a plain warm field the colour of the wall it was painted for. The story that a setting was planned and abandoned because the horse attacked the canvas is a good story and probably not true; the emptiness is most likely what Rockingham wanted, for a room where this was to hang between two other pictures."
+      }
+    ],
+    "placeholder": {
+      "aspect": 0.84,
+      "archetype": "portrait",
+      "palette": [
+        "#3A2E1C",
+        "#6A5236",
+        "#A87C48",
+        "#D8B884",
+        "#F0E4C8",
+        "#8A6A5A"
+      ],
+      "seed": 80
+    }
+  }
+]

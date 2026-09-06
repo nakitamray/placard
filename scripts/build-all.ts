@@ -1,21 +1,23 @@
 /**
- * build-all.ts — spec §5 / M3
+ * build-all.ts
  *
  * `pnpm build:assets` regenerates every shipped asset from data/.
  *
  * For each museum in data/museums/order.json, for each work it hangs:
  *   1. images   → wall/view/full × avif+webp+jpg, lqip.webp
  *   2. corpus   → corpus.bin + segment offsets
- *   3. glyphs   → glyphs.bin (+ glyphs-lo.bin for the low device tier, §14.2)
+ *   3. glyphs   → glyphs.bin (+ glyphs-lo.bin for the low device tier)
  *   4. meta     → meta.json (placard + provenance + corpus table + geometry)
  *
  * then per museum:
  *   5. public/museums/{id}.json   corridor style + floor plan + artwork index
  *   6. public/museums/index.json  the landing page's list
- *   7. public/landing/            backgrounds drawn from every museum
+ *   7. public/museums/works.json  every work in the exhibition, for the entrance
  *
  * Adding a museum = two files in data/ and a line in order.json.
  * Adding a work   = one record in data/collections/{museum}.json.
+ *
+ * `--strict` fails the run if any work is still on a procedural stand-in.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,22 +35,57 @@ import { buildCorpus } from './build-corpus.ts';
 import { buildGlyphs } from './build-glyphs.ts';
 import type { ArtworkRecord, MuseumRecord } from './lib/records.ts';
 
-/** kept in step with build-images.ts, which owns the flag */
-const SKIP_AVIF = process.env.PLACARD_SKIP_AVIF === '1';
+/**
+ * Where to hold a picture the entrance has to crop, when the record does not
+ * say. A tall canvas is nearly always a figure, and a figure's head is above
+ * the middle of it; everything else is held in the centre.
+ */
+function defaultFocus(aspect: number): [number, number] {
+  return aspect < 0.85 ? [0.5, 0.4] : [0.5, 0.5];
+}
 
 const museums = museumOrder();
 const museumIndex: Array<{
   id: string;
   name: string;
   city: string;
+  homepage: string;
   subtitle: string;
   count: number;
 }> = [];
-/** one representative image per museum for the landing slideshow */
-const landingPicks: Array<{ museum: string; id: string }> = [];
+/**
+ * Every work in the exhibition, flat, for the entrance.
+ *
+ * The entrance draws from all of them rather than from a shortlist, so this is
+ * the list it reads: enough to choose a work, size it and hold it in frame,
+ * and nothing else. It carries no bytes of its own — the pictures it names are
+ * the ones already published per artwork.
+ */
+const exhibition: Array<{
+  id: string;
+  museum: string;
+  artist: string;
+  title: string;
+  aspect: number;
+  focus: [number, number];
+  /** whether a real scan is published for it, or a procedural stand-in */
+  authentic: boolean;
+  /** whether the entrance may open on it */
+  hero: boolean;
+}> = [];
+
+/**
+ * `--strict` refuses to finish while any work is still on a procedural
+ * stand-in. Worth pointing a deploy at once every work has a real scan: a
+ * missing picture then fails the build and names itself, rather than quietly
+ * publishing a rendering that reads as a bug in the glyph engine.
+ */
+const STRICT = process.argv.includes('--strict');
 
 let generatedCount = 0;
 let authenticCount = 0;
+/** the works still on stand-ins, so `--strict` can name them */
+const generated: string[] = [];
 /** running totals, so the build says out loud what it is asking a visitor to download */
 let publishedBytes = 0;
 let glyphBytes = 0;
@@ -68,7 +105,11 @@ for (const museumId of museums) {
   for (const record of works) {
     console.log(`\n▸ ${record.id}`);
     const images = await buildImages(record);
-    images.authentic ? authenticCount++ : generatedCount++;
+    if (images.authentic) authenticCount++;
+    else {
+      generatedCount++;
+      generated.push(record.id);
+    }
     publishedBytes += Object.values(images.bytes).reduce((a, b) => a + b, 0);
 
     const corpus = buildCorpus(record);
@@ -89,12 +130,24 @@ for (const museumId of museums) {
       JSON.stringify(meta, null, 2),
     );
 
+    const aspect = (full.width ?? 1) / (full.height ?? 1);
     index.push({
       id: record.id,
       artist: record.artist,
       title: record.title,
-      aspect: (full.width ?? 1) / (full.height ?? 1),
+      aspect,
       accent: record.accentColor,
+      ...(record.frameShape ? { shape: record.frameShape } : {}),
+    });
+    exhibition.push({
+      id: record.id,
+      museum: museum.id,
+      artist: record.artist,
+      title: record.title,
+      aspect,
+      focus: record.heroFocus ?? defaultFocus(aspect),
+      authentic: images.authentic,
+      hero: images.authentic && !record.heroSkip,
     });
   }
 
@@ -107,6 +160,7 @@ for (const museumId of museums) {
         id: museum.id,
         name: museum.name,
         city: museum.city,
+        homepage: museum.homepage,
         subtitle: museum.subtitle,
         blurb: museum.blurb,
         corridorNote: museum.corridorNote,
@@ -124,13 +178,10 @@ for (const museumId of museums) {
     id: museum.id,
     name: museum.name,
     city: museum.city,
+    homepage: museum.homepage,
     subtitle: museum.subtitle,
     count: index.length,
   });
-  // two backgrounds per museum keeps the landing slideshow varied without
-  // shipping fifty full-size jpegs the landing page would never reach
-  landingPicks.push({ museum: museumId, id: works[0].id });
-  if (works.length > 4) landingPicks.push({ museum: museumId, id: works[4].id });
 }
 
 fs.writeFileSync(
@@ -138,65 +189,29 @@ fs.writeFileSync(
   JSON.stringify(museumIndex, null, 2),
 );
 
-/*
- * Landing backgrounds.
- *
- * These are the first bytes anyone downloads, before a single museum has been
- * chosen, so they are the whole first impression of how fast this place is.
- * Ten full-bleed 1920px jpegs used to be fetched the moment the page mounted —
- * the browser sees ten `background-image` declarations and honours all ten,
- * even though nine of them are behind `opacity: 0`. They are now published at
- * 1600px in three formats and the slideshow mounts two at a time (see
- * src/ui/LandingLayer.tsx), so the landing page costs one picture instead of
- * ten.
- */
-const landingDir = path.join(PUBLIC, 'landing');
-fs.mkdirSync(landingDir, { recursive: true });
-const landingFormats = SKIP_AVIF ? ['webp', 'jpg'] : ['avif', 'webp', 'jpg'];
-const manifest: string[] = [];
-let landingBytes = 0;
-let n = 1;
-for (const pick of landingPicks) {
-  const stem = `${String(n).padStart(2, '0')}-${pick.id}`;
-  const at = () =>
-    sharp(path.join(artworkPublic(pick.id), 'full.jpg')).resize({
-      width: 1600,
-      withoutEnlargement: true,
-    });
-  for (const fmt of landingFormats) {
-    const pipe =
-      fmt === 'avif'
-        ? at().avif({ quality: 52, effort: 3 })
-        : fmt === 'webp'
-          ? at().webp({ quality: 72, effort: 4 })
-          : at().jpeg({ quality: 76, mozjpeg: true });
-    const info = await pipe.toFile(path.join(landingDir, `${stem}.${fmt}`));
-    landingBytes += info.size;
-  }
-  manifest.push(stem);
-  n++;
-}
 fs.writeFileSync(
-  path.join(landingDir, 'manifest.json'),
-  JSON.stringify({ files: manifest, formats: landingFormats }, null, 2),
+  path.join(PUBLIC, 'museums', 'works.json'),
+  JSON.stringify(exhibition, null, 2),
 );
 
 const total = authenticCount + generatedCount;
 console.log(`\n▸ ${museums.length} museums, ${total} works`);
-console.log(
-  `▸ landing: ${manifest.length} backgrounds, ${(landingBytes / 1024 / 1024).toFixed(1)} MB across ` +
-    `${landingFormats.join('/')} — one is fetched on load`,
-);
+console.log(`▸ entrance: draws from all ${exhibition.length}, one at a time`);
 console.log(
   `▸ published: ${(publishedBytes / 1024 / 1024).toFixed(1)} MB of pictures, ` +
     `${(glyphBytes / 1024 / 1024).toFixed(1)} MB of glyphs`,
 );
 if (generatedCount) {
   console.log(
-    `\n⚠ ${generatedCount}/${total} works are rendering procedural stand-ins.\n` +
-      `  Drop a public-domain scan at data/artworks/{id}/source.jpg and rebuild\n` +
-      `  to replace one — see the README, "Authentic scans".`,
+    `\n⚠ ${generatedCount}/${total} works are rendering procedural stand-ins:\n` +
+      generated.map((id) => `    ${id}`).join('\n') +
+      `\n  Run \`pnpm fetch:images\`, or drop a public-domain scan at\n` +
+      `  data/artworks/{id}/source.jpg and rebuild — see the README, "Pictures".`,
   );
+  if (STRICT) {
+    console.log('\n--strict: refusing to publish an exhibition with stand-ins on the wall.\n');
+    process.exit(1);
+  }
 }
 console.log('\ndone.');
 
@@ -211,24 +226,30 @@ console.log('\ndone.');
  * reproduction it is showing and under what terms, and a hand-waved
  * "PD-Art" is not that.
  */
-function imageProvenance(id: string, authentic: boolean) {
+function imageProvenance(id: string, authentic: boolean, reproduction?: string) {
   const creditPath = path.join(artworkData(id), 'image-credit.json');
   if (authentic && fs.existsSync(creditPath)) {
     const c = JSON.parse(fs.readFileSync(creditPath, 'utf8'));
     return {
       file: 'full.jpg',
-      source: `Wikimedia Commons — ${c.commonsFile}${c.descriptionUrl ? ` (${c.descriptionUrl})` : ''}`,
+      source: 'Wikimedia Commons',
+      commonsFile: c.commonsFile ?? '',
+      url: c.descriptionUrl ?? '',
       license: c.license || 'see Commons',
       photoCredit: c.author || '',
+      // a work whose record says the picture is not the object says it here
+      // too, where the licence is: it is provenance, not a footnote
+      note: [reproduction, c.crop].filter(Boolean).join(' · '),
     };
   }
   return {
     file: 'full.jpg',
-    source: authentic
-      ? 'Public-domain scan supplied at data/artworks/{id}/source.jpg'
-      : 'Procedural stand-in generated by Placard — no scan supplied for this work',
+    source: authentic ? 'Scan supplied with the record' : 'Procedural stand-in',
+    commonsFile: '',
+    url: '',
     license: authentic ? 'PD-Art' : 'CC0 (generated)',
     photoCredit: '',
+    note: authentic ? '' : 'No reproduction is published for this work yet.',
   };
 }
 
@@ -257,13 +278,14 @@ function buildMeta(
     },
     labelText: record.labelText,
     extendedNote: record.extendedNote,
+    ...(record.link ? { link: record.link } : {}),
     textProvenance: {
       type: 'placard_original',
       attribution:
         'Wall label and extended note written for Placard; catalogue details stated from published museum records',
       url: '',
     },
-    image: imageProvenance(record.id, images.authentic),
+    image: imageProvenance(record.id, images.authentic, record.reproduction),
     images: imageManifest(images.bytes),
     accentColor: record.accentColor,
     regions: regionsFor(record),

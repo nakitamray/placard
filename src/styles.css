@@ -1,4 +1,4 @@
-/* ─── Placard UI system — spec §10C ───────────────────────────────────────
+/* ─── Placard UI system ───────────────────────────────────────
    The interface is the quiet frame around a loud idea. */
 
 :root {
@@ -36,16 +36,13 @@ body { margin: 0; overflow: hidden; background: var(--ink); }
 
 .no-native-cursor, .no-native-cursor * { cursor: none !important; }
 
-/* ─── type scale — spec §10C.2 ─── */
+/* ─── type scale ─── */
 .caption { font-size: 11px; line-height: 16px; letter-spacing: 0.09em; text-transform: uppercase; }
 .meta    { font-size: 13px; line-height: 20px; letter-spacing: 0.02em; font-variant-caps: small-caps; text-transform: none; }
 .body    { font-size: 16px; line-height: 26px; letter-spacing: 0; text-transform: none; }
 .title   { font-size: 21px; line-height: 28px; font-style: italic; font-weight: 500; }
 .display { font-size: 34px; line-height: 40px; letter-spacing: -0.01em; font-weight: 500; }
-.hero    { font-size: 54px; line-height: 58px; letter-spacing: -0.02em; font-weight: 500; }
-@media (max-width: 720px) { .hero { font-size: 38px; line-height: 42px; } }
 @media (max-height: 780px) {
-  .hero { font-size: 40px; line-height: 44px; }
   .landing-content .museum-row { min-height: 46px; }
 }
 
@@ -60,7 +57,7 @@ button {
   cursor: pointer;
 }
 button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
-  outline: 2px solid var(--gilt); /* never outline: none — spec §10C.10 */
+  outline: 2px solid var(--gilt); /* never outline: none */
   outline-offset: 3px;
 }
 button:active { transform: translateY(1px); }
@@ -73,10 +70,10 @@ button:active { transform: translateY(1px); }
 }
 .canvas-wrap.is-blurred {
   filter: blur(14px) saturate(0.92);
-  transform: scale(1.02); /* map backdrop breathes 1.00 → 1.02 (spec §10B.3) */
+  transform: scale(1.02); /* map backdrop breathes 1.00 → 1.02 */
 }
 
-/* ─── loading — spec §10C.8 ─── */
+/* ─── loading ─── */
 .loading { position: fixed; inset: 0; background: var(--ink); z-index: 60; }
 .loading-word {
   position: absolute; bottom: 28px; left: 0; right: 0;
@@ -94,7 +91,7 @@ button:active { transform: translateY(1px); }
   background: var(--bone); color: var(--ink); padding: var(--s6); text-align: center;
 }
 
-/* ─── landing — spec §10C.3 ─── */
+/* ─── landing ─── */
 /* Transparent: the background of this page is the live glyph canvas rendering
    behind it. Only the reduced-motion fallback paints a ground of its own.
 
@@ -164,9 +161,28 @@ button:active { transform: translateY(1px); }
   padding: 4vh 0; overflow-y: auto; scrollbar-width: none;
 }
 .landing-content::-webkit-scrollbar { display: none; }
-.landing-mark { color: var(--gilt); letter-spacing: 0.35em; margin: 0 0 var(--s4); flex: none; }
-.landing-content .hero { margin: 0 0 var(--s4); flex: none; }
-.landing-content .hairline { border-color: rgba(216, 205, 186, 0.4); width: 220px; margin-left: 0; }
+/* The title page: the name, then the one line under it. Nothing else — the
+   painting behind them is the description. */
+.landing-mark {
+  margin: 0; flex: none; color: var(--bone); font-weight: 500;
+  font-size: 68px; line-height: 74px; letter-spacing: 0.06em;
+}
+.landing-line {
+  margin: var(--s2) 0 0; flex: none; color: var(--gilt);
+  font-size: 22px; line-height: 28px; letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+@media (max-width: 720px) {
+  .landing-mark { font-size: 46px; line-height: 52px; }
+  .landing-line { font-size: 16px; line-height: 22px; letter-spacing: 0.12em; }
+}
+@media (max-height: 780px) {
+  .landing-mark { font-size: 52px; line-height: 58px; }
+  .landing-line { font-size: 18px; }
+}
+.landing-content .hairline {
+  border-color: rgba(216, 205, 186, 0.4); width: 220px; margin: var(--s6) 0 0;
+}
 .landing-choose { color: var(--stone); opacity: 0.85; margin: var(--s4) 0 var(--s2); flex: none; }
 .museum-list { list-style: none; margin: 0; padding: 0; flex: none; }
 .museum-list li { border-bottom: 1px solid rgba(216, 205, 186, 0.28); }
@@ -188,11 +204,23 @@ button:active { transform: translateY(1px); }
 .museum-row:hover .museum-name { transform: translateX(4px); }
 .museum-row:disabled { cursor: progress; }
 .museum-row.is-loading .museum-name { opacity: 0.55; }
+@media (max-width: 720px) {
+  /* The column is inset from the left on a wide screen so the painting has
+     somewhere to be. On a phone there is no room for that, and the inset
+     pushes the right-hand half of every museum row off the screen. */
+  .landing-content { left: 0; right: 0; width: auto; max-width: none; padding: 4vh var(--s5) 88px; }
+  /* and the row stacks: a name and its meta side by side need width neither
+     of them has here */
+  .museum-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .museum-meta { flex-direction: row; align-items: baseline; gap: var(--s2); flex-wrap: wrap; }
+}
 .landing-empty, .landing-error { color: var(--taupe); text-transform: none; letter-spacing: 0.02em; }
 .landing-error { color: #E2A08A; margin-top: var(--s4); }
 .landing-empty code { font-family: ui-monospace, Menlo, Consolas, monospace; }
 
-/* the one line that teaches the lens — it leaves as soon as it is obeyed */
+/* the one line that teaches the lens — it leaves as soon as it is obeyed, and
+   it is never shown to a visitor who has no cursor to move */
+@media (pointer: coarse) { .landing-lenshint { display: none; } }
 .landing-lenshint {
   margin: var(--s5) 0 0; flex: none; color: var(--gilt);
   text-transform: none; letter-spacing: 0.06em; font-size: 12px;
@@ -210,16 +238,19 @@ button:active { transform: translateY(1px); }
 }
 .skip-link:focus { top: var(--s4); }
 
-/* ─── map overlay — spec §10C.4 ──────────────────────────────────────────
-   The wing's index. It used to be a drawn floor plan on a bone scrim: pale,
-   boxy and, next to the corridor it opens over, unfinished-looking — the one
-   screen in the exhibition that switched the lights on. It is now the same
-   dark ground and hairline rules as the landing, so choosing a painting reads
-   as the same act as choosing a museum. */
+/* ─── map overlay ────────────────────────────────────────────────────────
+   The wing's index: the same dark ground and hairline rules as the entrance,
+   so choosing a painting reads as the same act as choosing a museum. A pale
+   scrim here would be the one screen in the exhibition that switches the
+   lights on. */
 .map-overlay {
   position: fixed; inset: 0; z-index: 30;
   background: linear-gradient(180deg, rgba(14, 12, 10, 0.9), rgba(20, 17, 14, 0.94));
-  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  /* No backdrop blur here. The canvas underneath is already carrying
+     blur(14px) from .is-blurred, and this sits on it under a gradient that is
+     ninety per cent opaque — three more pixels of blur are invisible through
+     that, and a full-screen backdrop filter is one of the most expensive
+     things a compositor can be asked for. */
   color: var(--bone);
   display: flex; justify-content: center;
   overflow-y: auto; overscroll-behavior: contain;
@@ -289,7 +320,7 @@ button:active { transform: translateY(1px); }
   .room-cue { display: none; }
 }
 
-/* ─── placard — spec §10C.5 ─── */
+/* ─── placard ─── */
 .placard {
   position: fixed; top: 0; left: 0; z-index: 25;
   width: 380px; background: var(--bone);
@@ -303,7 +334,7 @@ button:active { transform: translateY(1px); }
 }
 .placard.is-visible {
   opacity: 1; visibility: visible; translate: 0 0;
-  transition-delay: 400ms, 400ms, 0s; /* placard slides in late (spec §10.6) */
+  transition-delay: 400ms, 400ms, 0s; /* placard slides in late */
 }
 /* The label stays up while it is read, so it needs a way out of its own. */
 .placard-close {
@@ -331,14 +362,29 @@ button:active { transform: translateY(1px); }
 .placard-housing { font-weight: 500; }
 .placard-room { color: var(--taupe) !important; }
 .placard-label { margin-top: var(--s2) !important; }
+/* the way out to the whole object, for a work shown as a fragment. Set as a
+   line of its own under the wall text: it is not a control, it is a citation */
+.placard-link {
+  display: block; margin-top: var(--s3);
+  color: var(--gilt); text-decoration: none;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.35);
+  padding-bottom: 2px; width: fit-content;
+  transition: border-color var(--d-fast), color var(--d-fast);
+}
+.placard-link:hover { color: #ddb734; border-color: #ddb734; }
+
 .placard-more { color: var(--gilt) !important; margin-top: var(--s4); display: inline-flex; gap: 6px; }
 .placard-more .chev { display: inline-block; transition: rotate var(--d-base) var(--e-both); }
 .placard.is-expanded .placard-more .chev { rotate: 180deg; }
 .placard-note p { margin-top: var(--s4) !important; }
 .placard-provenance { font-style: italic; color: var(--taupe) !important; margin-top: var(--s5) !important; }
 
-@media (pointer: coarse), (max-width: 720px) {
-  /* bottom sheet (spec §10C.5 mobile) */
+/* A bottom sheet, but only where there is height for one. A phone held
+   sideways is 390 tall: a sheet taking 55% of that leaves a strip of painting
+   above it, which is the opposite of the point. Short screens keep the
+   right-hand column, which at 844 across still leaves the canvas 460. */
+@media (pointer: coarse) and (min-height: 560px),
+       (max-width: 720px) and (min-height: 560px) {
   .placard {
     top: auto; bottom: 0; left: 0; right: 0; width: 100%;
     translate: 0 40px; max-height: 55vh;
@@ -352,7 +398,7 @@ button:active { transform: translateY(1px); }
   }
 }
 
-/* ─── rail indicator — spec §10C.6 ─── */
+/* ─── rail indicator ─── */
 .rail {
   position: fixed; bottom: 92px; left: 50%; transform: translateX(-50%);
   z-index: 20; text-align: center;
@@ -372,7 +418,7 @@ button:active { transform: translateY(1px); }
    map overlay as well, so "back" is in the same place in every phase. */
 .gallery-back { position: fixed; top: var(--s5); left: var(--s6); z-index: 32; }
 
-/* ─── reveal vignette — spec §10.6: 18% opacity, generous radius ─── */
+/* ─── reveal vignette: 18% opacity, generous radius ─── */
 .reveal-vignette {
   position: fixed; inset: 0; z-index: 15; pointer-events: none;
   background: radial-gradient(ellipse 130% 130% at center, transparent 55%, rgba(36, 31, 26, 0.18) 100%);
@@ -396,78 +442,211 @@ button:active { transform: translateY(1px); }
    pale grey type on near-black is where reading goes to die.
 
    So it follows the wall label and the thread panel instead: dark type on a
-   warm bone ground, over a light wash of the room behind it. It still has no
-   hard edge — the same feathered mask dissolves all four sides — so it reads
-   as a page drawn across the exhibition rather than a window cut out of it. */
+   warm bone ground, beside a spine that takes the room's own colour. */
 .credits {
   position: fixed; inset: 0; z-index: 55;
   background: radial-gradient(
     130% 100% at 50% 42%,
-    rgba(242, 235, 223, 0.5) 0%,
-    rgba(36, 31, 26, 0.52) 100%
+    rgba(242, 235, 223, 0.3) 0%,
+    rgba(20, 17, 14, 0.56) 100%
   );
-  backdrop-filter: blur(11px) saturate(1.06);
-  -webkit-backdrop-filter: blur(11px) saturate(1.06);
+  backdrop-filter: blur(14px) saturate(1.04);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04);
   display: grid; place-items: center; padding: var(--s6);
   animation: credits-in var(--d-base) var(--e-out);
+  /* overridden per museum from the room's own palette — see ui/Credits.tsx */
+  --c-accent: #6e5b4a;
+  --c-gilt: var(--gilt);
+  --c-spine: #2a2119;
 }
 @keyframes credits-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* A guide, not a dialog: a dark spine carrying the sections and a bone page
+   beside it. The panel has no border — its edge is a fade — and no radius,
+   because museums have sharp corners. */
 .credits-inner {
   position: relative;
-  background: rgba(246, 241, 232, 0.94);
-  backdrop-filter: blur(30px) saturate(1.1);
-  -webkit-backdrop-filter: blur(30px) saturate(1.1);
+  display: grid; grid-template-columns: 252px minmax(0, 1fr);
+  background: rgba(247, 243, 236, 0.97);
+  backdrop-filter: blur(30px) saturate(1.06);
+  -webkit-backdrop-filter: blur(30px) saturate(1.06);
   color: var(--ink);
-  box-shadow: 0 30px 90px rgba(36, 31, 26, 0.4);
-  max-width: 700px; width: 100%; max-height: 86vh;
+  /* softened: a hard-edged slab reads as a dialog box dropped on a painting.
+     A little radius and a wide, weak shadow make it a page laid over one. */
+  border-radius: 6px;
+  box-shadow: 0 30px 80px rgba(20, 17, 14, 0.38), 0 2px 8px rgba(20, 17, 14, 0.16);
+  max-width: 940px; width: 100%; max-height: 86vh;
   overflow: hidden;
-  /*
-   * No border — the panel's edge is a fade, not a line.
-   *
-   * A mask clips the frosted backdrop along with everything drawn on top of
-   * it, so feathering all four sides here dissolves the page itself, not just
-   * the text on it. The side fades are narrower than the padding, so no line
-   * of type ever sits in one.
-   */
-  mask-image:
-    linear-gradient(to bottom, transparent 0, #000 34px, #000 calc(100% - 34px), transparent 100%),
-    linear-gradient(to right, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
-  mask-composite: intersect;
-  -webkit-mask-image:
-    linear-gradient(to bottom, transparent 0, #000 34px, #000 calc(100% - 34px), transparent 100%),
-    linear-gradient(to right, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
-  -webkit-mask-composite: source-in;
+  animation: credits-rise var(--d-slow) var(--e-out);
 }
+@keyframes credits-rise {
+  from { transform: translateY(14px) scale(0.995); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* ── the spine ── */
+.credits-rail {
+  display: flex; flex-direction: column; gap: var(--s5);
+  padding: var(--s7) var(--s5) var(--s5) var(--s6);
+  color: var(--bone);
+  /* the room's colour, but never at the room's brightness: the Orsay nave is
+     nearly white and a spine that pale cannot carry bone type. A third of the
+     hue over near-black keeps every museum legible and still distinct. */
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.22)),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--c-spine) 34%, #171310),
+      color-mix(in srgb, var(--c-spine) 16%, #100d0a)
+    );
+  /* the room's own colour, as a hairline down the inside edge */
+  box-shadow: inset -3px 0 0 -2px var(--c-gilt);
+  border-radius: 6px 0 0 6px;
+}
+.credits-rail-mark {
+  color: var(--c-gilt); letter-spacing: 0.35em; margin: 0 0 var(--s3);
+}
+.credits-rail-title { margin: 0; color: var(--bone); }
+.credits-rail-where {
+  margin: var(--s2) 0 0; color: var(--taupe);
+  text-transform: none; letter-spacing: 0.04em;
+}
+
+.credits-nav { display: flex; flex-direction: column; }
+.credits-nav-item {
+  display: grid; grid-template-columns: 26px 1fr; gap: var(--s3);
+  align-items: baseline; text-align: left;
+  padding: var(--s3) 0; color: var(--stone);
+  border-top: 1px solid rgba(232, 223, 208, 0.16);
+  transition: color var(--d-fast), padding-left var(--d-fast) var(--e-out);
+}
+.credits-nav-item:last-child { border-bottom: 1px solid rgba(232, 223, 208, 0.16); }
+.credits-nav-item:hover { color: var(--bone); padding-left: 5px; }
+.credits-nav-num { color: var(--taupe); opacity: 0.7; }
+.credits-nav-text { display: flex; flex-direction: column; gap: 2px; }
+.credits-nav-label { font-size: 18px; line-height: 22px; }
+.credits-nav-blurb {
+  color: var(--taupe); text-transform: none; letter-spacing: 0.02em; opacity: 0.72;
+}
+.credits-nav-item.is-on { color: var(--bone); padding-left: 5px; }
+.credits-nav-item.is-on .credits-nav-num { color: var(--c-gilt); opacity: 1; }
+.credits-nav-item.is-on .credits-nav-label { color: var(--c-gilt); }
+
+/* Top right of the page, over the reading column. A close control anywhere
+   else is a close control nobody finds on the first look. */
+.credits-close {
+  position: absolute; top: var(--s4); right: var(--s4); z-index: 3;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 13px; line-height: 1;
+  color: var(--umber);
+  background: rgba(36, 31, 26, 0.05);
+  border: 1px solid rgba(36, 31, 26, 0.12);
+  transition: background-color var(--d-fast), color var(--d-fast), transform var(--d-fast);
+}
+.credits-close:hover {
+  color: var(--ink); background: rgba(36, 31, 26, 0.1); transform: rotate(90deg);
+}
+
+/* ── the page ── */
 .credits-scroll {
   max-height: 86vh; overflow-y: auto; overscroll-behavior: contain;
-  padding: var(--s7); scrollbar-width: thin;
+  padding: var(--s7); padding-right: calc(var(--s7) - 4px);
+  /* a rule down the margin rather than a browser scrollbar: the panel is a
+     page, and a grey system trough down the side of it is the one part that
+     never looked like the rest */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(110, 91, 74, 0.34) transparent;
+  /* the top and bottom of the reading column dissolve rather than being cut */
+  mask-image: linear-gradient(to bottom, transparent 0, #000 26px, #000 calc(100% - 26px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px, #000 calc(100% - 26px), transparent 100%);
 }
-.credits-header { display: flex; justify-content: space-between; align-items: baseline; }
+.credits-scroll::-webkit-scrollbar { width: 10px; }
+.credits-scroll::-webkit-scrollbar-track { background: transparent; }
+.credits-scroll::-webkit-scrollbar-thumb {
+  background: rgba(110, 91, 74, 0.28);
+  border: 3px solid transparent; background-clip: content-box;
+  border-radius: 999px;
+}
+.credits-scroll::-webkit-scrollbar-thumb:hover { background-color: rgba(110, 91, 74, 0.5); }
 
-/* four ways into the same colophon: what it is made of, why it looks like
-   this, how it is built, and who built it */
-.credits-tabs {
-  display: flex; gap: var(--s5);
-  margin: var(--s5) 0 var(--s2);
-  border-bottom: 1px solid var(--limestone);
+.credits-section {
+  color: var(--c-accent); margin: var(--s6) 0 var(--s3);
+  letter-spacing: 0.14em; text-transform: uppercase; font-size: 11px;
+  display: flex; align-items: center; gap: var(--s3);
 }
-.credits-tabs button {
-  color: var(--umber); opacity: 0.62; padding: 0 0 9px;
-  position: relative; transition: color var(--d-fast), opacity var(--d-fast);
+.credits-scroll section:first-child .credits-section { margin-top: 0; }
+.credits-section::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, var(--c-gilt), transparent);
+  opacity: 0.55;
 }
-.credits-tabs button:hover { opacity: 1; }
-.credits-tabs button.is-on { color: #8a6d12; opacity: 1; }
-.credits-tabs button.is-on::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: -1px;
-  height: 1px; background: #8a6d12;
+.credits-note { color: rgba(36, 31, 26, 0.88); margin: 0 0 var(--s4); }
+/* the first paragraph of a section carries the weight */
+.credits-lede { font-size: 18px; line-height: 30px; color: rgba(36, 31, 26, 0.94); }
+
+/* one work: its own thumbnail, its texts beside it */
+.credits-works { list-style: none; margin: 0; padding: 0; }
+.credits-work {
+  display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: var(--s4);
+  padding: var(--s4) 0; border-bottom: 1px solid var(--limestone);
+}
+.credits-work:last-child { border-bottom: 0; }
+.credits-work-thumb {
+  width: 68px; height: 68px; object-fit: cover; display: block;
+  background: var(--limestone);
+  box-shadow: 0 0 0 1px rgba(36, 31, 26, 0.12), 0 6px 16px rgba(36, 31, 26, 0.14);
+}
+.credits-work-body { min-width: 0; }
+.credits-work-artist { color: var(--umber); font-style: normal; }
+.credits-work-sources { list-style: none; margin: var(--s2) 0 var(--s1); padding: 0; }
+.credits-title { margin: 0; color: var(--ink); }
+
+/* the seven rooms, each linking out to the museum it is named after */
+.credits-museums { list-style: none; margin: var(--s3) 0 0; padding: 0; }
+.credits-museum {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s2) var(--s4);
+  padding: 9px 0; border-top: 1px solid var(--limestone);
+}
+.credits-museum:last-child { border-bottom: 1px solid var(--limestone); }
+.credits-museum-name {
+  color: var(--ink); text-decoration: none;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.5);
+  transition: color var(--d-fast), border-color var(--d-fast);
+}
+.credits-museum-name:hover { color: #8a6d12; border-color: #8a6d12; }
+.credits-museum-where { color: var(--umber); opacity: 0.85; margin-left: auto; text-align: right; }
+
+/* the name at the end of the About page, set like a signature rather than a
+   byline: it is the last thing in the section, not the heading of it */
+.credits-signed {
+  margin: var(--s5) 0 0; color: var(--c-accent);
+  letter-spacing: 0.16em; text-transform: uppercase; font-size: 11px;
 }
 
-/* the design rules — a list that reads as a list, not as prose in bullets */
-.credits-rules { list-style: none; margin: 0; padding: 0; }
+.credits-tracks { list-style: none; margin: var(--s2) 0 0; padding: 0; }
+.credits-tracks li {
+  display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: var(--s3);
+  padding: var(--s1) 0;
+}
+.credits-track-where { color: var(--c-accent); letter-spacing: 0.1em; }
+
+/* The design rules — numbered, because they are in an order.
+   A hanging indent, NOT a two-column grid: a grid item is created for every
+   child of the <li>, raw text included, so the prose following a <strong>
+   lands in the next cell — which here was the numeral column, thirty pixels
+   wide, one word to a line. */
+.credits-rules { list-style: none; counter-reset: rule; margin: 0; padding: 0; }
 .credits-rules li {
-  padding: var(--s3) 0;
+  counter-increment: rule; position: relative;
+  padding: var(--s3) 0 var(--s3) 34px;
   border-bottom: 1px solid var(--limestone);
   color: rgba(36, 31, 26, 0.84);
+}
+.credits-rules li::before {
+  content: counter(rule, decimal-leading-zero);
+  position: absolute; left: 0; top: calc(var(--s3) + 4px);
+  font-size: 11px; letter-spacing: 0.09em; color: var(--c-gilt);
 }
 .credits-rules li:last-child { border-bottom: 0; }
 .credits-rules strong { color: var(--ink); font-weight: 600; }
@@ -475,59 +654,108 @@ button:active { transform: translateY(1px); }
 /* the technical table: a label and a value, aligned */
 .credits-spec { list-style: none; margin: 0; padding: 0; }
 .credits-spec li {
-  display: grid; grid-template-columns: 118px 1fr; gap: var(--s4);
+  display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: var(--s4);
   align-items: baseline; padding: var(--s2) 0;
   border-bottom: 1px solid var(--limestone);
 }
 .credits-spec li:last-child { border-bottom: 0; }
-.credits-spec .caption { color: #8a6d12; }
+.credits-spec .caption { color: var(--c-accent); }
 .credits-spec .body { color: rgba(36, 31, 26, 0.86); font-size: 15px; }
-@media (max-width: 560px) {
-  .credits-spec li { grid-template-columns: 1fr; gap: 2px; }
-}
 
-.credits-bio { color: rgba(36, 31, 26, 0.66); }
 .credits-links { list-style: none; margin: var(--s4) 0 0; padding: 0; }
 .credits-inner code {
   font-family: ui-monospace, Menlo, Consolas, monospace;
-  font-size: 0.86em; color: #8a6d12;
+  font-size: 0.86em; color: var(--c-accent);
 }
-.credits-header .display { margin: 0; }
-.credits-close { color: var(--umber); }
-.credits-close:hover { color: #8a6d12; }
-.credits-section {
-  color: #8a6d12; margin: var(--s6) 0 var(--s2); letter-spacing: 0.06em;
-}
-.credits-note { color: rgba(36, 31, 26, 0.88); margin: 0 0 var(--s4); }
-.credits-artwork {
-  margin-bottom: var(--s4); padding-bottom: var(--s3);
-  border-bottom: 1px solid var(--limestone);
-}
-.credits-artwork:last-child { border-bottom: 0; }
-.credits-title { margin: 0; color: var(--ink); }
-.credits-inner ul { margin: var(--s2) 0; padding-left: var(--s4); }
-.credits-inner li::marker { color: var(--taupe); }
+.credits-inner ul.credits-work-sources li::marker { color: transparent; }
 .credits-source {
   color: rgba(36, 31, 26, 0.72); text-transform: none; letter-spacing: 0.02em;
   margin: var(--s1) 0;
 }
-.credits-source a { color: rgba(36, 31, 26, 0.92); text-decoration-color: var(--gilt); }
-.credits-source a:hover { color: #8a6d12; }
-.credits-imgsrc { color: rgba(36, 31, 26, 0.55); text-transform: none; letter-spacing: 0.02em; }
+/* every link on the page reads as ink with a gilt rule under it, never as a
+   browser default blue */
+.credits-scroll a {
+  color: rgba(36, 31, 26, 0.92);
+  text-decoration: underline; text-decoration-color: var(--c-gilt);
+  text-underline-offset: 3px;
+}
+.credits-scroll a:hover { color: var(--c-accent); }
+.credits-imgsrc {
+  color: rgba(36, 31, 26, 0.55); text-transform: none; letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 860px) {
+  .credits { padding: 0; }
+  .credits-inner {
+    grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr);
+    max-height: 100vh; height: 100%;
+  }
+  .credits-rail {
+    padding: var(--s5) var(--s5) var(--s3);
+    gap: var(--s4); box-shadow: inset 0 -3px 0 -2px var(--c-gilt);
+  }
+  .credits-rail-title { font-size: 26px; line-height: 30px; }
+  .credits-nav { flex-direction: row; overflow-x: auto; gap: var(--s5); scrollbar-width: none; }
+  .credits-nav::-webkit-scrollbar { display: none; }
+  .credits-nav-item {
+    grid-template-columns: 1fr; gap: 0; border: 0; padding: var(--s2) 0;
+    flex: none; white-space: nowrap;
+  }
+  .credits-nav-item:last-child { border-bottom: 0; }
+  .credits-nav-blurb { display: none; }
+  .credits-nav-num { display: none; }
+  .credits-close { position: absolute; top: var(--s5); right: var(--s5); }
+  .credits-scroll { max-height: none; padding: var(--s5); }
+}
+@media (max-width: 560px) {
+  .credits-spec li { grid-template-columns: 1fr; gap: 2px; }
+  .credits-work { grid-template-columns: 1fr; }
+  /* the whole work, not a band across the middle of it: a full-width strip
+     cropped to cover shows the Mona Lisa's collarbone and nothing else */
+  .credits-work-thumb {
+    width: 100%; height: 150px; object-fit: contain;
+    background: rgba(36, 31, 26, 0.06); box-shadow: none;
+  }
+  .credits-tracks li { grid-template-columns: 1fr; }
+}
 
 /* ─── contact ────────────────────────────────────────────────────────────
    Three fields on the About tab. It posts to VITE_CONTACT_ENDPOINT when one
    is configured and otherwise composes a mailto, so it works out of the box
    with no account anywhere. Inputs are ruled lines rather than boxes: the
    panel is a page, and a page has lines to write on. */
+/* ─── contact ────────────────────────────────────────────────────────────
+   A room at the end of the document. Deep umber over ink, a thin gilt rule
+   along the top, and the fields lit from inside rather than punched out of
+   white — the page has been bright for a thousand words by the time anybody
+   reaches this, and the form should feel like arriving somewhere. */
+.credits-contact {
+  margin-top: var(--s7);
+  padding: var(--s6) var(--s6) var(--s5);
+  /* Flat, not a gradient. Nothing else on this site is a soft-cornered card
+     with light pooling in one corner of it; the rooms are flat colour and a
+     rule, and so is this. One tone of the exhibition's own wall, a hairline,
+     and a gilt band along the top — which is a wall label, which is what the
+     rest of the page is made of. */
+  background: var(--c-spine);
+  border: 1px solid rgba(242, 235, 223, 0.1);
+  border-top: 2px solid var(--gilt);
+  border-radius: var(--r-sm);
+  color: var(--bone);
+}
+.credits-contact .credits-note { color: rgba(242, 235, 223, 0.82); }
+.credits-contact-head { color: var(--gilt); border-color: rgba(201, 162, 39, 0.35); }
+.credits-contact .caption { color: rgba(242, 235, 223, 0.6); }
+
 .contact { display: flex; flex-direction: column; gap: var(--s4); margin-top: var(--s2); }
 .contact-field { display: flex; flex-direction: column; gap: 5px; }
-.contact-field .caption { color: var(--umber); opacity: 0.75; }
+.contact-field .caption { color: rgba(242, 235, 223, 0.6); opacity: 1; letter-spacing: 0.14em; }
 .contact-field input,
 .contact-field textarea {
-  font: inherit; font-size: 15px; line-height: 24px; color: var(--ink);
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid var(--limestone);
+  font: inherit; font-size: 15px; line-height: 24px; color: var(--bone);
+  background: rgba(12, 10, 8, 0.3);
+  border: 1px solid rgba(242, 235, 223, 0.16);
   border-radius: var(--r-sm);
   padding: 8px 11px;
   width: 100%;
@@ -537,24 +765,24 @@ button:active { transform: translateY(1px); }
 .contact-field input:focus,
 .contact-field textarea:focus {
   outline: none;
-  border-color: var(--gilt);
-  background: #fff;
+  border-color: rgba(201, 162, 39, 0.75);
+  background: rgba(12, 10, 8, 0.45);
 }
 .contact-field input::placeholder,
-.contact-field textarea::placeholder { color: var(--taupe); }
+.contact-field textarea::placeholder { color: rgba(242, 235, 223, 0.34); }
 .contact-foot { display: flex; align-items: center; gap: var(--s4); flex-wrap: wrap; }
 .contact-send {
-  color: var(--bone); background: var(--ink);
-  padding: 9px 22px; border-radius: 999px;
+  color: #241f1a; background: var(--gilt);
+  padding: 9px 24px; border-radius: 999px; font-weight: 500;
   transition: background-color var(--d-fast), opacity var(--d-fast);
 }
-.contact-send:hover:not(:disabled) { background: #3b322a; }
+.contact-send:hover:not(:disabled) { background: #ddb734; }
 .contact-send:disabled { opacity: 0.35; cursor: default; }
-.contact-error { color: #8f3b2a; text-transform: none; letter-spacing: 0.02em; }
-.contact-again { color: #8a6d12; margin-top: var(--s2); }
+.contact-error { color: #e0876d; text-transform: none; letter-spacing: 0.02em; }
+.contact-again { color: var(--gilt); margin-top: var(--s2); }
 .contact-again:hover { text-decoration: underline; }
 
-/* ─── cursor — spec §10C.7 ───────────────────────────────────────────────
+/* ─── cursor ───────────────────────────────────────────────
    A thin light ring carrying its own dark contact shadow, so it reads against
    the black corridor AND the bone map scrim without changing colour. */
 .cursor-ring {
@@ -585,9 +813,15 @@ button:active { transform: translateY(1px); }
    floor and a black vault alike, and settles rather than disappearing. */
 .control-hints {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  z-index: 31; display: flex; flex-wrap: wrap; justify-content: center;
-  align-items: center; gap: var(--s2) var(--s5);
-  max-width: min(1000px, 94vw);
+  z-index: 31; display: flex; justify-content: center;
+  align-items: center; gap: 6px var(--s5);
+  /* Sized to its contents, not to the space to the right of its own left
+     edge. Anchored at left:50%, the available width IS half the window, so
+     without this the bar wrapped a five-item line at any screen width — the
+     max-width below was never the constraint. */
+  width: max-content;
+  max-width: min(1240px, 94vw);
+  flex-wrap: wrap; white-space: nowrap;
   padding: 9px var(--s5);
   /* softened: a hard slab of near-black under the type read as a browser
      chrome bar sitting on the picture. This is a veil — enough to hold the
@@ -603,30 +837,62 @@ button:active { transform: translateY(1px); }
   font-size: 12px; letter-spacing: 0.1em; line-height: 16px;
   opacity: 1;
   transition: opacity 900ms var(--e-both), background-color 900ms var(--e-both);
+  /* nothing on the line is a target — it is a caption, not a control bar */
   pointer-events: none;
 }
-.control-hints.is-settled { opacity: 0.8; background: rgba(28, 24, 20, 0.22); }
+.control-hints.is-settled { opacity: 0.78; background: rgba(28, 24, 20, 0.26); }
+/* the whole set is on the line now, so the line is allowed to be two lines on
+   a narrow screen rather than shrinking until it cannot be read */
 .control-hint { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+/* Space, not rules. A hairline between items looks right on one line and
+   wrong the moment the bar wraps, because the divider that should have been
+   between two items is then hanging off the start of the second row. */
 .control-hints kbd {
   font: inherit; font-size: 11px;
   border: 1px solid currentColor; border-radius: 2px;
   padding: 1px 5px; opacity: 0.95; line-height: 1.35;
 }
-.hint-sep { padding: 0 5px; opacity: 0.75; }
 @media (max-width: 860px) { .control-hints { font-size: 11px; gap: 6px var(--s4); } }
-@media (max-width: 640px) { .control-hints { display: none; } }
+/* a landscape phone is the narrowest screen the door lets through, and two
+   short hints still fit on one line there */
+@media (max-width: 700px) { .control-hints { font-size: 10px; padding: 7px var(--s4); } }
+
+/* The way to the far end, for screens with no Shift key. Sits opposite the
+   way back, because they are the two ends of the same journey. */
+.walk-end {
+  position: fixed; top: 66px; left: var(--s5); z-index: 32;
+  display: none;
+  padding: 7px 14px; border-radius: 999px;
+  background: rgba(24, 20, 16, 0.46);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(242, 235, 223, 0.12);
+  color: var(--bone); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  opacity: 0.8;
+}
+.walk-end:hover { opacity: 1; color: var(--gilt); }
+@media (pointer: coarse) { .walk-end { display: block; } }
 
 /* museum name, top right of the corridor */
 .corridor-title {
   position: fixed; top: var(--s5); right: var(--s6); z-index: 32; margin: 0;
   color: var(--bone); text-align: right; font-size: 12px; letter-spacing: 0.11em;
+  text-decoration: none;
   padding: 6px 14px; border-radius: 999px;
   background: rgba(28, 24, 20, 0.26);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
-  pointer-events: none;
+  /* the corridor's title is a link out to the museum itself; the atlas and the
+     floor plan reuse the class as plain type, and a <p> takes no pointer */
+  pointer-events: auto;
+  transition: background-color var(--d-fast), color var(--d-fast);
 }
+p.corridor-title { pointer-events: none; }
+a.corridor-title:hover { background: rgba(28, 24, 20, 0.5); color: var(--gilt); }
+a.corridor-title:hover .corridor-out { opacity: 0.9; }
 .corridor-sub { opacity: 0.72; }
+/* the mark that says this one leaves the exhibition */
+.corridor-out { margin-left: 7px; font-size: 10px; opacity: 0.45; transition: opacity var(--d-fast); }
 
 /* the back control shares the treatment, so both corners read the same */
 .gallery-back {
@@ -790,7 +1056,10 @@ button:active { transform: translateY(1px); }
 /* the description card sits above the three words, anchored to the same corner */
 /* above the wall label: the card is transient, sits under the cursor, and was
    otherwise half-hidden behind the placard in the gallery */
-.quality { position: fixed; bottom: 20px; right: var(--s5); z-index: 30; }
+.quality {
+  position: fixed; bottom: 20px; right: var(--s5); z-index: 30;
+  display: flex; align-items: center; gap: 8px;
+}
 .quality-card {
   position: absolute; bottom: 34px; right: 0; width: 210px;
   padding: 12px 14px;
@@ -810,6 +1079,65 @@ button:active { transform: translateY(1px); }
   margin: 0; line-height: 1.5; color: rgba(242, 235, 223, 0.82);
   text-transform: none; letter-spacing: 0.02em; font-size: 12px;
 }
+
+/* the ? and its card, immediately left of the three words */
+.help { position: relative; display: flex; align-items: center; }
+.help-mark {
+  pointer-events: auto;
+  width: 22px; height: 22px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; line-height: 1; color: var(--gilt);
+  background: rgba(28, 24, 20, 0.34);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(201, 162, 39, 0.42);
+  opacity: 0.72;
+  transition: opacity var(--d-fast), background-color var(--d-fast);
+}
+.help-mark:hover, .help-mark.is-on { opacity: 1; background: rgba(201, 162, 39, 0.2); }
+.help-card {
+  position: absolute; bottom: 34px; right: 0;
+  width: min(360px, 84vw); max-height: min(66vh, 560px); overflow-y: auto;
+  padding: var(--s4) var(--s4) var(--s3);
+  text-align: left;
+  background: rgba(24, 21, 17, 0.9);
+  backdrop-filter: blur(20px) saturate(1.15);
+  -webkit-backdrop-filter: blur(20px) saturate(1.15);
+  border: 1px solid rgba(242, 235, 223, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 22px 54px rgba(10, 8, 6, 0.55);
+  animation: quality-in 220ms var(--e-out) both;
+  /* the card's own scrollbar, in the same materials as everything else */
+  scrollbar-width: thin; scrollbar-color: rgba(201, 162, 39, 0.4) transparent;
+}
+.help-card::-webkit-scrollbar { width: 8px; }
+.help-card::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 39, 0.34); border-radius: 999px;
+  border: 2px solid transparent; background-clip: padding-box;
+}
+.help-head {
+  margin: 0 0 var(--s3); color: var(--gilt);
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+}
+.help-section + .help-section { margin-top: var(--s3); }
+.help-title {
+  margin: 0 0 6px; color: rgba(242, 235, 223, 0.55);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.help-rows { list-style: none; margin: 0; padding: 0; }
+.help-row {
+  display: flex; gap: 8px; align-items: baseline;
+  padding: 3px 0;
+  color: rgba(242, 235, 223, 0.86);
+  font-size: 12px; line-height: 1.5; letter-spacing: 0.01em; text-transform: none;
+}
+.help-keys { flex: none; display: inline-flex; gap: 3px; }
+.help-card kbd {
+  font: inherit; font-size: 10px; color: var(--bone);
+  border: 1px solid rgba(242, 235, 223, 0.4); border-radius: 2px;
+  padding: 0 4px; line-height: 1.5;
+}
+@media (max-width: 860px) { .help-card { width: min(320px, 88vw); } }
 
 .quality-toggle {
   position: relative; z-index: 21;
@@ -846,13 +1174,13 @@ button:active { transform: translateY(1px); }
 .sound-toggle {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 6px 13px; border-radius: 999px;
-  background: rgba(28, 24, 20, 0.3);
+  background: rgba(24, 20, 16, 0.46);
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
   border: 1px solid rgba(242, 235, 223, 0.09);
   color: var(--bone); font-size: 10px; letter-spacing: 0.12em;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
-  opacity: 0.5; transition: opacity var(--d-base) var(--e-out), color var(--d-fast);
+  opacity: 0.72; transition: opacity var(--d-base) var(--e-out), color var(--d-fast);
 }
 .sound-toggle:hover { opacity: 1; }
 .sound-toggle.is-on { opacity: 0.9; color: var(--gilt); }
@@ -971,18 +1299,25 @@ button:active { transform: translateY(1px); }
 /* The way in. Top centre, where nothing else lives in any phase — a control
    that opens a view of the whole collection should not be hiding in a corner
    with the render-quality switch. */
-.atlas-open {
+/* the two ways out of a room and into the whole collection, centred together
+   at the top so neither is hiding in a corner with the quality switch */
+.top-links {
   position: fixed; top: var(--s5); left: 50%; transform: translateX(-50%);
-  /* above the landing scrim, so it stays crisp over the hero */
+  /* above the landing scrim, so they stay crisp over the hero */
   z-index: 45;
+  display: flex; align-items: center; gap: var(--s2);
+}
+.atlas-open {
   padding: 6px 15px; border-radius: 999px;
-  background: rgba(28, 24, 20, 0.3);
+  /* dark enough to hold bone type over the Orsay's white roof, which is the
+     brightest thing any of these ever sit on */
+  background: rgba(24, 20, 16, 0.46);
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
-  border: 1px solid rgba(242, 235, 223, 0.09);
+  border: 1px solid rgba(242, 235, 223, 0.12);
   color: var(--bone); font-size: 10px; letter-spacing: 0.14em;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
-  opacity: 0.55; transition: opacity var(--d-base) var(--e-out), color var(--d-fast);
+  opacity: 0.78; transition: opacity var(--d-base) var(--e-out), color var(--d-fast);
 }
 .atlas-open:hover { opacity: 1; color: var(--gilt); }
 @media (max-width: 640px) { .atlas-open { font-size: 9px; padding: 5px 11px; } }
@@ -1008,3 +1343,69 @@ button:active { transform: translateY(1px); }
 .atlas-toast-cue { color: var(--taupe); font-size: 9.5px; margin-top: 3px; }
 .atlas-toast:hover { border-color: var(--gilt); }
 @media (max-width: 640px) { .atlas-toast { display: none; } }
+
+/* ─── turn your device ───────────────────────────────────────────────────
+   Over everything, including the loading bar, because it is a precondition
+   rather than a state of the exhibition. The exhibition stays mounted behind
+   it: turning a phone back and forth must not reload the room. */
+.turn {
+  position: fixed; inset: 0; z-index: 200;
+  display: grid; place-items: center;
+  padding: var(--s6);
+  background: radial-gradient(120% 90% at 50% 30%, #2A2119 0%, #141110 100%);
+  color: var(--bone);
+  animation: credits-in var(--d-base) var(--e-out);
+}
+.turn-inner { max-width: 32ch; text-align: center; }
+.turn-mark { color: var(--gilt); letter-spacing: 0.35em; margin: 0 0 var(--s7); }
+.turn-title {
+  margin: var(--s6) 0 var(--s3); font-weight: 500;
+  font-size: 26px; line-height: 32px; letter-spacing: -0.01em;
+}
+.turn-note { color: var(--stone); opacity: 0.82; margin: 0; }
+
+/* the phone. Two nested boxes and one keyframe: the frame turns a quarter,
+   the screen inside it reproportions on the way round. */
+.turn-anim { display: grid; place-items: center; height: 132px; }
+.turn-device {
+  position: relative;
+  width: 68px; height: 116px;
+  border: 2px solid var(--taupe); border-radius: 10px;
+  animation: turn-device 3.4s var(--e-both) infinite;
+}
+.turn-screen {
+  position: absolute; inset: 7px 5px 11px;
+  background: rgba(201, 162, 39, 0.16);
+  border-radius: 3px;
+}
+.turn-home {
+  position: absolute; left: 50%; bottom: 3px; translate: -50% 0;
+  width: 18px; height: 2px; border-radius: 2px; background: var(--taupe);
+}
+@keyframes turn-device {
+  0%, 22%   { rotate: 0deg; }
+  55%, 78%  { rotate: -90deg; }
+  100%      { rotate: -90deg; }
+}
+/* the arc it travels, drawn once behind it */
+.turn-anim::before {
+  content: ''; position: absolute; width: 132px; height: 132px;
+  border-radius: 50%;
+  border: 1px dashed rgba(185, 168, 143, 0.28);
+  border-right-color: transparent; border-bottom-color: transparent;
+  rotate: 45deg;
+}
+@media (prefers-reduced-motion: reduce) {
+  .turn-device { animation: none; rotate: -90deg; }
+  .turn { animation: none; }
+}
+
+/* On a short landscape screen the wall label holds the right-hand column, and
+   the hint line moves out from under it rather than sitting on top. */
+@media (max-height: 559px) {
+  .placard { width: 42vw; max-width: 380px; }
+  .placard-scroll { max-height: 84vh; padding: var(--s5); }
+  .control-hints { bottom: 12px; left: 0; right: 42vw; transform: none; margin: 0 auto; width: auto; }
+  .corner-toggles { bottom: 12px; }
+  .rail { display: none; }
+}

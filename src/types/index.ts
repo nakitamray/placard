@@ -1,3 +1,14 @@
+/**
+ * How a work is framed, where a rectangle is the wrong answer.
+ *
+ * A tondo hung in a rectangular frame is not the same object; a diptych hung
+ * as one picture loses the hinge the whole composition is built across; and an
+ * altarpiece painted for a round-headed panel has its composition built for
+ * that arch. Set per artwork in the collection record; everything else takes
+ * the museum's own frame.
+ */
+export type FrameShape = 'round' | 'divided';
+
 export interface ArtworkIndexEntry {
   id: string;
   artist: string;
@@ -5,6 +16,7 @@ export interface ArtworkIndexEntry {
   aspect: number;
   /** per-painter wall tone — the colour the whole artwork room takes */
   accent: string;
+  shape?: FrameShape;
 }
 
 /** Thread Pull: a semantic area of the canvas mapped to a readable passage. */
@@ -42,12 +54,33 @@ export interface ArtworkMeta {
   };
   labelText: string;
   extendedNote: string;
+  /**
+   * One way out of the exhibition, for a work that cannot be shown whole.
+   *
+   * A handscroll is twelve metres of painting hung here as one scene of it,
+   * and no wall label can make up for that. The honest thing is to say which
+   * scene it is and point at the rest, which is what this is: a label and a
+   * URL, shown under the wall text, and only on the works that need one.
+   */
+  link?: { label: string; url: string };
   textProvenance: {
     type: 'museum_verbatim' | 'other_museum' | 'placard_original';
     attribution: string;
     url: string;
   };
-  image: { file: string; source: string; license: string; photoCredit: string };
+  image: {
+    file: string;
+    /** where the reproduction came from, in words */
+    source: string;
+    /** the Commons file it was fetched from, if it was */
+    commonsFile: string;
+    /** that file's page on Commons */
+    url: string;
+    license: string;
+    photoCredit: string;
+    /** anything done to the scan after fetching it, e.g. a crop */
+    note: string;
+  };
   /**
    * Which variants of this painting were actually published, and what each
    * one weighs. Written by scripts/build-images.ts; `src/lib/image.ts` names
@@ -87,7 +120,11 @@ export type CeilingKind =
   /** Orsay: colossal arched steel-and-glass train-shed roof */
   | 'steel-glass-arch'
   /** Met sculpture court: peaked triangular skylight over an indoor courtyard */
-  | 'peaked-court';
+  | 'peaked-court'
+  /** Uffizi: a flat ceiling of dark crossbeams with grotesque frescoes between */
+  | 'grotesque-beams'
+  /** British Museum: a deep grid of stepped coffers between heavy square beams */
+  | 'deep-coffers';
 
 export type FloorKind =
   /** pale reflective stone */
@@ -99,7 +136,11 @@ export type FloorKind =
   /** wide pale promenade with a darker central runner */
   | 'promenade'
   /** smooth outdoor-courtyard paving slabs */
-  | 'court-paving';
+  | 'court-paving'
+  /** polished marble laid as a diagonal checkerboard, charcoal and pale grey */
+  | 'checkerboard'
+  /** British Museum: wide bands of matte stone across the hall, grey and charcoal */
+  | 'stone-bands';
 
 export type WallKind =
   /** densely stacked salon hang on deep blue-grey */
@@ -111,7 +152,11 @@ export type WallKind =
   /** carved light stone with recessed bays */
   | 'carved-stone'
   /** asymmetric court: pale stone one side, red brick and white arches the other */
-  | 'court-facade';
+  | 'court-facade'
+  /** Uffizi: plaster and a portrait frieze one side, tall windows the other */
+  | 'uffizi-corridor'
+  /** British Museum: a free-standing colonnade off the wall, tall windows high on one side */
+  | 'stone-colonnade';
 
 export type FrameKind =
   /** deep gilt salon frame, corner cartouches, bead course */
@@ -123,7 +168,11 @@ export type FrameKind =
   /** slim reeded gilt, the impressionist standard */
   | 'orsay-reeded'
   /** broad flat-topped American gilt */
-  | 'met-broad';
+  | 'met-broad'
+  /** Florentine cassetta: a flat gilt bed between two carved courses */
+  | 'uffizi-gilt'
+  /** dark stained hardwood with a thin gilt sight edge — the museum standard */
+  | 'museum-plain';
 
 export interface MuseumStyle {
   ceiling: CeilingKind;
@@ -131,7 +180,18 @@ export interface MuseumStyle {
   wall: WallKind;
   frame: FrameKind;
   /** how the works are distributed on the wall */
-  hang: 'salon' | 'single' | 'alternating';
+  /**
+   * salon       a large work with two smaller ones stacked above it, both walls
+   * single      one work per bay, both walls
+   * alternating one work per bay, sides alternating
+   * one-wall    one work per bay, all of them on the left
+   *
+   * one-wall is for a corridor whose other side is not a wall — the Uffizi,
+   * where the whole right-hand side is glazed. It also has the property that
+   * ten bays hang ten works exactly once: the two-sided patterns fill twenty
+   * slots from ten records and hang everything twice.
+   */
+  hang: 'salon' | 'single' | 'alternating' | 'one-wall';
   /** half the corridor width, metres */
   halfWidth: number;
   /** wall height to the cornice, metres */
@@ -140,6 +200,11 @@ export interface MuseumStyle {
   vaultHeight: number;
   bays: number;
   bayDepth: number;
+  /**
+   * The height every painting in this corridor is centred on, in metres.
+   * Omitted, it is a bit under head height — see `dimsFor`.
+   */
+  hangHeight?: number;
   palette: {
     wall: string;
     wallDeep: string;
@@ -169,7 +234,16 @@ export interface MuseumStyle {
   };
   fixtures: {
     sculpture: 'pedestal-figures' | 'busts' | 'court-figures' | 'none';
-    seating: 'bench' | 'ottoman' | 'none';
+    /**
+     * bench         a single waxed dark oak bench on the centre line
+     * stone-benches two rows of pale stone benches with cushioned tops, one
+     *               either side of the centre line — the Orsay's nave, and the
+     *               thing that most tells it apart from the Louvre's corridor
+     * marble-benches carved marble with scrolled ends, down the centre line of
+     *               a hall of columns
+     * ottoman       a round tufted leather sofa in the middle of the room
+     */
+    seating: 'bench' | 'stone-benches' | 'marble-benches' | 'ottoman' | 'none';
     chandeliers: boolean;
     placards: boolean;
     /** Orsay's great clock on the end wall */
@@ -178,6 +252,26 @@ export interface MuseumStyle {
     terraces: boolean;
     /** the corridor ends in a floor-to-ceiling window rather than a solid wall */
     glazedEnd?: boolean;
+    /** brass stanchions and red rope down both sides, in front of the plinths */
+    ropes?: boolean;
+    /** waist-high stone platforms with glass cases on them, stripped of contents */
+    vitrines?: boolean;
+    /** a lighting track down the centre line, with directional spots on it */
+    spotTrack?: boolean;
+    /**
+     * The room is lit by its windows rather than by its lamps.
+     *
+     * Warm light is placed just inside the glazed wall and thrown across the
+     * corridor at the hang, instead of the row of point lights down the
+     * centre line that an artificially lit gallery gets.
+     */
+    daylight?: boolean;
+    /**
+     * A continuous warm source hidden along the top of both walls, throwing
+     * light up into the ceiling. The Gallery of Maps is lit this way and it
+     * is the whole reason that vault glows.
+     */
+    cove?: boolean;
   };
 }
 
@@ -201,6 +295,7 @@ export interface MuseumData {
   id: string;
   name: string;
   city: string;
+  homepage: string;
   subtitle: string;
   blurb: string;
   corridorNote: string;
@@ -213,6 +308,7 @@ export interface MuseumIndexEntry {
   id: string;
   name: string;
   city: string;
+  homepage: string;
   subtitle: string;
   count: number;
 }

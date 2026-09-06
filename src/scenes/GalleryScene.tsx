@@ -1,5 +1,5 @@
 /**
- * GalleryScene — spec §10.4 / §10.6 / M6.
+ * GalleryScene
  *
  * The room you are in when you are looking at one painting.
  *
@@ -40,24 +40,49 @@ import { discoverWork } from '../state/atlas';
 import { artworkProjector, regionAt } from '../threadpull/state';
 import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
 import type { Quality } from '../lib/quality';
+import { useShadowRefresh } from '../render/shadows';
 
 const SPACING = 8;
+/**
+ * HOW MANY PICTURE LIGHTS EXIST AT ALL.
+ *
+ * There was one `pointLight` per painting, which on a seventy-work wing is
+ * seventy of them. Three.js has no spatial culling for lights: every light in
+ * the scene goes into the uniform array, and every lit fragment of every
+ * standard material loops over all of them. Seventy iterations per pixel is
+ * most of what the gallery costs to draw, and sixty-five of those iterations
+ * resolve to nothing — the lamps carry `distance={11}` against a bay spacing
+ * of 8, and three.js's distance falloff is *exactly* zero past the cutoff.
+ *
+ * So the room keeps five and slides them along the rail: the bay you are in,
+ * and two either side. Two is one more than a lamp can reach, which is the
+ * margin that keeps one from appearing at the edge of the screen while the
+ * rail is still gliding.
+ *
+ * Five, not "however many are in range". The light count is compiled into
+ * every material's shader, so a number that changed as you scrolled would
+ * recompile the whole room mid-scroll. This count never changes; only the
+ * positions do, and moving a light is free.
+ */
+const LIT_BAYS = 5;
 /**
  * How far back the camera stands, and how big the canvas is drawn.
  *
  * These four numbers are one decision: how much of the screen the painting
- * gets. The room used to win — a 2.2m canvas at 5.6m through a 45° lens fills
- * about three fifths of the frame, and once a salon moulding is wrapped round
- * it the picture itself is barely half. A visitor who has walked down a
- * corridor and chosen this painting should be looking at the painting.
+ * gets against how much of it the room gets. A visitor who has walked down a
+ * corridor and chosen this painting should be looking at the painting, so the
+ * canvas wins — a moulding wrapped round a work that only fills three fifths
+ * of the frame leaves the picture itself at barely half.
  */
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+
 const CAM_Z = 5.2;
 /** the height a work is hung at unless it is too wide to allow it */
-export const PLANE_H = 2.55;
+const PLANE_H = 2.55;
 /** widest a work may be drawn before its height gives way (spec: fit.ts) */
 const MAX_W = 6.2;
 /** height every canvas is centred on */
-export const HANG_Y = 2.15;
+const HANG_Y = 2.15;
 const WALL_H = 6.2;
 
 /**
@@ -69,8 +94,27 @@ const WALL_H = 6.2;
  */
 const LENS_RADIUS = 0.26;
 
-/** screen-space projection of the active plane for the DOM placard (§10.7) */
+/** screen-space projection of the active plane for the DOM placard */
 export const placardAnchor = { x: 0, y: 0, edge: 0, visible: false };
+
+/** the warm end of the fill light; a constant, so it is made once */
+const FILL_WARM = new THREE.Color('#FFF3E0');
+
+/**
+ * Working values for the frame loop.
+ *
+ * Colours and vectors used to be built fresh inside `useFrame`, which is four
+ * throwaway objects per frame — a few hundred a second, all of them identical
+ * in shape and all of them immediately garbage. The room does not need them to
+ * survive the frame, so it stops making new ones: the collector has nothing to
+ * do, and the pauses it used to cause go with it.
+ */
+const scratch = {
+  accent: new THREE.Color(),
+  bg: new THREE.Color(),
+  point: new THREE.Vector3(),
+  projected: new THREE.Vector3(),
+};
 
 /* ── the moulded bay around one painting ────────────────────────────────── */
 
@@ -259,13 +303,28 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
   const spotRef = useRef<THREE.SpotLight>(null);
   const fillRef = useRef<THREE.HemisphereLight>(null);
   const spotTarget = useRef<THREE.Object3D>(new THREE.Object3D());
+  const refreshShadows = useShadowRefresh();
+  /** which bay the spot stood over when the shadow map was last drawn */
+  const shadowBay = useRef(-1);
+  /** the picture lights, placed by the frame loop rather than by React */
+  const lampRefs = useRef<Array<THREE.PointLight | null>>([]);
+  // a change of budget or of the hang itself is a new shadow map
+  useEffect(refreshShadows, [
+    refreshShadows,
+    quality.shadows,
+    quality.shadowMapSize,
+    quality.ornament,
+    artworks.length,
+  ]);
   const look = useRef({ x: 0, y: 0 });
   /** how far the room slides aside to make room for the wall label */
   const shift = useRef(0);
+  /** where the zoom is leaning, in world units off the canvas centre */
+  const pan = useRef({ x: 0, y: 0 });
   const touch = useRef({ x: 0, active: false });
   const roomTone = useRef(new THREE.Color('#3A3630'));
 
-  // load current + warm zone (spec §7.5). The work in front of the visitor
+  // load current + warm zone. The work in front of the visitor
   // loads immediately; its neighbours wait for an idle moment, so a prefetch
   // never delays the only painting on screen.
   useEffect(() => {
@@ -303,15 +362,15 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
    * The lens belongs to the canvas under the cursor and to nothing else.
    *
    * Moving along the rail, leaving the room, or switching into thread mode all
-   * have to shut it, or a circle of paint is left hanging over a work the
-   * cursor is no longer on.
+   * have to shut it, or a circle of paint hangs over a work the cursor has
+   * left.
    */
   useEffect(() => {
     closeLens();
     return closeLens;
   }, [index]);
 
-  // rail input: wheel / drag / arrows; scroll exits a reveal (spec §9)
+  // rail input: wheel / drag / arrows; scroll exits a reveal
   useEffect(() => {
     gallery.goal = index * SPACING;
     gallery.x = index * SPACING;
@@ -324,7 +383,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
       gallery.goal += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * 0.01;
       gallery.goal = Math.max(-1.5, Math.min((artworks.length - 1) * SPACING + 1.5, gallery.goal));
       wheelEnd.t = performance.now();
-      // magnetic snap after the wheel settles (spec §10.4)
+      // magnetic snap after the wheel settles
       setTimeout(() => {
         if (performance.now() - wheelEnd.t < 140) return;
         const i = Math.round(gallery.goal / SPACING);
@@ -399,7 +458,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
   useFrame((state, delta) => {
     gallery.x = damp(gallery.x, gallery.goal, 0.09, delta);
 
-    // pointer parallax, damped (spec §10B)
+    // pointer parallax, damped
     const k = dampK(0.06, delta);
     const px = reducedMotion ? 0 : pointer.x;
     const py = reducedMotion ? 0 : pointer.y;
@@ -416,6 +475,35 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     const dz = Math.max(1.55, CAM_Z / view.v);
 
     /*
+     * Zoom in on what you are looking at, not on the middle.
+     *
+     * Leaning in always toward the centre of the canvas is the one thing a
+     * zoom must not do: the reason to lean in is a hand, a signature, a
+     * wormhole in an apple, and those are never in the middle. So the camera
+     * pans toward the point under the cursor as it approaches — none at 1×,
+     * halfway to it at 2×, all the way in the limit — which keeps whatever
+     * you pointed at roughly where it was on the screen while the picture
+     * grows around it.
+     *
+     * The pan is damped and clamped to the work's own extents, so it can
+     * never carry the camera off the side of the painting, and it unwinds by
+     * itself as you zoom back out. `0` still puts everything back.
+     */
+    const entry = artworks[index];
+    const fit = entry ? fitWork(entry.aspect, PLANE_H, MAX_W) : { width: 0, height: 0 };
+    const halfH = Math.tan(((camera.fov || 45) * Math.PI) / 360) * dz;
+    const halfW = halfH * (size.width / Math.max(1, size.height));
+    const toward = 1 - 1 / Math.max(1, view.v);
+    const wantPanX = reducedMotion
+      ? 0
+      : clamp(pointer.x * halfW * toward, -fit.width / 2, fit.width / 2);
+    const wantPanY = reducedMotion
+      ? 0
+      : clamp(-pointer.y * halfH * toward, -fit.height / 2, fit.height / 2);
+    pan.current.x = damp(pan.current.x, wantPanX, 0.12, delta);
+    pan.current.y = damp(pan.current.y, wantPanY, 0.12, delta);
+
+    /*
      * Step aside for the label.
      *
      * The canvas is drawn large enough now that a 380px card at the right of
@@ -428,8 +516,8 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     shift.current = damp(shift.current, wantShift, 0.11, delta);
 
     camera.position.set(
-      gallery.x + shift.current + look.current.x * 0.1,
-      1.96 + look.current.y * -0.05,
+      gallery.x + shift.current + look.current.x * 0.1 + pan.current.x,
+      1.96 + look.current.y * -0.05 + pan.current.y,
       dz,
     );
     camera.rotation.set(
@@ -446,32 +534,58 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     // slow wash from one artist's ground to the next rather than a cut
     const nearest = artworks[Math.round(gallery.x / SPACING)] ?? artworks[index];
     if (nearest) {
-      const target = new THREE.Color(nearest.accent);
-      roomTone.current.lerp(target, Math.min(1, delta * 2.4));
-      const bg = roomTone.current.clone().multiplyScalar(0.34);
+      roomTone.current.lerp(scratch.accent.set(nearest.accent), Math.min(1, delta * 2.4));
+      const bg = scratch.bg.copy(roomTone.current).multiplyScalar(0.34);
       if (state.scene.background instanceof THREE.Color) state.scene.background.copy(bg);
       const fog = state.scene.fog as THREE.Fog | null;
       if (fog) fog.color.copy(bg);
       if (fillRef.current) {
-        fillRef.current.color.copy(roomTone.current).lerp(new THREE.Color('#FFF3E0'), 0.55);
+        fillRef.current.color.copy(roomTone.current).lerp(FILL_WARM, 0.55);
         fillRef.current.groundColor.copy(roomTone.current).multiplyScalar(0.7);
       }
     }
 
-    // spotlight follows + intensifies on reveal (spec §10.6)
+    /*
+     * The picture lights follow the camera, not the snapped index.
+     *
+     * A jump from the rail indicator glides the room across several bays in
+     * under a second, and for that second the camera is nowhere near the bay
+     * it is heading for. Following `gallery.x` means the bays it passes are
+     * lit as it passes them, which is what a row of picture lights does.
+     */
+    const litBays = Math.min(artworks.length, LIT_BAYS);
+    if (litBays) {
+      const centre = Math.round(gallery.x / SPACING);
+      const start = clamp(centre - (litBays >> 1), 0, artworks.length - litBays);
+      for (let i = 0; i < litBays; i++) {
+        lampRefs.current[i]?.position.set((start + i) * SPACING, 4.8, 2.6);
+      }
+    }
+
+    // spotlight follows + intensifies on reveal
     if (spotRef.current) {
       spotRef.current.position.set(index * SPACING, 4.6, 2.4);
       spotTarget.current.position.set(index * SPACING, HANG_Y, 0);
       spotTarget.current.updateMatrixWorld();
       spotRef.current.intensity = revealAnim.spot * 3.4;
+      /*
+       * The spot steps from bay to bay; it does not drift. So its shadow map
+       * is redrawn on the step and not on the sixty frames of standing in
+       * front of a painting that follow — the light gets brighter through a
+       * reveal, and brightness is not something a depth buffer records.
+       */
+      if (shadowBay.current !== index) {
+        shadowBay.current = index;
+        refreshShadows();
+      }
     }
     scene.environmentIntensity = 0.45 * revealAnim.env;
 
-    // project the active plane edge for the DOM placard (spec §10.7)
+    // project the active plane edge for the DOM placard
     const activeEntry = artworks[index];
     if (activeEntry) {
       const { width: w, height: h } = fitWork(activeEntry.aspect, PLANE_H, MAX_W);
-      const v = new THREE.Vector3(index * SPACING + w / 2, HANG_Y, 0.1);
+      const v = scratch.point.set(index * SPACING + w / 2, HANG_Y, 0.1);
       v.project(camera);
       placardAnchor.x = (v.x * 0.5 + 0.5) * size.width;
       placardAnchor.y = (-v.y * 0.5 + 0.5) * size.height;
@@ -481,7 +595,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
       // Recomputed from the live camera on every call, so a resize mid-flight
       // simply produces new coordinates rather than a stale cached path.
       artworkProjector.project = (u: number, vv: number) => {
-        const p = new THREE.Vector3(
+        const p = scratch.projected.set(
           index * SPACING + (u - 0.5) * w,
           HANG_Y + (0.5 - vv) * h,
           0.05,
@@ -514,7 +628,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
         <planeGeometry args={[railW, 14]} />
         <meshStandardMaterial color={p.ceiling} roughness={0.9} />
       </mesh>
-      {/* opposite wall, far behind the camera (true-3D parallax layer, §10B.3) */}
+      {/* opposite wall, far behind the camera — the true-3D parallax layer */}
       <mesh position={[centreX, WALL_H / 2, 10.5]} rotation={[0, Math.PI, 0]}>
         <planeGeometry args={[railW, WALL_H + 2]} />
         <meshStandardMaterial color={p.wallDeep} roughness={0.9} />
@@ -549,7 +663,9 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
 
       {/* one fully moulded bay per painting */}
       {artworks.map((a, i) => {
-        const { width, height } = fitWork(a.aspect, PLANE_H, MAX_W);
+        // a tondo is square whatever its scan measures, and the frame is
+        // turned rather than mitred
+        const { width, height } = fitWork(a.shape === 'round' ? 1 : a.aspect, PLANE_H, MAX_W);
         return (
           <group key={`bay${a.id}`} position={[i * SPACING, 0, 0]}>
             <MouldedBay artwork={a} museum={museum} width={width} height={height} />
@@ -560,6 +676,7 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
                 height={height}
                 gilt={p.gilt}
                 dark={p.wallDeep}
+                shape={a.shape}
                 detail={
                   quality.ornament && Math.abs(i - index) <= 1 ? 'full' : 'plain'
                 }
@@ -575,8 +692,9 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
           key={a.id}
           artwork={loaded.get(i) ?? null}
           position={[i * SPACING, HANG_Y, 0.09]}
-          height={fitWork(a.aspect, PLANE_H, MAX_W).height}
+          height={fitWork(a.shape === 'round' ? 1 : a.aspect, PLANE_H, MAX_W).height}
           aspect={a.aspect}
+          shape={a.shape}
           active={i === index}
           onLeave={() => {
             if (i !== index) return;
@@ -593,19 +711,6 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
             if (i !== index) return;
             const s = useStore.getState();
             const art = loaded.get(i);
-            if (s.extractionMode) {
-              /*
-               * Keep reporting what is under the cursor even while a passage
-               * is out. This used to return early once anything was pulled,
-               * which froze `hoveredRegion` — so moving to another part of
-               * the painting changed nothing, and the only way to read a
-               * second passage was to leave thread mode and come back.
-               * Thread mode is meant to be a mode you move around inside.
-               */
-              const region = art ? regionAt(art.meta.regions ?? [], u, v) : null;
-              if (region?.id !== s.hoveredRegion?.id) s.setHoveredRegion(region);
-              return;
-            }
             /*
              * HOVER LOOKS, CLICK DECIDES.
              *
@@ -615,9 +720,22 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
              * words. The room does not slide, the wall label does not arrive,
              * and the picture does not dissolve out from under you — all of
              * that belongs to the click.
+             *
+             * Thread mode gets the same circle. It is the one thing on this
+             * canvas that says "the cursor is here and the picture is under
+             * the words", and a mode that took it away and drew a rectangle
+             * instead read as a different, worse interface rather than as the
+             * same one doing something else.
              */
             if (!art || !matchMedia('(pointer: fine)').matches) return;
             moveLens(u, v, art.glyphs.imageW, art.glyphs.imageH, LENS_RADIUS);
+
+            if (s.extractionMode) {
+              // and it keeps reporting what is under the cursor even while a
+              // passage is out: thread mode is a mode you move around inside
+              const region = regionAt(art.meta.regions ?? [], u, v);
+              if (region?.id !== s.hoveredRegion?.id) s.setHoveredRegion(region);
+            }
           }}
           onTap={(u, v) => {
             if (i !== index) return;
@@ -637,13 +755,15 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
         />
       ))}
 
-      {/* lighting: an accent-tinted fill, a picture light per bay, and the
-          reveal spot */}
+      {/* lighting: an accent-tinted fill, the picture lights — placed along
+          the rail by the frame loop, see LIT_BAYS — and the reveal spot */}
       <hemisphereLight ref={fillRef} args={['#FFF3E0', '#9C9080', 0.5]} />
-      {artworks.map((_, i) => (
+      {Array.from({ length: Math.min(artworks.length, LIT_BAYS) }, (_, i) => (
         <pointLight
           key={i}
-          position={[i * SPACING, 4.8, 2.6]}
+          ref={(el) => {
+            lampRefs.current[i] = el;
+          }}
           color={museum.style.light.lamp}
           intensity={9}
           distance={11}

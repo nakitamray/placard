@@ -32,10 +32,17 @@ interface Props {
 
 const MOTES_BY_QUALITY = { high: 420, mid: 240, low: 0 } as const;
 
+/** how often the dust is moved, and the one matrix it is moved with */
+const DUST_HZ = 30;
+const DUST_STEP = 1 / DUST_HZ - 0.002;
+const dustMatrix = new THREE.Matrix4();
+
 export function Atmosphere({ style, d, quality }: Props) {
   const shaftRef = useRef<THREE.InstancedMesh>(null);
   const moteRef = useRef<THREE.InstancedMesh>(null);
   const t = useRef(0);
+  /** seconds of drift not yet applied to the motes */
+  const since = useRef(0);
 
   // the shafts lean the way the key light does
   const lean = useMemo(() => {
@@ -89,11 +96,24 @@ export function Atmosphere({ style, d, quality }: Props) {
 
     const dust = moteRef.current;
     if (!dust || !motes.length) return;
-    const m = new THREE.Matrix4();
+
+    /*
+     * Dust falls at a few centimetres a second. Rebuilding four hundred
+     * transforms and re-uploading the instance buffer for every frame of that
+     * is arithmetic nobody can see the result of; at thirty a second the motes
+     * drift exactly as they did. `since` carries the skipped time, so they
+     * fall at the same speed however often this runs.
+     */
+    since.current += delta;
+    if (since.current < DUST_STEP) return;
+    const step = since.current;
+    since.current = 0;
+
+    const m = dustMatrix;
     const ceiling = d.vaultHeight * 0.86;
     for (let i = 0; i < motes.length; i++) {
       const p = motes[i];
-      p.y += p.sp * delta;
+      p.y += p.sp * step;
       if (p.y > ceiling) p.y = 0.2;
       const sway = Math.sin(t.current * 0.4 + p.ph) * 0.22;
       const scale = p.s * (0.55 + 0.45 * Math.sin(t.current * 0.9 + p.ph));

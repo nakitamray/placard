@@ -102,6 +102,33 @@ const MEASURED: Record<FrameKind, FrameSpec> = {
     reeding: { offset: 0.03, count: 34, size: 0.012, role: 'gilt' },
   },
 
+  // The Florentine cassetta: a wide flat gilt bed between a carved sight edge
+  // and a carved outer course. It is a box round a picture rather than a swept
+  // moulding, and the Uffizi corridor is full of them.
+  'uffizi-gilt': {
+    courses: [
+      { offset: 0.0, width: 0.016, depth: 0.03, z: 0.03, bevel: 0.005, role: 'gilt' },
+      { offset: 0.016, width: 0.02, depth: 0.014, z: 0.01, bevel: 0.004, role: 'dark' },
+      // the flat bed — the part a cassetta is named for
+      { offset: 0.036, width: 0.07, depth: 0.036, z: 0.036, bevel: 0.006, role: 'gilt' },
+      { offset: 0.106, width: 0.024, depth: 0.056, z: 0.056, bevel: 0.012, role: 'gilt' },
+    ],
+    bead: { offset: 0.03, radius: 0.007, spacing: 0.036, role: 'gilt' },
+  },
+
+  // The modern museum frame: a deep box of dark stained hardwood with a thin
+  // gilt lip at the sight edge and nothing else. It is what a curator puts a
+  // print, a papyrus or a scroll into when the object is the subject and the
+  // frame is furniture — and against pale stone it is a hard dark rectangle,
+  // which is exactly what a spotlit wall needs.
+  'museum-plain': {
+    courses: [
+      { offset: 0.0, width: 0.008, depth: 0.026, z: 0.026, bevel: 0.002, role: 'gilt' },
+      { offset: 0.008, width: 0.052, depth: 0.05, z: 0.05, bevel: 0.008, role: 'dark' },
+      { offset: 0.06, width: 0.014, depth: 0.062, z: 0.062, bevel: 0.005, role: 'dark' },
+    ],
+  },
+
   // Broad, flat-topped, stepped: the American gilt frame, generous and plain,
   // reading well under the Met court's warm spotlights.
   'met-broad': {
@@ -243,19 +270,170 @@ export interface FrameGeometry {
  * Build one frame around a `width` × `height` painting whose centre is the
  * origin and whose surface sits at z = 0.
  */
+/**
+ * One draw call per material role.
+ *
+ * The courses are ExtrudeGeometry (non-indexed) and the ornament is boxes,
+ * cylinders and spheres (indexed). mergeGeometries requires the whole set to
+ * agree on both indexing and the attribute list, so everything is flattened to
+ * non-indexed and its attributes normalised before merging.
+ */
+function merge(list: THREE.BufferGeometry[]): THREE.BufferGeometry | null {
+  if (!list.length) return null;
+  const flat = list.map((g) => {
+    const n = g.getIndex() ? g.toNonIndexed() : g;
+    if (n !== g) g.dispose();
+    n.deleteAttribute('uv1');
+    n.deleteAttribute('uv2');
+    if (!n.getAttribute('uv')) {
+      const count = n.getAttribute('position').count;
+      n.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(count * 2), 2));
+    }
+    return n;
+  });
+  const merged = mergeGeometries(flat, false);
+  for (const g of flat) g.dispose();
+  return merged;
+}
+
+/**
+ * A tondo's frame: the same courses, turned.
+ *
+ * A round painting in a rectangular frame is a different object, and the
+ * Uffizi hangs two of them. Each course of the museum's own profile becomes a
+ * torus at the same offset and depth, so a tondo reads as the same carpentry
+ * as its neighbours — which is the point. The bead course runs round the
+ * circle at the same spacing it runs round a rectangle.
+ */
+export function buildRoundFrame(
+  kind: FrameKind,
+  diameter: number,
+  ornament = true,
+): FrameGeometry {
+  const spec = SPECS[kind] ?? SPECS['louvre-salon'];
+  const s = diameter;
+  const r0 = diameter / 2;
+  const parts: Record<Role, THREE.BufferGeometry[]> = { gilt: [], dark: [] };
+  const mat = new THREE.Matrix4();
+
+  for (const c of spec.courses) {
+    const inner = r0 + c.offset * s;
+    const band = c.width * s;
+    const depth = c.depth * s;
+    // a flat annulus extruded to the course's depth, which is what a turned
+    // moulding is before it is carved
+    const shape = new THREE.Shape();
+    shape.absarc(0, 0, inner + band, 0, Math.PI * 2, false);
+    const hole = new THREE.Path();
+    hole.absarc(0, 0, inner, 0, Math.PI * 2, true);
+    shape.holes.push(hole);
+    const geo = new THREE.ExtrudeGeometry(shape, {
+      depth,
+      bevelEnabled: true,
+      bevelSize: c.bevel * s,
+      bevelThickness: c.bevel * s,
+      bevelSegments: 2,
+      curveSegments: 48,
+    });
+    mat.makeTranslation(0, 0, c.z * s - depth);
+    parts[c.role].push(transformed(geo, mat));
+  }
+
+  const beads: THREE.Vector3[] = [];
+  if (spec.bead && ornament) {
+    const br = r0 + spec.bead.offset * s;
+    const n = Math.max(24, Math.round((2 * Math.PI * br) / (spec.bead.spacing * s)));
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      beads.push(new THREE.Vector3(Math.cos(a) * br, Math.sin(a) * br, spec.bead.radius * s));
+    }
+  }
+
+  return {
+    gilt: merge(parts.gilt),
+    dark: merge(parts.dark),
+    beads,
+    beadRadius: (spec.bead?.radius ?? 0.008) * s,
+    beadRole: spec.bead?.role ?? 'gilt',
+  };
+}
+
+/**
+ * The divider down the middle of a pair hung as one object.
+ *
+ * A diptych is two panels that face each other across a hinge, and hanging it
+ * as a single picture loses the hinge the whole composition is built across.
+ * This is the museum's own sight-edge and bed courses, turned on their side
+ * and run vertically down the centre of the frame, so the join is made of the
+ * same moulding as the surround.
+ *
+ * IT IS DELIBERATELY PLAIN, AND HALF THE WIDTH OF THE SURROUND. The ornament
+ * on a diptych belongs to the frame around the pair; a carved bar between two
+ * small panels competes with both of them and takes a slice out of each face.
+ * A slender moulded strip says "two panels, one object" and then gets out of
+ * the way, which is all it is for.
+ */
+export function buildDivider(
+  kind: FrameKind,
+  height: number,
+): { gilt: THREE.BufferGeometry; beads: THREE.Vector3[]; beadRadius: number } {
+  const spec = SPECS[kind] ?? SPECS['louvre-salon'];
+  const parts: THREE.BufferGeometry[] = [];
+  const mat = new THREE.Matrix4();
+  const outer = Math.max(...spec.courses.map((c) => c.offset + c.width)) * height;
+
+  // the bed, and a raised sight lip either side of it
+  const bed = new THREE.BoxGeometry(outer * 0.58, height, outer * 0.4);
+  mat.makeTranslation(0, 0, outer * 0.2);
+  parts.push(transformed(bed, mat));
+  for (const sx of [-1, 1]) {
+    const lip = new THREE.BoxGeometry(outer * 0.1, height, outer * 0.56);
+    mat.makeTranslation((sx * outer * 0.58) / 2, 0, outer * 0.28);
+    parts.push(transformed(lip, mat));
+  }
+
+  // no bead course: see above
+  return { gilt: merge(parts)!, beads: [], beadRadius: (spec.bead?.radius ?? 0.008) * height };
+}
+
 export function buildFrame(
   kind: FrameKind,
   width: number,
   height: number,
   /** carve the bead course, cartouches and reeding */
   ornament = true,
+  /**
+   * A grander version of the same moulding.
+   *
+   * Used where one frame carries more than one panel — a diptych hung as a
+   * single object — because a pair inside a plain surround reads as two
+   * pictures that happen to be adjacent. Two further courses are added
+   * outside the spec: a broad carved band and a stepped outer lip, in the
+   * frame's own materials and proportions, so it is unmistakably the same
+   * frame and unmistakably a bigger one.
+   */
+  rich = false,
 ): FrameGeometry {
   const spec = SPECS[kind] ?? SPECS['louvre-salon'];
   const s = height; // every dimension in the spec is a fraction of the height
   const parts: Record<Role, THREE.BufferGeometry[]> = { gilt: [], dark: [] };
   const mat = new THREE.Matrix4();
 
-  for (const c of spec.courses) {
+  const courses = rich
+    ? [
+        ...spec.courses,
+        ...(() => {
+          const out = Math.max(...spec.courses.map((c) => c.offset + c.width));
+          const deep = Math.max(...spec.courses.map((c) => c.z));
+          return [
+            { offset: out, width: 0.05, depth: deep * 1.25, z: deep * 1.25, bevel: 0.014, role: 'gilt' as Role },
+            { offset: out + 0.05, width: 0.018, depth: deep * 1.5, z: deep * 1.5, bevel: 0.005, role: 'dark' as Role },
+          ];
+        })(),
+      ]
+    : spec.courses;
+
+  for (const c of courses) {
     const innerW = width + c.offset * s * 2;
     const innerH = height + c.offset * s * 2;
     const geo = ringGeometry(innerW, innerH, c.width * s, c.depth * s, c.bevel * s);
@@ -267,7 +445,7 @@ export function buildFrame(
 
   // corner cartouches — raised carved blocks breaking the run of the moulding
   if (spec.cartouche && ornament) {
-    const outer = Math.max(...spec.courses.map((c) => c.offset + c.width));
+    const outer = Math.max(...courses.map((c) => c.offset + c.width));
     const size = spec.cartouche.size * s;
     const cx = width / 2 + outer * s - size * 0.28;
     const cy = height / 2 + outer * s - size * 0.28;
@@ -375,28 +553,6 @@ export function buildFrame(
       beads.push(new THREE.Vector3(-bx, y, beadRadius * 0.7));
     }
   }
-
-  const merge = (list: THREE.BufferGeometry[]) => {
-    if (!list.length) return null;
-    // The courses are ExtrudeGeometry (non-indexed) and the ornament is boxes,
-    // cylinders and spheres (indexed). mergeGeometries requires the whole set
-    // to agree on both indexing and the attribute list, so flatten everything
-    // to non-indexed and normalise the attributes before merging.
-    const flat = list.map((g) => {
-      const n = g.getIndex() ? g.toNonIndexed() : g;
-      if (n !== g) g.dispose();
-      n.deleteAttribute('uv1');
-      n.deleteAttribute('uv2');
-      if (!n.getAttribute('uv')) {
-        const count = n.getAttribute('position').count;
-        n.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(count * 2), 2));
-      }
-      return n;
-    });
-    const merged = mergeGeometries(flat, false);
-    for (const g of flat) g.dispose();
-    return merged;
-  };
 
   return {
     gilt: merge(parts.gilt),

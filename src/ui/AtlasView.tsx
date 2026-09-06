@@ -1,5 +1,5 @@
 /**
- * The Atlas — fifty paintings as one shape.
+ * The Atlas — the whole collection as one shape.
  *
  * A museum tells you who painted a thing and when. What it cannot tell you,
  * standing in front of one canvas, is that the man who taught the painter of
@@ -24,7 +24,7 @@
  *   and then stops: once the total energy falls below a floor the simulation
  *   costs nothing until something new appears.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
@@ -36,6 +36,7 @@ import {
 } from '../state/atlas';
 import { useStore, loadMuseum } from '../state/store';
 import { sfx } from '../lib/audio';
+import { FrameGovernor } from '../render/frameGovernor';
 import type { MuseumIndexEntry } from '../types';
 
 /** one colour per kind, out of the exhibition's own palette */
@@ -62,6 +63,8 @@ interface Body {
   p: THREE.Vector3;
   v: THREE.Vector3;
   degree: number;
+  /** the direction it was seeded in — where it waits until it is found */
+  dir: THREE.Vector3;
 }
 
 /** deterministic 0..1 from an id, so the map is the same shape every visit */
@@ -74,17 +77,62 @@ function hash01(s: string, salt: number): number {
   return ((h >>> 0) % 10000) / 10000;
 }
 
+/*
+ * The layout, in five numbers.
+ *
+ * They are here together because they only make sense together: repulsion
+ * spreads, springs gather, the centre pull holds the whole thing in one
+ * place, and MAP_RADIUS is the size the result is then normalised to — which
+ * is what stops the map changing shape every time the exhibition gains a
+ * work.
+ */
+/** how hard every node pushes every other */
+const REPEL = 21;
+/** how hard each of them is pulled toward the middle */
+const CENTRE_PULL = 0.8;
+/** what a link would like its length to be */
+const SPRING_LENGTH = 2.4;
+const SPRING_K = 3.2;
+/**
+ * How hard the map is pressed toward its own plane.
+ *
+ * A graph laid out in a free three dimensions projects to a screen as a mess
+ * of crossings: every edge that is merely passing behind another one reads as
+ * an edge crossing it, and thirty of those is a scribble. Pressed most of the
+ * way flat, the web reads as a web — and the depth that is left is enough
+ * that turning it still shows you something, which is the whole reason it is
+ * a map you can turn rather than a diagram.
+ */
+const FLATTEN = 2.2;
+/** the radius the settled cloud is eased to, in world units */
+const MAP_RADIUS = 9.5;
+/** how many steps the layout is run before the map is first drawn */
+const SETTLE_STEPS = 320;
+/**
+ * Where everything not yet found hangs.
+ *
+ * Undiscovered nodes are not in the simulation at all. They are the map's
+ * background noise — "there is more here" — and a hundred of them pushing on
+ * the twenty you have found is what turned the web into an even scatter with
+ * no clusters in it. So they are parked on a shell around the map, in the
+ * direction they were seeded in, and the thing in the middle is only what you
+ * have uncovered: one object, laid out for itself.
+ */
+const HALO_RADIUS = MAP_RADIUS * 2.1;
+
 function seedBodies(graph: AtlasGraph): Body[] {
   return graph.nodes.map((n) => {
     const t = hash01(n.id, 1) * Math.PI * 2;
     const u = hash01(n.id, 2) * 2 - 1;
     const r = 9 + hash01(n.id, 3) * 5;
     const s = Math.sqrt(1 - u * u);
+    const dir = new THREE.Vector3(s * Math.cos(t), s * Math.sin(t) * 0.7, u).normalize();
     return {
       id: n.id,
-      p: new THREE.Vector3(r * s * Math.cos(t), r * s * Math.sin(t) * 0.7, r * u),
+      p: dir.clone().multiplyScalar(r),
       v: new THREE.Vector3(),
       degree: (graph.around.get(n.id) ?? []).length,
+      dir,
     };
   });
 }
@@ -165,6 +213,19 @@ function Graph({
   const { camera, size } = useThree();
 
   const bodies = useMemo(() => seedBodies(graph), [graph]);
+  /*
+   * The node meshes, so the frame loop can move them.
+   *
+   * THIS IS NOT OPTIONAL. `position={b.p}` hands r3f a Vector3 whose identity
+   * never changes, and r3f writes props into the object on a React commit —
+   * so a node drawn that way sits wherever it was at the last render while the
+   * simulation carries on mutating `b.p` underneath it. The edges are rewritten
+   * from those same live vectors every frame, so the two disagree, and what you
+   * see is a web of lines floating away from the dots they are supposed to
+   * join. It looked fine for as long as the layout happened to settle during a
+   * render; adding nodes made it settle later, and the whole graph came apart.
+   */
+  const nodeRefs = useRef<Array<THREE.Mesh | null>>([]);
   const index = useMemo(() => new Map(bodies.map((b, i) => [b.id, i])), [bodies]);
   const energy = useRef(1);
   const quietRef = useRef<THREE.LineSegments>(null);
@@ -176,6 +237,36 @@ function Graph({
    * of a graph is the edges, and they were all one colour whether they had
    * anything to do with what you had just clicked or not.
    */
+  /*
+   * The springs, and they are the FOUND links only.
+   *
+   * The layout has to arrange the map the visitor can see. Pulling on every
+   * link in the graph — including the ones they have not uncovered — lays the
+   * nodes out for a diagram that is not on the screen, and what is on the
+   * screen is then a scatter of long lines with no clusters in it, because
+   * the structure holding those positions is invisible. Springing only the
+   * found edges means every line you can see is a line that is pulling, and
+   * the map tightens into groups as you discover it.
+   */
+  const springs = useMemo(() => {
+    const out: Array<[number, number]> = [];
+    for (const l of graph.links) {
+      if (!found.has(linkKey(l))) continue;
+      const ia = index.get(l.a);
+      const ib = index.get(l.b);
+      if (ia !== undefined && ib !== undefined) out.push([ia, ib]);
+    }
+    return out;
+  }, [graph, found, index]);
+
+  /** which bodies are discovered, by index — the ones the fit is measured on */
+  const knownBody = useMemo(() => bodies.map((b) => found.has(b.id)), [bodies, found]);
+  /** and the same thing as a list, which is what the simulation walks */
+  const live = useMemo(
+    () => knownBody.map((k, i) => (k ? i : -1)).filter((i) => i >= 0),
+    [knownBody],
+  );
+
   const near = useMemo(() => {
     if (!focus) return null;
     const nodes = new Set<string>([focus]);
@@ -213,60 +304,121 @@ function Graph({
     energy.current = 1;
   }, [found]);
 
+  /*
+   * One integration step, shared by the settle below and the frame loop.
+   *
+   * It is a function rather than inline code in `useFrame` for one reason:
+   * the map has to arrive already laid out. Letting the simulation converge
+   * on screen means the first seconds of the atlas are a cloud of nodes
+   * drifting into place, and — because the energy test stops the loop when
+   * the average speed is low rather than when the layout is finished — a
+   * sparse graph freezes half-settled and stays that way. Three hundred steps
+   * before the first frame costs a few milliseconds and the map opens
+   * composed.
+   */
+  const step = (dt: number) => {
+    let moved = 0;
+    // repulsion, over the discovered web only — every pair of it, which is at
+    // most a few thousand and usually far fewer
+    for (let ii = 0; ii < live.length; ii++) {
+      const a = bodies[live[ii]];
+      for (let jj = ii + 1; jj < live.length; jj++) {
+        const b = bodies[live[jj]];
+        const dx = a.p.x - b.p.x;
+        const dy = a.p.y - b.p.y;
+        const dz = a.p.z - b.p.z;
+        const d2 = dx * dx + dy * dy + dz * dz + 0.6;
+        const f = REPEL / d2;
+        const d = Math.sqrt(d2);
+        a.v.x += (dx / d) * f * dt;
+        a.v.y += (dy / d) * f * dt;
+        a.v.z += (dz / d) * f * dt;
+        b.v.x -= (dx / d) * f * dt;
+        b.v.y -= (dy / d) * f * dt;
+        b.v.z -= (dz / d) * f * dt;
+      }
+      // a pull to the middle, which is what keeps the map one object rather
+      // than a field of things that happen to be near each other
+      a.v.addScaledVector(a.p, -CENTRE_PULL * dt);
+      // and the press toward the plane — see FLATTEN
+      a.v.z -= a.p.z * FLATTEN * dt;
+    }
+
+    // springs, on the edges the visitor can actually see
+    for (const [ia, ib] of springs) {
+      const a = bodies[ia];
+      const b = bodies[ib];
+      const dx = b.p.x - a.p.x;
+      const dy = b.p.y - a.p.y;
+      const dz = b.p.z - a.p.z;
+      const d = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001;
+      const f = (d - SPRING_LENGTH) * SPRING_K * dt;
+      a.v.x += (dx / d) * f;
+      a.v.y += (dy / d) * f;
+      a.v.z += (dz / d) * f;
+      b.v.x -= (dx / d) * f;
+      b.v.y -= (dy / d) * f;
+      b.v.z -= (dz / d) * f;
+    }
+
+    for (const i of live) {
+      const b = bodies[i];
+      b.v.multiplyScalar(0.86);
+      b.p.addScaledVector(b.v, dt * 6);
+      moved += b.v.lengthSq();
+    }
+    energy.current = live.length ? moved / live.length : 0;
+
+    /*
+     * Keep the map centred on the origin and the same size, whatever it holds.
+     *
+     * Two problems, one fix. A force layout's equilibrium radius grows with
+     * the number of nodes in it, so uncovering more of the collection quietly
+     * spread the web past the edges of the screen. And the cloud's middle
+     * drifts wherever the forces leave it, while the drag gesture turns the
+     * group about the ORIGIN: a map whose middle is ten units off-centre does
+     * not turn, it swings — which is most of what "everything floats around"
+     * describes.
+     *
+     * So the discovered web is translated so its centroid is the origin — a
+     * rigid move, invisible in itself — and eased toward a fixed radius. Nodes
+     * and edges are drawn from the same vectors, so they scale together and
+     * stay joined.
+     */
+    if (live.length) {
+      centre.set(0, 0, 0);
+      for (const i of live) centre.add(bodies[i].p);
+      centre.multiplyScalar(1 / live.length);
+      let spread = 0;
+      for (const i of live) spread += bodies[i].p.distanceToSquared(centre);
+      spread = Math.sqrt(spread / live.length) || 1;
+      const fit = 1 + (MAP_RADIUS / spread - 1) * 0.06;
+      for (const i of live) bodies[i].p.sub(centre).multiplyScalar(fit);
+    }
+
+    // and everything still to be found waits on its shell, out of the way
+    for (let i = 0; i < bodies.length; i++) {
+      if (knownBody[i]) continue;
+      bodies[i].p.copy(bodies[i].dir).multiplyScalar(HALO_RADIUS);
+    }
+  };
+
+  /* Settle it before it is ever drawn, and again whenever a discovery
+     changes what the map is a picture of. */
+  useLayoutEffect(() => {
+    for (let i = 0; i < SETTLE_STEPS; i++) step(1 / 60);
+    energy.current = 0.02;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [live, springs]);
+
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.05);
+    // a settled map still breathes toward its fit; a disturbed one re-settles
+    if (energy.current > 0.00015) step(dt);
 
-    if (energy.current > 0.0025) {
-      let moved = 0;
-      // repulsion — every pair, which at this size is a few thousand
-      for (let i = 0; i < bodies.length; i++) {
-        const a = bodies[i];
-        for (let j = i + 1; j < bodies.length; j++) {
-          const b = bodies[j];
-          const dx = a.p.x - b.p.x;
-          const dy = a.p.y - b.p.y;
-          const dz = a.p.z - b.p.z;
-          const d2 = dx * dx + dy * dy + dz * dz + 0.6;
-          // stronger than it was: with a hundred and thirty nodes the old
-          // figure let the middle of the web pack into a ball you could not
-          // read an edge out of
-          const f = 38 / d2;
-          const d = Math.sqrt(d2);
-          a.v.x += (dx / d) * f * dt;
-          a.v.y += (dy / d) * f * dt;
-          a.v.z += (dz / d) * f * dt;
-          b.v.x -= (dx / d) * f * dt;
-          b.v.y -= (dy / d) * f * dt;
-          b.v.z -= (dz / d) * f * dt;
-        }
-        // a weak pull to the middle, so nothing drifts to infinity
-        a.v.addScaledVector(a.p, -0.5 * dt);
-      }
-      // springs
-      for (const l of graph.links) {
-        const ia = index.get(l.a);
-        const ib = index.get(l.b);
-        if (ia === undefined || ib === undefined) continue;
-        const a = bodies[ia];
-        const b = bodies[ib];
-        const dx = b.p.x - a.p.x;
-        const dy = b.p.y - a.p.y;
-        const dz = b.p.z - a.p.z;
-        const d = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001;
-        const f = (d - 4.4) * 1.5 * dt;
-        a.v.x += (dx / d) * f;
-        a.v.y += (dy / d) * f;
-        a.v.z += (dz / d) * f;
-        b.v.x -= (dx / d) * f;
-        b.v.y -= (dy / d) * f;
-        b.v.z -= (dz / d) * f;
-      }
-      for (const b of bodies) {
-        b.v.multiplyScalar(0.86);
-        b.p.addScaledVector(b.v, dt * 6);
-        moved += b.v.lengthSq();
-      }
-      energy.current = moved / bodies.length;
+    // the nodes themselves, moved from the simulation rather than from React
+    for (let i = 0; i < bodies.length; i++) {
+      nodeRefs.current[i]?.position.copy(bodies[i].p);
     }
 
     // edges — the found ones, sorted into the quiet web and the lit
@@ -298,7 +450,7 @@ function Graph({
     if (quietRef.current) {
       // the unfocused web is a haze the nodes sit in, not a diagram of its own:
       // at full strength a hundred and eighty edges is all anyone sees
-      (quietRef.current.material as THREE.LineBasicMaterial).opacity = near ? 0.07 : 0.17;
+      (quietRef.current.material as THREE.LineBasicMaterial).opacity = near ? 0.09 : 0.3;
     }
 
     /*
@@ -315,7 +467,7 @@ function Graph({
     if (g) {
       placed.length = 0;
       for (const b of ordered) {
-        const el = labelEls.current.get(b.id);
+        const el = labelEls.get(b.id);
         if (!el) continue;
         w.copy(b.p).applyMatrix4(g.matrixWorld);
         const dist = w.distanceTo(camera.position);
@@ -325,7 +477,7 @@ function Graph({
         el.style.transform = `translate(-50%, 0) translate(${x}px, ${y}px)`;
 
         if (v.z > 1) {
-          el.style.opacity = '0';
+          hide(el);
           continue;
         }
         // half the label's own width, so the test is against real extents
@@ -340,7 +492,7 @@ function Graph({
         // whatever is focused always gets its name, collision or not
         const forced = !!near && near.nodes.has(b.id);
         if (clash && !forced) {
-          el.style.opacity = '0';
+          hide(el);
           continue;
         }
         placed.push({ x, y, half });
@@ -352,25 +504,19 @@ function Graph({
         // a label belonging to nothing you are looking at gets out of the way
         const dim = near && !near.nodes.has(b.id) ? 0.2 : 1;
         el.style.opacity = String(byDist * dim);
+        el.style.pointerEvents = 'auto';
       }
     }
   });
 
   const v = useMemo(() => new THREE.Vector3(), []);
   const w = useMemo(() => new THREE.Vector3(), []);
-  const labelEls = useRef(new Map<string, HTMLElement>());
+  /** the cloud's own middle, recomputed each frame for the fit */
+  const centre = useMemo(() => new THREE.Vector3(), []);
   /** most-connected first, so the important names win a collision */
   const ordered = useMemo(() => [...bodies].sort((a, b) => b.degree - a.degree), [bodies]);
   /** label extents already claimed this frame, reused rather than reallocated */
   const placed = useMemo<Array<{ x: number; y: number; half: number }>>(() => [], []);
-
-  // hand the DOM label layer the elements to move
-  useEffect(() => {
-    labelEls.current = new Map();
-    document.querySelectorAll<HTMLElement>('[data-atlas-label]').forEach((el) => {
-      labelEls.current.set(el.dataset.atlasLabel!, el);
-    });
-  }, [graph, found, focus]);
 
   return (
     <group ref={groupRef} name="atlas-graph">
@@ -383,7 +529,7 @@ function Graph({
       <lineSegments geometry={hotGeo} frustumCulled={false}>
         <lineBasicMaterial color="#F2EBDF" transparent opacity={0.95} depthWrite={false} />
       </lineSegments>
-      {bodies.map((b) => {
+      {bodies.map((b, bi) => {
         const node = graph.byId.get(b.id)!;
         const known = found.has(b.id);
         const lit = !near || near.nodes.has(b.id);
@@ -396,6 +542,9 @@ function Graph({
         return (
           <mesh
             key={b.id}
+            ref={(el) => {
+              nodeRefs.current[bi] = el;
+            }}
             position={b.p}
             onPointerOver={(e) => {
               e.stopPropagation();
@@ -541,7 +690,15 @@ export function AtlasView() {
           spin.current.zoom = Math.max(0.45, Math.min(2.4, spin.current.zoom * (1 + e.deltaY * 0.0012)));
         }}
       >
-        <Canvas camera={{ fov: 45, position: [0, 0, 40], near: 0.1, far: 220 }} dpr={[1, 1.75]}>
+        <Canvas
+          /* the same capped loop the corridor runs on: the graph settles and
+             then holds still, and a still graph does not need a hundred and
+             twenty frames a second to go on holding still */
+          frameloop="never"
+          camera={{ fov: 45, position: [0, 0, 40], near: 0.1, far: 220 }}
+          dpr={[1, 1.75]}
+        >
+          <FrameGovernor maxFps={60} running />
           <Rig spin={spin} />
           <Starfield />
           {graph && (
@@ -569,7 +726,7 @@ export function AtlasView() {
       <p className="caption corridor-title atlas-level">The atlas</p>
 
       <header className="atlas-head">
-        <h2 className="display atlas-title">How the fifty are joined</h2>
+        <h2 className="display atlas-title">How the collection is joined</h2>
       </header>
 
       <p className="caption atlas-progress">
@@ -665,6 +822,25 @@ export function AtlasView() {
   );
 }
 
+/*
+ * The DOM elements the frame loop moves, registered by the labels themselves.
+ *
+ * IT HAS TO BE REGISTRATION, NOT A QUERY. The graph lives inside the r3f
+ * canvas, which is its own React root: an effect in there can run before the
+ * label layer's own elements have been committed to the page, and a label the
+ * frame loop never learned about is never moved off the top-left corner —
+ * which is a name sitting under the Back button until the selection changes
+ * again. Each label puts itself in here when it mounts and takes itself out
+ * when it goes, so there is no window in which one exists and is unknown.
+ */
+const labelEls = new Map<string, HTMLElement>();
+
+/** out of the frame and out of the way of anything under it */
+function hide(el: HTMLElement) {
+  el.style.opacity = '0';
+  el.style.pointerEvents = 'none';
+}
+
 /** applies the drag/zoom to the graph, damped, so it never snaps */
 function Rig({ spin }: { spin: React.MutableRefObject<{ yaw: number; pitch: number; zoom: number }> }) {
   const scene = useThree((s) => s.scene);
@@ -704,7 +880,7 @@ function LabelLayer({ graph, focus }: { graph: AtlasGraph; focus: string | null 
    *                     rather than its inventory
    *   something focused that node and everything it touches, and nothing else
    *
-   * Painting nodes never carry a standing label: there are fifty of them and
+   * Painting nodes never carry a standing label: there are seventy of them and
    * their titles are the longest strings in the graph.
    */
   const shown = useMemo(() => {
@@ -730,17 +906,48 @@ function LabelLayer({ graph, focus }: { graph: AtlasGraph; focus: string | null 
       {graph.nodes.map((n) => {
         if (!found.has(n.id) || !shown.has(n.id)) return null;
         return (
-          <button
-            key={n.id}
-            data-atlas-label={n.id}
-            className={`atlas-label caption ${selected === n.id ? 'is-on' : ''}`}
-            style={{ color: KIND_COLOUR[n.kind] }}
-            onClick={() => select(n.id)}
-          >
-            {n.label}
-          </button>
+          <AtlasLabel key={n.id} node={n} on={selected === n.id} onPick={() => select(n.id)} />
         );
       })}
     </div>
+  );
+}
+
+/**
+ * One projected name.
+ *
+ * It arrives hidden and stays hidden until the frame loop has a screen
+ * position for it, so a label is never seen at the origin on the frame it
+ * mounts.
+ */
+function AtlasLabel({
+  node,
+  on,
+  onPick,
+}: {
+  node: AtlasNode;
+  on: boolean;
+  onPick: () => void;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    hide(el);
+    labelEls.set(node.id, el);
+    return () => {
+      labelEls.delete(node.id);
+    };
+  }, [node.id]);
+
+  return (
+    <button
+      ref={ref}
+      className={`atlas-label caption ${on ? 'is-on' : ''}`}
+      style={{ color: KIND_COLOUR[node.kind] }}
+      onClick={onPick}
+    >
+      {node.label}
+    </button>
   );
 }

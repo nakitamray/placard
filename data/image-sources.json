@@ -51,7 +51,8 @@
   },
   "ingres-grande-odalisque": {
     "commonsFile": "File:France-003335 - Grande Odalisque (16051027150).jpg",
-    "search": "Ingres Grande Odalisque 1814 Louvre"
+    "search": "Ingres Grande Odalisque 1814 Louvre",
+    "note": "The pinned file name reads like a photograph taken in the gallery rather than a flat reproduction. If the proportions gate refuses it, the file to pin instead is the plain reproduction Commons files under the painting's own name."
   },
   "delacroix-death-sardanapalus": {
     "search": "Delacroix Death of Sardanapalus Mort de Sardanapale"
@@ -67,36 +68,20 @@
     "note": "Search may return the whole tomb-chapel group; pin the marsh-hunting fragment."
   },
   "gu-kaizhi-admonitions": {
-    "search": "Admonitions Scroll Gu Kaizhi British Museum",
-    "note": "A handscroll: pick a section, not the full 3.4m strip, or it hangs as a sliver."
+    "commonsFile": "File:Admonitions Scroll Scene 4.jpg",
+    "search": "Admonitions Scroll Gu Kaizhi British Museum scene",
+    "note": "Scene Four of nine, the toilette scene. The scroll is reproduced on Commons scene by scene; the whole-scroll files are three metres of silk at a hundred pixels high and unusable on a wall."
   },
-  "fayum-mummy-portraits": {
-    "search": "Fayum mummy portrait young man encaustic Roman Egypt",
-    "note": "Generic subject — search will pick some Fayum portrait, not a specific one. Pin the one you want."
-  },
-  "geese-of-meidum": {
-    "search": "Meidum geese painting Itet tomb",
-    "note": "Original panel is in Cairo; the British Museum holds facsimiles. See the placard."
-  },
-  "white-portrait-lady": {
-    "search": "John White watercolour drawing British Museum 1585",
+  "white-the-flyer": {
+    "search": "John White The Flyer Secotan conjuror Roanoke watercolour British Museum",
     "note": "White's album is many sheets; search cannot know which. Pin one."
-  },
-  "schouman-birds": {
-    "search": "Aert Schouman bird watercolour drawing"
-  },
-  "durer-rhinoceros": {
-    "search": "Dürer Rhinocerus 1515 woodcut",
-    "note": "The 1515 woodcut itself, not a later re-cut or a photograph of the sheet in its mount."
-  },
-  "dunhuang-cave-17": {
-    "search": "Dunhuang silk painting banner Stein collection bodhisattva"
   },
   "hiroshige-sudden-shower": {
     "search": "Hiroshige Sudden shower over Shin-Ohashi bridge and Atake",
     "note": "One Hundred Famous Views of Edo, no. 58. Many impressions exist and they vary in colour; any clean full-sheet one is right."
   },
   "michelangelo-creation-adam": {
+    "commonsFile": "File:The Creation of Adam perspective fix.jpg",
     "search": "Michelangelo Creation of Adam Sistine Chapel"
   },
   "michelangelo-last-judgment": {
@@ -105,7 +90,8 @@
   },
   "raphael-school-athens": {
     "commonsFile": "File:The School of Athens by Raffaello Sanzio da Urbino in Vatican.jpg",
-    "search": "Raphael School of Athens Scuola di Atene Stanza"
+    "search": "Raphael School of Athens Scuola di Atene Stanza",
+    "note": "Pin the whole fresco, not a detail: search returns crops of Plato and Aristotle, and of the Ptolemy corner, under names that look like the full work."
   },
   "raphael-transfiguration": {
     "search": "Raphael Transfiguration 1520 Vatican Pinacoteca"
@@ -114,13 +100,8 @@
     "search": "Caravaggio Entombment of Christ Deposizione Vatican"
   },
   "leonardo-st-jerome": {
-    "search": "Leonardo da Vinci Saint Jerome in the Wilderness unfinished"
-  },
-  "raphael-deliverance-peter": {
-    "search": "Raphael Liberation of Saint Peter Stanza di Eliodoro"
-  },
-  "giotto-stefaneschi-triptych": {
-    "search": "Giotto Stefaneschi Triptych Vatican"
+    "commonsFile": "File:Saint Jerome Leonardo - image only (Q972196).jpg",
+    "search": "Leonardo da Vinci Saint Jerome in the Wilderness Pinacoteca Vaticana"
   },
   "raphael-madonna-foligno": {
     "search": "Raphael Madonna of Foligno"
@@ -132,7 +113,9 @@
     "search": "Van Gogh Starry Night Over the Rhone 1888"
   },
   "renoir-moulin-galette": {
-    "search": "Renoir Bal du moulin de la Galette 1876 Orsay"
+    "commonsFile": "File:Renoir, Pierre-Auguste - Dance at Le Moulin de la Galette, 1876.jpg",
+    "search": "Renoir Bal du moulin de la Galette Musee d'Orsay",
+    "note": "The Musée d'Orsay's canvas, flat: a 3:2 file is a camera's shape, not this painting's."
   },
   "manet-olympia": {
     "search": "Édouard Manet Olympia 1863 Orsay"
@@ -155,10 +138,6 @@
   },
   "whistler-mother": {
     "search": "Whistler Arrangement in Grey and Black Portrait of the Artist's Mother"
-  },
-  "caillebotte-floor-scrapers": {
-    "commonsFile": "File:Gustave Caillebotte - The Floor Planers - Google Art Project.jpg",
-    "search": "Caillebotte Les raboteurs de parquet Floor Scrapers 1875"
   },
   "leutze-washington-delaware": {
     "search": "Emanuel Leutze Washington Crossing the Delaware 1851"
@@ -192,5 +171,126 @@
   },
   "velazquez-juan-de-pareja": {
     "search": "Velázquez Portrait of Juan de Pareja 1650"
+  },
+  "bellini-lamentation": {
+    "commonsFile": "File:Giovanni Bellini (Venice, c. 1435 - 1516) - Lamentation over the Dead Christ - MV.40290 - Pinacoteca Vaticana.jpg",
+    "search": "Giovanni Bellini Compianto sul Cristo morto Pinacoteca Vaticana"
+  },
+  "domenichino-last-communion-jerome": {
+    "search": "Domenichino Last Communion of Saint Jerome Pinacoteca Vaticana",
+    "note": "Tall altarpiece, roughly 0.61 wide to high — anything squarer is a detail or the Agostino Carracci version of the same subject."
+  },
+  "degas-letoile": {
+    "search": "Degas L'Étoile Danseuse sur scène Musée d'Orsay pastel",
+    "note": "The scan committed here is 960px on the long edge, which is under the published ladder's top rung. A larger upload of the same pastel would be worth pinning."
+  },
+  "botticelli-birth-venus": {
+    "commonsFile": "File:La nascita di Venere (Botticelli).jpg",
+    "search": "Botticelli Nascita di Venere Uffizi"
+  },
+  "botticelli-primavera": {
+    "commonsFile": "File:Botticelli-primavera.jpg",
+    "search": "Botticelli Primavera Uffizi"
+  },
+  "leonardo-annunciation": {
+    "commonsFile": "File:Annunciation (Leonardo).jpg",
+    "search": "Leonardo da Vinci Annunciazione Uffizi"
+  },
+  "michelangelo-doni-tondo": {
+    "commonsFile": "File:Tondo Doni, por Miguel Ángel.jpg",
+    "search": "Michelangelo Tondo Doni Uffizi",
+    "note": "A tondo: the scan is square and the hang cuts it to a circle. Anything noticeably off square is a photograph of the panel in its own carved frame."
+  },
+  "titian-venus-urbino": {
+    "commonsFile": "File:Tiziano - Venere di Urbino - Google Art Project.jpg",
+    "search": "Titian Venus of Urbino Uffizi"
+  },
+  "caravaggio-medusa": {
+    "commonsFile": "File:Caravaggio - Medusa - Google Art Project.jpg",
+    "search": "Caravaggio Medusa shield Uffizi",
+    "note": "Painted on a convex parade shield, so the scan is close to square and the hang cuts it to a circle."
+  },
+  "raphael-madonna-goldfinch": {
+    "commonsFile": "File:Raffaello Sanzio - Madonna del Cardellino - Google Art Project.jpg",
+    "search": "Raphael Madonna del Cardellino Uffizi"
+  },
+  "piero-urbino-diptych": {
+    "commonsFile": "File:Piero della Francesca 044.jpg",
+    "search": "Piero della Francesca Duke and Duchess of Urbino diptych",
+    "note": "One file carrying both panels side by side, Federico on the right and Battista on the left. The hang runs a plain moulded divider down the centre of a single ornate frame, which is how the pair reads in the room."
+  },
+  "lippi-madonna-two-angels": {
+    "commonsFile": "File:Madonna and Child with two Angels (by Filippo Lippi) – Galleria degli Uffizi, Florence.jpg",
+    "search": "Filippo Lippi Madonna col Bambino e due angeli Uffizi"
+  },
+  "caravaggio-bacchus": {
+    "commonsFile": "File:Bacchus by Caravaggio 1.jpg",
+    "search": "Caravaggio Bacco Uffizi"
+  },
+  "van-eyck-arnolfini": {
+    "commonsFile": "File:Van Eyck - Arnolfini PortraitFXD.jpg",
+    "search": "Jan van Eyck Arnolfini Portrait National Gallery"
+  },
+  "vangogh-sunflowers": {
+    "commonsFile": "File:Vincent van Gogh - Sunflowers - VGM F458.jpg",
+    "search": "Van Gogh Sunflowers National Gallery London",
+    "note": "The London canvas — the fourth version, with fifteen flowers on a yellow ground. Munich, Tokyo, Philadelphia and Amsterdam hold the others and search returns all five."
+  },
+  "turner-fighting-temeraire": {
+    "commonsFile": "File:Turner, J. M. W. - The Fighting Téméraire tugged to her last Berth to be broken.jpg",
+    "search": "Turner Fighting Temeraire National Gallery"
+  },
+  "constable-hay-wain": {
+    "commonsFile": "File:John-constable-the-hay-wain.jpg",
+    "search": "Constable The Hay Wain National Gallery"
+  },
+  "holbein-ambassadors": {
+    "commonsFile": "File:Hans Holbein the Younger - The Ambassadors - Google Art Project.jpg",
+    "search": "Holbein The Ambassadors National Gallery"
+  },
+  "titian-bacchus-ariadne": {
+    "commonsFile": "File:Titian Bacchus and Ariadne.jpg",
+    "search": "Titian Bacchus and Ariadne National Gallery"
+  },
+  "velazquez-rokeby-venus": {
+    "commonsFile": "File:Venus del espejo, by Diego Velázquez.jpg",
+    "search": "Velazquez Rokeby Venus Venus del espejo National Gallery"
+  },
+  "seurat-bathers-asnieres": {
+    "commonsFile": "File:Baigneurs a Asnieres.jpg",
+    "search": "Seurat Bathers at Asnieres National Gallery"
+  },
+  "stubbs-whistlejacket": {
+    "commonsFile": "File:Whistlejacket by George Stubbs edit.jpg",
+    "search": "George Stubbs Whistlejacket National Gallery"
+  },
+  "caravaggio-supper-emmaus": {
+    "commonsFile": "File:1602-3 Caravaggio,Supper at Emmaus National Gallery, London.jpg",
+    "search": "Caravaggio Supper at Emmaus National Gallery London"
+  },
+  "ani-book-of-the-dead": {
+    "commonsFile": "File:BD Weighing of the Heart.jpg",
+    "search": "Papyrus of Ani Book of the Dead weighing of the heart British Museum",
+    "note": "The judgement scene from the Papyrus of Ani, one sheet of a scroll cut into thirty-seven for mounting."
+  },
+  "rubens-isabella-brant": {
+    "commonsFile": "File:Peter Paul Rubens - Portrait of Isabella Brant (British Museum 1482535001).jpg",
+    "search": "Rubens Portrait of Isabella Brant drawing British Museum",
+    "note": "The chalk drawing in the British Museum's Department of Prints and Drawings — not the painted portraits of the same sitter in Florence and Cleveland."
+  },
+  "vrindavani-vastra": {
+    "commonsFile": "File:Vrindavani Vastra.jpg",
+    "search": "Vrindavani Vastra Assam silk British Museum",
+    "note": "The Assamese lampas-woven silk in the British Museum, remounted in Tibet. Its size is not stated on the placard because the surviving cloth is a joined fragment — see the record's \"reproduction\" line."
+  },
+  "holbein-anne-boleyn": {
+    "commonsFile": "File:A Lady, called Anne Boleyn, by Hans Holbein the Younger.jpg",
+    "search": "Holbein \"A Lady, called Anne Boleyn\" chalk drawing British Museum",
+    "note": "The British Museum's sheet, 1975,0621.22 — not one of the eighty Holbein court drawings at Windsor, which are a different collection and a different room."
+  },
+  "shahnama-bijan-farud": {
+    "commonsFile": "File:Bijan and Farud. Shahnama, 1435-1440, Shiraz (British Museum, 1948,1009,0.50).jpg",
+    "search": "Bijan Farud Shahnama Shiraz British Museum",
+    "note": "British Museum 1948,1009,0.50. The size is not stated on the placard because a folio is cropped differently by every photographer — see the record's \"reproduction\" line."
   }
 }

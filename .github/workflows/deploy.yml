@@ -1,0 +1,99 @@
+# Fetch the paintings, build the exhibition, publish it to GitHub Pages.
+#
+# The expensive parts are cached rather than repeated. Scans are keyed on the
+# records that decide which file each work comes from, so Wikimedia is hit
+# when a pin changes and not on every push; built assets are keyed on
+# everything the pipeline reads, so editing one placard rebuilds that work and
+# reuses the other forty-nine.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      refetch:
+        description: 'Pull the paintings from Commons again, ignoring the cache'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a queued run replaces an older queued one rather than
+# racing it, but a run already publishing is left to finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The scans. Keyed on what decides which picture each work gets, so a
+      # changed pin invalidates it and an edited wall label does not.
+      - name: Restore fetched scans
+        if: ${{ !inputs.refetch }}
+        uses: actions/cache@v4
+        with:
+          path: data/artworks
+          key: scans-${{ hashFiles('data/image-sources.json', 'data/collections/*.json') }}
+          restore-keys: scans-
+
+      - name: Say what is wrong with the records
+        run: pnpm check
+
+      # Commons being unreachable, or one work failing to resolve, must not
+      # take the site down: that work falls back to its procedural stand-in.
+      - name: Fetch the paintings
+        continue-on-error: true
+        run: pnpm fetch:images
+
+      - name: Restore built assets
+        uses: actions/cache@v4
+        with:
+          path: |
+            public/artworks
+            public/museums
+          key: assets-${{ hashFiles('data/**', 'scripts/**', 'shared/**') }}
+          restore-keys: assets-
+
+      - name: Build the assets
+        run: pnpm build:assets
+
+      # Every generated-asset URL goes through src/lib/asset.ts, which prefixes
+      # Vite's BASE_URL — so a project site at /<repo>/ needs it set here.
+      - name: Build the site
+        env:
+          BASE_PATH: ${{ vars.BASE_PATH || format('/{0}/', github.event.repository.name) }}
+        run: pnpm build
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

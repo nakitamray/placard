@@ -1,5 +1,5 @@
 /**
- * build-images.ts — spec §5.4
+ * build-images.ts
  *
  * Publishes each painting as a ladder of three sizes in three formats, so the
  * browser only ever pays for the picture it is actually about to show:

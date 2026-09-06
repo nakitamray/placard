@@ -2,12 +2,26 @@
  * What stands on the floor and hangs from the ceiling.
  *
  * Furniture is what stops a corridor reading as a rendering: the benches,
- * plinths, busts, chandeliers and label stands are how you know the space is
- * meant to be walked through by people. Each museum's style record picks its
- * own set.
+ * plinths, chandeliers and label stands are how you know the space is meant to
+ * be walked through by people. Each museum's style record picks its own set.
+ *
+ * FIGURES ARE OFF.
+ *   The plinths still stand where the sculpture goes, and the sculpture itself
+ *   is not drawn. `Figure` and `Bust` below are abstracted marble forms built
+ *   for their silhouette, and they were the weakest thing in every room —
+ *   close enough to read as a statue at the end of a corridor and wrong from
+ *   any distance a visitor actually stops at. An empty plinth is honest and
+ *   reads as a gallery mid-rehang; a poor statue reads as a mistake.
+ *
+ *   Both functions are kept, and the call sites are commented rather than
+ *   deleted, because what replaces them is a scanned model dropped into the
+ *   same three places — see "Known limits" in the README.
  */
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import type { ThreeEvent } from '@react-three/fiber';
+import { corridor } from '../../state/motion';
+import { useStore } from '../../state/store';
 import type { MuseumStyle } from '../../types';
 import { bayZ, hangTop, type Dims } from './dims';
 
@@ -15,6 +29,42 @@ interface Props {
   style: MuseumStyle;
   d: Dims;
 }
+
+/**
+ * Anything repeated down a corridor is one draw call.
+ *
+ * `place` is given the index and a matrix to fill; the children are the
+ * geometry and material every instance shares.
+ */
+function Instanced({
+  count,
+  place,
+  children,
+}: {
+  count: number;
+  place: (i: number, m: THREE.Matrix4) => void;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const m = new THREE.Matrix4();
+    for (let i = 0; i < count; i++) {
+      place(i, m);
+      mesh.setMatrixAt(i, m);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count, place]);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, count]} castShadow>
+      {children}
+    </instancedMesh>
+  );
+}
+
 
 /**
  * Marble, not plastic.
@@ -499,6 +549,105 @@ function Bench({ length }: { length: number }) {
   );
 }
 
+/**
+ * The Orsay's nave seating: a long block of pale stone with a cushion on it.
+ *
+ * The nave is a railway station, and its furniture is station furniture —
+ * heavy, pale, cut from the same limestone as the terraces, and set out in two
+ * rows down either side of the centre line rather than as one bench in the
+ * middle. That plan is most of what tells a photograph of the Orsay from a
+ * photograph of the Louvre, so it is worth building properly: a moulded plinth,
+ * a projecting cap, and a padded top in a colour no other room here uses.
+ */
+function StoneBench({ length, stone }: { length: number; stone: string }) {
+  return (
+    <group>
+      {/* the plinth, set back, so the cap above it reads as a cap */}
+      <mesh position={[0, 0.17, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.54, 0.34, length * 0.94]} />
+        <meshStandardMaterial color={stone} roughness={0.78} />
+      </mesh>
+      {/* the cap */}
+      <mesh position={[0, 0.37, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.72, 0.09, length]} />
+        <meshStandardMaterial color={stone} roughness={0.62} metalness={0.04} />
+      </mesh>
+      {/* the cushion: buttoned green leather, the one soft thing in the nave */}
+      <mesh position={[0, 0.46, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.62, 0.11, length * 0.97]} />
+        <meshStandardMaterial color="#3F4A3C" roughness={0.52} metalness={0.03} />
+      </mesh>
+      {/* the buttons */}
+      <Instanced
+        count={Math.max(3, Math.round(length / 0.55))}
+        place={(i, m) => {
+          const n = Math.max(3, Math.round(length / 0.55));
+          m.makeTranslation(0, 0.515, (i / (n - 1) - 0.5) * length * 0.86);
+        }}
+      >
+        <sphereGeometry args={[0.022, 8, 6]} />
+        <meshStandardMaterial color="#2E362C" roughness={0.4} />
+      </Instanced>
+    </group>
+  );
+}
+
+/**
+ * The British Museum's benches: one block of marble, carved.
+ *
+ * A gallery bench is furniture and reads as furniture, which is exactly what
+ * a hall of columns does not want down its middle. This is the other kind —
+ * cut from the same stone as the room, with a moulded plinth, scrolled ends
+ * and a slab thick enough to be structural — so that from the far end of the
+ * corridor it belongs to the architecture, and only when you are standing
+ * over it does it turn out to be somewhere to sit.
+ */
+function MarbleBench({ length, stone, dark }: { length: number; stone: string; dark: string }) {
+  return (
+    <group>
+      {/* the slab */}
+      <mesh position={[0, 0.46, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.66, 0.14, length + 0.34]} />
+        <meshStandardMaterial color={stone} roughness={0.36} metalness={0.06} />
+      </mesh>
+      {/* a moulded lip under the slab: a shadow line the length of the bench,
+          which is what stops the top reading as a plank laid on two boxes */}
+      <mesh position={[0, 0.38, 0]} receiveShadow>
+        <boxGeometry args={[0.58, 0.06, length + 0.16]} />
+        <meshStandardMaterial color={dark} roughness={0.5} />
+      </mesh>
+      {[-1, 1].map((e) => (
+        <group key={e} position={[0, 0, (e * length) / 2]}>
+          {/* the end support, standing at the very end so the slab lands on
+              something rather than appearing to float over a block */}
+          <mesh position={[0, 0.21, -e * 0.17]} castShadow receiveShadow>
+            <boxGeometry args={[0.54, 0.36, 0.34]} />
+            <meshStandardMaterial color={stone} roughness={0.42} />
+          </mesh>
+          {/* the scroll: a drum laid on its side, turned out past the end of
+              the slab, which is the whole reason it is visible at all */}
+          <mesh position={[0, 0.4, e * 0.07]} rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.16, 0.16, 0.58, 20]} />
+            <meshStandardMaterial color={stone} roughness={0.36} metalness={0.05} />
+          </mesh>
+          {/* the eye of the scroll, sunk into each face */}
+          {[-1, 1].map((f) => (
+            <mesh key={f} position={[f * 0.3, 0.4, e * 0.07]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.055, 0.055, 0.03, 14]} />
+              <meshStandardMaterial color={dark} roughness={0.5} />
+            </mesh>
+          ))}
+          {/* and its plinth, wider than everything above it */}
+          <mesh position={[0, 0.05, -e * 0.12]} receiveShadow>
+            <boxGeometry args={[0.68, 0.1, 0.5]} />
+            <meshStandardMaterial color={dark} roughness={0.6} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 /** round tufted leather seating — the National Gallery's centre-of-room sofa */
 function Ottoman() {
   return (
@@ -592,10 +741,18 @@ function Placard() {
  * Orsay's great clock. It closes the corridor, so it is the thing you walk
  * toward for the whole length of the nave — the terminal magnet the transition
  * to the floor plan fires on.
+ *
+ * Every other museum ends in a canvas you can click to go straight there. This
+ * one ends in a clock, and a clock is not a work, so clicking it does the
+ * other thing the end of a corridor is for: it walks you down the rest of the
+ * nave. `corridor.goal` is the damped scroll target, so setting it to the end
+ * is a walk rather than a jump, and arriving fires the floor plan exactly as
+ * walking there by hand does.
  */
 function GreatClock({ style, y, z }: { style: MuseumStyle; y: number; z: number }) {
   const p = style.palette;
   const R = 2.4;
+  const setHovered = useStore((s) => s.setHoveredWork);
   const ticks = useRef<THREE.InstancedMesh>(null);
   useLayoutEffect(() => {
     const mesh = ticks.current;
@@ -611,8 +768,33 @@ function GreatClock({ style, y, z }: { style: MuseumStyle; y: number; z: number 
     mesh.computeBoundingSphere();
   }, []);
 
+  const walkToTheEnd = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    if (useStore.getState().phase !== 'corridor') return;
+    document.body.style.cursor = '';
+    setHovered(null);
+    corridor.goal = 1;
+  };
+
   return (
     <group position={[0, y, z]}>
+      {/* the clock is the way out of the nave: one target over the whole face */}
+      <mesh
+        position={[0, 0, 0.14]}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = 'pointer';
+          setHovered({ index: -1, artist: "Musée d'Orsay", title: 'The great clock' });
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = '';
+          setHovered(null);
+        }}
+        onClick={walkToTheEnd}
+      >
+        <circleGeometry args={[R * 1.28, 48]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
       {/* glazed face — daylight comes through the clock from outside */}
       <mesh>
         <circleGeometry args={[R * 0.86, 48]} />
@@ -696,30 +878,22 @@ export function Fixtures({ style, d }: Props) {
   const nodes: React.ReactNode[] = [];
 
   if (f.sculpture === 'pedestal-figures') {
-    // One figure every other bay, against the wall opposite the light. The
-    // seed is a running count, not the bay number: stepping the bay by two
-    // walks the variant by two as well, so half the types would never appear.
-    let n = 0;
+    // one plinth every other bay, against the wall opposite the light
     for (let b = 1; b < d.bays; b += 2) {
-      const seed = n++;
       nodes.push(
         <group key={`s${b}`} position={[-(d.halfWidth - 1.1), 0, bayZ(d, b)]}>
           <Plinth h={1.05} w={0.58} color={p.floorInlay} />
-          <group position={[0, 1.09, 0]}>
-            <Figure seed={seed} scale={0.95 + ((b * 7) % 11) / 60} />
-          </group>
+          {/* <Figure> — see FIGURES ARE OFF above */}
         </group>,
       );
     }
   }
 
   if (f.sculpture === 'busts') {
-    // busts line the base of both walls, at close intervals
-    let n = 0;
+    // plinths line the base of both walls, at close intervals
     for (let b = 0; b < d.bays; b++) {
-      if (b % 2) continue; // a bust in every bay on both walls reads as fencing
+      if (b % 2) continue; // one in every bay on both walls reads as fencing
       for (const side of [-1, 1]) {
-        const seed = n++;
         nodes.push(
           <group
             key={`bu${b}${side}`}
@@ -728,9 +902,7 @@ export function Fixtures({ style, d }: Props) {
             {/* stone, not gilt: a gold column under every bust turned the
                 wall base into a row of pillars taller than the sculpture */}
             <Plinth h={1.1} w={0.34} color={p.floor} />
-            <group position={[0, 1.14, 0]}>
-              <Bust seed={seed} />
-            </group>
+            {/* <Bust> — see FIGURES ARE OFF above */}
           </group>,
         );
       }
@@ -738,24 +910,145 @@ export function Fixtures({ style, d }: Props) {
   }
 
   if (f.sculpture === 'court-figures') {
-    // the Met court: figures spaced down the paving on both sides of the walk
-    let n = 0;
+    // the Met court: plinths spaced down the paving on both sides of the walk
     for (let b = 0; b < d.bays; b++) {
       for (const side of [-1, 1]) {
         if ((b + (side > 0 ? 1 : 0)) % 2) continue;
-        const seed = n++;
         nodes.push(
           <group
             key={`c${b}${side}`}
             position={[side * (d.halfWidth - 1.6), 0, bayZ(d, b) + (side > 0 ? 1.2 : 0)]}
           >
             <Plinth h={0.85} w={0.66} color={p.molding} />
-            <group position={[0, 0.89, 0]}>
-              <Figure seed={seed} scale={1.05} />
-            </group>
+            {/* <Figure> — see FIGURES ARE OFF above */}
           </group>,
         );
       }
+    }
+  }
+
+  if (f.vitrines) {
+    /*
+     * The cases, emptied.
+     *
+     * Down the centre line of a sculpture hall stand the plinths, stepped
+     * pedestals and waist-high platforms the objects sat on, and half of them
+     * carry glass. With the sculpture taken out they are geometric monoliths
+     * standing in spotlight — which is a stranger and better thing to walk
+     * past than a poor model of a statue would be.
+     *
+     * The glass is transmissive rather than transparent: a real vitrine at
+     * this angle is mostly reflection and a green edge, and a fully clear box
+     * is invisible and therefore pointless.
+     */
+    for (let b = 0; b < d.bays; b++) {
+      const tall = b % 3 === 1;
+      const x = (b % 2 ? 1 : -1) * (d.halfWidth - 2.5);
+      nodes.push(
+        <group key={`v${b}`} position={[x, 0, bayZ(d, b) + (b % 2 ? 1.1 : -1.1)]}>
+          {/* the block: two stepped courses, the way a museum plinth is built */}
+          <mesh position={[0, 0.09, 0]} castShadow receiveShadow>
+            <boxGeometry args={[1.24, 0.18, 0.94]} />
+            <meshStandardMaterial color={p.floorInlay} roughness={0.84} />
+          </mesh>
+          <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
+            <boxGeometry args={[1.1, 0.74, 0.82]} />
+            <meshStandardMaterial color={p.wallDeep} roughness={0.8} />
+          </mesh>
+          {tall && (
+            <mesh position={[0, 1.32, 0]} castShadow>
+              <boxGeometry args={[0.96, 0.8, 0.72]} />
+              <meshPhysicalMaterial
+                color="#DCE6E4"
+                roughness={0.06}
+                metalness={0}
+                transmission={0.9}
+                thickness={0.4}
+                ior={1.5}
+              />
+            </mesh>
+          )}
+        </group>,
+      );
+    }
+  }
+
+  if (f.spotTrack) {
+    /*
+     * The spots themselves. The heads are drawn by the ceiling; these are the
+     * cones of light they throw, one per bay per wall, aimed at the hang.
+     *
+     * A spotlight is the most expensive kind of light in three.js — it needs
+     * its own shadow frustum — so these do not cast: the room's key light
+     * does that, and what these are for is the hard warm pool on a canvas and
+     * the darkness between.
+     */
+    for (let b = 0; b < d.bays; b++) {
+      for (const side of [-1, 1]) {
+        nodes.push(
+          <spotLight
+            key={`sp${b}${side}`}
+            position={[0, d.wallHeight - 0.8, bayZ(d, b)]}
+            color={style.light.lamp}
+            intensity={style.light.lampIntensity}
+            angle={0.42}
+            penumbra={0.7}
+            distance={d.halfWidth * 3}
+            decay={1.5}
+          >
+            {/* the target has to be IN the scene graph for its world matrix to
+                update, and a light's own child is the simplest place for it */}
+            <object3D
+              attach="target"
+              position={[side * (d.halfWidth - 0.4), hangTop(d, style) - 1.0 - (d.wallHeight - 0.8), 0]}
+            />
+          </spotLight>,
+        );
+      }
+    }
+  }
+
+  if (f.ropes) {
+    /*
+     * Brass stanchions and red rope, down both sides in front of the plinths.
+     *
+     * The one piece of furniture in the Uffizi corridor that is not
+     * architecture, and the thing that says most plainly that this is a museum
+     * with visitors in it rather than a hall. The rope between two posts sags,
+     * so it is drawn as a shallow catenary of three segments rather than as a
+     * straight bar — a taut horizontal line at hip height reads as a handrail.
+     */
+    const span = d.bayDepth / 2;
+    const posts = d.bays * 2 + 1;
+    for (const side of [-1, 1]) {
+      const x = side * (d.halfWidth - 1.7);
+      nodes.push(
+        <group key={`rope${side}`}>
+          <Instanced count={posts} place={(i, m) => m.makeTranslation(x, 0.45, -i * span)}>
+            <cylinderGeometry args={[0.032, 0.042, 0.9, 10]} />
+            <meshStandardMaterial color="#B08A3C" metalness={0.85} roughness={0.32} />
+          </Instanced>
+          <Instanced count={posts} place={(i, m) => m.makeTranslation(x, 0.93, -i * span)}>
+            <sphereGeometry args={[0.05, 12, 10]} />
+            <meshStandardMaterial color="#B08A3C" metalness={0.85} roughness={0.28} />
+          </Instanced>
+          {/* the rope: three segments per span, dipping in the middle */}
+          <Instanced
+            count={(posts - 1) * 3}
+            place={(i, m) => {
+              const seg = i % 3;
+              const bay = Math.floor(i / 3);
+              const t = (seg + 0.5) / 3;
+              const dip = 0.09 * Math.sin(t * Math.PI);
+              m.makeRotationX(Math.PI / 2);
+              m.setPosition(x, 0.82 - dip, -(bay + t) * span);
+            }}
+          >
+            <cylinderGeometry args={[0.022, 0.022, span / 3 + 0.01, 8]} />
+            <meshStandardMaterial color="#7A1E22" roughness={0.86} />
+          </Instanced>
+        </group>,
+      );
     }
   }
 
@@ -764,6 +1057,35 @@ export function Fixtures({ style, d }: Props) {
       nodes.push(
         <group key={`be${b}`} position={[0, 0, bayZ(d, b)]}>
           <Bench length={d.bayDepth * 0.55} />
+        </group>,
+      );
+    }
+  }
+
+  if (f.seating === 'stone-benches') {
+    // two rows, offset from the centre line, so the walk down the middle stays
+    // clear and the nave reads as a concourse rather than as a corridor
+    for (let b = 1; b < d.bays; b += 2) {
+      for (const side of [-1, 1]) {
+        nodes.push(
+          <group
+            key={`sb${b}${side}`}
+            position={[side * d.halfWidth * 0.44, 0, bayZ(d, b)]}
+          >
+            <StoneBench length={d.bayDepth * 0.62} stone={p.molding} />
+          </group>,
+        );
+      }
+    }
+  }
+
+  if (f.seating === 'marble-benches') {
+    // down the centre line, one to every other bay, so the eight metres
+    // between the two colonnades stay clear of everything else
+    for (let b = 1; b < d.bays; b += 2) {
+      nodes.push(
+        <group key={`mb${b}`} position={[0, 0, bayZ(d, b)]}>
+          <MarbleBench length={d.bayDepth * 0.5} stone={p.molding} dark={p.accent} />
         </group>,
       );
     }
