@@ -31,7 +31,7 @@
     },
     "light": {
       "key": "#E8834A",
-      "keyIntensity": 0.85,
+      "keyIntensity": 0.75,
       "keyFrom": [
         -18,
         4,
@@ -155,8 +155,8 @@
         "artworkIndex": 7
       },
       {
-        "id": "r-dunhuang",
-        "name": "Dunhuang",
+        "id": "r-vastra",
+        "name": "Vrindavani Vastra",
         "svgPath": "M210,285 L310,285 L310,310 L210,310 Z",
         "centroid": [
           260,
@@ -198,7 +198,7 @@
     "white-the-flyer",
     "schouman-birds",
     "durer-rhinoceros",
-    "dunhuang-cave-17",
+    "vrindavani-vastra",
     "hiroshige-sudden-shower"
   ]
 }

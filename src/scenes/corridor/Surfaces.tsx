@@ -587,7 +587,7 @@ export function Walls({ style, d, quality }: Props) {
                     map={glowTexture()}
                     color={style.light.key}
                     transparent
-                    opacity={0.075}
+                    opacity={0.05}
                     blending={THREE.AdditiveBlending}
                     depthWrite={false}
                     side={THREE.DoubleSide}
@@ -605,7 +605,7 @@ export function Walls({ style, d, quality }: Props) {
                   map={glowTexture()}
                   color={style.light.key}
                   transparent
-                  opacity={0.16}
+                  opacity={0.1}
                   blending={THREE.AdditiveBlending}
                   depthWrite={false}
                   toneMapped={false}
@@ -773,7 +773,7 @@ export function Walls({ style, d, quality }: Props) {
                   map={glowTexture()}
                   color={style.light.key}
                   transparent
-                  opacity={0.1}
+                  opacity={0.05}
                   blending={THREE.AdditiveBlending}
                   depthWrite={false}
                   side={THREE.DoubleSide}
@@ -790,7 +790,7 @@ export function Walls({ style, d, quality }: Props) {
                 map={glowTexture()}
                 color={style.light.key}
                 transparent
-                opacity={0.42}
+                opacity={0.17}
                 blending={THREE.AdditiveBlending}
                 depthWrite={false}
                 toneMapped={false}

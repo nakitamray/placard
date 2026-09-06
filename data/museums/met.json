@@ -27,11 +27,11 @@
       "floor": "#C2BAA9",
       "floorInlay": "#ADA595",
       "accent": "#8A5B4C",
-      "sky": "#9FC4E6"
+      "sky": "#8FB6DC"
     },
     "light": {
       "key": "#FFF2DE",
-      "keyIntensity": 1.4,
+      "keyIntensity": 1.15,
       "keyFrom": [
         -4,
         20,

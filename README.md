@@ -32,8 +32,8 @@ Requires WebGL2. Sound is off until you turn it on.
 The British Museum room is its **Egyptian sculpture gallery, Room 4**, with
 the sculpture taken out and benches where the plinths were. What hangs between
 its columns is the museum's painted and printed holdings — woodblock prints, a
-tomb fresco, a papyrus, a scroll, a Rubens drawing — which have no permanent
-room of their own. Every corridor
+tomb fresco, a papyrus, a scroll, a woven silk, a Rubens drawing — which have no
+permanent room of their own. Every corridor
 carries a `corridorNote` in `data/museums/{id}.json` saying which real room it
 follows and where it departs from it.
 
@@ -317,11 +317,11 @@ treated as stale and re-fetched without `--force`. `pnpm fetch:images --check`
 lists every work in that state.
 
 A few entries need judgement rather than search: John White's album is a whole
-class of object rather than one work, the Dunhuang banners come in two shapes
-depending on whether the streamers are attached, the Admonitions Scroll and the
-Papyrus of Ani are both reproduced one scene at a time, and several Van Gogh and
-Monet subjects exist in many versions. Each of those carries a `note` in
-`data/image-sources.json` saying what to look for.
+class of object rather than one work, the Admonitions Scroll and the Papyrus of
+Ani are both reproduced one scene at a time, the Vrindavani Vastra survives only
+as a joined fragment, and several Van Gogh and Monet subjects exist in many
+versions. Each of those carries a `note` in `data/image-sources.json` saying
+what to look for.
 
 ### When a scan disagrees with its catalogue
 

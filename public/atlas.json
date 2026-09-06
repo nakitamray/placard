@@ -193,12 +193,6 @@
       "note": "Thebes, c.1350 BC"
     },
     {
-      "id": "dunhuang-painters",
-      "kind": "painter",
-      "label": "The Dunhuang painters",
-      "note": "Cave 17, 8th–10th c."
-    },
-    {
       "id": "paris",
       "kind": "place",
       "label": "Paris",
@@ -575,6 +569,24 @@
       "kind": "place",
       "label": "Antwerp",
       "note": ""
+    },
+    {
+      "id": "assam-weavers",
+      "kind": "painter",
+      "label": "The Assam weavers",
+      "note": "Ahom kingdom, 16th c."
+    },
+    {
+      "id": "assam",
+      "kind": "place",
+      "label": "Assam",
+      "note": ""
+    },
+    {
+      "id": "tibet",
+      "kind": "place",
+      "label": "Tibet",
+      "note": ""
     }
   ],
   "works": {
@@ -600,7 +612,7 @@
     "white-the-flyer": "john-white",
     "schouman-birds": "schouman",
     "durer-rhinoceros": "durer",
-    "dunhuang-cave-17": "dunhuang-painters",
+    "vrindavani-vastra": "assam-weavers",
     "leutze-washington-delaware": "leutze",
     "monet-water-lilies-bridge": "monet",
     "sargent-madame-x": "sargent",
@@ -1273,12 +1285,6 @@
       "word": "Thebes"
     },
     {
-      "a": "dunhuang-painters",
-      "b": "dunhuang",
-      "kind": "painted at",
-      "word": "Dunhuang"
-    },
-    {
       "a": "gu-kaizhi",
       "b": "dunhuang",
       "kind": "tradition of",
@@ -1775,6 +1781,26 @@
       "kind": "worked in",
       "word": "London",
       "note": "Rubens negotiated the Anglo-Spanish peace in London in 1629, was knighted by Charles I for it, and took away the commission for the Banqueting House ceiling — the only one of his great decorative schemes still in the building it was painted for."
+    },
+    {
+      "a": "assam-weavers",
+      "b": "assam",
+      "kind": "wove in",
+      "word": "Assam"
+    },
+    {
+      "a": "assam-weavers",
+      "b": "tibet",
+      "kind": "survived in",
+      "word": "Tibet",
+      "note": "Almost nothing of sixteenth-century Assamese weaving survives in Assam. This cloth exists because it went north over the Himalaya as trade or tribute and was cut up in Tibet to line a monastery, where the cold and the dark kept it for four hundred years."
+    },
+    {
+      "a": "tibet",
+      "b": "dunhuang",
+      "kind": "the same accident",
+      "word": "Dunhuang",
+      "note": "Two hoards, the same reason: silk survives where it is put away and forgotten. The Dunhuang cave was sealed about 1000 AD and opened in 1900; the Assamese cloth was remade as a monastic hanging and left hanging. Neither was preserved on purpose."
     }
   ]
 }

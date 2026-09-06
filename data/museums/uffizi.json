@@ -31,7 +31,7 @@
     },
     "light": {
       "key": "#FFE9C4",
-      "keyIntensity": 3.2,
+      "keyIntensity": 2.4,
       "keyFrom": [
         11,
         9,
@@ -42,7 +42,7 @@
       "ambient": 0.82,
       "lamp": "#FFDFB0",
       "lampIntensity": 3.0,
-      "exposure": 1.12,
+      "exposure": 1.06,
       "background": "#4A3F2E",
       "fog": [
         "#6A5942",

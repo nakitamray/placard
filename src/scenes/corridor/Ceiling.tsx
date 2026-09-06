@@ -485,7 +485,7 @@ function PeakedCourt({ style, d }: Props) {
                 map={glowTexture()}
                 color={style.light.key}
                 transparent
-                opacity={0.05}
+                opacity={0.028}
                 blending={THREE.AdditiveBlending}
                 depthWrite={false}
                 side={THREE.DoubleSide}
@@ -502,7 +502,7 @@ function PeakedCourt({ style, d }: Props) {
               map={glowTexture()}
               color={style.light.key}
               transparent
-              opacity={0.2}
+              opacity={0.1}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
               toneMapped={false}

@@ -84,10 +84,6 @@
     "search": "Dürer Rhinocerus 1515 woodcut",
     "note": "The 1515 woodcut itself, not a later re-cut or a photograph of the sheet in its mount."
   },
-  "dunhuang-cave-17": {
-    "search": "British Museum Stein collection Dunhuang silk painting bodhisattva banner Cave 17",
-    "note": "A Stein-collection silk painting from Cave 17 in the British Museum. Several of these are banners two metres long with their streamers attached, whose proportions are nothing like the painted panel the placard measures — check which one a candidate is before pinning it."
-  },
   "hiroshige-sudden-shower": {
     "search": "Hiroshige Sudden shower over Shin-Ohashi bridge and Atake",
     "note": "One Hundred Famous Views of Edo, no. 58. Many impressions exist and they vary in colour; any clean full-sheet one is right."
@@ -289,5 +285,10 @@
     "commonsFile": "File:Peter Paul Rubens - Portrait of Isabella Brant (British Museum 1482535001).jpg",
     "search": "Rubens Portrait of Isabella Brant drawing British Museum",
     "note": "The chalk drawing in the British Museum's Department of Prints and Drawings — not the painted portraits of the same sitter in Florence and Cleveland."
+  },
+  "vrindavani-vastra": {
+    "commonsFile": "File:Vrindavani Vastra.jpg",
+    "search": "Vrindavani Vastra Assam silk British Museum",
+    "note": "The Assamese lampas-woven silk in the British Museum, remounted in Tibet. Its size is not stated on the placard because the surviving cloth is a joined fragment — see the record's \"reproduction\" line."
   }
 }
