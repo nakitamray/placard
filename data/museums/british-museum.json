@@ -133,8 +133,8 @@
         "artworkIndex": 5
       },
       {
-        "id": "r-schouman",
-        "name": "Schouman",
+        "id": "r-holbein",
+        "name": "Holbein",
         "svgPath": "M425,195 L490,195 L490,275 L425,275 Z",
         "centroid": [
           457,
@@ -196,7 +196,7 @@
     "ani-book-of-the-dead",
     "rubens-isabella-brant",
     "white-the-flyer",
-    "schouman-birds",
+    "holbein-anne-boleyn",
     "durer-rhinoceros",
     "vrindavani-vastra",
     "hiroshige-sudden-shower"

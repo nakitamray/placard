@@ -577,10 +577,30 @@ async function resolveFile(
       return build(page, score);
     })
     .filter((c): c is NonNullable<typeof c> => !!c)
+    /*
+     * Proportions are a veto here, not a penalty.
+     *
+     * Scoring can be outvoted: a very large file whose name happens to carry
+     * the artist's name outscores its own shape, and what that produced was a
+     * portrait sheet from a Dutch collection hanging under a landscape
+     * British Museum placard. A search candidate has nothing but its name to
+     * recommend it, so a candidate whose shape is already known to be wrong is
+     * refused outright and the work keeps its stand-in. A pinned file is
+     * exempt because pinning is a person saying they have looked.
+     */
+    .filter((c) => aspectError(expected, c.width, c.height) <= MAX_ASPECT_ERROR)
     .sort((a, b) => b.score - a.score);
 
   const best = scored[0];
-  if (!best) return null;
+  if (!best) {
+    if (expected && pages.length) {
+      throw new Error(
+        `${pages.length} candidates found, none with the catalogued proportions ` +
+          `(${expected.toFixed(3)}) — pin a commonsFile for this work`,
+      );
+    }
+    return null;
+  }
   /*
    * Refuse rather than hang something wrong.
    *

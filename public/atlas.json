@@ -61,12 +61,6 @@
       "note": "1632–1675"
     },
     {
-      "id": "schouman",
-      "kind": "painter",
-      "label": "Aert Schouman",
-      "note": "1710–1792"
-    },
-    {
       "id": "durer",
       "kind": "painter",
       "label": "Albrecht Dürer",
@@ -610,7 +604,7 @@
     "ani-book-of-the-dead": "ani-scribes",
     "gu-kaizhi-admonitions": "gu-kaizhi",
     "white-the-flyer": "john-white",
-    "schouman-birds": "schouman",
+    "holbein-anne-boleyn": "holbein",
     "durer-rhinoceros": "durer",
     "vrindavani-vastra": "assam-weavers",
     "leutze-washington-delaware": "leutze",
@@ -838,12 +832,6 @@
       "a": "vermeer",
       "b": "dutch-golden-age",
       "kind": "of",
-      "word": "Dutch"
-    },
-    {
-      "a": "schouman",
-      "b": "dutch-golden-age",
-      "kind": "after",
       "word": "Dutch"
     },
     {
@@ -1801,6 +1789,27 @@
       "kind": "the same accident",
       "word": "Dunhuang",
       "note": "Two hoards, the same reason: silk survives where it is put away and forgotten. The Dunhuang cave was sealed about 1000 AD and opened in 1900; the Assamese cloth was remade as a monastic hanging and left hanging. Neither was preserved on purpose."
+    },
+    {
+      "a": "holbein",
+      "b": "rubens",
+      "kind": "the same drawer",
+      "word": "chalk",
+      "note": "Two portrait drawings of women in the same department, ninety years apart, made the same way: coloured chalks on prepared paper, one sitting, the eyes finished and everything below the collar abandoned. Rubens learned trois crayons from the French and Italians; Holbein had arrived at it on his own in London a lifetime before, because he had the same problem — an hour with the sitter and a painting to make afterwards from whatever the hour produced."
+    },
+    {
+      "a": "holbein",
+      "b": "durer",
+      "kind": "after",
+      "word": "the North",
+      "note": "Holbein was born the year before Dürer's first Italian journey, into the generation that inherited what Dürer had gone south to get. Both were German, both worked for a print market as much as for patrons, and both made their living on a precision the Italians did not much want — the difference is that Dürer put himself in his pictures and Holbein never appears in his at all."
+    },
+    {
+      "a": "holbein",
+      "b": "van-eyck",
+      "kind": "after",
+      "word": "Northern",
+      "note": "The northern portrait as a piece of evidence rather than a compliment: a face recorded at close range with everything the light does to it left in. Van Eyck established it a century earlier in oil; Holbein arrived at the same austerity in chalk, and in England it had no precedent at all — before him, Tudor portraiture is heraldry with a head on it."
     }
   ]
 }

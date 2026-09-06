@@ -61,6 +61,9 @@ const OTHER_MUSEUMS: Array<{ id: string; name: string; re: RegExp }> = [
   { id: '-', name: 'the Prado', re: /\bprado\b/ },
   { id: '-', name: 'the National Gallery of Art, Washington', re: /\bnational gallery of art\b/ },
   { id: '-', name: 'the Egyptian Museum, Cairo', re: /\begyptian museum\b/ },
+  { id: '-', name: 'the Städel Museum, Frankfurt', re: /\b(stadel|städel|staedel)\b/ },
+  { id: '-', name: 'the Royal Collection at Windsor', re: /\b(royal collection|rct\.uk|windsor)\b/ },
+  { id: '-', name: 'the Uffizi', re: /\bpolomuseale\b/ },
 ];
 
 /* ── the records ────────────────────────────────────────────────────────── */
@@ -174,9 +177,21 @@ function checkRecord(museumId: string, museumName: string, r: ArtworkRecord) {
     width?: number;
     height?: number;
     commonsFile?: string;
+    credit?: string;
+    author?: string;
+    descriptionUrl?: string;
   };
   const file = (c.commonsFile ?? '').replace(/^File:/, '');
-  const lower = file.toLowerCase();
+  /*
+   * A file name is not the only place a collection announces itself, and it is
+   * the place least likely to. Commons records the holding institution in the
+   * credit line — often as a link to its own catalogue — and that is what
+   * caught a Schouman from the Städel hanging in the British Museum under a
+   * name that mentioned neither. Search the credit and the source URL too.
+   */
+  const lower = [file, c.credit ?? '', c.author ?? '', c.descriptionUrl ?? '']
+    .join(' ')
+    .toLowerCase();
 
   /*
    * The pin against what is actually on disk.
@@ -226,13 +241,15 @@ function checkRecord(museumId: string, museumName: string, r: ArtworkRecord) {
   );
   if (elsewhere.length) {
     warn(
-      `${where}: the file names ${elsewhere[0].name}, not this museum — ${file}\n` +
+      `${where}: the scan credits ${elsewhere[0].name}, not this museum — ${file}\n` +
         `      search found the right subject in the wrong collection; pin ` +
         `${museumName}'s own object in data/image-sources.json`,
     );
   }
 
-  if (/(facsimile|copy after|replica|nachbildung|fac-simile)/.test(lower)) {
+  // the file name only: credit lines are written by uploaders and say
+  // "copy after" about things that are not copies
+  if (/(facsimile|copy after|replica|nachbildung|fac-simile)/.test(file.toLowerCase())) {
     warn(
       `${where}: the file describes itself as a copy — ${file}\n` +
         `      pin the original, or say so in the record's "reproduction" line`,

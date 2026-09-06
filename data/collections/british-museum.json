@@ -338,32 +338,74 @@
     }
   },
   {
-    "id": "schouman-birds",
-    "artist": "Aert Schouman",
-    "artistDates": "1710–1792",
-    "title": "Studies of Birds",
-    "titleOriginal": "Vogelstudies",
-    "year": "c. 1750–1780",
-    "medium": "Watercolour and bodycolour on paper",
-    "dimensions": "approx. 24 × 33 cm",
+    "id": "holbein-anne-boleyn",
+    "artist": "Hans Holbein the Younger",
+    "artistDates": "1497/8–1543",
+    "title": "A Lady, called Anne Boleyn",
+    "year": "c. 1532–36",
+    "medium": "Black and coloured chalks on pale pink prepared paper",
+    "dimensions": "32.1 × 23.5 cm",
     "room": "Prints and Drawings",
-    "accession": "",
-    "creditLine": "Department of Prints and Drawings",
-    "accentColor": "#4A5240",
-    "labelText": "Schouman painted birds from life, in the menageries of Dutch collectors and stadholders, at a moment when live exotic species were arriving in the Netherlands by the shipload and nobody yet knew what most of them were. The results are watercolours of extraordinary delicacy — plumage built up in translucent washes with the paper left bare for the highlights — and they are also, quietly, a record of the reach of the Dutch trading empire.",
-    "extendedNote": "He was a decorative painter by trade, producing painted wall-hangings for houses in Dordrecht and The Hague, and the bird studies began as reference material. They outlasted the wallpaper. Schouman worked in the menagerie at Het Kleine Loo and in private collections, drawing from the living animal rather than from skins, which is why his birds stand and grip and look about instead of lying flat like specimens.\n\nWatercolour was the right medium and an unusual choice for the period. Layered thinly, it does what oil cannot easily do with feathers: hold the translucency of a wing edge and the soft dry mass of a breast in the same passage. The technical interest is inseparable from the history — a cockatoo in a Dutch garden in 1760 arrived on a company ship from the far side of the world, and Schouman's careful, affectionate, entirely unsentimental drawings are among the best evidence of what those animals looked like before most of them died in the winter.",
+    "accession": "1975,0621.22",
+    "creditLine": "Department of Prints and Drawings, acquired 1975",
+    "accentColor": "#A85E52",
+    "heroFocus": [
+      0.5,
+      0.38
+    ],
+    "labelText": "A woman in an undercap and a plain gown, drawn from life in black and coloured chalks on paper the colour of skin. Holbein has done the eyes, the mouth and the line of the jaw and left almost everything else — the cap is a few strokes, the shoulders barely stated, the pink of the paper doing the work of the flesh. It is a working drawing, made at close range and quickly, of the kind he used as the record to paint from later. To the left of her, a hand a century younger has written in brown ink: Anna Bullen decollata fuit Londini 19 May 1536. Anne Boleyn was beheaded in London, the 19th of May 1536. That sentence is the only reason anyone calls this her, and it was written by somebody who was not born when she died.",
+    "extendedNote": "Holbein came to England in 1526 with a letter from Erasmus, went home to Basel, came back in 1532 and stayed. By 1536 he was the King's Painter, and the way he worked was this: one sitting with the subject, an hour or two, a sheet of paper prepared with a pale pink ground, black chalk for the structure and coloured chalks for the eyes and the mouth — then the sitter left, and the painting was made in the workshop from the drawing. Around eighty of these sheets survive. Most of the paintings they were made for do not.\n\nSo the drawings are not studies in the ordinary sense. They are the primary record — the only place a good many Tudor faces still exist — and they were drawn to be sufficient on their own: measured, unflattering, and made in one pass because there was no second sitting to be had. What looks like modern economy is a working constraint. Holbein put down what he would need and nothing he would not. The sitter here is in a linen undercap, the thing worn beneath a hood, which is to say she is drawn undressed by court standards — an argument used on both sides: a queen does not sit like this, or a queen who has known the painter for four years might.\n\nThe name came later, and not by much less than a century. The inscription is in a seventeenth-century hand, in brown ink, and it does not simply name her — it records the execution and the date, the way you would label a relic. Anne Boleyn was beheaded in May 1536 and comprehensively removed afterwards: her badges chiselled out, her portraits taken down, her daughter's mother made into a subject one did not raise. There is no undisputed likeness of her from life. The famous image — the gable hood, the pearl B at the throat — comes from Elizabethan copies of a lost original, made half a century on, when it had become safe to have one again. Which leaves this sheet: a face drawn from life by the best draughtsman in England, in the right years, in the right city, with the right name attached to it a hundred years too late by somebody working from what he had been told. It is either the only thing we have of her, or it is somebody else entirely, and the drawing is not going to say.",
+    "regions": [
+      {
+        "id": "inscription",
+        "label": "The inscription",
+        "box": [
+          0.0,
+          0.14,
+          0.28,
+          0.6
+        ],
+        "text": "Anna Bullen decollata fuit Londini 19 May 1536 — Anne Boleyn was beheaded in London, the 19th of May 1536. Brown ink, a seventeenth-century hand, added to the left of the sitter by somebody a hundred years after the fact. It is the whole attribution, and notice what it is interested in: not who she was, but how she ended. Somebody labelling a drawing as evidence of a death."
+      },
+      {
+        "id": "eyes",
+        "label": "The eyes",
+        "box": [
+          0.24,
+          0.22,
+          0.78,
+          0.42
+        ],
+        "text": "Coloured chalk, and the only part of the sheet Holbein finishes. He is drawing against a clock — one sitting, then the sitter is gone — so the order of work is the order of what he cannot reconstruct later. A cap can be remembered. The set of somebody's eyelids cannot."
+      },
+      {
+        "id": "paper",
+        "label": "The pink ground",
+        "box": [
+          0.0,
+          0.6,
+          1.0,
+          1.0
+        ],
+        "text": "The paper is prepared with a pale pink priming, and it is not a background — it is the flesh. Holbein draws the shadows and leaves the lights untouched, so the ground itself does the cheek and the forehead and the throat. Everything below the jaw is simply the sheet, and the drawing stops the instant it has what it came for."
+      }
+    ],
     "placeholder": {
-      "aspect": 1.38,
-      "archetype": "still-life",
+      "aspect": 0.732,
+      "archetype": "portrait",
       "palette": [
-        "#2A2C22",
-        "#4E5440",
-        "#7B8264",
-        "#ADB08C",
-        "#EAE6D2",
-        "#C4682E"
+        "#2A1E1C",
+        "#5E3A34",
+        "#A85E52",
+        "#D69A88",
+        "#F0DCD2",
+        "#3A4452"
       ],
       "seed": 27
+    },
+    "link": {
+      "label": "The sheet, at the British Museum",
+      "url": "https://www.britishmuseum.org/collection/object/P_1975-0621-22"
     }
   },
   {
