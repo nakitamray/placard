@@ -93,7 +93,7 @@ export type RoomKind = 'entrance' | 'gallery' | 'atlas';
  * site makes — the level at which a corridor is atmosphere is the level at
  * which a front door is loud.
  */
-const VOLUME: Record<RoomKind, number> = { entrance: 12, gallery: 34, atlas: 17 };
+const VOLUME: Record<RoomKind, number> = { entrance: 25, gallery: 30, atlas: 17 };
 
 /**
  * How long one room takes to give way to the next.
