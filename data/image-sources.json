@@ -76,10 +76,6 @@
     "search": "John White The Flyer Secotan conjuror Roanoke watercolour British Museum",
     "note": "White's album is many sheets; search cannot know which. Pin one."
   },
-  "schouman-birds": {
-    "search": "Aert Schouman birds watercolour \"British Museum\"",
-    "note": "Unpinned, and the only record in the exhibition still relying on search. Schouman drew birds all his life and most of the sheets are in Dutch collections, so search reaches for those first — the run now refuses any candidate whose proportions are not the catalogued landscape ones rather than hanging one of them. Pin a British Museum sheet by its Commons file name to settle it."
-  },
   "durer-rhinoceros": {
     "search": "Dürer Rhinocerus 1515 woodcut",
     "note": "The 1515 woodcut itself, not a later re-cut or a photograph of the sheet in its mount."
@@ -290,5 +286,10 @@
     "commonsFile": "File:Vrindavani Vastra.jpg",
     "search": "Vrindavani Vastra Assam silk British Museum",
     "note": "The Assamese lampas-woven silk in the British Museum, remounted in Tibet. Its size is not stated on the placard because the surviving cloth is a joined fragment — see the record's \"reproduction\" line."
+  },
+  "holbein-anne-boleyn": {
+    "commonsFile": "File:A Lady, called Anne Boleyn, by Hans Holbein the Younger.jpg",
+    "search": "Holbein \"A Lady, called Anne Boleyn\" chalk drawing",
+    "note": "Holbein drew the English court in chalk and the sheets were dispersed; most are at Windsor and a few are in the British Museum's Prints and Drawings department. Pin the British Museum's sheet — if this file's Commons page credits the Royal Collection, it is the Windsor one and belongs to a different room."
   }
 }
