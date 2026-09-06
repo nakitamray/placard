@@ -155,8 +155,8 @@ export type WallKind =
   | 'court-facade'
   /** Uffizi: plaster and a portrait frieze one side, tall windows the other */
   | 'uffizi-corridor'
-  /** British Museum: engaged fluted pilasters, and tall screened windows high on one side */
-  | 'fluted-pilasters';
+  /** British Museum: a free-standing colonnade off the wall, tall windows high on one side */
+  | 'stone-colonnade';
 
 export type FrameKind =
   /** deep gilt salon frame, corner cartouches, bead course */
@@ -234,9 +234,11 @@ export interface MuseumStyle {
      * stone-benches two rows of pale stone benches with cushioned tops, one
      *               either side of the centre line — the Orsay's nave, and the
      *               thing that most tells it apart from the Louvre's corridor
+     * marble-benches carved marble with scrolled ends, down the centre line of
+     *               a hall of columns
      * ottoman       a round tufted leather sofa in the middle of the room
      */
-    seating: 'bench' | 'stone-benches' | 'ottoman' | 'none';
+    seating: 'bench' | 'stone-benches' | 'marble-benches' | 'ottoman' | 'none';
     chandeliers: boolean;
     placards: boolean;
     /** Orsay's great clock on the end wall */

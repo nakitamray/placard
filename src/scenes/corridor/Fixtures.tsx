@@ -592,6 +592,62 @@ function StoneBench({ length, stone }: { length: number; stone: string }) {
   );
 }
 
+/**
+ * The British Museum's benches: one block of marble, carved.
+ *
+ * A gallery bench is furniture and reads as furniture, which is exactly what
+ * a hall of columns does not want down its middle. This is the other kind —
+ * cut from the same stone as the room, with a moulded plinth, scrolled ends
+ * and a slab thick enough to be structural — so that from the far end of the
+ * corridor it belongs to the architecture, and only when you are standing
+ * over it does it turn out to be somewhere to sit.
+ */
+function MarbleBench({ length, stone, dark }: { length: number; stone: string; dark: string }) {
+  return (
+    <group>
+      {/* the slab */}
+      <mesh position={[0, 0.46, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.66, 0.14, length + 0.34]} />
+        <meshStandardMaterial color={stone} roughness={0.36} metalness={0.06} />
+      </mesh>
+      {/* a moulded lip under the slab: a shadow line the length of the bench,
+          which is what stops the top reading as a plank laid on two boxes */}
+      <mesh position={[0, 0.38, 0]} receiveShadow>
+        <boxGeometry args={[0.58, 0.06, length + 0.16]} />
+        <meshStandardMaterial color={dark} roughness={0.5} />
+      </mesh>
+      {[-1, 1].map((e) => (
+        <group key={e} position={[0, 0, (e * length) / 2]}>
+          {/* the end support, standing at the very end so the slab lands on
+              something rather than appearing to float over a block */}
+          <mesh position={[0, 0.21, -e * 0.17]} castShadow receiveShadow>
+            <boxGeometry args={[0.54, 0.36, 0.34]} />
+            <meshStandardMaterial color={stone} roughness={0.42} />
+          </mesh>
+          {/* the scroll: a drum laid on its side, turned out past the end of
+              the slab, which is the whole reason it is visible at all */}
+          <mesh position={[0, 0.4, e * 0.07]} rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.16, 0.16, 0.58, 20]} />
+            <meshStandardMaterial color={stone} roughness={0.36} metalness={0.05} />
+          </mesh>
+          {/* the eye of the scroll, sunk into each face */}
+          {[-1, 1].map((f) => (
+            <mesh key={f} position={[f * 0.3, 0.4, e * 0.07]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.055, 0.055, 0.03, 14]} />
+              <meshStandardMaterial color={dark} roughness={0.5} />
+            </mesh>
+          ))}
+          {/* and its plinth, wider than everything above it */}
+          <mesh position={[0, 0.05, -e * 0.12]} receiveShadow>
+            <boxGeometry args={[0.68, 0.1, 0.5]} />
+            <meshStandardMaterial color={dark} roughness={0.6} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 /** round tufted leather seating — the National Gallery's centre-of-room sofa */
 function Ottoman() {
   return (
@@ -1020,6 +1076,18 @@ export function Fixtures({ style, d }: Props) {
           </group>,
         );
       }
+    }
+  }
+
+  if (f.seating === 'marble-benches') {
+    // down the centre line, one to every other bay, so the eight metres
+    // between the two colonnades stay clear of everything else
+    for (let b = 1; b < d.bays; b += 2) {
+      nodes.push(
+        <group key={`mb${b}`} position={[0, 0, bayZ(d, b)]}>
+          <MarbleBench length={d.bayDepth * 0.5} stone={p.molding} dark={p.accent} />
+        </group>,
+      );
     }
   }
 

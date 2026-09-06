@@ -520,32 +520,42 @@ function Lamps({
      * the hang; the British Museum's Egyptian gallery is lit from the left,
      * high up, through screens.
      */
-    const daySide = museum.style.wall === 'fluted-pilasters' ? -1 : 1;
+    const daySide = museum.style.wall === 'stone-colonnade' ? -1 : 1;
     const step = Math.max(2, Math.ceil(d.bays / quality.maxLamps));
     for (let b = 0; b < d.bays; b += step) {
       lights.push(
         <pointLight
           key={`day${b}`}
-          position={[daySide * (d.halfWidth - 0.5), d.wallHeight * 0.62, bayZ(d, b)]}
+          position={[daySide * (d.halfWidth - 0.5), d.wallHeight * 0.66, bayZ(d, b)]}
           color={l.sky}
-          intensity={l.lampIntensity * 1.5}
+          intensity={l.lampIntensity * 1.2}
           distance={d.bayDepth * 3.4}
           decay={1.7}
         />,
       );
-      // and the room's own fixtures, warm, under the ceiling. Scaled from the
-      // record: a daylit corridor that also has lamps says so by asking for a
-      // high lampIntensity, and one that does not is left alone.
-      lights.push(
-        <pointLight
-          key={`warm${b}`}
-          position={[0, d.wallHeight - 0.7, bayZ(d, b)]}
-          color={l.lamp}
-          intensity={l.lampIntensity * 0.55}
-          distance={d.bayDepth * 2.6}
-          decay={2}
-        />,
-      );
+      /*
+       * The room's own lamps, warm, and against the WALLS rather than down the
+       * centre line.
+       *
+       * A lamp on the centre line lights the floor, flattens the columns and
+       * leaves the hang in its own shade. Set behind the colonnade at picture
+       * height, the same lamp washes the canvas it stands beside, rakes the
+       * column in front of it into relief, and throws the shadow of that
+       * column across the wall — which is most of what makes a hall of
+       * columns look like a hall of columns.
+       */
+      for (const side of [-1, 1]) {
+        lights.push(
+          <pointLight
+            key={`warm${b}${side}`}
+            position={[side * (d.halfWidth - 1.7), d.wallHeight * 0.5, bayZ(d, b)]}
+            color={l.lamp}
+            intensity={l.lampIntensity * 0.5}
+            distance={d.bayDepth * 2.4}
+            decay={2}
+          />,
+        );
+      }
     }
     return (
       <>
