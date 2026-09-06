@@ -10,7 +10,7 @@
  */
 import type { Phase } from '../types';
 
-export const ALLOWED: Record<Phase, Phase[]> = {
+const ALLOWED: Record<Phase, Phase[]> = {
   boot: ['landing'],
   landing: ['corridor'],
   // a painting in the corridor can be opened directly — you should not

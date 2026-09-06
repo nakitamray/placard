@@ -27,14 +27,14 @@ export const gallery = {
  * toward the canvas, which is the honest way to get closer to a painting.
  */
 export const view = { v: 1, goal: 1 };
-export const ZOOM_MIN = 0.75;
-export const ZOOM_MAX = 2.6;
+const ZOOM_MIN = 0.75;
+const ZOOM_MAX = 2.6;
 
-export function setZoom(next: number) {
+function setZoom(next: number) {
   view.goal = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, next));
 }
 
-export function nudgeZoom(factor: number) {
+function nudgeZoom(factor: number) {
   setZoom(view.goal * factor);
 }
 

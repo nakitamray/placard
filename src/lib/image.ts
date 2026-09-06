@@ -41,7 +41,7 @@ function decodes(dataUri: string): Promise<boolean> {
 let probe: Promise<ImageFormat> | null = null;
 
 /** The best format this browser can decode. Probed once, then cached. */
-export function bestFormat(): Promise<ImageFormat> {
+function bestFormat(): Promise<ImageFormat> {
   if (probe) return probe;
   probe = (async () => {
     if (typeof Image === 'undefined') return 'jpg';

@@ -59,7 +59,8 @@
       "terraces": false,
       "cove": true,
       "ropes": true
-    }
+    },
+    "hangHeight": 2.85
   },
   "plan": {
     "viewBox": "20 40 520 240",

@@ -459,6 +459,58 @@ function PeakedCourt({ style, d }: Props) {
         </group>
       ))}
 
+      {/*
+       * The sun through it.
+       *
+       * A skylight that is only a bright surface reads as a lit ceiling. What
+       * says roof is the light arriving underneath it: two leaning shafts a
+       * bay, running from the ridge down to the floor on the sunward side,
+       * and the pool each one lands in. Additive, soft-edged and faint — this
+       * is a glazed court at midday, not a cathedral.
+       */}
+      {Array.from({ length: d.bays }, (_, b) => (
+        <group key={`shaft${b}`}>
+          {[0, 1].map((k) => (
+            <mesh
+              key={k}
+              position={[
+                -d.halfWidth * (0.15 + k * 0.16),
+                (eaves + ridge) * 0.32,
+                bayZ(d, b) + (k - 0.5) * d.bayDepth * 0.3,
+              ]}
+              rotation={[0, 0, 0.3 + k * 0.06]}
+            >
+              <planeGeometry args={[2.6 - k * 0.5, ridge * 1.35]} />
+              <meshBasicMaterial
+                map={glowTexture()}
+                color={style.light.key}
+                transparent
+                opacity={0.05}
+                blending={THREE.AdditiveBlending}
+                depthWrite={false}
+                side={THREE.DoubleSide}
+                toneMapped={false}
+              />
+            </mesh>
+          ))}
+          <mesh
+            position={[-d.halfWidth * 0.3, 0.02, bayZ(d, b) + d.bayDepth * 0.1]}
+            rotation={[-Math.PI / 2, 0, 0]}
+          >
+            <planeGeometry args={[d.halfWidth * 1.3, d.bayDepth * 0.85]} />
+            <meshBasicMaterial
+              map={glowTexture()}
+              color={style.light.key}
+              transparent
+              opacity={0.2}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
+        </group>
+      ))}
+
       {/* the lower flat glazing, eaves to wall head, both sides */}
       {[-1, 1].map((side) => (
         <mesh

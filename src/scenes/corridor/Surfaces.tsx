@@ -469,6 +469,14 @@ export function Walls({ style, d, quality }: Props) {
               <cylinderGeometry args={[rBot * 1.08, rBot * 1.2, 0.14, 20]} />
               <meshStandardMaterial color={p.molding} roughness={0.84} />
             </Instanced>
+            {/* The apophyge: the flare where the shaft grows out of its base.
+                Without it the base stack stops at 0.55 and the shaft starts at
+                0.62, and a column with a seven-centimetre gap in it does not
+                look like it is standing on anything. */}
+            <Instanced count={nCol} place={atColumns(0.58, side)}>
+              <cylinderGeometry args={[rBot, rBot * 1.1, 0.12, 20]} />
+              <meshStandardMaterial color={p.molding} roughness={0.86} />
+            </Instanced>
 
             {/* the necking ring, then the capital: echinus, volutes, abacus */}
             <Instanced count={nCol} place={atColumns(baseH + shaftH + 0.04, side)}>
@@ -577,9 +585,9 @@ export function Walls({ style, d, quality }: Props) {
                   <planeGeometry args={[beamL, winW * (0.5 - k * 0.08)]} />
                   <meshBasicMaterial
                     map={glowTexture()}
-                    color={p.sky}
+                    color={style.light.key}
                     transparent
-                    opacity={0.16}
+                    opacity={0.075}
                     blending={THREE.AdditiveBlending}
                     depthWrite={false}
                     side={THREE.DoubleSide}
@@ -595,9 +603,9 @@ export function Walls({ style, d, quality }: Props) {
                 <planeGeometry args={[d.halfWidth * 1.7, d.bayDepth * 0.8]} />
                 <meshBasicMaterial
                   map={glowTexture()}
-                  color={p.sky}
+                  color={style.light.key}
                   transparent
-                  opacity={0.34}
+                  opacity={0.16}
                   blending={THREE.AdditiveBlending}
                   depthWrite={false}
                   toneMapped={false}
@@ -740,25 +748,55 @@ export function Walls({ style, d, quality }: Props) {
         </mesh>
         {bands(1, p.molding, 1.0)}
 
-        {/* the sun on the floor, one patch per opening. Additive and soft: it
-            is light landing on stone, not a decal of a rectangle. */}
+        {/*
+         * The sun coming in, and where it lands.
+         *
+         * The sky outside is blue and the light inside is not: what comes
+         * through a window at midday is warm by the time it has crossed a
+         * plastered room, and painting the floor pools the colour of the sky
+         * turns a Florentine corridor into a swimming pool. So the glazing
+         * takes the palette's sky and everything the light touches takes the
+         * key, which is the room's own warmth.
+         *
+         * The shafts are steep, because it is midday and the sun is high.
+         */}
         {Array.from({ length: nWindows }, (_, i) => (
-          <mesh
-            key={`sun${i}`}
-            position={[d.halfWidth * 0.34, 0.02, winZ(i) - 0.5]}
-            rotation={[-Math.PI / 2, 0, 0]}
-          >
-            <planeGeometry args={[d.halfWidth * 1.5, pitch * 0.72]} />
-            <meshBasicMaterial
-              map={glowTexture()}
-              color={p.sky}
-              transparent
-              opacity={0.5}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-              toneMapped={false}
-            />
-          </mesh>
+          <group key={`sun${i}`}>
+            {[0, 1].map((k) => (
+              <mesh
+                key={k}
+                position={[d.halfWidth - 0.9 - k * 0.5, (sill + head) / 2 - 0.4, winZ(i)]}
+                rotation={[0, 0, 0.34 + k * 0.05]}
+              >
+                <planeGeometry args={[1.9, (head - sill) * (0.86 - k * 0.12)]} />
+                <meshBasicMaterial
+                  map={glowTexture()}
+                  color={style.light.key}
+                  transparent
+                  opacity={0.1}
+                  blending={THREE.AdditiveBlending}
+                  depthWrite={false}
+                  side={THREE.DoubleSide}
+                  toneMapped={false}
+                />
+              </mesh>
+            ))}
+            <mesh
+              position={[d.halfWidth * 0.34, 0.02, winZ(i) - 0.5]}
+              rotation={[-Math.PI / 2, 0, 0]}
+            >
+              <planeGeometry args={[d.halfWidth * 1.5, pitch * 0.72]} />
+              <meshBasicMaterial
+                map={glowTexture()}
+                color={style.light.key}
+                transparent
+                opacity={0.42}
+                blending={THREE.AdditiveBlending}
+                depthWrite={false}
+                toneMapped={false}
+              />
+            </mesh>
+          </group>
         ))}
 
         {/* the portrait frieze, both walls, above everything */}
