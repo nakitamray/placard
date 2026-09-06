@@ -396,37 +396,69 @@
     }
   },
   {
-    "id": "dunhuang-cave-17",
-    "artist": "Unknown painters, Dunhuang",
-    "artistDates": "Tang dynasty, 8th–10th century",
-    "title": "Painted Banner from Cave 17, Dunhuang",
-    "titleOriginal": "From the Library Cave, Mogao",
-    "year": "8th–10th century",
-    "medium": "Ink and colour on silk",
-    "dimensions": "approx. 80 × 55 cm",
-    "room": "Chinese galleries",
+    "id": "vrindavani-vastra",
+    "artist": "Unknown weavers, Assam",
+    "artistDates": "Ahom and Koch kingdoms, 16th century",
+    "title": "Vrindavani Vastra",
+    "titleOriginal": "বৃন্দাবনী বস্ত্ৰ · the cloth of Vrindavan",
+    "year": "c. 1560–1600",
+    "medium": "Silk lampas, woven in narrow strips and joined",
+    "dimensions": "a fragment, some two metres across, of a far larger cloth",
+    "room": "Asian galleries",
     "accession": "",
-    "creditLine": "Stein collection, acquired 1907",
-    "accentColor": "#4E3628",
+    "creditLine": "Acquired in Tibet, where the cloth had been remounted as a monastic hanging",
+    "accentColor": "#7A2E24",
     "heroSkip": true,
-    "heroFocus": [
-      0.5,
-      0.36
+    "reproduction": "The Vrindavani Vastra was never one object of a fixed size: it was woven in narrow strips and sewn together, cut apart again in Tibet, and what survives is a joined fragment of it. Its proportions are the seamstress's, not the loom's.",
+    "labelText": "Bands of figures on a dark ground, woven rather than painted: Krishna dancing on the hood of the serpent Kaliya, lifting the hill of Govardhan on one finger, surrounded by gopis and elephants and lions, with lines of Assamese script running between the registers naming what is happening. Every figure is made of silk floats on a silk ground — no dye is painted on, no thread is embroidered over the top. The cloth was made in Assam in the sixteenth century, and it survived because somebody in Tibet cut it up and sewed it into a monastic hanging.",
+    "extendedNote": "The name means the cloth of Vrindavan, the forest where Krishna spent his childhood, and the weaving belongs to the Vaishnava revival that Srimanta Sankardeva led across the Brahmaputra valley — a movement that carried its theology in performance, song and textile rather than in temple sculpture. Tradition holds that the Koch king Naranarayana commissioned it, and that it took a workshop of weavers the better part of a year.\n\nThe technique is lampas: two warps and two wefts interlaced so that the figures are woven into the structure of the cloth rather than laid on it. It is done in muga and pat, the wild and cultivated silks of Assam, and the loom is narrow — so the design is built strip by strip, each one carrying its own band of the story, and the strips are then joined. That constraint is why the composition reads as registers: a horizontal narrative is what a narrow loom can make.\n\nHow it reached the British Museum is the interesting part. Assamese silk travelled north over the Himalaya as trade and as tribute, and in Tibet this cloth was taken apart and remade as a canopy or wall hanging for a monastery, where the climate and the dark kept it. Almost nothing of sixteenth-century Assamese weaving survives in Assam. What we have of it, we have because it left.",
+    "regions": [
+      {
+        "id": "krishna",
+        "label": "Krishna on the serpent",
+        "box": [
+          0.28,
+          0.18,
+          0.66,
+          0.62
+        ],
+        "text": "Dancing on the many hoods of Kaliya, the serpent who had poisoned the river. It is the moment the story is usually told at, and the weaver has given it the centre of a band and the widest spacing on the cloth — which in a woven design is the only emphasis available. There is no scale, no perspective and no shadow; there is position, repetition and interval."
+      },
+      {
+        "id": "script",
+        "label": "The inscriptions",
+        "box": [
+          0.0,
+          0.6,
+          1.0,
+          0.8
+        ],
+        "text": "Lines of Assamese script run between the registers, naming the scenes. They are woven, not written, which means every letter had to be counted out in warp and weft before the shuttle moved — and it makes the cloth one of the earliest dated objects in the language."
+      },
+      {
+        "id": "joins",
+        "label": "The joins",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.22
+        ],
+        "text": "The seams are visible, and they are two different histories. Some are the loom's: the cloth was woven in narrow strips and sewn edge to edge, because that is the width an Assamese loom gives you. Others are Tibet's: the hanging was cut down and reassembled for a monastery, four hundred years ago, by somebody who did not read the script and cared only that it was silk."
+      }
     ],
-    "labelText": "In 1900 a Daoist caretaker at the Mogao caves near Dunhuang broke through a plastered wall into a small chamber packed floor to ceiling with manuscripts, silk paintings and banners, sealed for roughly nine hundred years. This banner is one of them: a bodhisattva painted on silk in mineral pigment and ink, made as a votive object to hang in a cave shrine on the edge of the Taklamakan desert.",
-    "extendedNote": "Cave 17 held perhaps fifty thousand items — Buddhist sutras in Chinese, Tibetan, Sanskrit, Sogdian, Uyghur and Khotanese; contracts; a printed Diamond Sutra of 868 that is the earliest dated printed book in existence; and several hundred paintings on silk, hemp and paper. Why it was sealed is still unsettled: an evacuation ahead of an invasion, or a sacred waste deposit for texts too holy to destroy.\n\nAurel Stein reached the site in 1907 and left with several thousand items for a fraction of what they were worth; Paul Pelliot followed a year later, and the contents of the cave are now divided between London, Paris, Beijing, Delhi and St Petersburg. The paintings themselves are provincial in the best sense — made on a trade route where Chinese, Indian, Tibetan and Central Asian conventions met, by workshops rather than court masters, in a palette of malachite, azurite, cinnabar and gold. The line is fluent and repetitive, the way work is when the same figure has been painted a thousand times, and the silk has kept its colour because it spent nine centuries in the dark.",
     "placeholder": {
-      "aspect": 0.7,
-      "archetype": "fresco",
+      "aspect": 1.42,
+      "archetype": "register",
       "palette": [
-        "#2A1E16",
-        "#4E3A28",
-        "#7C6244",
-        "#AC9068",
-        "#E2D2B0",
-        "#B0442C"
+        "#1E140E",
+        "#4A2018",
+        "#7A2E24",
+        "#B06A3E",
+        "#D8B47A",
+        "#3E5240"
       ],
-      "seed": 29
+      "seed": 26
     }
   },
   {
