@@ -259,6 +259,16 @@ export interface MuseumStyle {
     /** a lighting track down the centre line, with directional spots on it */
     spotTrack?: boolean;
     /**
+     * The room is lit for evening.
+     *
+     * One flag rather than three because the three are one decision: a glazed
+     * roof shows sky instead of daylight, the pools it throws on the floor
+     * fall away to almost nothing, and the pictures are lit by their own
+     * lamps. Setting any one of them without the others gives a room that
+     * reads as broken rather than as dusk.
+     */
+    dusk?: boolean;
+    /**
      * The room is lit by its windows rather than by its lamps.
      *
      * Warm light is placed just inside the glazed wall and thrown across the

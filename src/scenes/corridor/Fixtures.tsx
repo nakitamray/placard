@@ -24,6 +24,7 @@ import { corridor } from '../../state/motion';
 import { useStore } from '../../state/store';
 import type { MuseumStyle } from '../../types';
 import { bayZ, hangTop, type Dims } from './dims';
+import { glowTexture } from './glow';
 
 interface Props {
   style: MuseumStyle;
@@ -602,6 +603,55 @@ function StoneBench({ length, stone }: { length: number; stone: string }) {
  * corridor it belongs to the architecture, and only when you are standing
  * over it does it turn out to be somewhere to sit.
  */
+/**
+ * One picture light: a stem down from the cornice, a short arm, and a barrel
+ * head tilted at the canvas.
+ *
+ * The lens is drawn as a small emissive disc rather than lit like everything
+ * else. A lamp whose own glass is dark is the giveaway that a room is faking
+ * its light — the eye reads brightness at the source before it reads
+ * brightness on the wall — and one unlit disc costs nothing.
+ */
+function SpotHead({ lamp, metal, side }: { lamp: string; metal: string; side: number }) {
+  return (
+    <group>
+      {/* the drop from the cornice, and the arm out over the picture */}
+      <mesh position={[0, 0.34, 0]}>
+        <cylinderGeometry args={[0.035, 0.035, 0.68, 8]} />
+        <meshStandardMaterial color={metal} metalness={0.7} roughness={0.42} />
+      </mesh>
+      <mesh position={[side * 0.16, 0.02, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.03, 0.03, 0.34, 8]} />
+        <meshStandardMaterial color={metal} metalness={0.7} roughness={0.42} />
+      </mesh>
+      {/* the barrel, nose down and turned toward the wall */}
+      <group position={[side * 0.3, -0.04, 0]} rotation={[0, 0, side * -0.72]}>
+        <mesh>
+          <cylinderGeometry args={[0.075, 0.095, 0.26, 12]} />
+          <meshStandardMaterial color={metal} metalness={0.65} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, -0.135, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.082, 12]} />
+          <meshBasicMaterial color={lamp} toneMapped={false} side={THREE.DoubleSide} />
+        </mesh>
+        {/* the glow around the lens itself */}
+        <mesh position={[0, -0.14, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.52, 0.52]} />
+          <meshBasicMaterial
+            map={glowTexture()}
+            color={lamp}
+            transparent
+            opacity={0.5}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
 function MarbleBench({ length, stone, dark }: { length: number; stone: string; dark: string }) {
   return (
     <group>
@@ -975,34 +1025,78 @@ export function Fixtures({ style, d }: Props) {
 
   if (f.spotTrack) {
     /*
-     * The spots themselves. The heads are drawn by the ceiling; these are the
-     * cones of light they throw, one per bay per wall, aimed at the hang.
+     * Picture lights: a warm head on a short arm above each painting, and the
+     * cone it throws down onto it.
+     *
+     * These used to sit on the centre line and fire outward at both walls,
+     * which is the one place a gallery never puts them — the throw is long,
+     * the angle is flat, and the canvas gets an even wash with the frame
+     * casting nothing. Standing them a metre and a half off the wall at the
+     * top of it and aiming steeply down gives the short raking throw that
+     * actually lights a picture: bright in the middle, falling off at the
+     * edges, the moulding of the frame in relief, and darkness between one
+     * bay and the next.
      *
      * A spotlight is the most expensive kind of light in three.js — it needs
-     * its own shadow frustum — so these do not cast: the room's key light
-     * does that, and what these are for is the hard warm pool on a canvas and
-     * the darkness between.
+     * its own shadow frustum — so these do not cast. What they are for is the
+     * pool on the canvas and the dark between.
      */
+    const armY = d.wallHeight - 0.55;
+    const armX = d.halfWidth - 1.45;
     for (let b = 0; b < d.bays; b++) {
       for (const side of [-1, 1]) {
         nodes.push(
-          <spotLight
-            key={`sp${b}${side}`}
-            position={[0, d.wallHeight - 0.8, bayZ(d, b)]}
-            color={style.light.lamp}
-            intensity={style.light.lampIntensity}
-            angle={0.42}
-            penumbra={0.7}
-            distance={d.halfWidth * 3}
-            decay={1.5}
+          <group key={`sp${b}${side}`} position={[side * armX, armY, bayZ(d, b)]}>
+            <spotLight
+              color={style.light.lamp}
+              intensity={style.light.lampIntensity}
+              angle={0.5}
+              penumbra={0.62}
+              distance={d.wallHeight * 2.2}
+              decay={1.5}
+            >
+              {/* the target has to be IN the scene graph for its world matrix
+                  to update, and a light's own child is the simplest place */}
+              <object3D
+                attach="target"
+                position={[side * (1.45 - 0.28), hangTop(d, style) - 0.75 - armY, 0]}
+              />
+            </spotLight>
+            <SpotHead lamp={style.light.lamp} metal={p.molding} side={side} />
+          </group>,
+        );
+
+        /*
+         * And the pool itself, painted on the wall.
+         *
+         * A spotlight in three.js lights a surface correctly and looks like
+         * almost nothing: the falloff is smooth, the cone edge lands where
+         * the geometry does, and at the intensity where you can see it on the
+         * canvas the wall around it is blown out. What reads as a lamp
+         * pointing at a picture is the shape of the light on the wall behind
+         * it — brighter above where the head is, fading below — so that is
+         * drawn, additively, the same way the daylight pools on the floors of
+         * the other rooms are. The spotlight above still does the modelling;
+         * this does the seeing.
+         */
+        nodes.push(
+          <mesh
+            key={`pool${b}${side}`}
+            position={[side * (d.halfWidth - 0.07), hangTop(d, style) - 0.55, bayZ(d, b)]}
+            rotation={[0, side * -Math.PI / 2, 0]}
+            renderOrder={2}
           >
-            {/* the target has to be IN the scene graph for its world matrix to
-                update, and a light's own child is the simplest place for it */}
-            <object3D
-              attach="target"
-              position={[side * (d.halfWidth - 0.4), hangTop(d, style) - 1.0 - (d.wallHeight - 0.8), 0]}
+            <planeGeometry args={[d.bayDepth * 0.92, d.wallHeight * 0.78]} />
+            <meshBasicMaterial
+              map={glowTexture()}
+              color={style.light.lamp}
+              transparent
+              opacity={0.3}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              toneMapped={false}
             />
-          </spotLight>,
+          </mesh>,
         );
       }
     }

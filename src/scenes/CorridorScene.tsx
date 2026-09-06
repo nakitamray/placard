@@ -600,10 +600,17 @@ function Lamps({
     }
   }
 
-  // Every point light is evaluated per fragment across every lit surface in
-  // the room, so the count is a budget rather than a look: they are spread
-  // evenly down the corridor and thinned rather than truncated.
-  if (!museum.style.fixtures.chandeliers) {
+  /*
+   * Every point light is evaluated per fragment across every lit surface in
+   * the room, so the count is a budget rather than a look: they are spread
+   * evenly down the corridor and thinned rather than truncated.
+   *
+   * Not where the pictures have their own lamps, though. A row of lights down
+   * the middle is the exact opposite of what a track of spots is for: it
+   * fills in the dark between the bays, flattens the canvas the spot was
+   * raking, and leaves a room that has been lit twice and reads as neither.
+   */
+  if (!museum.style.fixtures.chandeliers && !museum.style.fixtures.spotTrack) {
     const step = Math.max(2, Math.ceil(d.bays / quality.maxLamps));
     for (let b = 0; b < d.bays; b += step) {
       lights.push(
@@ -624,7 +631,13 @@ function Lamps({
       <pointLight
         position={[0, d.wallHeight * 0.62, d.apseZ + 2.4]}
         color={l.lamp}
-        intensity={l.lampIntensity * 2.6 + 8}
+        /* the glow at the far end is what gives the corridor its depth, but in
+           a room lit only by picture lights the same lamp is a bonfire */
+        intensity={
+          museum.style.fixtures.spotTrack
+            ? l.lampIntensity * 0.8 + 2
+            : l.lampIntensity * 2.6 + 8
+        }
         distance={d.bayDepth * 3}
         decay={1.7}
       />

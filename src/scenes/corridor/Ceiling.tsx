@@ -11,6 +11,7 @@ import * as THREE from 'three';
 import { grotesqueTexture } from './grotesque';
 import { glowTexture } from './glow';
 import { vaultFrescoTexture } from './fresco';
+import { duskSkyTexture } from './nightsky';
 import type { MuseumStyle } from '../../types';
 import { bayZ, type Dims } from './dims';
 
@@ -351,6 +352,18 @@ function SteelGlassArch({ style, d }: Props) {
   const r = d.halfWidth;
   const springing = d.wallHeight;
   const mid = -d.length / 2;
+  /*
+   * After sunset the roof stops being a source and becomes a window.
+   *
+   * By day the glazing is a flat bright panel and that is right: you do not
+   * look at the sky through a glass roof at noon, you look at the light
+   * coming off it. In the evening the opposite is true — the shell has to
+   * read as something you can see through, which needs an actual sky on it
+   * with stars in it. Same geometry, same unlit material; only the map and
+   * the tint change.
+   */
+  const dusk = !!style.fixtures.dusk;
+  const sky = dusk ? duskSkyTexture() : null;
 
   return (
     <group>
@@ -359,7 +372,14 @@ function SteelGlassArch({ style, d }: Props) {
         <cylinderGeometry
           args={[r, r, d.length + d.bayDepth * 3, 40, 1, true, Math.PI / 2, Math.PI]}
         />
-        <meshBasicMaterial color={p.ceiling} toneMapped={false} side={THREE.BackSide} />
+        <meshBasicMaterial
+          map={sky}
+          // an unlit material multiplies its map, so the tint has to be white
+          // where there is a sky to show or it would only darken it
+          color={sky ? '#FFFFFF' : p.ceiling}
+          toneMapped={false}
+          side={THREE.BackSide}
+        />
       </mesh>
 
       {/* The day coming through it, landing on the floor.
@@ -378,7 +398,9 @@ function SteelGlassArch({ style, d }: Props) {
             map={glowTexture()}
             color={p.sky}
             transparent
-            opacity={0.22}
+            /* a glass roof at dusk still puts something on the floor, but it
+               is the last of the sky rather than the sun: a fifth as much */
+            opacity={dusk ? 0.045 : 0.22}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             toneMapped={false}
