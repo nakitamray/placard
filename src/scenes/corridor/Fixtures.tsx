@@ -24,6 +24,8 @@ import { corridor } from '../../state/motion';
 import { useStore } from '../../state/store';
 import type { MuseumStyle } from '../../types';
 import { bayZ, hangTop, type Dims } from './dims';
+import { glowTexture } from './glow';
+import { clockFaceTexture, DIAL_Y, FACE_ASPECT } from './clockface';
 
 interface Props {
   style: MuseumStyle;
@@ -602,6 +604,55 @@ function StoneBench({ length, stone }: { length: number; stone: string }) {
  * corridor it belongs to the architecture, and only when you are standing
  * over it does it turn out to be somewhere to sit.
  */
+/**
+ * One picture light: a stem down from the cornice, a short arm, and a barrel
+ * head tilted at the canvas.
+ *
+ * The lens is drawn as a small emissive disc rather than lit like everything
+ * else. A lamp whose own glass is dark is the giveaway that a room is faking
+ * its light — the eye reads brightness at the source before it reads
+ * brightness on the wall — and one unlit disc costs nothing.
+ */
+function SpotHead({ lamp, metal, side }: { lamp: string; metal: string; side: number }) {
+  return (
+    <group>
+      {/* the drop from the cornice, and the arm out over the picture */}
+      <mesh position={[0, 0.34, 0]}>
+        <cylinderGeometry args={[0.035, 0.035, 0.68, 8]} />
+        <meshStandardMaterial color={metal} metalness={0.7} roughness={0.42} />
+      </mesh>
+      <mesh position={[side * 0.16, 0.02, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.03, 0.03, 0.34, 8]} />
+        <meshStandardMaterial color={metal} metalness={0.7} roughness={0.42} />
+      </mesh>
+      {/* the barrel, nose down and turned toward the wall */}
+      <group position={[side * 0.3, -0.04, 0]} rotation={[0, 0, side * -0.72]}>
+        <mesh>
+          <cylinderGeometry args={[0.075, 0.095, 0.26, 12]} />
+          <meshStandardMaterial color={metal} metalness={0.65} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, -0.135, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.082, 12]} />
+          <meshBasicMaterial color={lamp} toneMapped={false} side={THREE.DoubleSide} />
+        </mesh>
+        {/* the glow around the lens itself */}
+        <mesh position={[0, -0.14, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.52, 0.52]} />
+          <meshBasicMaterial
+            map={glowTexture()}
+            color={lamp}
+            transparent
+            opacity={0.5}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
 function MarbleBench({ length, stone, dark }: { length: number; stone: string; dark: string }) {
   return (
     <group>
@@ -750,23 +801,14 @@ function Placard() {
  * walking there by hand does.
  */
 function GreatClock({ style, y, z }: { style: MuseumStyle; y: number; z: number }) {
-  const p = style.palette;
   const R = 2.4;
   const setHovered = useStore((s) => s.setHoveredWork);
-  const ticks = useRef<THREE.InstancedMesh>(null);
-  useLayoutEffect(() => {
-    const mesh = ticks.current;
-    if (!mesh) return;
-    const m = new THREE.Matrix4();
-    for (let i = 0; i < 12; i++) {
-      const a = (i / 12) * Math.PI * 2;
-      m.makeRotationZ(a);
-      m.setPosition(Math.sin(a) * R * 0.78, Math.cos(a) * R * 0.78, 0.06);
-      mesh.setMatrixAt(i, m);
-    }
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.computeBoundingSphere();
-  }, []);
+  const face = clockFaceTexture();
+  /* the plate carries crown and apron as well as the dial, so it is taller
+     than it is wide, and the dial's centre is not the plate's centre */
+  const plateW = R * 2.28;
+  const plateH = plateW / FACE_ASPECT;
+  const dialOffset = plateH * (0.5 - DIAL_Y);
 
   const walkToTheEnd = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
@@ -780,7 +822,7 @@ function GreatClock({ style, y, z }: { style: MuseumStyle; y: number; z: number 
     <group position={[0, y, z]}>
       {/* the clock is the way out of the nave: one target over the whole face */}
       <mesh
-        position={[0, 0, 0.14]}
+        position={[0, 0, 0.2]}
         onPointerOver={(e) => {
           e.stopPropagation();
           document.body.style.cursor = 'pointer';
@@ -792,40 +834,61 @@ function GreatClock({ style, y, z }: { style: MuseumStyle; y: number; z: number 
         }}
         onClick={walkToTheEnd}
       >
-        <circleGeometry args={[R * 1.28, 48]} />
+        <circleGeometry args={[R * 1.2, 40]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-      {/* glazed face — daylight comes through the clock from outside */}
-      <mesh>
-        <circleGeometry args={[R * 0.86, 48]} />
-        <meshBasicMaterial color={p.sky} toneMapped={false} />
+
+      {/*
+       * The case, drawn. Unlit and alpha-tested rather than blended: the plate
+       * is mostly empty, and a blended transparent plane this size would have
+       * to be sorted against the glazing behind it every frame and would still
+       * pick the wrong order at some angles. An alpha test writes depth like
+       * any solid surface and the ornament occludes correctly.
+       */}
+      <mesh position={[0, dialOffset, 0.06]}>
+        <planeGeometry args={[plateW, plateH]} />
+        <meshBasicMaterial
+          map={face}
+          transparent
+          alphaTest={0.35}
+          toneMapped={false}
+          side={THREE.DoubleSide}
+        />
       </mesh>
-      {/* gilded surround, heavily ornamented */}
-      <mesh position={[0, 0, 0.03]} castShadow>
-        <torusGeometry args={[R * 0.9, 0.16, 10, 48]} />
-        <meshStandardMaterial color={p.gilt} metalness={0.82} roughness={0.32} />
+
+      {/*
+       * Two real rings over the drawn ones. The plate has all the ornament but
+       * no relief, and the clock is the one object in the room the camera
+       * approaches head-on for thirty seconds — so the outermost torus and the
+       * bezel around the glazing are geometry, and catch the light as the
+       * walk brings them nearer.
+       */}
+      <mesh position={[0, 0, 0.09]} castShadow>
+        <torusGeometry args={[R * 0.99, 0.075, 8, 56]} />
+        <meshStandardMaterial color={style.palette.gilt} metalness={0.85} roughness={0.28} />
       </mesh>
-      <mesh position={[0, 0, 0.01]}>
-        <torusGeometry args={[R * 1.12, 0.3, 10, 48]} />
-        <meshStandardMaterial color={p.gilt} metalness={0.7} roughness={0.4} />
+      <mesh position={[0, 0, 0.1]}>
+        <torusGeometry args={[R * 0.395, 0.05, 8, 48]} />
+        <meshStandardMaterial color={style.palette.gilt} metalness={0.85} roughness={0.3} />
       </mesh>
-      {/* radiating ornament between the two rings */}
-      <mesh position={[0, 0, -0.02]}>
-        <circleGeometry args={[R * 1.28, 48]} />
-        <meshStandardMaterial color={p.molding} roughness={0.75} />
-      </mesh>
-      <instancedMesh ref={ticks} args={[undefined, undefined, 12]}>
-        <boxGeometry args={[0.09, 0.3, 0.06]} />
-        <meshStandardMaterial color={p.gilt} metalness={0.8} roughness={0.3} />
-      </instancedMesh>
+
       {/* hands, stopped — a museum clock in a station that stopped being one */}
-      <mesh position={[0, R * 0.2, 0.08]} rotation={[0, 0, 0.35]}>
-        <boxGeometry args={[0.07, R * 0.62, 0.03]} />
-        <meshStandardMaterial color="#2A241C" roughness={0.6} />
+      <mesh position={[0, R * 0.17, 0.13]} rotation={[0, 0, 0.32]}>
+        <boxGeometry args={[0.055, R * 0.56, 0.025]} />
+        <meshStandardMaterial color="#241F18" roughness={0.55} />
       </mesh>
-      <mesh position={[R * 0.14, R * 0.1, 0.08]} rotation={[0, 0, -1.1]}>
-        <boxGeometry args={[0.06, R * 0.42, 0.03]} />
-        <meshStandardMaterial color="#2A241C" roughness={0.6} />
+      <mesh position={[R * 0.11, R * 0.08, 0.13]} rotation={[0, 0, -1.12]}>
+        <boxGeometry args={[0.05, R * 0.38, 0.025]} />
+        <meshStandardMaterial color="#241F18" roughness={0.55} />
+      </mesh>
+      {/* the seconds hand and the boss it turns on */}
+      <mesh position={[-R * 0.1, -R * 0.05, 0.14]} rotation={[0, 0, 0.9]}>
+        <boxGeometry args={[0.022, R * 0.5, 0.02]} />
+        <meshStandardMaterial color="#241F18" roughness={0.55} />
+      </mesh>
+      <mesh position={[0, 0, 0.15]}>
+        <cylinderGeometry args={[0.09, 0.09, 0.05, 12]} />
+        <meshStandardMaterial color={style.palette.gilt} metalness={0.85} roughness={0.25} />
       </mesh>
     </group>
   );
@@ -975,34 +1038,78 @@ export function Fixtures({ style, d }: Props) {
 
   if (f.spotTrack) {
     /*
-     * The spots themselves. The heads are drawn by the ceiling; these are the
-     * cones of light they throw, one per bay per wall, aimed at the hang.
+     * Picture lights: a warm head on a short arm above each painting, and the
+     * cone it throws down onto it.
+     *
+     * These used to sit on the centre line and fire outward at both walls,
+     * which is the one place a gallery never puts them — the throw is long,
+     * the angle is flat, and the canvas gets an even wash with the frame
+     * casting nothing. Standing them a metre and a half off the wall at the
+     * top of it and aiming steeply down gives the short raking throw that
+     * actually lights a picture: bright in the middle, falling off at the
+     * edges, the moulding of the frame in relief, and darkness between one
+     * bay and the next.
      *
      * A spotlight is the most expensive kind of light in three.js — it needs
-     * its own shadow frustum — so these do not cast: the room's key light
-     * does that, and what these are for is the hard warm pool on a canvas and
-     * the darkness between.
+     * its own shadow frustum — so these do not cast. What they are for is the
+     * pool on the canvas and the dark between.
      */
+    const armY = d.wallHeight - 0.55;
+    const armX = d.halfWidth - 1.45;
     for (let b = 0; b < d.bays; b++) {
       for (const side of [-1, 1]) {
         nodes.push(
-          <spotLight
-            key={`sp${b}${side}`}
-            position={[0, d.wallHeight - 0.8, bayZ(d, b)]}
-            color={style.light.lamp}
-            intensity={style.light.lampIntensity}
-            angle={0.42}
-            penumbra={0.7}
-            distance={d.halfWidth * 3}
-            decay={1.5}
+          <group key={`sp${b}${side}`} position={[side * armX, armY, bayZ(d, b)]}>
+            <spotLight
+              color={style.light.lamp}
+              intensity={style.light.lampIntensity}
+              angle={0.5}
+              penumbra={0.62}
+              distance={d.wallHeight * 2.2}
+              decay={1.5}
+            >
+              {/* the target has to be IN the scene graph for its world matrix
+                  to update, and a light's own child is the simplest place */}
+              <object3D
+                attach="target"
+                position={[side * (1.45 - 0.28), hangTop(d, style) - 0.75 - armY, 0]}
+              />
+            </spotLight>
+            <SpotHead lamp={style.light.lamp} metal={p.molding} side={side} />
+          </group>,
+        );
+
+        /*
+         * And the pool itself, painted on the wall.
+         *
+         * A spotlight in three.js lights a surface correctly and looks like
+         * almost nothing: the falloff is smooth, the cone edge lands where
+         * the geometry does, and at the intensity where you can see it on the
+         * canvas the wall around it is blown out. What reads as a lamp
+         * pointing at a picture is the shape of the light on the wall behind
+         * it — brighter above where the head is, fading below — so that is
+         * drawn, additively, the same way the daylight pools on the floors of
+         * the other rooms are. The spotlight above still does the modelling;
+         * this does the seeing.
+         */
+        nodes.push(
+          <mesh
+            key={`pool${b}${side}`}
+            position={[side * (d.halfWidth - 0.07), hangTop(d, style) - 0.55, bayZ(d, b)]}
+            rotation={[0, side * -Math.PI / 2, 0]}
+            renderOrder={2}
           >
-            {/* the target has to be IN the scene graph for its world matrix to
-                update, and a light's own child is the simplest place for it */}
-            <object3D
-              attach="target"
-              position={[side * (d.halfWidth - 0.4), hangTop(d, style) - 1.0 - (d.wallHeight - 0.8), 0]}
+            <planeGeometry args={[d.bayDepth * 0.92, d.wallHeight * 0.78]} />
+            <meshBasicMaterial
+              map={glowTexture()}
+              color={style.light.lamp}
+              transparent
+              opacity={0.3}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              toneMapped={false}
             />
-          </spotLight>,
+          </mesh>,
         );
       }
     }

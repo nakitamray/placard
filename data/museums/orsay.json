@@ -3,9 +3,9 @@
   "name": "Musée d'Orsay",
   "city": "Paris",
   "homepage": "https://www.musee-orsay.fr/en",
-  "subtitle": "The central nave",
-  "blurb": "A railway station turned gallery: arched steel and glass overhead, carved stone terraces, the great clock at the end.",
-  "corridorNote": "Modelled on the vast central nave of the Gare d'Orsay. A colossal vaulted roof of arched steel and glass floods the hall with daylight; the walls and archways are light carved stone set with deep rosettes; raised galleries with modern glass railings flank a wide central promenade; and the enormous gilded clock hangs at the far end, which is where the corridor's vanishing point lands.",
+  "subtitle": "The central nave, after sunset",
+  "blurb": "A railway station turned gallery: arched steel and glass overhead, the sky going out through it, and the pictures picked out one at a time.",
+  "corridorNote": "Modelled on the vast central nave of the Gare d'Orsay, at the end of the day. The colossal vaulted roof of arched steel and glass is dark now and you can see the first stars through it; the carved stone of the walls and archways holds what is left of the blue; and the light in the hall comes from the picture lamps on their short arms, one over each canvas, tungsten and warm, with the dark between them. The enormous gilded clock still hangs at the far end, which is where the corridor's vanishing point lands.",
   "style": {
     "ceiling": "steel-glass-arch",
     "floor": "promenade",
@@ -18,36 +18,36 @@
     "bays": 10,
     "bayDepth": 5.4,
     "palette": {
-      "wall": "#CFC5B2",
-      "wallDeep": "#B0A692",
-      "molding": "#E6DFCE",
+      "wall": "#6F6A5C",
+      "wallDeep": "#514E44",
+      "molding": "#8A8676",
       "gilt": "#C9A227",
-      "ceiling": "#EAF1F7",
-      "ceilingAccent": "#CFD7DE",
-      "floor": "#CAC2B3",
-      "floorInlay": "#A79C89",
-      "accent": "#BEB5A1",
-      "sky": "#F6FAFF"
+      "ceiling": "#1A2138",
+      "ceilingAccent": "#5A6070",
+      "floor": "#4E4C44",
+      "floorInlay": "#3C3A34",
+      "accent": "#5E5A4E",
+      "sky": "#7C93C8"
     },
     "light": {
-      "key": "#FFFAF0",
-      "keyIntensity": 3.0,
+      "key": "#8FA6D6",
+      "keyIntensity": 0.16,
       "keyFrom": [
-        -5,
-        24,
-        8
+        -4,
+        26,
+        10
       ],
-      "sky": "#EAF3FC",
-      "ground": "#7C7362",
-      "ambient": 0.7,
-      "lamp": "#FFE2B2",
-      "lampIntensity": 5,
-      "exposure": 1.06,
-      "background": "#3B3830",
+      "sky": "#6B84BC",
+      "ground": "#2A2822",
+      "ambient": 0.075,
+      "lamp": "#FFC98C",
+      "lampIntensity": 55,
+      "exposure": 1.0,
+      "background": "#0B0E18",
       "fog": [
-        "#5A564A",
-        66,
-        175
+        "#111624",
+        54,
+        168
       ]
     },
     "fixtures": {
@@ -56,7 +56,10 @@
       "chandeliers": false,
       "placards": true,
       "clock": true,
-      "terraces": true
+      "terraces": true,
+      "dusk": true,
+      "spotTrack": true,
+      "glazedEnd": true
     }
   },
   "plan": {

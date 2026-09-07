@@ -37,6 +37,7 @@ import { Floor, Walls } from './corridor/Surfaces';
 import { Fixtures } from './corridor/Fixtures';
 import { bayZ, dimsFor, hangHeight, workMaxHeight, type Dims } from './corridor/dims';
 import { Atmosphere } from './corridor/Atmosphere';
+import { duskWallSkyTexture } from './corridor/nightsky';
 import type { ArtworkIndexEntry, MuseumData } from '../types';
 import type { Quality } from '../lib/quality';
 import { useShadowRefresh } from '../render/shadows';
@@ -413,12 +414,23 @@ function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
           // a window, not a wall: the light at the end of the corridor is
           // outside, which is what makes a covered court read as a courtyard.
           // Tone-mapped, or an unclamped plane this size washes out the room.
-          <meshBasicMaterial color={p.sky} />
+          // At dusk it carries the actual sky, because at that hour the end of
+          // the nave is the darkest thing in it and a flat tint reads as paper.
+          <meshBasicMaterial
+            map={museum.style.fixtures.dusk ? duskWallSkyTexture() : null}
+            color={museum.style.fixtures.dusk ? '#FFFFFF' : p.sky}
+          />
         ) : (
           <meshStandardMaterial color={p.wallDeep} roughness={0.86} />
         )}
       </mesh>
-      {museum.style.fixtures.glazedEnd && <EndGlazing d={d} colour={p.molding} />}
+      {museum.style.fixtures.glazedEnd && (
+        <EndGlazing
+          d={d}
+          colour={museum.style.fixtures.dusk ? '#2E2C2A' : p.molding}
+          fine={museum.style.fixtures.dusk}
+        />
+      )}
       {!museum.style.fixtures.clock && (
         <group position={[0, hangHeight(d) + 0.5, d.apseZ + 0.1]}>
           <mesh position={[0, 0, -0.02]}>
@@ -466,28 +478,51 @@ function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
   );
 }
 
-/** The mullion grid over a glazed corridor end. */
-function EndGlazing({ d, colour }: { d: Dims; colour: string }) {
+/**
+ * The mullion grid over a glazed corridor end.
+ *
+ * `fine` is the station window rather than the museum one: iron rather than
+ * stone, so the bars are a third the thickness and there are three times as
+ * many of them. What makes a wall of glass read as a wall of glass is the
+ * count — a coarse grid of thick bars is a set of windows, a fine grid of
+ * thin ones is a single glazed screen with a building's worth of sky behind
+ * it — and thin dark bars against a lit sky cost almost nothing to draw.
+ */
+function EndGlazing({ d, colour, fine }: { d: Dims; colour: string; fine?: boolean }) {
   const w = d.halfWidth * 2.1;
   const h = d.vaultHeight + 1;
-  const cols = Math.round(w / 1.15);
-  const rows = Math.round(h / 1.35);
+  const pitch = fine ? 0.46 : 1.15;
+  const bar = fine ? 0.032 : 0.09;
+  const cols = Math.round(w / pitch);
+  const rows = Math.round(h / (fine ? 0.52 : 1.35));
   const bars: React.ReactNode[] = [];
   for (let i = 1; i < cols; i++) {
     bars.push(
       <mesh key={`c${i}`} position={[-w / 2 + (i / cols) * w, h / 2, d.apseZ + 0.06]}>
-        <boxGeometry args={[0.09, h, 0.09]} />
-        <meshStandardMaterial color={colour} roughness={0.6} />
+        <boxGeometry args={[bar, h, bar]} />
+        <meshStandardMaterial color={colour} roughness={0.6} metalness={fine ? 0.5 : 0} />
       </mesh>,
     );
   }
   for (let j = 1; j < rows; j++) {
     bars.push(
       <mesh key={`r${j}`} position={[0, (j / rows) * h, d.apseZ + 0.06]}>
-        <boxGeometry args={[w, 0.09, 0.09]} />
-        <meshStandardMaterial color={colour} roughness={0.6} />
+        <boxGeometry args={[w, bar, bar]} />
+        <meshStandardMaterial color={colour} roughness={0.6} metalness={fine ? 0.5 : 0} />
       </mesh>,
     );
+  }
+  /* the heavier verticals every sixth light, which is what stops a fine grid
+     reading as graph paper */
+  if (fine) {
+    for (let i = 6; i < cols; i += 6) {
+      bars.push(
+        <mesh key={`m${i}`} position={[-w / 2 + (i / cols) * w, h / 2, d.apseZ + 0.07]}>
+          <boxGeometry args={[0.075, h, 0.075]} />
+          <meshStandardMaterial color={colour} roughness={0.55} metalness={0.5} />
+        </mesh>,
+      );
+    }
   }
   return <>{bars}</>;
 }
@@ -601,10 +636,17 @@ function Lamps({
     }
   }
 
-  // Every point light is evaluated per fragment across every lit surface in
-  // the room, so the count is a budget rather than a look: they are spread
-  // evenly down the corridor and thinned rather than truncated.
-  if (!museum.style.fixtures.chandeliers) {
+  /*
+   * Every point light is evaluated per fragment across every lit surface in
+   * the room, so the count is a budget rather than a look: they are spread
+   * evenly down the corridor and thinned rather than truncated.
+   *
+   * Not where the pictures have their own lamps, though. A row of lights down
+   * the middle is the exact opposite of what a track of spots is for: it
+   * fills in the dark between the bays, flattens the canvas the spot was
+   * raking, and leaves a room that has been lit twice and reads as neither.
+   */
+  if (!museum.style.fixtures.chandeliers && !museum.style.fixtures.spotTrack) {
     const step = Math.max(2, Math.ceil(d.bays / quality.maxLamps));
     for (let b = 0; b < d.bays; b += step) {
       lights.push(
@@ -625,7 +667,13 @@ function Lamps({
       <pointLight
         position={[0, d.wallHeight * 0.62, d.apseZ + 2.4]}
         color={l.lamp}
-        intensity={l.lampIntensity * 2.6 + 8}
+        /* the glow at the far end is what gives the corridor its depth, but in
+           a room lit only by picture lights the same lamp is a bonfire */
+        intensity={
+          museum.style.fixtures.spotTrack
+            ? l.lampIntensity * 0.8 + 2
+            : l.lampIntensity * 2.6 + 8
+        }
         distance={d.bayDepth * 3}
         decay={1.7}
       />

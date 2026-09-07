@@ -65,6 +65,20 @@ interface Body {
   degree: number;
   /** the direction it was seeded in — where it waits until it is found */
   dir: THREE.Vector3;
+  /**
+   * How much room it clears around itself, and how hard the middle holds it.
+   *
+   * Both come from its degree, and they pull opposite ways on purpose. A
+   * painter joined to nine things clears a wider space than a place joined to
+   * one, and is at the same time held closer to the centre — so the busy part
+   * of the collection compacts into a core with gaps in it, and the single
+   * links trail off it in strands. With one value for every node the layout
+   * has nothing to make a shape out of and settles into the even disc it had.
+   */
+  rep: number;
+  hold: number;
+  /** a small constant shove in its own seed direction: see DRIFT */
+  drift: THREE.Vector3;
 }
 
 /** deterministic 0..1 from an id, so the map is the same shape every visit */
@@ -78,13 +92,21 @@ function hash01(s: string, salt: number): number {
 }
 
 /*
- * The layout, in five numbers.
+ * The layout.
  *
- * They are here together because they only make sense together: repulsion
+ * These are here together because they only make sense together: repulsion
  * spreads, springs gather, the centre pull holds the whole thing in one
  * place, and MAP_RADIUS is the size the result is then normalised to — which
  * is what stops the map changing shape every time the exhibition gains a
  * work.
+ *
+ * The rest of them exist because those four alone make one shape, and it is
+ * a disc. Symmetric forces and a single value per node give a layout nothing
+ * to vary, and what came out was even to look at and dull to turn. So the
+ * strength of the centre pull differs by axis and by how connected a node is,
+ * links differ in the length they want, and every node carries a small fixed
+ * shove of its own. None of it is random at run time — it is all hashed off
+ * the ids, so the map is the same shape every visit.
  */
 /** how hard every node pushes every other */
 const REPEL = 21;
@@ -94,16 +116,53 @@ const CENTRE_PULL = 0.8;
 const SPRING_LENGTH = 2.4;
 const SPRING_K = 3.2;
 /**
+ * How much a link's ideal length varies.
+ *
+ * Every edge wanting the same length is the other half of why the old map
+ * looked knitted rather than grown. A link between two hubs has to span the
+ * space both of them have cleared, and a link out to a leaf does not — so
+ * length scales with the degrees at the two ends, and a deterministic jitter
+ * on top keeps even the equal cases from lining up.
+ */
+const SPRING_SPREAD = 0.13;
+const SPRING_JITTER = 0.58;
+/**
  * How hard the map is pressed toward its own plane.
  *
  * A graph laid out in a free three dimensions projects to a screen as a mess
- * of crossings: every edge that is merely passing behind another one reads as
- * an edge crossing it, and thirty of those is a scribble. Pressed most of the
- * way flat, the web reads as a web — and the depth that is left is enough
- * that turning it still shows you something, which is the whole reason it is
- * a map you can turn rather than a diagram.
+ * of crossings: every edge merely passing behind another reads as an edge
+ * crossing it, and thirty of those is a scribble. Pressed nearly flat it
+ * stops being a scribble and starts being a diagram — which is the opposite
+ * failure, and the one this had. So the press is now light, and the depth is
+ * held in check by PULL_Z instead: the cloud is about half as deep as it is
+ * wide, which is enough that turning it genuinely reveals structure and
+ * little enough that the near edges stay readable.
  */
-const FLATTEN = 2.2;
+const FLATTEN = 0.5;
+/**
+ * How much of the centre pull acts along each axis.
+ *
+ * A pull of equal strength in three directions makes a ball, and a ball seen
+ * from anywhere is the same silhouette. Held harder vertically than
+ * horizontally and softest of all in depth, the same web settles into a
+ * lopsided ovoid that is wider than it is tall and shallower than it is wide
+ * — so turning it changes what you are looking at rather than rotating a
+ * picture of it.
+ */
+const PULL_Y = 1.3;
+const PULL_Z = 0.5;
+/**
+ * A constant nudge, per node, in the direction it was seeded in.
+ *
+ * Everything else here is symmetric: repulsion has no preferred direction,
+ * the springs pull along themselves, the centre pull is radial. Symmetric
+ * forces make symmetric shapes, and the map looked machined. This is the one
+ * asymmetry — a fixed small push whose size differs per node and whose
+ * direction is the node's own — and it is what turns an even cloud into one
+ * with lobes and hollows. Deterministic, so the map is still the same shape
+ * every visit.
+ */
+const DRIFT = 1.7;
 /** the radius the settled cloud is eased to, in world units */
 const MAP_RADIUS = 9.5;
 /** how many steps the layout is run before the map is first drawn */
@@ -127,12 +186,19 @@ function seedBodies(graph: AtlasGraph): Body[] {
     const r = 9 + hash01(n.id, 3) * 5;
     const s = Math.sqrt(1 - u * u);
     const dir = new THREE.Vector3(s * Math.cos(t), s * Math.sin(t) * 0.7, u).normalize();
+    const degree = (graph.around.get(n.id) ?? []).length;
+    // 0 for a node joined to one thing, 1 for one joined to nine or more —
+    // past that the difference stops being worth more space
+    const busy = Math.min(1, Math.sqrt(Math.max(0, degree - 1) / 8));
     return {
       id: n.id,
       p: dir.clone().multiplyScalar(r),
       v: new THREE.Vector3(),
-      degree: (graph.around.get(n.id) ?? []).length,
+      degree,
       dir,
+      rep: 0.72 + busy * 0.95,
+      hold: 0.78 + busy * 0.85,
+      drift: dir.clone().multiplyScalar(DRIFT * (0.25 + hash01(n.id, 5))),
     };
   });
 }
@@ -249,15 +315,22 @@ function Graph({
    * the map tightens into groups as you discover it.
    */
   const springs = useMemo(() => {
-    const out: Array<[number, number]> = [];
+    const out: Array<[number, number, number]> = [];
     for (const l of graph.links) {
       if (!found.has(linkKey(l))) continue;
       const ia = index.get(l.a);
       const ib = index.get(l.b);
-      if (ia !== undefined && ib !== undefined) out.push([ia, ib]);
+      if (ia === undefined || ib === undefined) continue;
+      // the third number is what this particular link would like to be — see
+      // SPRING_SPREAD
+      const busy = bodies[ia].degree + bodies[ib].degree;
+      const rest =
+        SPRING_LENGTH *
+        (1 + SPRING_SPREAD * Math.sqrt(busy) + SPRING_JITTER * (hash01(linkKey(l), 7) - 0.5));
+      out.push([ia, ib, rest]);
     }
     return out;
-  }, [graph, found, index]);
+  }, [graph, found, index, bodies]);
 
   /** which bodies are discovered, by index — the ones the fit is measured on */
   const knownBody = useMemo(() => bodies.map((b) => found.has(b.id)), [bodies, found]);
@@ -328,7 +401,7 @@ function Graph({
         const dy = a.p.y - b.p.y;
         const dz = a.p.z - b.p.z;
         const d2 = dx * dx + dy * dy + dz * dz + 0.6;
-        const f = REPEL / d2;
+        const f = (REPEL * a.rep * b.rep) / d2;
         const d = Math.sqrt(d2);
         a.v.x += (dx / d) * f * dt;
         a.v.y += (dy / d) * f * dt;
@@ -337,22 +410,32 @@ function Graph({
         b.v.y -= (dy / d) * f * dt;
         b.v.z -= (dz / d) * f * dt;
       }
-      // a pull to the middle, which is what keeps the map one object rather
-      // than a field of things that happen to be near each other
-      a.v.addScaledVector(a.p, -CENTRE_PULL * dt);
-      // and the press toward the plane — see FLATTEN
+      /*
+       * The pull to the middle, which is what keeps the map one object rather
+       * than a field of things that happen to be near each other — but not
+       * the same pull in every direction or on every node. Its strength
+       * differs per axis (PULL_Y, PULL_Z) so the settled cloud is an ovoid
+       * rather than a ball, and per node (hold) so the well-connected sit in
+       * the core and the sparsely joined trail off it.
+       */
+      const k = CENTRE_PULL * a.hold * dt;
+      a.v.x -= a.p.x * k;
+      a.v.y -= a.p.y * k * PULL_Y;
+      a.v.z -= a.p.z * k * PULL_Z;
+      // the press toward the plane — see FLATTEN — and the one asymmetry
       a.v.z -= a.p.z * FLATTEN * dt;
+      a.v.addScaledVector(a.drift, dt);
     }
 
     // springs, on the edges the visitor can actually see
-    for (const [ia, ib] of springs) {
+    for (const [ia, ib, rest] of springs) {
       const a = bodies[ia];
       const b = bodies[ib];
       const dx = b.p.x - a.p.x;
       const dy = b.p.y - a.p.y;
       const dz = b.p.z - a.p.z;
       const d = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001;
-      const f = (d - SPRING_LENGTH) * SPRING_K * dt;
+      const f = (d - rest) * SPRING_K * dt;
       a.v.x += (dx / d) * f;
       a.v.y += (dy / d) * f;
       a.v.z += (dz / d) * f;
