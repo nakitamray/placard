@@ -583,11 +583,10 @@ not there, or a floor plan with a room too many, fails the deploy rather than
 publishing a broken room. Warnings — a work still on a stand-in, a scan whose
 proportions do not match its catalogue — do not.
 
-Two things worth setting in the project's environment variables, both optional:
-`VITE_CONTACT_EMAIL` if the form should reach an address other than the one in
-the source, and `VITE_CONTACT_ENDPOINT` if it should POST rather than open a
-mail client. Neither is a secret; both are compiled into the bundle, which is
-why the address is never rendered anywhere in the interface.
+Set `VITE_CONTACT_ENDPOINT` in the project's environment variables if you want
+the contact form. Without it — or `VITE_CONTACT_EMAIL` — the form is not
+rendered at all, because a form that goes nowhere is worse than no form. See
+[Contact form](#contact-form) for which of the two to use.
 
 **If six minutes a deploy becomes annoying**, the fix is to stop rebuilding
 what did not change: commit `public/artworks` and `public/museums` (they are
@@ -628,19 +627,28 @@ repository variable for a custom domain (use `/`). On Vercel, leave it alone.
 
 ## Contact form
 
-The **About** tab of the Colophon carries a three-field form. Out of the box it
-composes a `mailto:` to `VITE_CONTACT_EMAIL` and hands it to the visitor's own
-mail client — no account anywhere, works the moment it ships. To have messages
-arrive without the visitor needing a mail client, point one environment
-variable at a form endpoint (Formspree, Getform, Basin, or a function of your
-own) and the form POSTs JSON to it instead:
+The **About** tab of the Colophon carries a three-field form. It needs one of
+two environment variables, and with neither it does not render.
 
 ```
-VITE_CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx
+VITE_CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx   # POSTs JSON, address stays private
+VITE_CONTACT_EMAIL=you@example.com                      # composes a mailto:
 ```
 
-Vite inlines `VITE_`-prefixed variables at build time, so a change needs a
-redeploy.
+**Prefer the endpoint.** Vite inlines `VITE_`-prefixed variables at build time,
+so whatever goes in one becomes a plain string in the shipped JavaScript — an
+address set here is readable by anyone who opens the bundle, and a crawler that
+reads `.js` files finds it as fast as one that reads HTML. `VITE_CONTACT_EMAIL`
+therefore publishes the address twice over: once in the bundle and once in the
+mail client it opens in front of the visitor. `VITE_CONTACT_ENDPOINT` publishes
+a form URL instead, and the address lives with the form service.
+
+Formspree, Getform and Basin all give a free endpoint that takes a JSON POST
+and forwards it to you. A serverless function of your own works too — anything
+that accepts `{ name, email, message }`.
+
+Because the substitution happens at build time, changing either one needs a
+redeploy, not just a restart.
 
 ## Known limits
 
