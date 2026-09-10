@@ -34,6 +34,7 @@ import { ArtworkPlane } from './ArtworkPlane';
 import { OrnateFrame } from './OrnateFrame';
 import { frameReach } from './frames';
 import { fitWork } from './fit';
+import { placardAnchor } from './placardAnchor';
 import { startReveal, endReveal, revealAnim } from '../transitions/reveal';
 import { closeLens, moveLens } from '../transitions/lens';
 import { discoverWork } from '../state/atlas';
@@ -93,9 +94,6 @@ const WALL_H = 6.2;
  * would, at the hero's radius, read as the painting simply coming back.
  */
 const LENS_RADIUS = 0.26;
-
-/** screen-space projection of the active plane for the DOM placard */
-export const placardAnchor = { x: 0, y: 0, edge: 0, visible: false };
 
 /** the warm end of the fill light; a constant, so it is made once */
 const FILL_WARM = new THREE.Color('#FFF3E0');

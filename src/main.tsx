@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import gsap from 'gsap';
 import App from './App';
 import './styles.css';
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // GSAP defaults to lagSmoothing(500, 33): any frame longer than 500ms is
 // treated as 33ms, which quietly converts wall-clock choreography into

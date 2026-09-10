@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { selectArtworks, useStore } from './state/store';
@@ -13,16 +13,12 @@ import {
   storedQuality,
   type QualityName,
 } from './lib/quality';
-import { CorridorScene } from './scenes/CorridorScene';
 import { LandingScene } from './scenes/LandingScene';
-import { GalleryScene } from './scenes/GalleryScene';
 import { Environment } from './scenes/Lighting';
 import { LandingLayer } from './ui/LandingLayer';
 import { MapOverlay } from './ui/MapOverlay';
 import { Placard } from './ui/Placard';
 import { RailIndicator } from './ui/RailIndicator';
-import { Credits } from './ui/Credits';
-import { AtlasView } from './ui/AtlasView';
 import { AtlasToast } from './ui/AtlasToast';
 import { ThreadPull } from './ui/ThreadPull';
 import { setThreadMode, toggleThreadMode } from './threadpull/state';
@@ -39,6 +35,30 @@ import { loadAtlas, useAtlas } from './state/atlas';
 import { FrameGovernor } from './render/frameGovernor';
 import { useCanvasLive } from './render/canvasGate';
 import type { MuseumIndexEntry } from './types';
+
+/**
+ * The rooms nobody has walked into yet.
+ *
+ * Everything below is real work — a procedural corridor, a gallery, a graph
+ * with its own WebGL canvas, a colophon that lists seventy sources — and none
+ * of it is on screen when the page opens. Bundled with the entrance it was
+ * a couple of hundred kilobytes of JavaScript that had to be downloaded,
+ * parsed and compiled before the first painting could be drawn, on the one
+ * screen where a visitor is deciding whether this is worth their time.
+ *
+ * Split out, each arrives while the visitor is doing the thing that leads to
+ * it — choosing a museum, opening a canvas, opening the map — which is a
+ * moment that already has a beat in it. The entrance is what loads first
+ * because the entrance is what you see first.
+ */
+const CorridorScene = lazy(() =>
+  import('./scenes/CorridorScene').then((m) => ({ default: m.CorridorScene })),
+);
+const GalleryScene = lazy(() =>
+  import('./scenes/GalleryScene').then((m) => ({ default: m.GalleryScene })),
+);
+const AtlasView = lazy(() => import('./ui/AtlasView').then((m) => ({ default: m.AtlasView })));
+const Credits = lazy(() => import('./ui/Credits').then((m) => ({ default: m.Credits })));
 
 export default function App() {
   const phase = useStore((s) => s.phase);
@@ -60,6 +80,7 @@ export default function App() {
 
   const [sound, setSoundOn] = useState(false);
   const atlasOpen = useAtlas((s) => s.open);
+  const creditsOpen = useStore((s) => s.creditsOpen);
   /* nothing is drawn while something opaque is over the canvas — see canvasGate */
   const canvasLive = useCanvasLive();
   /** the wall label is up: revealed by a click, not by a passing cursor */
@@ -127,11 +148,36 @@ export default function App() {
     };
   }, []);
 
-  // The atlas graph is in memory from the start: discovery is recorded the
-  // moment somebody walks into a room, which is long before they open the map.
+  /*
+   * The atlas graph, and the room the visitor is most likely to open next.
+   *
+   * Both are wanted soon and neither is wanted now, so both wait for the
+   * browser to run out of more important things to do. Discovery is recorded
+   * the moment somebody walks into a room — long before they open the map —
+   * so the graph has to be in memory well ahead of the map itself; and the
+   * corridor's code, fetched while the entrance is still being read, means
+   * choosing a museum opens a door rather than a blank frame.
+   *
+   * On `idle` rather than on mount because the first seconds belong to the
+   * painting behind the headline, which is the only thing anybody can see.
+   */
   useEffect(() => {
-    void loadAtlas();
-  }, []);
+    const warm = () => {
+      void loadAtlas();
+      if (phase === 'landing') void import('./scenes/CorridorScene');
+      if (phase === 'corridor' || phase === 'map') void import('./scenes/GalleryScene');
+    };
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      cancelIdleCallback?: (h: number) => void;
+    };
+    if (!w.requestIdleCallback) {
+      const t = window.setTimeout(warm, 1200);
+      return () => window.clearTimeout(t);
+    }
+    const h = w.requestIdleCallback(warm, { timeout: 4000 });
+    return () => w.cancelIdleCallback?.(h);
+  }, [phase]);
 
   useEffect(() => attachPointer(), []);
   // zoom is a gallery gesture; see attachZoom
@@ -323,8 +369,10 @@ export default function App() {
           {inGallery && <ThreadToggle />}
         </div>
       )}
-      <Credits />
-      <AtlasView />
+      <Suspense fallback={null}>
+        {creditsOpen && <Credits />}
+        {atlasOpen && <AtlasView />}
+      </Suspense>
       <AtlasToast />
       <FlashLayer />
       <CursorRing />
