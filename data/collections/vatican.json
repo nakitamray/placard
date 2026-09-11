@@ -94,7 +94,42 @@
         "#8C4A38"
       ],
       "seed": 32
-    }
+    },
+    "regions": [
+      {
+        "id": "christ",
+        "label": "Christ and the Virgin",
+        "box": [
+          0.3,
+          0.14,
+          0.7,
+          0.4
+        ],
+        "text": "A beardless, athletic Christ with his arm raised, and the Virgin turned in against his side, not interceding. The gesture has been argued about for five centuries: it is either the damning or the raising, and Michelangelo gave it no attribute that would settle it. Everything in the wall rotates around this one pair, which sits above the true centre."
+      },
+      {
+        "id": "damned",
+        "label": "The damned",
+        "box": [
+          0.44,
+          0.62,
+          1.0,
+          1.0
+        ],
+        "text": "Charon beating souls out of his boat with an oar, taken directly from Dante rather than from scripture, and Minos below with a serpent round him. The face of Minos is said to be Biagio da Cesena, the papal master of ceremonies who complained the fresco belonged in a bathhouse. Michelangelo is reported to have replied that he had no jurisdiction in hell."
+      },
+      {
+        "id": "bartholomew",
+        "label": "St Bartholomew",
+        "box": [
+          0.34,
+          0.44,
+          0.62,
+          0.68
+        ],
+        "text": "He holds his own flayed skin, as he always does, but the face on the empty skin is not his — it is a distorted self-portrait of Michelangelo, hanging limp in the middle of his own fresco. He was in his sixties, in a long crisis of faith, and he put himself into the picture as something a saint is carrying."
+      }
+    ]
   },
   {
     "id": "raphael-school-athens",
@@ -187,7 +222,42 @@
         "#B08A2E"
       ],
       "seed": 34
-    }
+    },
+    "regions": [
+      {
+        "id": "christ",
+        "label": "Christ above",
+        "box": [
+          0.16,
+          0.02,
+          0.86,
+          0.36
+        ],
+        "text": "Lifted off the mountain in white light with Moses and Elijah either side, and the three apostles thrown flat below. Raphael paints the light as the subject rather than as illumination: nothing here has a shadow that makes sense, because the source is the body itself. It is the last thing he worked on and it stood at the head of his coffin."
+      },
+      {
+        "id": "apostles",
+        "label": "The apostles below",
+        "box": [
+          0.0,
+          0.4,
+          0.62,
+          0.86
+        ],
+        "text": "Nine of them, arguing, gesturing at a book, unable to do anything — and the whole lower half is lit by ordinary daylight while the upper half is not. Two gospel episodes that occur one after the other are stacked in one frame, so the picture is about the distance between what is happening on the mountain and what is failing at the bottom of it."
+      },
+      {
+        "id": "boy",
+        "label": "The possessed boy",
+        "box": [
+          0.5,
+          0.44,
+          1.0,
+          0.92
+        ],
+        "text": "Eyes rolled back, arm twisted up, mouth open, being held by his father — and his raised arm points straight at the transfigured Christ, which nobody in the lower group has noticed. The one figure in the picture who cannot see is the only one aimed at the answer."
+      }
+    ]
   },
   {
     "id": "caravaggio-entombment",
@@ -220,7 +290,42 @@
         "#8E2E22"
       ],
       "seed": 35
-    }
+    },
+    "regions": [
+      {
+        "id": "stone",
+        "label": "The corner of the slab",
+        "box": [
+          0.16,
+          0.6,
+          0.86,
+          0.92
+        ],
+        "text": "The stone juts out of the picture toward the viewer, and the altar the painting hung over stood directly beneath it — so the body was being lowered onto the altar where the mass was said. Caravaggio builds the whole composition to make a physical claim about the room it is in. Nothing else in the picture is as far forward as that corner."
+      },
+      {
+        "id": "body",
+        "label": "The body",
+        "box": [
+          0.1,
+          0.42,
+          0.9,
+          0.76
+        ],
+        "text": "A dead weight held by two men who are clearly finding it heavy, with one hand slipping into the wound in the side. The arm hangs down, unsupported, the knuckles almost touching the stone. Caravaggio's models were street people, and the argument against him was always that his sacred figures had dirty feet."
+      },
+      {
+        "id": "arms",
+        "label": "The raised arms",
+        "box": [
+          0.4,
+          0.02,
+          0.9,
+          0.4
+        ],
+        "text": "Mary of Cleophas throws both arms straight up at the top of the picture — the only vertical gesture in a composition that otherwise falls continuously from top right to bottom left. Everything descends, and one woman goes the other way. Rubens copied the picture; so did Géricault and Cézanne."
+      }
+    ]
   },
   {
     "id": "leonardo-st-jerome",
@@ -249,7 +354,42 @@
         "#7A5E38"
       ],
       "seed": 36
-    }
+    },
+    "regions": [
+      {
+        "id": "head",
+        "label": "The head and the neck",
+        "box": [
+          0.24,
+          0.12,
+          0.66,
+          0.44
+        ],
+        "text": "The most finished part of an unfinished panel, and the anatomy underneath is visible in a way no completed painting shows: the sternocleidomastoid standing out of the neck, the hollow of the temple, the jaw of a man who has not eaten. Leonardo was dissecting by this date and the head is built from the inside out."
+      },
+      {
+        "id": "lion",
+        "label": "The lion",
+        "box": [
+          0.0,
+          0.62,
+          0.72,
+          1.0
+        ],
+        "text": "Jerome's lion, drawn in a few brown contours across the foreground and never painted. It is mid-roar and the body is a single sweeping line. At this stage the picture is a drawing on a prepared panel, and the lion shows exactly how much Leonardo settled before he started laying in paint — which is a great deal."
+      },
+      {
+        "id": "panel",
+        "label": "The bare ground",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.6
+        ],
+        "text": "Brown underpaint, the rock behind barely indicated, the sky unlaid. The panel was famously cut up at some point and used as a table and a cobbler's board, and the head was found separately — you can still see where it was rejoined. Leonardo left perhaps a fifth of what he began, and this is the clearest view anyone has of how he began it."
+      }
+    ]
   },
   {
     "id": "raphael-madonna-foligno",
@@ -278,7 +418,42 @@
         "#C08A34"
       ],
       "seed": 39
-    }
+    },
+    "regions": [
+      {
+        "id": "virgin",
+        "label": "The Virgin and Child",
+        "box": [
+          0.18,
+          0.04,
+          0.86,
+          0.4
+        ],
+        "text": "Seated in a golden disc of cloud with the Child twisting in her lap, high above a landscape. Raphael divides the panel firmly in two — heaven above, earth below — and then runs the glances across the join so the halves are held together by where people are looking rather than by anything in the design."
+      },
+      {
+        "id": "donor",
+        "label": "The donor",
+        "box": [
+          0.52,
+          0.44,
+          1.0,
+          0.94
+        ],
+        "text": "Sigismondo de' Conti, papal secretary, kneeling in red and presented by St Jerome, who has a hand on his head. He commissioned the altarpiece in thanks for surviving something that fell on his house — and the thing is painted in, small, in the sky over the town behind."
+      },
+      {
+        "id": "meteor",
+        "label": "The town and the fireball",
+        "box": [
+          0.0,
+          0.34,
+          0.6,
+          0.62
+        ],
+        "text": "A streak of fire coming down over Foligno in the middle distance, in a picture otherwise entirely composed of calm. It is the event the whole altarpiece exists because of, and Raphael gives it less than a hundredth of the surface — put behind the donor's shoulder at the size it would actually have appeared."
+      }
+    ]
   },
   {
     "id": "raphael-coronation-virgin",
@@ -307,7 +482,42 @@
         "#B4923A"
       ],
       "seed": 40
-    }
+    },
+    "regions": [
+      {
+        "id": "coronation",
+        "label": "The coronation",
+        "box": [
+          0.1,
+          0.02,
+          0.92,
+          0.36
+        ],
+        "text": "Christ setting the crown on his mother's head, seated on cloud with music either side. Raphael was about twenty and still working out of Perugino's shop, and the upper half is the part where that shows most — the sweetness, the tilted heads, the even spacing are all his master's."
+      },
+      {
+        "id": "apostles",
+        "label": "The apostles at the tomb",
+        "box": [
+          0.0,
+          0.44,
+          1.0,
+          0.92
+        ],
+        "text": "They are standing round an empty sarcophagus looking up, which is the join between the two halves: the reason the lower group is amazed is painted directly above them. Thomas holds the girdle she dropped. The figures nearest the front are already turning in a way Perugino's never do."
+      },
+      {
+        "id": "flowers",
+        "label": "The flowers in the tomb",
+        "box": [
+          0.24,
+          0.66,
+          0.8,
+          0.92
+        ],
+        "text": "Lilies and roses growing out of the empty sarcophagus, painted small and precisely at the bottom centre of the panel. It is the only still life in the picture and the only piece of physical evidence in it — everything above is testimony, and this is the thing left in the box."
+      }
+    ]
   },
   {
     "id": "bellini-lamentation",
@@ -408,6 +618,41 @@
         "#8E2A24"
       ],
       "seed": 38
-    }
+    },
+    "regions": [
+      {
+        "id": "jerome",
+        "label": "Jerome",
+        "box": [
+          0.16,
+          0.34,
+          0.62,
+          0.86
+        ],
+        "text": "Ninety-one years old, unable to stand, held up by two men so that he can receive communion one last time. Domenichino paints the failure of the body with no softening at all — the slack chest, the legs that are not taking weight — inside an altarpiece of enormous formal grandeur."
+      },
+      {
+        "id": "priest",
+        "label": "The host",
+        "box": [
+          0.44,
+          0.28,
+          0.86,
+          0.66
+        ],
+        "text": "St Ephrem holds out the wafer and the whole picture is arranged to arrive at the small white disc between his fingers. Poussin thought this one of the greatest paintings in Rome and studied it closely; two centuries later it was still being copied by students as the model of how to build an altarpiece."
+      },
+      {
+        "id": "lion",
+        "label": "The lion",
+        "box": [
+          0.0,
+          0.66,
+          0.44,
+          1.0
+        ],
+        "text": "Lying in the shadow at the bottom left, watching, entirely calm. Jerome's lion is a standing attribute, but Domenichino makes it an attendant at a deathbed rather than a symbol — it is at the correct distance for an animal that has known someone a long time and can see what is happening."
+      }
+    ]
   }
 ]

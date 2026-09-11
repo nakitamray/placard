@@ -18,11 +18,28 @@
  * IMPLEMENTATION
  *   Its own <Canvas>, mounted only while open, so nothing here can disturb
  *   the corridor's renderer or its render target. Layout is a plain
- *   force-directed simulation in `useFrame` — repulsion between every pair,
- *   springs along the edges, a weak pull to the middle — seeded from a hash of
- *   each id so the map has the same shape every time you open it. It settles
- *   and then stops: once the total energy falls below a floor the simulation
- *   costs nothing until something new appears.
+ *   force-directed simulation — repulsion between every pair, springs along
+ *   the edges, a weak pull to the middle — seeded from a hash of each id so
+ *   the map has the same shape every time you open it.
+ *
+ * THE LAYOUT IS SOLVED, NOT ANIMATED
+ *   It runs to completion before the map is ever drawn and then does not run
+ *   again. Nothing on screen moves unless the visitor moves it.
+ *
+ *   It used to keep stepping every frame, stopping only once the average
+ *   speed fell under a floor — and it never really got there, because each
+ *   node carries a small constant drift and the fit correction is always
+ *   easing the whole cloud toward its target radius. The result was a graph
+ *   that crept: names slid out from under the cursor, an edge you were
+ *   reading about changed length while you read, and nothing ever held still
+ *   long enough to be studied. A map of relationships is a diagram, and a
+ *   diagram that is still settling is asking you to chase it.
+ *
+ *   So the simulation lives entirely in the layout effect below, which runs
+ *   before paint whenever the discovered set changes, and the frame loop does
+ *   nothing but draw: node positions, edge endpoints, and the projection of
+ *   the labels. Turning and zooming still move — those are the visitor's, and
+ *   they are damped so they never snap.
  */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -293,7 +310,6 @@ function Graph({
    */
   const nodeRefs = useRef<Array<THREE.Mesh | null>>([]);
   const index = useMemo(() => new Map(bodies.map((b, i) => [b.id, i])), [bodies]);
-  const energy = useRef(1);
   const quietRef = useRef<THREE.LineSegments>(null);
 
   /**
@@ -372,25 +388,19 @@ function Graph({
   useEffect(() => () => lineGeo.dispose(), [lineGeo]);
   useEffect(() => () => hotGeo.dispose(), [hotGeo]);
 
-  // a new discovery wakes the simulation back up
-  useEffect(() => {
-    energy.current = 1;
-  }, [found]);
-
   /*
-   * One integration step, shared by the settle below and the frame loop.
+   * One integration step. Called only by the layout effect below, in a tight
+   * loop, off-screen — never from the frame loop.
    *
-   * It is a function rather than inline code in `useFrame` for one reason:
-   * the map has to arrive already laid out. Letting the simulation converge
+   * The map has to arrive already laid out. Letting the simulation converge
    * on screen means the first seconds of the atlas are a cloud of nodes
-   * drifting into place, and — because the energy test stops the loop when
-   * the average speed is low rather than when the layout is finished — a
-   * sparse graph freezes half-settled and stays that way. Three hundred steps
-   * before the first frame costs a few milliseconds and the map opens
-   * composed.
+   * drifting into place, and it never stops drifting afterwards either: each
+   * node carries a constant drift and the fit correction below is permanently
+   * easing the cloud toward its target radius, so there is no state this
+   * reaches in which nothing is moving. Solving it in one go and then leaving
+   * it alone is the only way the diagram holds still.
    */
   const step = (dt: number) => {
-    let moved = 0;
     // repulsion, over the discovered web only — every pair of it, which is at
     // most a few thousand and usually far fewer
     for (let ii = 0; ii < live.length; ii++) {
@@ -448,9 +458,7 @@ function Graph({
       const b = bodies[i];
       b.v.multiplyScalar(0.86);
       b.p.addScaledVector(b.v, dt * 6);
-      moved += b.v.lengthSq();
     }
-    energy.current = live.length ? moved / live.length : 0;
 
     /*
      * Keep the map centred on the origin and the same size, whatever it holds.
@@ -486,18 +494,27 @@ function Graph({
     }
   };
 
-  /* Settle it before it is ever drawn, and again whenever a discovery
-     changes what the map is a picture of. */
+  /*
+   * The whole simulation, run here and nowhere else.
+   *
+   * In a layout effect, so it completes before the browser paints: the map is
+   * never seen mid-solve, on the first opening or on any later one. It runs
+   * again only when `live` or `springs` change — that is, when the visitor has
+   * discovered something and the map is a picture of a different graph than it
+   * was. Three hundred and twenty steps is a few milliseconds.
+   */
   useLayoutEffect(() => {
     for (let i = 0; i < SETTLE_STEPS; i++) step(1 / 60);
-    energy.current = 0.02;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [live, springs]);
 
-  useFrame((_, delta) => {
-    const dt = Math.min(delta, 0.05);
-    // a settled map still breathes toward its fit; a disturbed one re-settles
-    if (energy.current > 0.00015) step(dt);
+  useFrame(() => {
+    /*
+     * No integration here. The layout was solved before the first frame and
+     * is solved again, off-screen, whenever the discovered set changes — see
+     * the note at the top of this file. What follows only draws what is
+     * already decided.
+     */
 
     // the nodes themselves, moved from the simulation rather than from React
     for (let i = 0; i < bodies.length; i++) {

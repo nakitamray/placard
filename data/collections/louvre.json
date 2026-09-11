@@ -162,7 +162,42 @@
         "#A81E22"
       ],
       "seed": 13
-    }
+    },
+    "regions": [
+      {
+        "id": "crowning",
+        "label": "The crowning",
+        "box": [
+          0.36,
+          0.16,
+          0.68,
+          0.88
+        ],
+        "text": "Napoleon has already crowned himself and is raising the second crown over Joséphine, kneeling. David's first design showed the self-coronation directly and it was abandoned: an emperor putting a crown on his own head is the truth of the event and unusable as a picture. Crowning his wife makes the same point about where the authority came from, and lets everyone in the room keep their dignity."
+      },
+      {
+        "id": "pope",
+        "label": "Pius VII",
+        "box": [
+          0.58,
+          0.26,
+          0.8,
+          0.78
+        ],
+        "text": "The Pope is seated behind the Emperor's shoulder, and in the first version his hands rested in his lap. Napoleon is said to have objected that he had not brought the man from Rome to do nothing, so a blessing was painted in. Either way he is behind, and seated, and smaller, which is the whole argument of the picture made as a matter of staging rather than of doctrine."
+      },
+      {
+        "id": "tribune",
+        "label": "The tribune",
+        "box": [
+          0.28,
+          0.03,
+          0.52,
+          0.32
+        ],
+        "text": "Letizia Bonaparte sits in the gallery, watching her son. She was not at Notre-Dame — she stayed away over the quarrel with Lucien — and David put her in at the Emperor's instruction. It is the one openly false thing in a painting otherwise obsessed with the accuracy of its buttons, and it is placed at the exact centre of the upper half."
+      }
+    ]
   },
   {
     "id": "gericault-raft-medusa",
@@ -259,7 +294,42 @@
         "#B8912F"
       ],
       "seed": 15
-    }
+    },
+    "regions": [
+      {
+        "id": "musicians",
+        "label": "The musicians",
+        "box": [
+          0.36,
+          0.54,
+          0.64,
+          0.94
+        ],
+        "text": "A consort in white at the very front of the picture, playing viols and a cornetto, with an hourglass on the table between them. Tradition names them as Venetian painters — Veronese himself, Titian on the bass viol, Tintoretto — and the identification is not documented anywhere before the eighteenth century. The hourglass is the part that is certainly meant: time running, at a feast, in front of the man about to be told his hour has not yet come."
+      },
+      {
+        "id": "christ",
+        "label": "Christ at the table",
+        "box": [
+          0.4,
+          0.3,
+          0.6,
+          0.58
+        ],
+        "text": "He is exactly at the centre, frontal, haloed, and almost impossible to find. A hundred and thirty figures are between us and him, all of them louder — turbans, dwarfs, greyhounds, a man carving meat on the balcony. Veronese was hauled before the Inquisition over a different painting for precisely this habit, and told them a painter takes the same licence as a poet or a madman."
+      },
+      {
+        "id": "balustrade",
+        "label": "The balustrade",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.3
+        ],
+        "text": "Above the feast the architecture opens onto sky, and the wedding turns out to be happening in a Palladian courtyard in Venice rather than in a village in Galilee. Nobody in the picture is dressed for the first century. This is a Venetian banquet with a gospel title, painted for the refectory of San Giorgio Maggiore so that the monks eating below could see themselves at the table."
+      }
+    ]
   },
   {
     "id": "david-oath-horatii",
@@ -292,7 +362,42 @@
         "#A32820"
       ],
       "seed": 16
-    }
+    },
+    "regions": [
+      {
+        "id": "brothers",
+        "label": "The three brothers",
+        "box": [
+          0.06,
+          0.22,
+          0.46,
+          0.94
+        ],
+        "text": "Three bodies making one shape: legs braced in a single rank, three arms out along one line. They are lit like sculpture and drawn with no softness anywhere — the contour of a calf here is as hard as the edge of the column behind it. Exhibited in 1785, four years before the Revolution, and read ever since as its advance notice, though David painted it on a royal commission in Rome."
+      },
+      {
+        "id": "swords",
+        "label": "The swords",
+        "box": [
+          0.4,
+          0.22,
+          0.64,
+          0.52
+        ],
+        "text": "The exact centre of the picture is a fist holding three blades, and the vanishing point of the whole perspective sits on it. Everything in the room — the floor tiles, the arches, the shadows — is arranged to arrive there. There is no oath like this in Livy or in Corneille. David invented the gesture, and it has been the image of a vow being taken ever since."
+      },
+      {
+        "id": "women",
+        "label": "The women",
+        "box": [
+          0.58,
+          0.38,
+          0.98,
+          0.98
+        ],
+        "text": "They occupy the third arch, seated, collapsed into curves, in a painting where every other line is straight. One of them is a Horatia betrothed to a Curiatius; one is a Curiatia married to a Horatius. Whoever wins, they lose, and they already know it while the men are still swearing. David gives them the whole right-hand third and not one straight edge."
+      }
+    ]
   },
   {
     "id": "vermeer-lacemaker",
@@ -325,7 +430,42 @@
         "#C8A02A"
       ],
       "seed": 17
-    }
+    },
+    "regions": [
+      {
+        "id": "hands",
+        "label": "The hands",
+        "box": [
+          0.32,
+          0.4,
+          0.74,
+          0.7
+        ],
+        "text": "The one place in the painting that is in focus. Bobbins, pins and the thread pinched between finger and thumb are drawn with a precision found nowhere else on the panel — not on her face, not on the cushion, not on her own sleeve. Vermeer has reproduced not the scene but the way a person attending to close work actually sees it, with everything outside the task going soft."
+      },
+      {
+        "id": "threads",
+        "label": "The red and white threads",
+        "box": [
+          0.0,
+          0.52,
+          0.34,
+          0.94
+        ],
+        "text": "Spilling out of the blue sewing cushion in the foreground, and painted wet-in-wet with no drawing underneath — loose skeins of pure colour that resolve into thread only at the distance the picture is meant to be seen from. It is the most abstract passage in seventeenth-century Dutch painting and it is nine centimetres across, in the corner, out of focus on purpose."
+      },
+      {
+        "id": "face",
+        "label": "The bowed head",
+        "box": [
+          0.34,
+          0.06,
+          0.76,
+          0.4
+        ],
+        "text": "She does not look up and there is no invitation to us anywhere in the picture. That is the subject: a person entirely inside a task, painted by a man who wanted you to recognise the state rather than the woman. At twenty-four by twenty-one centimetres this is the smallest thing Vermeer left, and Renoir thought it the most beautiful painting in the world."
+      }
+    ]
   },
   {
     "id": "ingres-grande-odalisque",
@@ -354,7 +494,42 @@
         "#2E4C6E"
       ],
       "seed": 18
-    }
+    },
+    "regions": [
+      {
+        "id": "back",
+        "label": "The length of the back",
+        "box": [
+          0.18,
+          0.26,
+          0.72,
+          0.84
+        ],
+        "text": "The critics counted the vertebrae and decided there were three too many. They were right — the spine is extended, the pelvis rotated in a way no pelvis rotates, the left arm longer than the right. Ingres was not failing at anatomy; he was a supreme draughtsman who wanted a single uninterrupted curve from shoulder to hip and took the vertebrae he needed to get it."
+      },
+      {
+        "id": "head",
+        "label": "The turn of the head",
+        "box": [
+          0.58,
+          0.06,
+          0.92,
+          0.46
+        ],
+        "text": "She looks back over her shoulder, straight out, cool and entirely unbothered. The gaze is the difference between this and the mythological nudes the Salon was comfortable with: there is no story here to excuse the looking, so the picture hands the transaction back to the person doing it."
+      },
+      {
+        "id": "drapery",
+        "label": "The silks",
+        "box": [
+          0.0,
+          0.48,
+          0.36,
+          1.0
+        ],
+        "text": "Blue curtain, white sheet, fur, a peacock fan — the whole Orientalist inventory, assembled by a painter who had never been east of Rome. Ingres worked from other pictures and from travel books, and the room he built is a French idea of a Turkish one. The fabrics are rendered with the same cool exactness as the skin, which is part of the point being made about both."
+      }
+    ]
   },
   {
     "id": "delacroix-death-sardanapalus",
@@ -383,7 +558,42 @@
         "#B4231C"
       ],
       "seed": 19
-    }
+    },
+    "regions": [
+      {
+        "id": "king",
+        "label": "Sardanapalus",
+        "box": [
+          0.2,
+          0.06,
+          0.58,
+          0.44
+        ],
+        "text": "He is lying down, propped on an elbow at the top of his own bed, watching his possessions destroyed — horses, women, gold — and doing nothing. The bed is the largest object in the picture and it is tipped toward us so steeply that everything on it seems about to slide off. His calm is the still point that makes the rest unbearable."
+      },
+      {
+        "id": "foreground",
+        "label": "The foreground",
+        "box": [
+          0.42,
+          0.42,
+          0.88,
+          0.98
+        ],
+        "text": "A woman is being stabbed across the corner of the bed, her body a long white diagonal ending in a hand that has stopped gripping. Delacroix built the picture out of diagonals and red and gave it no horizon, no orthogonals, no still place for the eye — the exact opposite of everything David taught. The Salon of 1828 hated it and the state stopped buying his work for years."
+      },
+      {
+        "id": "horse",
+        "label": "The horse",
+        "box": [
+          0.0,
+          0.46,
+          0.32,
+          0.98
+        ],
+        "text": "A white horse being dragged down at the lower left, eye rolling, head twisted against the pull. Delacroix drew horses all his life and this is the one where the drawing is doing the most work: the animal cannot be told what is happening, so its panic is the only honest reaction in the room."
+      }
+    ]
   },
   {
     "id": "leonardo-st-john-baptist",
@@ -416,6 +626,41 @@
         "#8A7050"
       ],
       "seed": 20
-    }
+    },
+    "regions": [
+      {
+        "id": "hand",
+        "label": "The pointing hand",
+        "box": [
+          0.26,
+          0.26,
+          0.62,
+          0.62
+        ],
+        "text": "One finger up, toward something outside the frame and above it. The gesture recurs across Leonardo's late work — the same finger, the same ambiguity about what exactly is being indicated — and it is the last thing he painted that anyone can date with confidence. The arm crosses the body so that the hand arrives near the centre of the panel, which is where the light also arrives."
+      },
+      {
+        "id": "face",
+        "label": "The face",
+        "box": [
+          0.36,
+          0.06,
+          0.76,
+          0.42
+        ],
+        "text": "A smile that is not a saint's smile, on a face that has been called androgynous since the day it was finished. The sfumato is at its most extreme here: there is no line anywhere on this head, and the transition from lit cheek to shadow happens over a distance the eye cannot measure. Leonardo built it in dozens of glazes, each barely tinted."
+      },
+      {
+        "id": "dark",
+        "label": "The dark",
+        "box": [
+          0.0,
+          0.52,
+          1.0,
+          1.0
+        ],
+        "text": "Almost half the panel is a brown-black nothing with no setting in it at all — no rock, no wilderness, none of the landscape a Baptist is entitled to. Leonardo removed the world and left the figure suspended in the dark with a light source that is not in the picture. Later varnish has made it darker than he left it, but the decision was his."
+      }
+    ]
   }
 ]

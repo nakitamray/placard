@@ -94,7 +94,42 @@
         "#2F7A78"
       ],
       "seed": 22
-    }
+    },
+    "regions": [
+      {
+        "id": "nebamun",
+        "label": "Nebamun",
+        "box": [
+          0.04,
+          0.1,
+          0.56,
+          0.94
+        ],
+        "text": "He is twice the size of his wife and three times his daughter's, and none of that is perspective — scale here is rank, not distance. The body is the Egyptian composite: shoulders square to us, head and legs in profile, the eye drawn frontally in a profile face. It is not an inability to foreshorten. Every part of the man is shown from the angle at which that part is most itself, which is a different theory of what a picture is for."
+      },
+      {
+        "id": "cat",
+        "label": "The cat",
+        "box": [
+          0.48,
+          0.3,
+          0.8,
+          0.64
+        ],
+        "text": "A tawny cat in the papyrus with three birds at once — one in its jaws, one under each front paw. Its eye is gilded, the only gold on the fragment, so it catches the lamp before anything else in the marsh does. Cats are not usually hunting companions in these scenes, and the argument has run for a century over whether this one is a real animal, a pun on the sun god in cat form, or a joke about excess."
+      },
+      {
+        "id": "marsh",
+        "label": "The papyrus and the birds",
+        "box": [
+          0.42,
+          0.0,
+          1.0,
+          0.38
+        ],
+        "text": "The thicket goes up in a burst of birds and butterflies, and they are painted precisely enough that ornithologists have named the species — pied kingfisher, shrike, white wagtail. This is the part of the picture that is observed rather than prescribed, and it is why a tomb painting made to guarantee an afterlife also happens to be a record of what lived in the Nile marshes in 1350 BC."
+      }
+    ]
   },
   {
     "id": "gu-kaizhi-admonitions",
@@ -335,7 +370,42 @@
         "#8A5C3A"
       ],
       "seed": 26
-    }
+    },
+    "regions": [
+      {
+        "id": "head",
+        "label": "The head, and the bird in it",
+        "box": [
+          0.28,
+          0.0,
+          0.8,
+          0.26
+        ],
+        "text": "A small bird is fixed upright at the side of the shaved head. White labelled the figure 'the flyer' for it, and later writers made him a conjuror or priest on that evidence alone — a single object in a watercolour carrying the whole identification. What the bird meant to the man wearing it is not recorded anywhere by anyone who asked him."
+      },
+      {
+        "id": "body",
+        "label": "The painted body",
+        "box": [
+          0.22,
+          0.24,
+          0.84,
+          0.64
+        ],
+        "text": "White was sent to Roanoke in 1585 as the expedition's recorder, and he drew what was in front of him with a surveyor's attention: the fringed apron, the pouch at the hip, the marks on the skin. These sheets are among the very few images of Algonquian people made from life before the encounter destroyed the world that made them, which puts an unreasonable weight on a set of watercolours painted in a hurry."
+      },
+      {
+        "id": "stride",
+        "label": "The stride",
+        "box": [
+          0.14,
+          0.6,
+          0.9,
+          1.0
+        ],
+        "text": "He is caught mid-step, weight on the front foot, the other lifting — a walking pose, not a standing portrait. That is rarer than it sounds in sixteenth-century drawing, and it is the reason the sheet reads as a person observed rather than a type recorded. Engravers copying White for Theodor de Bry's editions stiffened the legs and lost it within five years."
+      }
+    ]
   },
   {
     "id": "holbein-anne-boleyn",
@@ -575,6 +645,41 @@
         "#E4E0D4"
       ],
       "seed": 30
-    }
+    },
+    "regions": [
+      {
+        "id": "rain",
+        "label": "The rain",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.42
+        ],
+        "text": "Rain drawn as lines is an invention, not an observation — nobody has ever seen a rainstorm as a set of dark strokes. Hiroshige cuts them in two directions across separate blocks so the sheets cross at a slight angle, and the shower reads as a squall with wind in it. Van Gogh copied this print in oil in 1887, and could only get the rain by painting the lines themselves, one at a time."
+      },
+      {
+        "id": "bridge",
+        "label": "The bridge",
+        "box": [
+          0.0,
+          0.3,
+          1.0,
+          0.64
+        ],
+        "text": "Shin-Ōhashi, cut off at both edges so it runs out of the picture on either side. Everyone on it is hurrying and bent, and their solutions to the rain are all different: an umbrella, a straw cape, a mat held over the head, a bare back. The bridge is the only horizontal in the design and it is doing the work of an anchor for everything sliding diagonally past it."
+      },
+      {
+        "id": "river",
+        "label": "The far bank",
+        "box": [
+          0.0,
+          0.62,
+          1.0,
+          1.0
+        ],
+        "text": "The Sumida below and the Atake timber yards beyond, laid in as a flat grey wash with almost nothing drawn in it. It is the deliberate emptiness that makes the storm read: the eye finds no detail there, gives up, and comes back to the bridge. The dark band was printed from a block wiped by hand, so no two impressions of this print have the same weather."
+      }
+    ]
   }
 ]
