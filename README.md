@@ -28,7 +28,7 @@ Requires WebGL2. Sound is off until you turn it on.
 | **Runs on** | Anything with WebGL2, phone to desktop, under a three-step quality budget that measures its own frame times and steps down if it has to |
 
 This repository is published to be read and studied. It is not a template, and
-there are no deployment instructions here — see [Using this code](#using-this-code).
+there are no deployment instructions here.
 
 ---
 
@@ -418,15 +418,7 @@ arm's width at a time. Both say so on their placards.
 
 ## Using this code
 
-The code and the writing here are mine. The repository is public so that it can
-be read — the architecture, the shader, the pipeline, the decisions above — and
-not as a starting point for a copy of the exhibition. Deployment configuration,
-the asset build and the site's own environment are deliberately not documented
-here.
-
 Please don't publish this exhibition, or a re-skin of it, under your own name.
-If you want to build on any part of it, or use it in something of your own,
-write to me through the form in the Colophon — the answer is usually yes.
 
 All rights reserved. The paintings themselves are public domain; their
 reproductions are credited per file in the Colophon.
