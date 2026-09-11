@@ -27,6 +27,9 @@ Requires WebGL2. Sound is off until you turn it on.
 | **Pipeline** | An offline build turns authored records and public-domain scans into image ladders, text corpora and packed glyph binaries |
 | **Runs on** | Anything with WebGL2, phone to desktop, under a three-step quality budget that measures its own frame times and steps down if it has to |
 
+This repository is published to be read and studied. It is not a template, and
+there are no deployment instructions here — see [Using this code](#using-this-code).
+
 ---
 
 # Visiting
@@ -47,9 +50,8 @@ The British Museum room is its **Egyptian sculpture gallery, Room 4**, with
 the sculpture taken out and benches where the plinths were. What hangs between
 its columns is the museum's painted and printed holdings — woodblock prints, a
 tomb fresco, a papyrus, a scroll, a woven silk, a Rubens drawing — which have no
-permanent room of their own. Every corridor
-carries a `corridorNote` in `data/museums/{id}.json` saying which real room it
-follows and where it departs from it.
+permanent room of their own. Every corridor records which real room it follows
+and where it departs from it.
 
 ## Moving through it
 
@@ -98,6 +100,14 @@ a reading panel. **Pin this thread** holds one still while you read it;
 It is a mode, and a mode you cannot see is a mode you cannot tell from a bug,
 so a gilt pill sits low on the screen for exactly as long as it is on.
 
+## The atlas
+
+Seventy works, laid out as a graph of what they share — a painter, a city, a
+century, a subject. It is a second WebGL canvas of its own, and the room behind
+it stops drawing entirely while it is open. The layout is solved once and then
+held still: a graph that drifts while you are reading it is a graph you cannot
+point at.
+
 ## Sound
 
 Off until you press the switch, always. Sound that starts by itself is an
@@ -134,161 +144,105 @@ always steps back one level.
 
 ---
 
-# Developing
+# How it is built
 
-## Quick start
-
-```bash
-pnpm install
-pnpm fetch:images   # pull the real paintings from Wikimedia Commons
-pnpm check          # read the records and say what is wrong with them
-pnpm build:assets   # regenerate public/ from data/ — images, corpora, glyphs
-pnpm dev
-```
-
-Node ≥ 20. `pnpm approve-builds` may be needed once so `sharp` can install its
-prebuilt binaries. `public/artworks/` and `public/museums/` are generated and
-not committed, so `build:assets` has to run once after install; it takes a few
-minutes, because seventy works are each analysed into a glyph field twice.
-
-`fetch:images` is optional. Skipped, any work without a scan renders a
-procedural stand-in — honest and obvious, and not what belongs on a published
-site.
-
-Copy `.env.example` to `.env.local` to enable the contact form locally; see
-[Contact form](#contact-form).
-
-| Command | |
-|---|---|
-| `pnpm dev` | Vite dev server |
-| `pnpm build` | typecheck and build to `dist/` |
-| `pnpm preview` | serve the built site |
-| `pnpm check` | validate the authored records and the Commons scorer, offline |
-| `pnpm build:assets` | regenerate every published asset from `data/` |
-| `pnpm build:assets:strict` | the same, but a work with no real scan fails the build |
-| `pnpm fetch:images` | fetch the paintings from Wikimedia Commons |
-
-With npm rather than pnpm, flags need `--` in front of them, or npm reads them
-as its own config: `npm run fetch:images -- --dry --only manet-olympia`.
-
-## Repository map
+## The shape of the repository
 
 ```
-data/
-  museums/order.json        the museums, in the order the entrance lists them
-  museums/{id}.json         identity, corridor style, floor plan, works hung
-  collections/{id}.json     an array of self-contained artwork records
-  artworks/{id}/            optional per-work overrides — see below
-  image-sources.json        where the fetcher looks for each work on Commons
-scripts/                    the asset pipeline, all of it offline-first
-  fetch-images.ts           resolve and download from Wikimedia Commons
-  build-all.ts              images + corpora + glyphs + manifests
-  build-glyphs.ts           quadtree analysis → glyphs.bin
-  build-corpus.ts           text → charset indices → corpus.bin
-  build-images.ts           the three-size, three-format ladder
-  build-placeholder.ts      procedural stand-ins for works with no scan
-  check.ts                  what `pnpm check` runs
+data/         everything authored by hand — museums, artwork records, the
+              provenance of every reproduction. The source of truth.
+scripts/      the offline pipeline that turns data/ into what the browser
+              fetches: image ladders, text corpora, packed glyph binaries
 src/
-  scenes/                   the corridor, the gallery, the entrance hero
-  scenes/corridor/          ceilings, floors, walls, fixtures, atmosphere
-  glyph/                    the atlas, the shader, the instanced pre-pass
-  render/                   when the canvas is drawn, and how often
-  ui/                       everything in the DOM over the canvas
-  state/                    one store for the room, one for the atlas
-  lib/                      audio, music, images, quality, device tiering
-shared/                     types shared between the build and the runtime
+  scenes/     the corridor, the gallery, the artwork room, the entrance hero
+  scenes/corridor/  ceilings, floors, walls, fixtures, atmosphere
+  glyph/      the atlas, the shader, the instanced pre-pass
+  render/     when the canvas is drawn, and how often
+  ui/         everything in the DOM over the canvas
+  state/      one store for the room, one for the atlas, one for the door
+  lib/        audio, music, images, quality, device tiering
+shared/       types shared between the build and the runtime
 ```
 
-## Authoring
+Nothing about a particular building is hard-coded in the renderer. A museum is
+a record: its identity, the room it follows, and a `style` block that drives
+the whole corridor — ceiling, floor, wall and frame kinds, the hang pattern,
+room proportions, a ten-colour palette, a full lighting rig, and which fixtures
+to place. An artwork is a record too: the placard, the painter's accent colour,
+how it should be cropped for the entrance, and optionally the hand-authored
+regions Thread Pull reads.
 
-Adding a museum is two files and a line in `order.json`. Adding a work is one
-record.
+## The glyph field
 
-A **museum record** carries its identity — name, city, subtitle, the blurb the
-entrance lists, the `corridorNote` saying which real room it follows, and the
-`homepage` the corridor title and the colophon link out to — plus a `style`
-block that drives the entire corridor: `ceiling`, `floor`, `wall` and `frame`
-kinds, the `hang` pattern, room proportions, a ten-colour palette, a full
-lighting rig (key colour, intensity and direction; sky and ground fill; lamp
-colour; tone-mapping exposure; background and fog) and which fixtures to place —
-sculpture, seating, chandeliers, label stands, ropes, vitrines, a lighting
-track, a clock, terraces, whether the room is lit by its windows rather than by
-its lamps, and whether it has a cove throwing light up into its ceiling.
-Nothing about a particular building is hard-coded in the renderer.
+**Build time.** Each painting is published as three sizes in three formats —
+`wall` for the corridor, `view` for the reveal, `full` for the upgrade, each as
+AVIF, WebP and JPEG. It is then analysed once by a quadtree variance
+subdivision — small cells across faces and detail, large cells across sky and
+flat ground — and emitted as a compact binary held to a glyph budget, so no one
+painting can cost several times what its neighbours do. The work's corpus is
+cleaned, stripped of whitespace and encoded as charset indices; where a work
+has no historical texts on disk, the corpus is built from its own wall label
+and extended note, which is the premise stated at its smallest.
 
-`hang` decides how the works are distributed: `salon` stacks three to a bay on
-both walls, `single` hangs one per bay on both, `alternating` swaps sides bay by
-bay, and `one-wall` hangs everything on the left — for the Uffizi, whose other
-side is a run of windows, where anything hung opposite would be seen against
-the day.
+**Runtime.** One instanced draw call renders every glyph — up to twenty
+thousand letters for one draw. All per-glyph attributes upload once and the
+animation is uniform-driven: the *character occupying each slot* advances
+through the corpus over time while positions and colours stay fixed, so the
+painting holds still while its history scrolls through it. The reveal, the
+reading lens and Thread Pull are the same mechanism seen three ways — a
+per-glyph dissolve threshold compared against a global value, a radius around
+the cursor, or a rectangle around a semantic region.
 
-An **artwork record** carries the placard (artist, dates, title, year, medium,
-dimensions, room, accession, credit line, wall label, extended note), the
-painter's `accentColor`, an optional `heroFocus`, a `placeholder` spec, and
-optionally hand-authored Thread Pull `regions`.
+**Tone.** A letterform covers only 20–30% of its cell, so drawing letters alone
+over a dark ground reproduces a painting at a quarter of its true luminance.
+Each glyph instead fills its cell with the cell's mean colour at a low opacity
+and draws the letterform brighter on top.
 
-`heroFocus` is `[x, y]` in normalised image coordinates with y down, and it
-matters in exactly one place: the entrance is the only screen that crops a
-painting, and a centred crop of a tall canvas throws away the face. Omit it and
-a tall work is held a little above centre and everything else in the middle.
-`heroSkip: true` keeps a work off the entrance altogether — a scroll six times
-wider than it is tall, or a work whose best scan is soft at full bleed, is
-fine on a wall and wrong across a window.
+## The rooms
 
-`frameShape` handles the works a rectangle is wrong for. `'round'` turns the
-museum's own moulding on a lathe and cuts the canvas to a circle, for a tondo;
-`'divided'` keeps the rectangle, runs a moulded bar down the centre and gives
-the surround two extra carved courses, for a pair of panels hung as one object.
-A round work is cut to the same silhouette in the shader as in the frame, so
-the words stop where the panel does. Omitted, a work takes the museum's plain
-frame.
+**Frames.** A frame is a stack of concentric extruded, bevelled mouldings —
+"courses" — optionally carrying a bead course, corner cartouches, reeding or a
+full architectural tabernacle. Courses are merged by material before they reach
+the GPU, so an elaborate five-course frame with ornament costs three draw calls.
 
-`data/artworks/{id}/` is optional and exists only to override generated assets:
+**Corridors.** Ceiling, floor, wall treatment and fixtures are half a dozen
+implementations each, selected by the style record. Everything repeated — ribs,
+purlins, mullions, pilasters, brick courses, paving joints, dentils, bead
+courses, dust motes — is instanced.
 
-| File | Overrides |
-|---|---|
-| `source.jpg` | the real public-domain scan — the one file worth adding |
-| `sources.json` + `corpus/*.txt` | building the corpus from the record's own placard text |
-| `regions.json` | Thread Pull regions (records may also carry them inline) |
-| `config.json` | glyph tuning — cell sizes, variance threshold, palette size, `maxGlyphs` |
+**Hanging.** Every work is centred on a shared hanging line and the moulded
+panel behind it is centred on the same line, so a canvas sits in the middle of
+its surround rather than sinking to the bottom of it. Works too wide to hang at
+full height give up height rather than run into their neighbours.
 
-Run `pnpm check` after any edit. It reads the records without touching the
-network and reports a museum whose floor plan points at a room that is not
-there, a work listed by a museum but missing from its collection, an impossible
-Thread Pull box, a wall label too short to build a corpus from, and — the one
-that matters most — a scan whose proportions are far enough from the catalogued
-dimensions that it is probably framed, cropped, or a different painting.
+**The artwork room.** Each painting sits in a full moulded bay — fluted
+pilasters, entablature, cornice, dentils, a raised bolection panel, a coffer
+overhead — and the entire room, walls, joinery, fill light, fog and background,
+takes the painter's own accent colour, easing from one to the next as you move
+along the rail.
 
-## Pictures
+**Sound.** The ambience is real music streamed from YouTube through two hidden
+IFrame players — two, because one player holds one video and a single player
+makes every room change a cut. The recordings are not ours to copy; an embed is
+the arrangement the uploaders have agreed to, and it keeps megabytes of audio
+out of the bundle. Everything that has to land on a particular frame is
+synthesised in WebAudio instead: a convolution reverb built rather than
+recorded, the chime when a work resolves, the swoosh when the wall label
+arrives, the swell through the end wall. So is the room tone — a warm drone,
+formant murmurs and footfalls in irregular pairs — which is the *fallback*,
+played only when the player cannot be built at all, because the alternative is
+silence.
 
-Every reproduction comes from Wikimedia Commons. `pnpm fetch:images` resolves
-each work, downloads a 2000px render and writes `data/artworks/{id}/source.jpg`
-plus an `image-credit.json` recording the exact file, its stated licence and
-its author — which is what the Colophon then publishes on the work's placard.
+## Choosing the pictures
 
-```bash
-pnpm fetch:images --dry      # resolve everything, download nothing — read this first
-pnpm fetch:images            # fetch every work that has no scan yet
-pnpm fetch:images --check    # which scans disagree with their pins, offline
-```
-
-**How a picture is chosen — three steps, most trustworthy first.**
-
-1. **`commonsFile`** in `data/image-sources.json` — an exact file, used as
-   given, because a person looked at it and said so. A pin is a decision, not a
-   hint: if it cannot be resolved the work *fails* rather than falling through
-   to search, because a silent fall-through looks exactly like the pin having
-   no effect.
-2. **Wikidata.** The work's own item carries P18: a curated statement that this
-   file is the image *of this artwork*. The item is found by search and then
-   proved before it is trusted — it has to be typed as an artwork and its
-   description has to name the artist — so a "Mona Lisa" that turns out to be a
-   pop song is discarded rather than hung.
-3. **Commons file search, scored.**
-
-Scoring exists because search is the only step that can be confidently wrong,
+Every reproduction comes from Wikimedia Commons, resolved offline before a
+build. The resolver prefers an exact file pinned by hand, falls back to the
+curated image statement on the work's own Wikidata item, and only then to a
+scored search — because search is the only step that can be confidently wrong,
 and a wrong painting hung under the right label is worse than no painting at
-all. Candidates lose points for being the failures this exhibition actually
+all.
+
+Candidates lose points for being the failures this exhibition actually
 suffered: the work photographed *in its frame*, the work on a gallery wall with
 visitors in front of it, an engraving after it, a detail, or plainly a
 different painting. Words are read in context — "engraving" is damning for a
@@ -301,168 +255,35 @@ work's real dimensions, so its true proportions are known before anything is
 downloaded, and a frame or a room around the canvas changes them by far more
 than two reproductions of the same painting ever differ. That check runs again
 on the real pixels after the download, so a hand-pinned photograph of a frame
-is refused as firmly as a search result would be. Anything that clears neither
-is left on its stand-in.
+is refused as firmly as a search result would be.
 
 It cuts both ways: a pin that fails the proportions test is usually the pin
 being right and the *catalogue* being wrong about what is in the picture. The
 Urbino diptych is measured panel by panel — 47 × 33 cm each — and photographed
-as a pair, so the file is twice as wide as the record expected and was refused
-until the record said `47 × 66 cm as hung`.
-
-| Flag | |
-|---|---|
-| `--dry` | resolve and print the table, download nothing |
-| `--check` | compare what is on disk against the pins, without the network |
-| `--force` | re-fetch works that already have a scan |
-| `--pin` | write the resolved file names back into `data/image-sources.json` |
-| `--sheet` | build the contact sheet even on a `--dry` run |
-| `--concurrency 6` | works in flight at once (default 4, max 8) |
-| `--museum louvre` | one museum only |
-| `--only id1,id2` | named works only |
-
-**Run once with `--pin` and commit the result.** It records the exact file
-chosen for every work, so from then on the fetch is a lookup rather than a
-search. Search rankings drift, and an exhibition that hangs a different picture
-next month is not one you can point people at.
-
-**Then open `data/.cache/contact-sheet.html`.** Every run builds it: one page
-showing every picture with the file it came from, the catalogued
-dimensions and how it was resolved. Seventy works is too many to check by
-clicking through seventy Commons pages, and not checking is how an exhibition
-ends up hanging a photograph of a frame. Each card carries a **pin this** block
-to paste straight into `data/image-sources.json`:
-
-```json
-"manet-olympia": { "commonsFile": "File:Edouard Manet - Olympia - Google Art Project 3.jpg" }
-```
-
-Changing a pin is enough on its own — a scan that came from a different file is
-treated as stale and re-fetched without `--force`. `pnpm fetch:images --check`
-lists every work in that state.
-
-A few entries need judgement rather than search: John White's album is a whole
-class of object rather than one work, the Admonitions Scroll and the Papyrus of
-Ani are both reproduced one scene at a time, the Vrindavani Vastra survives only
-as a joined fragment, and several Van Gogh and Monet subjects exist in many
-versions. Each of those carries a `note` in `data/image-sources.json` saying
-what to look for.
-
-### When a scan disagrees with its catalogue
-
-`pnpm check` compares what is hanging against what the placard says is hanging,
-offline, and there are only four things it can mean. The message names which:
-
-**The pin has not been fetched yet.** *the scan on disk is not the pinned file*
-— pinning a work does not download it. Run `pnpm fetch:images`, which
-re-fetches every work whose pin has changed since its scan. Until then the room
-is still showing whatever search found last time, and any other complaint about
-that work is about a file already on its way out. Fix this one first.
-
-**The file is the right subject in the wrong collection.** *the file names the
-Altes Museum, Berlin, not this museum* — a Fayum portrait, a Dunhuang banner or
-a Book of the Dead exists in a dozen museums, and search reaches for the
-best-photographed one rather than the one whose room you are standing in. Pin
-this museum's own object.
-
-**The file is a copy.** *the file describes itself as a copy* — a facsimile or
-a replica. Pin the original, or say so in the record (below).
-
-**The proportions are wrong.** *the scan is 33% off the catalogued proportions*
-— the file is framed, cropped, a detail, or a different version. Re-fetch it
-with `pnpm fetch:images --force --only <id>` and pin a better one. But check
-the other possibility first: that the catalogue is measuring something the
-picture is not. A diptych photographed as a pair is not one panel; a handscroll
-is shown as a section; the Geese of Meidum is in Cairo and what every other
-museum hangs is a facsimile. Where that is the case, say so in the record:
-
-```json
-"reproduction": "The scroll is three and a half metres long … what is reproduced
-                 here is the fourth of its nine surviving scenes"
-```
-
-That sentence is printed on the colophon beside the image credit, and both the
-proportions check and the fetcher's own gate stop applying the whole object's
-shape to a picture of part of it. It is a statement, not a silencer — a visitor
-looking at one scene of nine is owed the same sentence the check was owed. A
-work in that position can also carry a `link`, which the placard shows under
-the wall text:
-
-```json
-"link": { "label": "The whole scroll, at the British Museum",
-          "url": "https://www.britishmuseum.org/collection/object/A_1903-0408-0-1" }
-```
-
-To supply a scan by hand instead, save it as `data/artworks/{id}/source.jpg`
-and run `pnpm build:assets`. `data/.cache/previews/{id}.png` shows the glyph
-field for one work and is the fastest loop for tuning its `config.json`.
+as a pair, so the file is twice as wide as the record expected until the record
+says `47 × 66 cm as hung`.
 
 Everything hung is old enough to be in the public domain; reproductions are
-PD-Art in the US and most of Europe. The fetcher records whatever licence
-Commons states per file rather than assuming.
+PD-Art in the US and most of Europe. Whatever licence Commons states per file
+is recorded rather than assumed, and published on the work's own placard.
 
-## How it works
+## The door
 
-**Build time** (`scripts/`). Each painting is published as three sizes in three
-formats — `wall` 1024px for the corridor, `view` 1200px for the reveal, `full`
-2000px for the upgrade, each as AVIF, WebP and JPEG. It is then analysed once
-by a quadtree variance subdivision — small cells across faces and detail, large
-cells across sky and flat ground — and emitted as a compact binary
-(`glyphs.bin`, format in `shared/glyphFormat.ts`) held to a glyph budget so no
-one painting can cost several times what its neighbours do. The work's corpus
-is cleaned, stripped of whitespace and encoded as charset indices
-(`corpus.bin`); where a work has no historical texts on disk, the corpus is
-built from its own wall label and extended note, which is the premise stated at
-its smallest.
+The exhibition used to open the moment the museum list arrived — long before
+anything was ready to be drawn. The bundle still had to be parsed, the first
+painting's glyph binary still had to be fetched, and, most expensively, the
+shaders still had to be compiled: a custom GPU program cannot be built until
+something first tries to draw with it, and that compile stalls the whole page.
+So the stall happened in plain sight, one frame after a loading bar had filled
+and promised the visitor it was finished.
 
-**Runtime** (`src/glyph/`). One instanced draw call renders every glyph — up to
-twenty thousand letters for one draw. All per-glyph attributes upload once and
-the animation is uniform-driven: the *character occupying each slot* advances
-through the corpus over time while positions and colours stay fixed, so the
-painting holds still while its history scrolls through it. The reveal, the
-reading lens and Thread Pull are the same mechanism seen three ways — a
-per-glyph dissolve threshold compared against a global value, a radius around
-the cursor, or a rectangle around a semantic region.
-
-**Tone.** A letterform covers only 20–30% of its cell, so drawing letters alone
-over a dark ground reproduces a painting at a quarter of its true luminance.
-Each glyph instead fills its cell with the cell's mean colour at `uWash`
-opacity and draws the letterform brighter on top.
-
-**Frames** (`src/scenes/frames.ts`). A frame is a stack of concentric extruded,
-bevelled mouldings — "courses" — optionally carrying a bead course, corner
-cartouches, reeding or a full architectural tabernacle. Courses are merged by
-material before they reach the GPU, so an elaborate five-course frame with
-ornament costs three draw calls.
-
-**Corridors** (`src/scenes/corridor/`). Ceiling, floor, wall treatment and
-fixtures are half a dozen implementations each, selected by the style record.
-Everything repeated — ribs, purlins, mullions, pilasters, brick courses, paving
-joints, dentils, bead courses, dust motes — is instanced.
-
-**Hanging.** Every work is centred on a shared hanging line and the moulded
-panel behind it is centred on the same line, so a canvas sits in the middle of
-its surround rather than sinking to the bottom of it. Works too wide to hang at
-full height give up height rather than run into their neighbours
-(`src/scenes/fit.ts`).
-
-**The artwork room.** Each painting sits in a full moulded bay — fluted
-pilasters, entablature, cornice, dentils, a raised bolection panel, a coffer
-overhead — and the entire room, walls, joinery, fill light, fog and background,
-takes the painter's own accent colour, easing from one to the next as you move
-along the rail.
-
-**Sound** (`src/lib/audio.ts`, `src/lib/music.ts`). The ambience is real music
-streamed from YouTube through two hidden IFrame players — two, because one
-player holds one video and a single player makes every room change a cut. The
-recordings are not ours to copy; an embed is the arrangement the uploaders have
-agreed to, and it keeps megabytes of audio out of the bundle. Everything that
-has to land on a particular frame is synthesised in WebAudio instead: a
-convolution reverb built rather than recorded, the chime when a work resolves,
-the swoosh when the wall label arrives, the swell through the end wall. So is
-the room tone — a warm drone, formant murmurs and footfalls in irregular
-pairs — which is the *fallback*, played only when the player cannot be built at
-all, because the alternative is silence.
+Now three real pieces of work report in — the catalogue, the first canvas, the
+light — and the door opens only once a frame has actually been drawn behind the
+curtain. What covers the wait is the exhibition's own material: a wall of text
+stepping and breathing exactly as the paintings do, lighting from dim bone to
+gilt in reading order as the steps land. The progress *is* the text being lit.
+There is no bar, because a bar would be furniture, and this site does not have
+furniture.
 
 ## Performance
 
@@ -475,7 +296,7 @@ in the corridor at 1280×720, per frame:
 | Balanced | ~530 | ~100k |
 | Rich | ~930 | ~225k |
 
-What each switch buys, in `src/lib/quality.ts`:
+What each switch buys:
 
 - **Reflections** — the mirrored floor is *a second full render of the scene*
   into a mirror buffer. It roughly doubles draw calls on its own, so it belongs
@@ -498,20 +319,18 @@ guessing high costs a stuttering first impression.
 The budgets above decide how much is in a frame. These decide how many frames
 there are, which for a room that mostly drifts turns out to matter more.
 
-- **The frame loop is capped, and stops.** The canvas runs on
-  `frameloop="never"` and `src/render/frameGovernor.tsx` drives it: thirty
-  frames a second on Smooth, sixty on the other two. Nothing here resolves
-  faster than that — the camera eases, the letters breathe, the dust falls — so
-  on a 120Hz laptop panel the uncapped loop was drawing the whole corridor
-  twice for every change anybody could see. `src/render/canvasGate.ts` stops it
-  outright whenever something opaque is over the canvas: the atlas, which is a
-  second WebGL canvas of its own; the map, which is a scrim over a blurred
-  still; the credits sheet; another tab. The last frame stays on screen, which
-  is exactly what those screens were showing anyway.
+- **The frame loop is capped, and stops.** Thirty frames a second on Smooth,
+  sixty on the other two. Nothing here resolves faster than that — the camera
+  eases, the letters breathe, the dust falls — so on a 120Hz laptop panel the
+  uncapped loop was drawing the whole corridor twice for every change anybody
+  could see. It stops outright whenever something opaque is over the canvas:
+  the atlas, which is a second WebGL canvas of its own; the map, which is a
+  scrim over a blurred still; the credits sheet; another tab. The last frame
+  stays on screen, which is exactly what those screens were showing anyway.
 - **One picture light per bay in range, not one per painting.** Three.js has no
   spatial culling for lights: every light in the scene goes into the uniform
   array and every lit fragment loops over all of them. A seventy-work wing had
-  seventy of them, sixty-five of which were beyond their own `distance` and
+  seventy of them, sixty-five of which were beyond their own falloff and
   contributing exactly zero. The gallery now slides a fixed window of five
   along the rail — fixed, because the light count is compiled into the shader
   and a count that changed as you scrolled would recompile every material in
@@ -531,12 +350,18 @@ there are, which for a room that mostly drifts turns out to matter more.
   rebuilt and re-uploaded for motes drifting at a few centimetres a second is
   arithmetic with no visible result. The skipped time is carried, so they fall
   at the same speed.
+- **Textures are held, counted, and let go.** A painting's corpus, palette and
+  wall texture are reference-counted while something is looking at them and
+  disposed on the GPU a few seconds after the last viewer walks away — dropping
+  the JavaScript reference alone leaves the memory where it was. Six works stay
+  resident, which is as many as any one screen can be showing.
 - **The DOM stops writing when it has arrived.** The cursor ring's loop ends
   once it has caught up and wakes on the next pointer event; the wall label and
   the placard measure themselves when their size changes rather than on every
-  frame, and skip writes that would set the transform they already have. The
-  map's scrim lost a `backdrop-filter` that was blurring a full screen of
-  already-blurred canvas underneath a gradient ninety per cent opaque.
+  frame, and skip writes that would set the transform they already have.
+  Blurred backdrops were removed wherever something opaque could do the same
+  job, because a `backdrop-filter` is recomputed every frame its backdrop
+  changes.
 
 Nothing on this list changes what the exhibition looks like. They are all the
 same picture, arrived at without redrawing the parts of it that had not
@@ -565,126 +390,20 @@ which is what actually quarters the glyph field rather than shaving two percent
 off it.
 
 The bundle is split so the renderer caches separately from the exhibition:
-`three` (~178 kB gzip) and `r3f` (~17 kB) change only on a dependency upgrade,
-the app itself (~60 kB gzip) every time a placard is edited.
+`three` and `r3f` change only on a dependency upgrade, the app itself every
+time a placard is edited, and the corridor, the gallery, the atlas and the
+colophon are each fetched the first time somebody goes there.
 
-## Deploying
-
-The exhibition is a static site. Everything it serves — the glyph fields, the
-pictures in three sizes and three formats, the manifests — is produced by
-`pnpm build:assets` from the records, and the scans those are built from are
-committed, so a build host needs no network access to Wikimedia and no secrets
-to produce the whole thing.
-
-### Vercel
-
-`vercel.json` holds the whole configuration:
-
-```json
-{ "buildCommand": "pnpm check && pnpm build:assets && pnpm build",
-  "outputDirectory": "dist",
-  "framework": "vite" }
-```
-
-Import the repository at vercel.com/new and it needs no other settings. What
-to expect, measured from a clean checkout:
-
-| | |
-|---|---|
-| Build | about six and a half minutes, nearly all of it the glyph fields |
-| Output | 90 MB, of which 88 MB is pictures |
-| Node | 20 or newer; `packageManager` pins pnpm so the host resolves the same one |
-
-`pnpm check` runs first deliberately: a record that points at a work which is
-not there, or a floor plan with a room too many, fails the deploy rather than
-publishing a broken room. Warnings — a work still on a stand-in, a scan whose
-proportions do not match its catalogue — do not.
-
-Set `VITE_CONTACT_ENDPOINT` in the project's environment variables if you want
-the contact form. Without it the form is not rendered at all, because a form
-that goes nowhere is worse than no form. See [Contact form](#contact-form).
-
-**Trading repository size for deploy time.** The build is dominated by
-regenerating assets that did not change. Committing `public/artworks` and
-`public/museums` — they are gitignored because they are generated, but they
-are also deterministic — and setting the build command to `pnpm build` alone
-turns a six-minute deploy into a twenty-second one, at the cost of 90 MB in
-the repository. Worth doing once a collection has stopped changing, and not
-before.
-
-### Serving from a subpath
-
-Every generated-asset URL goes through `src/lib/asset.ts`, which prefixes
-Vite's `BASE_URL`:
-
-```bash
-pnpm build                        # a domain root — Vercel, Netlify, S3
-BASE_PATH=/placard/ pnpm build    # served from a subdirectory
-```
-
-Set `BASE_PATH` in the host's environment to serve from a subdirectory. On
-Vercel, and on any host serving from a domain root, leave it alone.
-
-## Contact form
-
-The **About** tab of the Colophon carries a three-field form. It needs one
-environment variable, and without it the form does not render.
-
-```
-VITE_CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx
-CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx      # the same thing, shorter name
-```
-
-**Either name works.** The first is the Vite convention; the second is
-accepted because some hosts' dashboards will not take a `VITE_`-prefixed name.
-What makes the short one possible is `envPrefix` in `vite.config.ts`, which
-lists the prefixes Vite is allowed to expose to the browser — a variable not
-covered by one of them is simply absent at runtime, which looks identical to a
-form nobody has configured. Keep that list narrow: **anything matching a
-prefix in it is published into a file any visitor can read**, so never name a
-secret `CONTACT_ANYTHING`.
-
-Set only one of the two. If both are set, `VITE_CONTACT_ENDPOINT` wins.
-
-**The address is never in the browser.** Vite inlines `VITE_`-prefixed
-variables at build time, so whatever goes in one becomes a plain string in the
-shipped JavaScript — readable by anyone who opens the bundle, and findable by
-any crawler that reads `.js` files as easily as one that reads HTML. What goes
-in this variable is a form id, which is meant to be public and gives nothing
-away. The address it forwards to is known to the form service and to nobody
-else, and a visitor who submits the form never sees it.
-
-There is deliberately **no `mailto:` fallback**. It is the obvious way to build
-a contact form and it cannot be made private: the address would sit in the
-bundle *and* be shown to the visitor in their own mail client's To: field. An
-earlier version supported both and chose whichever was set; a private form with
-a public-by-construction fallback one misconfiguration away is not a private
-form, so the fallback was removed rather than discouraged.
-
-Formspree, Web3Forms, Getform and Basin all give a free endpoint that takes a
-JSON POST and forwards it to you. A serverless function of your own works too —
-anything that accepts `{ name, email, message }`.
-
-Because the substitution happens at build time, changing it needs a
-redeploy, not just a restart.
+---
 
 ## Known limits
 
 **The sculpture is procedural.** The figures and busts in the corridors are
-abstracted marble forms built for their silhouette
-(`src/scenes/corridor/Fixtures.tsx`). They are the weakest thing in the rooms.
-Real scans would be better, and the two obvious sources are
-[SMK's 3D models](https://www.smk.dk/en/article/3d-models/) and
-[Scan The World](https://www.myminifactory.com/users/Scan%20The%20World);
-neither is a drop-in. Both publish for 3D *printing* — STL or OBJ, tens of
-millions of untextured triangles, 100–400 MB per figure — so each needs a
-decimate-and-bake step (Blender, or `gltf-transform` + `meshopt`) run once
-offline and committed as Draco-compressed glTF. Scan The World's licences are
-per model and often **CC BY-NC-SA**, which is a real constraint on a published
-site. And scale, up-axis and base height differ per model, so each one needs a
-hand-written transform rather than a shared component. The runtime half is
-easy: `useGLTF` and a manifest of `{ file, scale, rotation, plinth }`, falling
-back to the procedural forms wherever a model is missing.
+abstracted marble forms built for their silhouette. They are the weakest thing
+in the rooms. Real scans would be better, and the obvious sources publish for
+3D *printing* — tens of millions of untextured triangles per figure, licences
+that are per-model and often non-commercial — so each would need a
+decimate-and-bake step run offline and a hand-written transform of its own.
 
 **Catalogue details are stated from published museum records** and are worth
 verifying against the museums' own collection pages. Accession numbers are
@@ -696,6 +415,21 @@ the original panel is in the Egyptian Museum in Cairo and the British Museum
 holds nineteenth-century facsimiles. *The Admonitions Scroll* — shown as a
 section, because a handscroll is eleven metres long and is meant to be read an
 arm's width at a time. Both say so on their placards.
+
+## Using this code
+
+The code and the writing here are mine. The repository is public so that it can
+be read — the architecture, the shader, the pipeline, the decisions above — and
+not as a starting point for a copy of the exhibition. Deployment configuration,
+the asset build and the site's own environment are deliberately not documented
+here.
+
+Please don't publish this exhibition, or a re-skin of it, under your own name.
+If you want to build on any part of it, or use it in something of your own,
+write to me through the form in the Colophon — the answer is usually yes.
+
+All rights reserved. The paintings themselves are public domain; their
+reproductions are credited per file in the Colophon.
 
 ## Credits
 
