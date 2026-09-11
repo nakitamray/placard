@@ -669,11 +669,11 @@ function ContactForm() {
     <section className="credits-contact">
       <h3 className="meta credits-section credits-contact-head">Write to me</h3>
       {state === 'sent' ? (
-        <p className="body credits-note">
+        <p className="body credits-note contact-thanks">
           Thank you — it arrived. I read everything.
           <br />
           <button className="caption contact-again" onClick={() => setState('idle')}>
-            Write another →
+            Write another
           </button>
         </p>
       ) : (
@@ -683,25 +683,28 @@ function ContactForm() {
             down and I will get it.
           </p>
           <form className="contact" onSubmit={submit}>
-            <label className="contact-field">
-              <span className="caption">Your name</span>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoComplete="name"
-              />
-            </label>
-            <label className="contact-field">
-              <span className="caption">Your email</span>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                placeholder="so I can reply"
-              />
-            </label>
+            {/* the two short answers share a line; the message gets the page */}
+            <div className="contact-row">
+              <label className="contact-field">
+                <span className="caption">Your name</span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoComplete="name"
+                />
+              </label>
+              <label className="contact-field">
+                <span className="caption">Your email</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  placeholder="so I can reply"
+                />
+              </label>
+            </div>
             <label className="contact-field">
               <span className="caption">Message</span>
               <textarea
@@ -715,9 +718,10 @@ function ContactForm() {
               <button
                 type="submit"
                 className="caption contact-send"
+                data-sending={state === 'sending' ? '' : undefined}
                 disabled={state === 'sending' || !message.trim()}
               >
-                {state === 'sending' ? 'Sending…' : 'Send'}
+                {state === 'sending' ? 'Sending' : 'Send'}
               </button>
               {state === 'failed' && (
                 <span className="caption contact-error">

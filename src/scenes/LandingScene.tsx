@@ -27,11 +27,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GlyphPrePass } from '../glyph/GlyphPrePass';
-import { loadArtwork, loadMeta, loadReveal, retain, type LoadedArtwork } from '../glyph/artworkLoader';
+import { loadArtwork, loadReveal, retain, type LoadedArtwork } from '../glyph/artworkLoader';
 import { lens } from '../transitions/lens';
 import { pointer } from '../state/motion';
 import { useStore } from '../state/store';
-import { markBoot, useBoot } from '../state/boot';
+import { markBoot } from '../state/boot';
 import { exhibitionWorks, heroWorks, shuffled, type ExhibitionWork } from '../state/works';
 import type { DeviceTier } from '../types';
 
@@ -157,23 +157,6 @@ function Hero({
      * have already gone past — see artworkLoader.
      */
     const release = retain(id, tier);
-
-    /*
-     * The wall text, asked for on its own and ahead of everything else.
-     *
-     * The entrance curtain reads this while it waits, and it used to arrive
-     * bundled with the artwork — which meant the first third of the wait was
-     * a dark screen with nothing on it, and the words landed just in time to
-     * be taken away. `loadMeta` is five kilobytes and memoised, so asking for
-     * it here costs no extra request: it is the same fetch the artwork load
-     * is about to make, started earlier and read sooner.
-     */
-    if (role === 'in') {
-      void loadMeta(id).then((m) => {
-        if (!alive || useBoot.getState().line) return;
-        useBoot.getState().setLine(m.labelText, `${m.artist} · ${m.title}`);
-      });
-    }
 
     void loadArtwork(id, tier).then((a) => {
       if (!alive) return;

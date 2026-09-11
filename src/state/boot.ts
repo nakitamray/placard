@@ -19,12 +19,11 @@
  * of the exhibition.
  *
  * WHAT IS ON SCREEN WHILE IT WAITS
- *   The wall text of the painting that is about to appear. This exhibition's
- *   whole claim is that these pictures are made out of the writing about them,
- *   so the wait is not dead time to be dressed up with a spinner — it is the
- *   first thing anybody reads, and what they read is the text the first
- *   painting is built from. By the time the words have gone, the picture they
- *   describe is standing behind them.
+ *   A wall of the exhibition's own text, stepping and breathing exactly as the
+ *   paintings do, lighting from dim bone to gilt in reading order as these
+ *   steps report in — see ui/LoadingBar.tsx. The progress is the text being
+ *   lit rather than a bar with a caption under it, which is the only kind of
+ *   loading screen this site could honestly have.
  */
 import { create } from 'zustand';
 
@@ -40,25 +39,17 @@ export type BootKey = (typeof BOOT_STEPS)[number]['key'];
 interface BootState {
   /** which steps have reported in */
   done: BootKey[];
-  /** the wall text of the work about to appear, once it is known */
-  line: string | null;
-  /** and whose it is */
-  credit: string | null;
   /** the first frame has been drawn: the room behind the curtain is real */
   ready: boolean;
   mark: (key: BootKey) => void;
-  setLine: (line: string, credit: string) => void;
   open: () => void;
 }
 
 export const useBoot = create<BootState>((set) => ({
   done: [],
-  line: null,
-  credit: null,
   ready: false,
   mark: (key) =>
     set((s) => (s.done.includes(key) ? s : { done: [...s.done, key] })),
-  setLine: (line, credit) => set({ line, credit }),
   open: () => set({ ready: true }),
 }));
 

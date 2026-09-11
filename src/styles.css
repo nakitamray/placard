@@ -105,72 +105,27 @@ button:active { transform: translateY(1px); }
 
 /* ─── loading ─── */
 /* ─── the entrance curtain ─────────────────────────────────────────────────
-   It covers a stall that has to happen somewhere (see render/warmup.tsx) and
-   spends it on the first thing worth reading. It leaves by fading, over a
-   scene that has already been drawing underneath it for a beat. */
+   A wall of the exhibition's own text, lighting in reading order as the three
+   boot steps report in. All of it is painted into one canvas — see
+   ui/LoadingBar.tsx — so there is nothing here to lay out and nothing to
+   reflow; the stylesheet's whole job is to hold it over the page and take it
+   away again.
+
+   It leaves by fading, over a scene that has already been drawing underneath
+   it for a beat, and it stops taking the pointer the instant it starts to go
+   — a visitor already reaching for a museum should never be clicking through
+   a sheet that is only mostly gone. */
 .loading {
   position: fixed; inset: 0; z-index: 60;
-  background: var(--ink);
-  display: grid; grid-template-rows: 1fr auto;
-  /* the label sits clear of the foot rather than on top of it — a wall text
-     crowding the wordmark reads as a layout that has not finished loading
-     either */
-  row-gap: var(--s7);
-  padding: var(--s7) var(--s6) 52px;
+  background: #15120e;
   opacity: 1;
   transition: opacity 900ms var(--e-both);
 }
-/* The curtain does not slide, it stops being in the way — and it stops taking
-   the pointer immediately, so a visitor who is already reaching for a museum
-   is never clicking through a sheet that is only mostly gone. */
 .loading.is-closing { opacity: 0; pointer-events: none; }
+.loading-field { display: block; width: 100%; height: 100%; }
 
-.loading-text {
-  display: flex; flex-direction: column; justify-content: flex-end;
-  max-width: 62ch; margin: 0 auto; width: 100%;
-  /* the words arrive when the first painting's label does, which is partway
-     through the wait — so they fade in rather than appearing */
-  animation: loading-words 1100ms var(--e-out) both;
-}
-@keyframes loading-words { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.loading-line {
-  margin: 0; color: var(--stone);
-  font-size: clamp(15px, 1.7vw, 20px); line-height: 1.72;
-  /* the first line is set slightly proud of the rest, the way a wall label's
-     opening sentence is */
-  text-wrap: pretty;
-}
-.loading-credit {
-  margin: var(--s4) 0 0; color: var(--gilt);
-  font-size: 10px; letter-spacing: 0.16em;
-}
-
-.loading-foot {
-  display: flex; align-items: baseline; justify-content: space-between;
-  gap: var(--s4); margin: 0 auto; max-width: 62ch; width: 100%;
-}
-.loading-word {
-  margin: 0; color: var(--bone); letter-spacing: 0.35em;
-}
-.loading-step { margin: 0; color: var(--taupe); letter-spacing: 0.14em; font-size: 10px; }
-.loading-count { opacity: 0.55; }
-
-.loading-rule {
-  position: absolute; bottom: 16px; left: var(--s6); right: var(--s6);
-  height: 1px; background: var(--gilt);
-  transform-origin: left center;
-  transition: transform 700ms var(--e-out);
-}
-
-@media (max-width: 700px) {
-  .loading { padding: var(--s6) var(--s5) 44px; }
-  .loading-rule { left: var(--s5); right: var(--s5); }
-}
-
-/* Nothing here moves for a visitor who has asked for that. */
 @media (prefers-reduced-motion: reduce) {
-  .loading-text { animation: none; }
-  .loading, .loading-rule { transition: none; }
+  .loading { transition: none; }
 }
 
 .webgl-missing {
@@ -808,66 +763,108 @@ button:active { transform: translateY(1px); }
 }
 
 /* ─── contact ────────────────────────────────────────────────────────────
-   Three fields on the About tab. It posts to VITE_CONTACT_ENDPOINT when one
-   is configured and otherwise composes a mailto, so it works out of the box
-   with no account anywhere. Inputs are ruled lines rather than boxes: the
-   panel is a page, and a page has lines to write on. */
-/* ─── contact ────────────────────────────────────────────────────────────
-   A room at the end of the document. Deep umber over ink, a thin gilt rule
-   along the top, and the fields lit from inside rather than punched out of
-   white — the page has been bright for a thousand words by the time anybody
-   reaches this, and the form should feel like arriving somewhere. */
+   The visitors' book.
+
+   This was a dark card with rounded corners, filled input boxes and a gilt
+   pill button — a perfectly ordinary web form, dropped into the middle of a
+   document that is set like a catalogue. Nothing else in the exhibition has
+   a soft-cornered panel or a pill in it; the rooms are flat colour and a
+   hairline, the labels are small caps over a gilt rule, and the one link
+   that leaves the site is a word with an arrow after it.
+
+   So the form is furniture from the same workshop now. Museums keep a book
+   by the door: ruled lines, a caption over each, nothing boxed. The rules are
+   ink at low alpha and go gilt under the cursor; the send is a word and an
+   arrow, not a button-shaped object; and the whole thing stays on the bone
+   page rather than arriving as a slab of another colour. */
 .credits-contact {
   margin-top: var(--s7);
-  padding: var(--s6) var(--s6) var(--s5);
-  /* Flat, not a gradient. Nothing else on this site is a soft-cornered card
-     with light pooling in one corner of it; the rooms are flat colour and a
-     rule, and so is this. One tone of the exhibition's own wall, a hairline,
-     and a gilt band along the top — which is a wall label, which is what the
-     rest of the page is made of. */
-  background: var(--c-spine);
-  border: 1px solid rgba(242, 235, 223, 0.1);
-  border-top: 2px solid var(--gilt);
-  border-radius: var(--r-sm);
-  color: var(--bone);
+  padding-top: var(--s5);
+  /* the one heavy rule on the page, because this is where it ends */
+  border-top: 2px solid var(--c-gilt);
 }
-.credits-contact .credits-note { color: rgba(242, 235, 223, 0.82); }
-.credits-contact-head { color: var(--gilt); border-color: rgba(201, 162, 39, 0.35); }
-.credits-contact .caption { color: rgba(242, 235, 223, 0.6); }
+.credits-contact-head { color: var(--c-accent); }
+/* Every other section on this page earns its gilt rule by not having one
+   above it. This one sits directly under the heavy band that opens the
+   section, and two gilt rules four lines apart read as indecision rather than
+   as structure — so the heading here is small caps and nothing else. */
+.credits-contact-head::after { display: none; }
 
-.contact { display: flex; flex-direction: column; gap: var(--s4); margin-top: var(--s2); }
-.contact-field { display: flex; flex-direction: column; gap: 5px; }
-.contact-field .caption { color: rgba(242, 235, 223, 0.6); opacity: 1; letter-spacing: 0.14em; }
+.contact { display: flex; flex-direction: column; gap: var(--s5); margin-top: var(--s5); }
+
+/* name and address are short and belong on one line; the message is not */
+.contact-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5);
+}
+@media (max-width: 620px) { .contact-row { grid-template-columns: 1fr; gap: var(--s5); } }
+
+.contact-field { display: flex; flex-direction: column; gap: 2px; }
+.contact-field .caption {
+  color: rgba(36, 31, 26, 0.5); opacity: 1;
+  letter-spacing: 0.16em; text-transform: uppercase; font-size: 10px;
+}
 .contact-field input,
 .contact-field textarea {
-  font: inherit; font-size: 15px; line-height: 24px; color: var(--bone);
-  background: rgba(12, 10, 8, 0.3);
-  border: 1px solid rgba(242, 235, 223, 0.16);
-  border-radius: var(--r-sm);
-  padding: 8px 11px;
+  font: inherit; font-size: 16px; line-height: 30px;
+  color: var(--ink);
+  background: none;
+  border: none;
+  /* the line you write on, and nothing else */
+  border-bottom: 1px solid rgba(36, 31, 26, 0.22);
+  border-radius: 0;
+  padding: 2px 0 4px;
   width: 100%;
-  transition: border-color var(--d-fast), background-color var(--d-fast);
+  transition: border-color var(--d-fast);
 }
-.contact-field textarea { resize: vertical; min-height: 108px; }
+.contact-field textarea {
+  resize: vertical; min-height: 90px;
+  /* a ruled page rather than one long line: the rule repeats down it at the
+     same rhythm as the line height, so the message field is the book */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 29px,
+    rgba(36, 31, 26, 0.12) 29px,
+    rgba(36, 31, 26, 0.12) 30px
+  );
+  border-bottom-color: transparent;
+}
 .contact-field input:focus,
 .contact-field textarea:focus {
   outline: none;
-  border-color: rgba(201, 162, 39, 0.75);
-  background: rgba(12, 10, 8, 0.45);
+  border-bottom-color: var(--c-gilt);
 }
+.contact-field textarea:focus { border-bottom-color: transparent; box-shadow: none; }
 .contact-field input::placeholder,
-.contact-field textarea::placeholder { color: rgba(242, 235, 223, 0.34); }
-.contact-foot { display: flex; align-items: center; gap: var(--s4); flex-wrap: wrap; }
-.contact-send {
-  color: #241f1a; background: var(--gilt);
-  padding: 9px 24px; border-radius: 999px; font-weight: 500;
-  transition: background-color var(--d-fast), opacity var(--d-fast);
+.contact-field textarea::placeholder {
+  color: rgba(36, 31, 26, 0.32); font-style: italic;
 }
-.contact-send:hover:not(:disabled) { background: #ddb734; }
-.contact-send:disabled { opacity: 0.35; cursor: default; }
-.contact-error { color: #e0876d; text-transform: none; letter-spacing: 0.02em; }
-.contact-again { color: var(--gilt); margin-top: var(--s2); }
-.contact-again:hover { text-decoration: underline; }
+
+.contact-foot { display: flex; align-items: baseline; gap: var(--s5); flex-wrap: wrap; }
+/* A word and an arrow — the same grammar as every other action on this site.
+   The rule under it is the affordance; there is no button-shaped object. */
+.contact-send {
+  color: var(--c-accent); letter-spacing: 0.18em; text-transform: uppercase;
+  font-size: 11px; padding: 4px 0;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.45);
+  transition: border-color var(--d-fast), color var(--d-fast), opacity var(--d-fast);
+}
+.contact-send::after { content: ' →'; }
+.contact-send:hover:not(:disabled) { border-bottom-color: var(--c-gilt); color: var(--ink); }
+.contact-send:disabled { opacity: 0.3; cursor: default; border-bottom-color: transparent; }
+.contact-send[data-sending]::after { content: ' ·'; }
+.contact-error {
+  color: #9c4221; text-transform: none; letter-spacing: 0.02em; font-style: italic;
+}
+/* the acknowledgement reads as a hand-written note under the rule, which is
+   what a visitors' book gives you back */
+.contact-thanks { font-style: italic; }
+.contact-again {
+  color: var(--c-accent); letter-spacing: 0.18em; text-transform: uppercase;
+  font-size: 10px; margin-top: var(--s3); display: inline-block;
+  border-bottom: 1px solid transparent;
+}
+.contact-again:hover { border-bottom-color: var(--c-gilt); }
 
 /* ─── cursor ───────────────────────────────────────────────
    A thin light ring carrying its own dark contact shadow, so it reads against
