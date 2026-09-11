@@ -9,6 +9,26 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23241f1a'/%3E%3Crect x='7' y='7' width='18' height='18' fill='none' stroke='%23c9a227' stroke-width='2'/%3E%3C/svg%3E"
     />
+    <!--
+      The two manifests the first screen cannot start without.
+
+      Boot is a chain: the bundle has to arrive and run before it can ask for
+      the museum list, and the entrance has to have the list of works before it
+      can choose a painting to open on. That is two round trips spent one after
+      the other, after everything else has finished downloading, with a loading
+      bar on screen for the whole of it.
+
+      Asked for here, they are in flight from the moment the browser reads the
+      head — alongside the JavaScript rather than behind it — and are usually
+      already in the cache by the time anything calls fetch(). %BASE_URL% is
+      substituted at build time, so this survives being served from a subpath.
+
+      No `crossorigin`: these are same-origin fetches, and a preload whose CORS
+      mode does not match the request that follows is a preload the browser
+      warns about and then throws away.
+    -->
+    <link rel="preload" href="%BASE_URL%museums/index.json" as="fetch" />
+    <link rel="preload" href="%BASE_URL%museums/works.json" as="fetch" />
     <style>
       /* Boot backdrop before React mounts — bone, never a white flash */
       html { background: #241f1a; }

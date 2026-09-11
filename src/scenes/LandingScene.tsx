@@ -27,10 +27,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GlyphPrePass } from '../glyph/GlyphPrePass';
-import { loadArtwork, loadReveal, type LoadedArtwork } from '../glyph/artworkLoader';
+import { loadArtwork, loadReveal, retain, type LoadedArtwork } from '../glyph/artworkLoader';
 import { lens } from '../transitions/lens';
 import { pointer } from '../state/motion';
 import { useStore } from '../state/store';
+import { markBoot } from '../state/boot';
 import { exhibitionWorks, heroWorks, shuffled, type ExhibitionWork } from '../state/works';
 import type { DeviceTier } from '../types';
 
@@ -147,21 +148,53 @@ function Hero({
 
   useEffect(() => {
     let alive = true;
+    let upgrade = 0;
     setArt(null);
+    /*
+     * Held for as long as this hero is mounted, so the entrance's carousel
+     * cannot evict the painting it is in the middle of drawing. Released on
+     * teardown, which is what lets the resident set reclaim the works that
+     * have already gone past — see artworkLoader.
+     */
+    const release = retain(id, tier);
+
     void loadArtwork(id, tier).then((a) => {
       if (!alive) return;
       setArt(a);
       /*
-       * The full 2000px reproduction, not the 1200px one the gallery asks
-       * for. This is the only place a painting is stretched across an entire
-       * window, so it is the one place that needs every pixel that exists.
+       * The first painting has landed, and with it the words the entrance
+       * curtain is showing while it waits — see state/boot.ts. Only the live
+       * hero speaks for the door; the outgoing side of a crossfade is not a
+       * first anything.
        */
-      void loadReveal(a, 'full');
+      if (role === 'in') markBoot('canvas');
+      /*
+       * The 1200px rung first, then the 2000px one behind it.
+       *
+       * This is the only place a painting is stretched across an entire
+       * window, so it does want every pixel that exists — but it wants them
+       * second. Asking for `full` alone meant the entrance showed letters
+       * over an empty ground until a third of a megabyte had landed, on the
+       * one screen where a visitor is deciding whether to stay. `view` is a
+       * third of the bytes and arrives that much sooner; the upgrade follows
+       * a beat later and replaces it in place, which is a sharpening nobody
+       * watches happen.
+       *
+       * The outgoing side of a crossfade is on screen for three seconds and
+       * fading, and never asks for the upgrade at all.
+       */
+      void loadReveal(a, 'view');
+      if (role === 'out') return;
+      upgrade = window.setTimeout(() => {
+        if (alive) void loadReveal(a, 'full');
+      }, 900);
     });
     return () => {
       alive = false;
+      window.clearTimeout(upgrade);
+      release();
     };
-  }, [id, tier]);
+  }, [id, tier, role]);
 
   const uniforms = useMemo(
     () => ({
@@ -321,6 +354,28 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
     if (order.length < 2) return;
     let raf = 0;
     let timer = 0;
+    /*
+     * A hidden tab is not an audience.
+     *
+     * The carousel is a timer, and a timer keeps its appointments whether or
+     * not anybody is in the room: a visitor who opened the entrance and went
+     * to lunch came back to a page that had quietly downloaded a glyph binary
+     * and a reproduction for every work it had cycled through while nobody
+     * was looking. The change is deferred instead, and happens on the frame
+     * after they come back — so the work waiting for them is the one that was
+     * on screen when they left.
+     */
+    const cleanups: Array<() => void> = [];
+    const whenVisible = (fn: () => void) => {
+      if (!document.hidden) return fn();
+      const resume = () => {
+        if (document.hidden) return;
+        document.removeEventListener('visibilitychange', resume);
+        fn();
+      };
+      document.addEventListener('visibilitychange', resume);
+      cleanups.push(() => document.removeEventListener('visibilitychange', resume));
+    };
     const advance = () => {
       setPair((p) => ({ from: p.to, to: (p.to + 1) % order.length }));
       fade.current.mix = 0;
@@ -335,15 +390,16 @@ export function LandingScene({ tier }: { tier: DeviceTier }) {
           // the only render in the whole change: the outgoing work leaves the
           // tree, and its pre-pass and its target go with it
           setCrossing(false);
-          timer = window.setTimeout(advance, HOLD_MS);
+          timer = window.setTimeout(() => whenVisible(advance), HOLD_MS);
         }
       };
       raf = requestAnimationFrame(step);
     };
-    timer = window.setTimeout(advance, HOLD_MS);
+    timer = window.setTimeout(() => whenVisible(advance), HOLD_MS);
     return () => {
       window.clearTimeout(timer);
       cancelAnimationFrame(raf);
+      for (const off of cleanups) off();
     };
   }, [order]);
 

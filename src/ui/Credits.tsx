@@ -591,30 +591,45 @@ export function Credits() {
 /**
  * The contact form.
  *
- * Two ways it can deliver, and it picks whichever is configured:
+ * It delivers one way and one way only: `VITE_CONTACT_ENDPOINT`, a form
+ * service URL (Formspree, Web3Forms, Basin) or a serverless function of your
+ * own. The message is POSTed as JSON, the visitor never leaves the
+ * exhibition, and the address it eventually reaches is known to the form
+ * service and to nobody else.
  *
- *   1. `VITE_CONTACT_ENDPOINT` — a Formspree / Getform / Basin form URL, or a
- *      serverless function of your own. The message is POSTed as JSON, the
- *      visitor never leaves the exhibition, and the address stays with the
- *      form service. This is the private option and the one to use.
- *   2. `VITE_CONTACT_EMAIL` — the form composes a `mailto:` and hands it to
- *      the visitor's own mail client.
+ * THERE IS DELIBERATELY NO `mailto:` FALLBACK.
+ *   It is the obvious way to build a contact form and it cannot be made
+ *   private. Vite substitutes environment variables at build time, so an
+ *   address put in one becomes a plain string sitting in the shipped
+ *   JavaScript, which any visitor can read and any scraper can harvest — and
+ *   then `mailto:` hands it to the visitor a second time by opening their own
+ *   mail client with it in the To: field. An endpoint URL gives away nothing:
+ *   it is a form id, it is meant to be public, and the address behind it
+ *   never reaches the browser at all.
  *
- * Neither is set by default, and that is deliberate. Vite substitutes these
- * at build time, so whatever is in them becomes a plain string in the shipped
- * JavaScript: an address put here is not hidden from anybody who opens the
- * bundle, and a crawler reading .js files finds it as easily as one reading
- * HTML. (2) therefore publishes the address by definition — twice over, since
- * the mail client shows it to the visitor as well. (1) does not publish it at
- * all.
+ *   This used to support both, choosing whichever was configured. The
+ *   fallback is gone rather than merely discouraged, because a private
+ *   contact form with a public-by-construction fallback one misconfiguration
+ *   away is not a private contact form.
  *
- * With neither configured the form is not rendered. A form that silently goes
- * nowhere is worse than no form.
+ * With no endpoint configured the form is not rendered. A form that silently
+ * goes nowhere is worse than no form.
  *
  * It is deliberately three fields. Every extra one costs replies.
  */
-const CONTACT_ENDPOINT = (import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined) ?? '';
-const CONTACT_EMAIL = (import.meta.env.VITE_CONTACT_EMAIL as string | undefined) ?? '';
+/*
+ * Either name works.
+ *
+ * `VITE_CONTACT_ENDPOINT` is the Vite convention; `CONTACT_ENDPOINT` is here
+ * because some hosts' dashboards will not take the first one, and being told
+ * your contact form is broken by a naming convention is a bad afternoon.
+ * `envPrefix` in vite.config.ts is what lets the shorter name through — a
+ * variable Vite has not been told to expose is simply absent at runtime,
+ * which looks exactly like a form that has not been configured.
+ */
+const CONTACT_ENDPOINT =
+  ((import.meta.env.VITE_CONTACT_ENDPOINT ??
+    import.meta.env.CONTACT_ENDPOINT) as string | undefined) ?? '';
 
 function ContactForm() {
   const [name, setName] = useState('');
@@ -625,18 +640,6 @@ function ContactForm() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
-
-    if (!CONTACT_ENDPOINT && CONTACT_EMAIL) {
-      const subject = `Placard — a note from ${name.trim() || 'a visitor'}`;
-      const body = `${message}\n\n— ${name.trim() || 'anonymous'}${
-        email.trim() ? ` <${email.trim()}>` : ''
-      }`;
-      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-        subject,
-      )}&body=${encodeURIComponent(body)}`;
-      setState('sent');
-      return;
-    }
 
     setState('sending');
     try {
@@ -655,8 +658,8 @@ function ContactForm() {
     }
   };
 
-  /* Nowhere to send it: say so rather than collect words into a void. */
-  if (!CONTACT_ENDPOINT && !CONTACT_EMAIL) return null;
+  /* Nowhere to send it: show nothing rather than collect words into a void. */
+  if (!CONTACT_ENDPOINT) return null;
 
   return (
     /* The one dark panel on a bone page. Everything above it is a document to
@@ -666,41 +669,42 @@ function ContactForm() {
     <section className="credits-contact">
       <h3 className="meta credits-section credits-contact-head">Write to me</h3>
       {state === 'sent' ? (
-        <p className="body credits-note">
-          {CONTACT_ENDPOINT
-            ? 'Thank you — it arrived. I read everything.'
-            : 'Your mail client should be opening with the message in it, ready to send.'}
+        <p className="body credits-note contact-thanks">
+          Thank you — it arrived. I read everything.
           <br />
           <button className="caption contact-again" onClick={() => setState('idle')}>
-            Write another →
+            Write another
           </button>
         </p>
       ) : (
         <>
           <p className="body credits-note">
-            Something you liked, something that broke, a painting that should be here — write it
-            down and I will get it.
+            Something you liked, something that broke, a painting you think ought to be hanging
+            here — or nothing in particular at all. Write it down and I will write back.
           </p>
           <form className="contact" onSubmit={submit}>
-            <label className="contact-field">
-              <span className="caption">Your name</span>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoComplete="name"
-              />
-            </label>
-            <label className="contact-field">
-              <span className="caption">Your email</span>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                placeholder="so I can reply"
-              />
-            </label>
+            {/* the two short answers share a line; the message gets the page */}
+            <div className="contact-row">
+              <label className="contact-field">
+                <span className="caption">Your name</span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoComplete="name"
+                />
+              </label>
+              <label className="contact-field">
+                <span className="caption">Your email</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  placeholder="so I can reply"
+                />
+              </label>
+            </div>
             <label className="contact-field">
               <span className="caption">Message</span>
               <textarea
@@ -714,9 +718,10 @@ function ContactForm() {
               <button
                 type="submit"
                 className="caption contact-send"
+                data-sending={state === 'sending' ? '' : undefined}
                 disabled={state === 'sending' || !message.trim()}
               >
-                {state === 'sending' ? 'Sending…' : 'Send'}
+                {state === 'sending' ? 'Sending' : 'Send'}
               </button>
               {state === 'failed' && (
                 <span className="caption contact-error">

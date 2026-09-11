@@ -3,8 +3,8 @@
   "name": "Musée d'Orsay",
   "city": "Paris",
   "homepage": "https://www.musee-orsay.fr/en",
-  "subtitle": "The central nave, after sunset",
-  "blurb": "A railway station turned gallery: arched steel and glass overhead, the sky going out through it, and the pictures picked out one at a time.",
+  "subtitle": "Central Nave",
+  "blurb": "The former Gare d'Orsay railway station turned gallery: arched steel and glass overhead, the sky going out through it, and the pictures picked out one at a time.",
   "corridorNote": "Modelled on the vast central nave of the Gare d'Orsay, at the end of the day. The colossal vaulted roof of arched steel and glass is dark now and you can see the first stars through it; the carved stone of the walls and archways holds what is left of the blue; and the light in the hall comes from the picture lamps on their short arms, one over each canvas, tungsten and warm, with the dark between them. The enormous gilded clock still hangs at the far end, which is where the corridor's vanishing point lands.",
   "style": {
     "ceiling": "steel-glass-arch",

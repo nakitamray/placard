@@ -14,7 +14,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { selectArtworks, useStore } from '../state/store';
-import { placardAnchor } from '../scenes/GalleryScene';
+import { placardAnchor } from '../scenes/placardAnchor';
 import { loadMeta } from '../glyph/artworkLoader';
 import { endReveal, latchReveal } from '../transitions/reveal';
 import { discoverWork } from '../state/atlas';

@@ -36,8 +36,124 @@ export interface LoadedArtwork {
   revealLevel: 'none' | 'view' | 'full';
 }
 
-const cache = new Map<string, Promise<LoadedArtwork>>();
 const texLoader = new THREE.TextureLoader();
+
+/* ── the resident set ───────────────────────────────────────────────────── */
+
+/**
+ * How many works stay in memory at once.
+ *
+ * A loaded work is not small: a corpus texture up to 2048 wide, a palette, a
+ * wall thumbnail, and — once anybody has looked at it — a 1200 or 2000px
+ * reproduction sitting in video memory. Six of those is comfortably more than
+ * anything on screen ever needs (the gallery's warm zone holds four, the
+ * entrance holds two mid-crossfade) and is a ceiling rather than a target.
+ *
+ * There was no ceiling before, and the entrance is a carousel: it changes
+ * work every fifteen seconds, for as long as somebody leaves the tab open,
+ * and every one of those was kept for the life of the page. Ten minutes at
+ * the front door was seventy paintings' worth of textures the browser could
+ * not reclaim, which is the shape of slowness people describe as "it gets
+ * worse the longer I leave it".
+ */
+const MAX_RESIDENT = 6;
+
+/**
+ * How long an unclaimed work is left alone before it can be evicted.
+ *
+ * Not everything that reads a work holds on to it — Thread Pull asks for the
+ * one it is tearing a region out of and lets go the same tick. The grace
+ * period means a request in flight, or a component between renders, is never
+ * evicted out from under itself; anything longer-lived says so with `retain`.
+ */
+const GRACE_MS = 10_000;
+
+interface Entry {
+  promise: Promise<LoadedArtwork>;
+  /** set once the load resolves — null while it is still in flight */
+  art: LoadedArtwork | null;
+  /** how many mounted components are drawing this work right now */
+  refs: number;
+  /** when anything last asked for it */
+  used: number;
+}
+
+const cache = new Map<string, Entry>();
+
+const keyFor = (id: string, tier: DeviceTier) => `${id}${tier.glyphSuffix}`;
+
+/**
+ * Hand every GPU resource this work owns back to the driver.
+ *
+ * Dropping the JavaScript reference is not enough: a THREE texture holds a
+ * WebGL object that only `dispose()` releases, and the typed arrays behind
+ * the glyph buffers are already on the GPU as attribute data.
+ */
+function evict(key: string, entry: Entry) {
+  cache.delete(key);
+  const art = entry.art;
+  if (!art) return;
+  art.corpusTex.dispose();
+  art.paletteTex.dispose();
+  art.wallTex.dispose();
+  art.fullTex?.dispose();
+  // the reproduction ladder is this work's too — leaving it behind would keep
+  // the largest texture of the lot alive with nothing left to draw it
+  revealCache.delete(`${art.id}/view`);
+  revealCache.delete(`${art.id}/full`);
+}
+
+/**
+ * Drop the least recently used works until the set is back under its ceiling.
+ *
+ * Nothing held by a mounted component is ever a candidate, and neither is
+ * anything still loading — there is nothing to dispose yet, and the promise
+ * has somebody waiting on it.
+ */
+function sweep() {
+  if (cache.size <= MAX_RESIDENT) return;
+  const now = performance.now();
+  const spare = [...cache.entries()]
+    .filter(([, e]) => e.refs === 0 && e.art !== null && now - e.used > GRACE_MS)
+    .sort((a, b) => a[1].used - b[1].used);
+  for (const [key, entry] of spare) {
+    if (cache.size <= MAX_RESIDENT) return;
+    evict(key, entry);
+  }
+}
+
+/** Is this the copy of the work the cache is still holding? */
+function resident(art: LoadedArtwork): boolean {
+  for (const entry of cache.values()) if (entry.art === art) return true;
+  return false;
+}
+
+/**
+ * Keep a work resident for as long as something is drawing it.
+ *
+ * Call it from the effect that puts the work on screen and call the returned
+ * function when that effect tears down — the entrance's two heroes and the
+ * gallery's warm zone both do. A work nobody has claimed is fair game for the
+ * sweep above; a claimed one cannot be taken away mid-frame.
+ */
+export function retain(id: string, tier: DeviceTier): () => void {
+  const key = keyFor(id, tier);
+  // make sure there is something to hold on to, even if the caller retains
+  // before it asks for the load
+  void loadArtwork(id, tier);
+  const entry = cache.get(key);
+  if (entry) entry.refs++;
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    const e = cache.get(key);
+    if (!e) return;
+    e.refs = Math.max(0, e.refs - 1);
+    e.used = performance.now();
+    sweep();
+  };
+}
 
 /**
  * Load a texture, stepping down the format ladder if the browser turns out
@@ -84,9 +200,12 @@ export function loadMeta(id: string): Promise<ArtworkMeta> {
 }
 
 export function loadArtwork(id: string, tier: DeviceTier): Promise<LoadedArtwork> {
-  const key = `${id}${tier.glyphSuffix}`;
+  const key = keyFor(id, tier);
   const hit = cache.get(key);
-  if (hit) return hit;
+  if (hit) {
+    hit.used = performance.now();
+    return hit.promise;
+  }
 
   const p = (async (): Promise<LoadedArtwork> => {
     const base = asset(`artworks/${id}`);
@@ -141,7 +260,19 @@ export function loadArtwork(id: string, tier: DeviceTier): Promise<LoadedArtwork
     };
   })();
 
-  cache.set(key, p);
+  const entry: Entry = { promise: p, art: null, refs: 0, used: performance.now() };
+  cache.set(key, entry);
+  void p.then(
+    (art) => {
+      entry.art = art;
+      sweep();
+    },
+    () => {
+      // a failed load is not worth remembering: the next visitor to this work
+      // should get a fresh attempt rather than the same rejected promise
+      if (cache.get(key) === entry) cache.delete(key);
+    },
+  );
   return p;
 }
 
@@ -175,6 +306,21 @@ export function loadReveal(
   }
   return p.then(
     (t) => {
+      /*
+       * The work may have left while its reproduction was in the air.
+       *
+       * A 2000px painting is the largest single thing this exhibition
+       * downloads, and it can easily still be arriving when the entrance
+       * moves on to the next hero and the sweep reclaims the work it belongs
+       * to. Handing it to an artwork nothing is drawing any more would leak
+       * exactly the texture the resident set exists to bound, so it is
+       * disposed on arrival instead.
+       */
+      if (!resident(art)) {
+        t.dispose();
+        revealCache.delete(key);
+        return art.fullTex;
+      }
       // a slower `view` must not overwrite a `full` that landed first
       if (RANK[art.revealLevel] < RANK[size]) {
         art.fullTex = t;
@@ -213,7 +359,14 @@ export function prefetchAround(
   onLoad?: (i: number, art: LoadedArtwork) => void,
 ): () => void {
   let alive = true;
+  /*
+   * The warm zone is a claim, not just a fetch. Four works are held for as
+   * long as the visitor is standing among them, so the resident set cannot
+   * evict the one they are looking at to make room for the one behind them.
+   */
+  const held: Array<() => void> = [];
   const take = (i: number) => {
+    held.push(retain(ids[i], tier));
     void loadArtwork(ids[i], tier).then((art) => {
       if (alive) onLoad?.(i, art);
     });
@@ -228,5 +381,6 @@ export function prefetchAround(
   });
   return () => {
     alive = false;
+    for (const release of held) release();
   };
 }

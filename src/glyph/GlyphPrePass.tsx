@@ -6,7 +6,7 @@
  * the active artwork plane samples as a map. Exactly one artwork renders
  * live glyphs at any moment.
  */
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { getGlyphAtlas } from './glyphAtlas';
@@ -15,6 +15,7 @@ import type { LoadedArtwork } from './artworkLoader';
 import { useStore } from '../state/store';
 import { threadPullAnim } from '../threadpull/state';
 import { lens } from '../transitions/lens';
+import { useWarmup } from '../render/warmup';
 
 export const glyphRT: { current: THREE.WebGLRenderTarget | null } = { current: null };
 
@@ -165,6 +166,27 @@ export function GlyphPrePass({
     sizeScale: undefined as number | undefined,
   });
 
+  /**
+   * Whether this pass has a mesh yet.
+   *
+   * The shader warm-up below needs something to compile: asking the driver to
+   * build the programs for an empty scene succeeds immediately and teaches it
+   * nothing, and the stall comes straight back on the first real frame.
+   */
+  const [built, setBuilt] = useState(false);
+
+  /*
+   * Compile before the first draw rather than during it.
+   *
+   * This material is the most expensive program in the exhibition, and until
+   * something tried to render with it the driver had not built it — so the
+   * build landed on the first frame the visitor ever saw. Warmed here, it is
+   * paid for behind the entrance curtain; see render/warmup.tsx. This is the
+   * compile the loading screen is actually waiting for, so it is the one that
+   * reports.
+   */
+  useWarmup(scene, built, true);
+
   // swap attribute buffers when the active artwork changes ( // buffers are precomputed; this is only bufferData calls)
   useEffect(() => {
     if (!artwork) return;
@@ -182,6 +204,8 @@ export function GlyphPrePass({
     u.uPalette.value = artwork.paletteTex;
     u.uPaletteSize.value = artwork.paletteSize;
     u.uImageSize.value.set(artwork.glyphs.imageW, artwork.glyphs.imageH);
+
+    setBuilt(true);
 
     // letterbox the ortho camera so the artwork aspect is preserved in the RT
     return () => {

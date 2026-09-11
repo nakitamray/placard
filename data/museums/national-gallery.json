@@ -4,30 +4,31 @@
   "city": "London",
   "homepage": "https://www.nationalgallery.org.uk",
   "subtitle": "Room 32",
-  "blurb": "Deep crimson walls under a pitched glass lantern, gilded archways, polished light wood underfoot.",
-  "corridorNote": "Modelled on Room 32 at the National Gallery, London — the Julia and Hans Rausing Room: deep crimson walls under a pitched glass lantern carried on gilded archways, warm red and gold coving, a polished light wood floor, tufted leather seating down the centre, and a small number of very large works hung singly in heavy swept gilt frames.",
+  "blurb": "Deep crimson walls under a long glazed lantern, a coffered red and gold ceiling on gilded arches, and a doorway through to the next room.",
+  "corridorNote": "Modelled on Room 32 at the National Gallery, London — the Julia and Hans Rausing Room: a wide, tall room with deep crimson walls, a continuous glazed lantern down the centre of the ceiling flanked by deeply coffered coves in red and gold, transverse gilded arches on a heavy gilded cornice, a light oak floor bordered in dark inlay, tufted leather seating down the centre, and an opening at the far end through to the next red room. A small number of very large works hang singly in heavy swept gilt frames.",
   "style": {
     "ceiling": "pitched-glass",
     "floor": "parquet",
     "wall": "crimson-enfilade",
     "frame": "gallery-swept",
     "hang": "single",
-    "halfWidth": 4.6,
-    "wallHeight": 5.6,
-    "vaultHeight": 9.8,
+    "halfWidth": 7.0,
+    "wallHeight": 6.0,
+    "vaultHeight": 9.6,
     "bays": 9,
-    "bayDepth": 5.6,
+    "bayDepth": 5.2,
     "palette": {
-      "wall": "#7C1D23",
-      "wallDeep": "#5C1319",
-      "molding": "#E9DEC6",
-      "gilt": "#CBA13A",
-      "ceiling": "#F1EEE6",
+      "wall": "#8A1E27",
+      "wallDeep": "#5E1219",
+      "molding": "#EFE6D2",
+      "gilt": "#C9A227",
+      "ceiling": "#F4F1E9",
       "ceilingAccent": "#8E2A26",
-      "floor": "#C9A97C",
-      "floorInlay": "#8B6C46",
+      "floor": "#D8BC92",
+      "floorInlay": "#6E4B2C",
       "accent": "#8E2F2C",
-      "sky": "#F3F7FC"
+      "sky": "#F5F8FC",
+      "stone": "#2F3A33"
     },
     "light": {
       "key": "#FFF9F0",
@@ -56,8 +57,10 @@
       "chandeliers": false,
       "placards": true,
       "clock": false,
-      "terraces": false
-    }
+      "terraces": false,
+      "doorway": true
+    },
+    "blurb": "Deep crimson walls under a long glazed lantern, a coffered red and gold ceiling on gilded arches, and a doorway through to the next room."
   },
   "plan": {
     "viewBox": "20 20 528 366",

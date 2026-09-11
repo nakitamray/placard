@@ -13,6 +13,20 @@ gallery rail → one painting**.
 
 Requires WebGL2. Sound is off until you turn it on.
 
+**[Open the exhibition →](https://placard-ten.vercel.app/)**
+
+---
+
+## At a glance
+
+|  |  |
+|---|---|
+| **What it is** | A browser exhibition of seventy paintings, each one drawn live out of the writing about it |
+| **Built with** | TypeScript · React · three.js / react-three-fiber · GSAP · Zustand · Vite |
+| **Rendering** | A custom instanced-glyph shader draws tens of thousands of characters into an off-screen target each frame; seven procedurally modelled museum rooms, no external 3D assets |
+| **Pipeline** | An offline build turns authored records and public-domain scans into image ladders, text corpora and packed glyph binaries |
+| **Runs on** | Anything with WebGL2, phone to desktop, under a three-step quality budget that measures its own frame times and steps down if it has to |
+
 ---
 
 # Visiting
@@ -137,9 +151,12 @@ prebuilt binaries. `public/artworks/` and `public/museums/` are generated and
 not committed, so `build:assets` has to run once after install; it takes a few
 minutes, because seventy works are each analysed into a glyph field twice.
 
-`fetch:images` is optional — skip it and any work without a scan renders a
-procedural stand-in, which is honest and obvious and not what you want on a
-published site.
+`fetch:images` is optional. Skipped, any work without a scan renders a
+procedural stand-in — honest and obvious, and not what belongs on a published
+site.
+
+Copy `.env.example` to `.env.local` to enable the contact form locally; see
+[Contact form](#contact-form).
 
 | Command | |
 |---|---|
@@ -584,33 +601,16 @@ publishing a broken room. Warnings — a work still on a stand-in, a scan whose
 proportions do not match its catalogue — do not.
 
 Set `VITE_CONTACT_ENDPOINT` in the project's environment variables if you want
-the contact form. Without it — or `VITE_CONTACT_EMAIL` — the form is not
-rendered at all, because a form that goes nowhere is worse than no form. See
-[Contact form](#contact-form) for which of the two to use.
+the contact form. Without it the form is not rendered at all, because a form
+that goes nowhere is worse than no form. See [Contact form](#contact-form).
 
-**If six minutes a deploy becomes annoying**, the fix is to stop rebuilding
-what did not change: commit `public/artworks` and `public/museums` (they are
-in `.gitignore` for a reason — they are generated — but they are also
-deterministic), and set the build command to `pnpm build` alone. That trades
-90 MB of repository for a twenty-second deploy. Do it when the exhibition
-stops changing, not before.
-
-### GitHub Pages
-
-`.github/workflows/deploy.yml` does the same on every push to `main`. Turn it
-on with **Settings → Pages → Source: GitHub Actions**; the site lands at
-`https://<user>.github.io/<repo>/`.
-
-Two caches carry the cost across runs:
-
-| Cache | Keyed on | Effect |
-|---|---|---|
-| Fetched scans | `data/image-sources.json`, `data/collections/*` | Wikimedia is hit once, not on every deploy |
-| Built assets | `data/**`, `scripts/**`, `shared/**` | editing one placard rebuilds that work and reuses the other sixty-nine |
-
-`workflow_dispatch` has a **refetch** checkbox for pulling the paintings again
-deliberately. The image fetch is `continue-on-error`, so an unreachable Commons
-falls back to stand-ins rather than failing the deploy.
+**Trading repository size for deploy time.** The build is dominated by
+regenerating assets that did not change. Committing `public/artworks` and
+`public/museums` — they are gitignored because they are generated, but they
+are also deterministic — and setting the build command to `pnpm build` alone
+turns a six-minute deploy into a twenty-second one, at the cost of 90 MB in
+the repository. Worth doing once a collection has stopped changing, and not
+before.
 
 ### Serving from a subpath
 
@@ -619,35 +619,53 @@ Vite's `BASE_URL`:
 
 ```bash
 pnpm build                        # a domain root — Vercel, Netlify, S3
-BASE_PATH=/placard/ pnpm build    # a GitHub Pages project site
+BASE_PATH=/placard/ pnpm build    # served from a subdirectory
 ```
 
-The workflow sets it from the repository name; override it with a `BASE_PATH`
-repository variable for a custom domain (use `/`). On Vercel, leave it alone.
+Set `BASE_PATH` in the host's environment to serve from a subdirectory. On
+Vercel, and on any host serving from a domain root, leave it alone.
 
 ## Contact form
 
-The **About** tab of the Colophon carries a three-field form. It needs one of
-two environment variables, and with neither it does not render.
+The **About** tab of the Colophon carries a three-field form. It needs one
+environment variable, and without it the form does not render.
 
 ```
-VITE_CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx   # POSTs JSON, address stays private
-VITE_CONTACT_EMAIL=you@example.com                      # composes a mailto:
+VITE_CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx
+CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx      # the same thing, shorter name
 ```
 
-**Prefer the endpoint.** Vite inlines `VITE_`-prefixed variables at build time,
-so whatever goes in one becomes a plain string in the shipped JavaScript — an
-address set here is readable by anyone who opens the bundle, and a crawler that
-reads `.js` files finds it as fast as one that reads HTML. `VITE_CONTACT_EMAIL`
-therefore publishes the address twice over: once in the bundle and once in the
-mail client it opens in front of the visitor. `VITE_CONTACT_ENDPOINT` publishes
-a form URL instead, and the address lives with the form service.
+**Either name works.** The first is the Vite convention; the second is
+accepted because some hosts' dashboards will not take a `VITE_`-prefixed name.
+What makes the short one possible is `envPrefix` in `vite.config.ts`, which
+lists the prefixes Vite is allowed to expose to the browser — a variable not
+covered by one of them is simply absent at runtime, which looks identical to a
+form nobody has configured. Keep that list narrow: **anything matching a
+prefix in it is published into a file any visitor can read**, so never name a
+secret `CONTACT_ANYTHING`.
 
-Formspree, Getform and Basin all give a free endpoint that takes a JSON POST
-and forwards it to you. A serverless function of your own works too — anything
-that accepts `{ name, email, message }`.
+Set only one of the two. If both are set, `VITE_CONTACT_ENDPOINT` wins.
 
-Because the substitution happens at build time, changing either one needs a
+**The address is never in the browser.** Vite inlines `VITE_`-prefixed
+variables at build time, so whatever goes in one becomes a plain string in the
+shipped JavaScript — readable by anyone who opens the bundle, and findable by
+any crawler that reads `.js` files as easily as one that reads HTML. What goes
+in this variable is a form id, which is meant to be public and gives nothing
+away. The address it forwards to is known to the form service and to nobody
+else, and a visitor who submits the form never sees it.
+
+There is deliberately **no `mailto:` fallback**. It is the obvious way to build
+a contact form and it cannot be made private: the address would sit in the
+bundle *and* be shown to the visitor in their own mail client's To: field. An
+earlier version supported both and chose whichever was set; a private form with
+a public-by-construction fallback one misconfiguration away is not a private
+form, so the fallback was removed rather than discouraged.
+
+Formspree, Web3Forms, Getform and Basin all give a free endpoint that takes a
+JSON POST and forwards it to you. A serverless function of your own works too —
+anything that accepts `{ name, email, message }`.
+
+Because the substitution happens at build time, changing it needs a
 redeploy, not just a restart.
 
 ## Known limits

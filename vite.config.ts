@@ -6,6 +6,27 @@ export default defineConfig({
   // GitHub Pages. Every generated-asset URL goes through src/lib/asset.ts, so
   // setting this is all that is needed to move the site under a subpath.
   base: process.env.BASE_PATH || '/',
+
+  /**
+   * Which environment variables reach the browser.
+   *
+   * Vite exposes nothing to client code by default — a build machine's
+   * environment is full of tokens and deploy keys, and inlining it into a
+   * public bundle would be a catastrophe. Only names carrying one of these
+   * prefixes are substituted into `import.meta.env`.
+   *
+   * `CONTACT_` is here alongside the default so the contact form's endpoint
+   * can be named either `VITE_CONTACT_ENDPOINT` or `CONTACT_ENDPOINT`,
+   * whichever a host will accept. It is the one setting this site needs at
+   * build time and it is public by nature: a form id, which is meant to be
+   * handed out, and never the address behind it.
+   *
+   * ANYTHING MATCHING A PREFIX HERE IS PUBLISHED. Adding a broad one — or
+   * naming a secret `CONTACT_SOMETHING` — puts it in a file any visitor can
+   * read. Keep this list narrow and keep secrets out of the names it covers.
+   */
+  envPrefix: ['VITE_', 'CONTACT_'],
+
   plugins: [react()],
   assetsInclude: ['**/*.bin', '**/*.glsl'],
   build: {

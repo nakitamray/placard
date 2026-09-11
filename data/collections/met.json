@@ -26,7 +26,42 @@
         "#9E4632"
       ],
       "seed": 51
-    }
+    },
+    "regions": [
+      {
+        "id": "washington",
+        "label": "Washington standing",
+        "box": [
+          0.34,
+          0.14,
+          0.58,
+          0.72
+        ],
+        "text": "Standing up in a small boat in a river full of ice, which is the one thing everybody knows is wrong. Leutze knew it too: he needed a vertical at the centre of a picture made entirely of diagonals, and a general sitting down is not a monument. The telescope, the pose and the light all arrive at the same point, and the historical objection has never once stopped the image from working."
+      },
+      {
+        "id": "ice",
+        "label": "The ice and the oars",
+        "box": [
+          0.0,
+          0.58,
+          1.0,
+          1.0
+        ],
+        "text": "The crossing was on the night of 25 December 1776 in sleet, in Durham boats that were forty feet long and carried horses. Leutze paints a rowing boat, daylight coming, and floes that behave more like Rhine ice than Delaware ice — he painted it in Düsseldorf, from the river outside his window. The men at the oars are the part he got right: they are straining, and half of them are not soldiers."
+      },
+      {
+        "id": "flag",
+        "label": "The flag",
+        "box": [
+          0.46,
+          0.06,
+          0.72,
+          0.44
+        ],
+        "text": "The Stars and Stripes did not exist in December 1776; the flag adopted six months later is the one flying here, held by a future president. Leutze was painting in 1850 for a European audience, hoping the American Revolution would encourage the German revolutionaries who had just failed. The anachronism is the message: this is not a report of a night crossing, it is an argument addressed to Europe."
+      }
+    ]
   },
   {
     "id": "david-death-socrates",
@@ -55,7 +90,42 @@
         "#9E3020"
       ],
       "seed": 52
-    }
+    },
+    "regions": [
+      {
+        "id": "hand",
+        "label": "The raised hand and the cup",
+        "box": [
+          0.3,
+          0.18,
+          0.66,
+          0.6
+        ],
+        "text": "He is reaching for the hemlock without looking at it, one finger up, still mid-sentence. The two gestures are the whole picture: the hand that takes the poison and the hand that goes on arguing, at the same moment, by the same man. The jailer holding out the cup has turned his face away and cannot watch."
+      },
+      {
+        "id": "disciples",
+        "label": "The disciples",
+        "box": [
+          0.0,
+          0.22,
+          0.34,
+          0.92
+        ],
+        "text": "Every one of them is falling apart in a different direction — clutching, covering the face, gripping a thigh — and the dying man is the only figure in the room who is composed. David arranges the grief along the left like a frieze so that it reads as one continuous collapse against a single upright."
+      },
+      {
+        "id": "plato",
+        "label": "Plato at the foot of the bed",
+        "box": [
+          0.02,
+          0.4,
+          0.24,
+          0.98
+        ],
+        "text": "The old man sitting apart at the end of the bed, head down, hands folded, is Plato — who says in the Phaedo that he was ill and not present. David puts him there anyway, old, though he would have been about twenty-eight. The painting's authority comes from a text whose author has been written into the scene he said he missed."
+      }
+    ]
   },
   {
     "id": "monet-water-lilies-bridge",
@@ -84,7 +154,42 @@
         "#B888B0"
       ],
       "seed": 53
-    }
+    },
+    "regions": [
+      {
+        "id": "bridge",
+        "label": "The bridge",
+        "box": [
+          0.0,
+          0.06,
+          1.0,
+          0.44
+        ],
+        "text": "A Japanese footbridge Monet had built in his own garden at Giverny, from prints he collected. It is the last piece of drawing in the series: a firm arc across the top of the canvas, everything under it dissolving. In the later versions even this goes, until there is no bank, no bridge and no horizon at all — just the surface of the water, edge to edge."
+      },
+      {
+        "id": "lilies",
+        "label": "The lilies",
+        "box": [
+          0.0,
+          0.52,
+          1.0,
+          1.0
+        ],
+        "text": "Painted as horizontal touches that sit flat on the canvas, while the reflections plunge vertically through them. Two readings of the same square inch — a surface you look at and a depth you look into — held at once, without the picture deciding. That contradiction is the entire subject of the next twenty-five years of Monet's work."
+      },
+      {
+        "id": "foliage",
+        "label": "The green",
+        "box": [
+          0.0,
+          0.3,
+          1.0,
+          0.7
+        ],
+        "text": "This belongs to a group of about twelve views of the bridge from nearly the same spot, painted in 1899. The point of a series is that it removes the subject as a variable: with the motif fixed, everything that differs between canvases is light and weather. What is being painted is not a bridge, it is a difference between two mornings."
+      }
+    ]
   },
   {
     "id": "sargent-madame-x",
@@ -117,7 +222,42 @@
         "#8A6A3A"
       ],
       "seed": 54
-    }
+    },
+    "regions": [
+      {
+        "id": "profile",
+        "label": "The profile",
+        "box": [
+          0.24,
+          0.06,
+          0.8,
+          0.3
+        ],
+        "text": "Virginie Gautreau turns her head away and shows the profile she was known for in Paris — she was famous as a beauty before she was famous as a scandal. The skin is painted with lavender in it, because she powdered with it, and Sargent kept the colour rather than flattering it. The face is doing nothing at all, which at the Salon of 1884 was read as arrogance."
+      },
+      {
+        "id": "strap",
+        "label": "The shoulder",
+        "box": [
+          0.2,
+          0.28,
+          0.74,
+          0.52
+        ],
+        "text": "Sargent first exhibited it with the right strap fallen off the shoulder. That detail, and not the dress or the pose or the powder, was what the Salon could not forgive; the reviews were savage, the family asked for the picture to be withdrawn, and Sargent repainted the strap up and left for London. He kept the canvas for over thirty years and called it the best thing he had done."
+      },
+      {
+        "id": "hand",
+        "label": "The hand on the table",
+        "box": [
+          0.02,
+          0.46,
+          0.44,
+          0.78
+        ],
+        "text": "Everything about the pose is unstable. She is twisted away from the table while one hand takes her weight on it, and the fingers are bent back hard enough that the whole stance depends on them. X-rays show Sargent moved the arm repeatedly. A portrait that looks this effortless was built out of about thirty sittings and an argument."
+      }
+    ]
   },
   {
     "id": "el-greco-view-toledo",
@@ -150,7 +290,42 @@
         "#8A9A3A"
       ],
       "seed": 55
-    }
+    },
+    "regions": [
+      {
+        "id": "sky",
+        "label": "The storm",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.42
+        ],
+        "text": "A black-green sky with the light coming from behind it, and no source anywhere that would explain the illumination on the ground. This is the first landscape in Western painting that is not a setting for something — nothing happens in it, there is no saint and no story, only weather over a town. Nobody painted another one like it for two hundred years."
+      },
+      {
+        "id": "city",
+        "label": "The city",
+        "box": [
+          0.28,
+          0.32,
+          0.86,
+          0.7
+        ],
+        "text": "Toledo, rearranged. The Alcázar and the cathedral are both there and neither is where it stands: El Greco moved the cathedral to the left of the Alcázar because that is where it was needed, and said so in a note on another version. The buildings are lit as if each one were being shown to us separately."
+      },
+      {
+        "id": "hills",
+        "label": "The green hills",
+        "box": [
+          0.0,
+          0.58,
+          1.0,
+          1.0
+        ],
+        "text": "The Tagus and the slopes below the city, painted in a green that no ground has ever been, with the highlights whipped on in a single loaded stroke each. The whole lower half is handled faster and looser than anything else of its date in Europe, which is why the nineteenth century decided El Greco had been mad or astigmatic rather than simply early."
+      }
+    ]
   },
   {
     "id": "rembrandt-aristotle-homer",
@@ -183,7 +358,42 @@
         "#C8A82E"
       ],
       "seed": 56
-    }
+    },
+    "regions": [
+      {
+        "id": "hand",
+        "label": "The hand on Homer",
+        "box": [
+          0.08,
+          0.42,
+          0.46,
+          0.74
+        ],
+        "text": "A philosopher resting his hand on the head of a blind poet who has been dead three centuries. The touch is the subject: one kind of knowledge laid on another, gently, by a man who is not looking at it. Rembrandt gives the bust its own light so that the marble and the living hand are lit as if from different sources."
+      },
+      {
+        "id": "chain",
+        "label": "The gold chain",
+        "box": [
+          0.3,
+          0.28,
+          0.74,
+          0.56
+        ],
+        "text": "The heaviest impasto in the picture is on the chain, which is the fee paid by Alexander — the pupil who made him rich. It is painted thickly enough to cast its own small shadows, and it hangs between the hand on Homer and the eye of the viewer. Wealth, in the exact centre, rendered more materially than any other object present."
+      },
+      {
+        "id": "face",
+        "label": "The face",
+        "box": [
+          0.3,
+          0.06,
+          0.72,
+          0.3
+        ],
+        "text": "Shadowed, unresolved, thinking about something he is not going to tell us. Rembrandt was bankrupt when he painted this and it was commissioned from Sicily by a collector he never met, for a price that would have paid a year of debts. A picture about the value of a thinking man, made to order, for money, by a man who badly needed it."
+      }
+    ]
   },
   {
     "id": "vermeer-water-pitcher",
@@ -216,7 +426,42 @@
         "#B08A32"
       ],
       "seed": 57
-    }
+    },
+    "regions": [
+      {
+        "id": "window",
+        "label": "The window and the hand on it",
+        "box": [
+          0.0,
+          0.1,
+          0.42,
+          0.6
+        ],
+        "text": "One hand on the leaded casement, about to push it open, and the whole light of the room arriving through that yellow glass. Vermeer's windows are never views — this one shows nothing outside at all — they are apertures, and their only job is to be the reason everything else in the picture is the colour it is."
+      },
+      {
+        "id": "pitcher",
+        "label": "The basin and the ewer",
+        "box": [
+          0.28,
+          0.44,
+          0.7,
+          0.84
+        ],
+        "text": "Silver-gilt, and the hardest thing in the room to paint, because a polished vessel has no colour of its own — it has the tablecloth in it, and the window, and a smear of her sleeve. Vermeer paints the reflections rather than the metal, and the metal appears."
+      },
+      {
+        "id": "map",
+        "label": "The map",
+        "box": [
+          0.6,
+          0.06,
+          1.0,
+          0.52
+        ],
+        "text": "A wall map of the Seventeen Provinces, hung where a picture would normally go. Maps appear in six of Vermeer's interiors and they do the same work each time: they put the whole world on the wall of a room where a woman is doing something very small, and let the two sizes sit in the same frame without comment."
+      }
+    ]
   },
   {
     "id": "vangogh-straw-hat",
@@ -249,7 +494,42 @@
         "#C4642A"
       ],
       "seed": 58
-    }
+    },
+    "regions": [
+      {
+        "id": "hat",
+        "label": "The straw hat",
+        "box": [
+          0.16,
+          0.02,
+          0.9,
+          0.34
+        ],
+        "text": "Painted in Paris in 1887, after two years of seeing Impressionist colour for the first time. The hat is built from yellow strokes laid in the direction the straw runs, so the brushwork describes the weave rather than covering it. Van Gogh made over thirty self-portraits in Paris chiefly because he could not afford models."
+      },
+      {
+        "id": "face",
+        "label": "The eyes",
+        "box": [
+          0.26,
+          0.22,
+          0.8,
+          0.58
+        ],
+        "text": "Green and red laid side by side in the shadows of the face — complementaries used at full strength on human skin, which is not what Impressionist portraiture was doing. He is looking slightly past us. In a mirror-made self-portrait the sitter's gaze is aimed at his own eye, so the deflection is deliberate."
+      },
+      {
+        "id": "ground",
+        "label": "The background",
+        "box": [
+          0.0,
+          0.44,
+          1.0,
+          1.0
+        ],
+        "text": "Not a wall and not a room — a field of hatched strokes in a single direction, each one separate, none blended. He was working from Pointillism and from the Japanese prints he had been collecting, and what he took from both was that a background could be an active surface rather than empty space behind a head."
+      }
+    ]
   },
   {
     "id": "degas-dance-class",
@@ -278,7 +558,42 @@
         "#9E5A4A"
       ],
       "seed": 59
-    }
+    },
+    "regions": [
+      {
+        "id": "master",
+        "label": "The ballet master",
+        "box": [
+          0.32,
+          0.24,
+          0.6,
+          0.76
+        ],
+        "text": "Jules Perrot, leaning on a stick at the centre of the room, painted from an old drawing when he was long past dancing. He is the only still figure in the picture and everything is arranged around him — but he is not at the centre of the canvas, and half the class is not watching him."
+      },
+      {
+        "id": "dancers",
+        "label": "The waiting dancers",
+        "box": [
+          0.5,
+          0.14,
+          1.0,
+          0.86
+        ],
+        "text": "Scratching, yawning, adjusting a strap, sitting on the piano. Degas painted perhaps fifteen hundred dance subjects and almost none of them are performances: what interested him was the unglamorous machinery — the waiting, the repetition, the sore feet — which is where the real work and the real bodies are."
+      },
+      {
+        "id": "floor",
+        "label": "The floor",
+        "box": [
+          0.0,
+          0.56,
+          1.0,
+          1.0
+        ],
+        "text": "The boards run away steeply to the left and the room tips with them. Degas had been looking hard at Japanese prints and at the way a photograph crops, and he learned from both that you can put the empty middle of a floor at the front of a picture and let the subject happen around the edges."
+      }
+    ]
   },
   {
     "id": "velazquez-juan-de-pareja",
@@ -311,6 +626,41 @@
         "#6E5A3E"
       ],
       "seed": 60
-    }
+    },
+    "regions": [
+      {
+        "id": "face",
+        "label": "The face",
+        "box": [
+          0.26,
+          0.1,
+          0.76,
+          0.44
+        ],
+        "text": "Painted in Rome in 1650 as a warm-up before the portrait of Innocent X, using the man who ground his colours. Juan de Pareja was enslaved in Velázquez's household and was freed within months of sitting for this. He became a painter himself; his own work hangs in the Prado. He looks out of this canvas like a man who has decided exactly how he wishes to be seen."
+      },
+      {
+        "id": "collar",
+        "label": "The collar",
+        "box": [
+          0.26,
+          0.42,
+          0.76,
+          0.62
+        ],
+        "text": "Grey-white lace over dark wool, done in a handful of loaded strokes that do not describe a single thread. Stand close and it is paint; step back and it is Flemish lace. Roman painters who saw the picture at the Pantheon that year said the rest of the exhibition was art and this was truth."
+      },
+      {
+        "id": "cloak",
+        "label": "The sleeve",
+        "box": [
+          0.0,
+          0.48,
+          0.42,
+          1.0
+        ],
+        "text": "Almost nothing — a few dry passes of grey-brown over the ground, the weave of the canvas showing through. Velázquez spends his labour on a face and a collar and leaves everything else at the speed of a sketch, and the eye completes it without noticing that it has been asked to."
+      }
+    ]
   }
 ]
