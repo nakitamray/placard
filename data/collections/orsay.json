@@ -55,7 +55,42 @@
         "#5A6EA8"
       ],
       "seed": 42
-    }
+    },
+    "regions": [
+      {
+        "id": "light",
+        "label": "The light through the trees",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.38
+        ],
+        "text": "Sunlight coming through acacias and landing in blue-violet patches on jackets, hats and the ground. Renoir refused to darken shadows with black — every shadow here is a colour — and the critics who saw it in 1877 complained that his figures looked mouldy, as though covered in spots. What they were objecting to is the only thing in the picture anybody remembers."
+      },
+      {
+        "id": "dancers",
+        "label": "The dancers",
+        "box": [
+          0.28,
+          0.18,
+          0.72,
+          0.72
+        ],
+        "text": "A crowd at an open-air dance hall on the Butte Montmartre on a Sunday afternoon, and nearly everybody in it is a friend: painters, a Cuban art student, models, the woman in striped blue who sat for several of these. Renoir worked on the spot, carrying a canvas of this size up the hill, which is the part his contemporaries found hardest to believe."
+      },
+      {
+        "id": "foreground",
+        "label": "The table in front",
+        "box": [
+          0.0,
+          0.52,
+          0.56,
+          1.0
+        ],
+        "text": "The group at the bench is close enough to be interrupted and none of them is looking at us. Renoir builds a foreground you seem to be sitting inside rather than looking at — the figures are cut by the frame, the chair backs are at your own eye level — so the dance is something happening a few feet away over somebody's shoulder."
+      }
+    ]
   },
   {
     "id": "manet-olympia",
@@ -152,7 +187,42 @@
         "#A8965E"
       ],
       "seed": 44
-    }
+    },
+    "regions": [
+      {
+        "id": "gaze",
+        "label": "The look out",
+        "box": [
+          0.22,
+          0.28,
+          0.52,
+          0.76
+        ],
+        "text": "She is naked, in a park, beside two clothed men, looking directly out at whoever is standing in front of the canvas. Manet took the pose from a Raphael composition known through an engraving — the group is a river-god trio — and the respectability of the source made the offence worse rather than better. It is the eye contact that did the damage, and it is still doing it."
+      },
+      {
+        "id": "men",
+        "label": "The two men",
+        "box": [
+          0.4,
+          0.22,
+          0.84,
+          0.82
+        ],
+        "text": "In contemporary Parisian dress, mid-conversation, paying her no attention at all. One is Manet's brother Eugène, the other his future brother-in-law; the woman is Victorine Meurent, who sat for Olympia too and was a painter herself. Rejected from the Salon of 1863 and shown at the Salon des Refusés, where it was the thing everyone went to laugh at."
+      },
+      {
+        "id": "bather",
+        "label": "The bather and the still life",
+        "box": [
+          0.0,
+          0.4,
+          0.34,
+          1.0
+        ],
+        "text": "Two things sit outside the argument: a woman stooping in the stream behind, painted at a scale that does not fit her distance, and a heap of discarded clothes with a basket of fruit tipped over in the corner. The still life is the most conventionally beautiful passage in the painting, and Manet put it in the shadow at the edge."
+      }
+    ]
   },
   {
     "id": "millet-gleaners",
@@ -185,7 +255,42 @@
         "#8E4A32"
       ],
       "seed": 45
-    }
+    },
+    "regions": [
+      {
+        "id": "women",
+        "label": "The three women",
+        "box": [
+          0.02,
+          0.32,
+          0.72,
+          0.94
+        ],
+        "text": "Three backs bent at three different stages of the same movement — reaching, gathering, straightening — so that one body is shown through three. Gleaning was the right of the very poor to take what the harvest left, and Millet gives these three the monumental treatment reserved for saints and heroes. That is what the 1857 Salon objected to, and it was read as a political act."
+      },
+      {
+        "id": "harvest",
+        "label": "The harvest behind",
+        "box": [
+          0.3,
+          0.1,
+          1.0,
+          0.44
+        ],
+        "text": "Everything the gleaners do not get: stacks the height of houses, a full cart, a crowd of paid harvesters, and a mounted overseer watching from the right. Millet bathes the far distance in gold light and leaves the foreground grey. The picture's whole argument is made by putting abundance and scarcity in the same field and lighting them differently."
+      },
+      {
+        "id": "hands",
+        "label": "The stubble",
+        "box": [
+          0.0,
+          0.72,
+          1.0,
+          1.0
+        ],
+        "text": "Bare ground and the few ears the rakes missed, painted with as much attention as the figures. The wheat is counted out stalk by stalk, which makes the labour legible: you can see how little is actually there. Nothing in the lower third is picturesque, and it is the part of the canvas most carefully worked."
+      }
+    ]
   },
   {
     "id": "cezanne-apples-oranges",
@@ -214,7 +319,42 @@
         "#C46A22"
       ],
       "seed": 46
-    }
+    },
+    "regions": [
+      {
+        "id": "fruit",
+        "label": "The fruit",
+        "box": [
+          0.28,
+          0.34,
+          0.8,
+          0.72
+        ],
+        "text": "Each apple is built from planes of colour rather than modelled from light — cold greens on one side, hot reds on the other, and no local shadow tying it to the cloth. Cézanne is rendering the roundness itself rather than the appearance of roundness under an illumination, which is the whole difference between him and everything before him."
+      },
+      {
+        "id": "cloth",
+        "label": "The white cloth",
+        "box": [
+          0.0,
+          0.42,
+          0.72,
+          1.0
+        ],
+        "text": "White paint that has almost no white in it: blue, ochre, grey and lilac, laid in flat facets that behave like the folds of a mountain. The cloth is the hardest passage to read and the one he clearly cared about most — it is where the canvas stops being a table with fruit on it and becomes a construction."
+      },
+      {
+        "id": "jug",
+        "label": "The jug and the tilted plane",
+        "box": [
+          0.52,
+          0.02,
+          1.0,
+          0.56
+        ],
+        "text": "The tabletop is seen from above and the jug from the side, and the two viewpoints are simply allowed to coexist. Cézanne tips the plate so we can see into it, then keeps the vessel upright so we can see its profile. Picasso and Braque took this one habit and spent a decade on it."
+      }
+    ]
   },
   {
     "id": "vangogh-self-portrait",
@@ -247,7 +387,42 @@
         "#C4622A"
       ],
       "seed": 47
-    }
+    },
+    "regions": [
+      {
+        "id": "ground",
+        "label": "The swirling ground",
+        "box": [
+          0.0,
+          0.0,
+          1.0,
+          0.46
+        ],
+        "text": "Painted at Saint-Rémy in September 1889, in the asylum, between attacks. The background is a single blue-green worked into tight coils that break against the outline of the head and go round it. It is not a wall behind him; it is the same energy as the head, in a different colour, held off by the drawing."
+      },
+      {
+        "id": "face",
+        "label": "The face",
+        "box": [
+          0.24,
+          0.2,
+          0.8,
+          0.66
+        ],
+        "text": "He sent it to Theo with a note saying it was an attempt to paint himself when he was thin and pale as a ghost. The flesh is worked in the same directional strokes as the coat and the background, so the head is made of the same substance as the room — the only thing separating them is where the strokes change direction."
+      },
+      {
+        "id": "eyes",
+        "label": "The eyes",
+        "box": [
+          0.32,
+          0.24,
+          0.7,
+          0.4
+        ],
+        "text": "Green, steady, and pointed straight out of the canvas — the one part of the picture that is not moving. Everything else, including his own jacket, is in motion around them. This was among the last self-portraits he made; he had ten months left."
+      }
+    ]
   },
   {
     "id": "cezanne-card-players",
@@ -276,7 +451,42 @@
         "#5E6E8A"
       ],
       "seed": 48
-    }
+    },
+    "regions": [
+      {
+        "id": "players",
+        "label": "The two players",
+        "box": [
+          0.06,
+          0.1,
+          0.94,
+          0.94
+        ],
+        "text": "Two farm workers from the Jas de Bouffan estate, facing each other across a table, in the last and barest of five versions — the earlier ones have five figures, a standing onlooker, a child. Cézanne emptied it out each time until only the symmetry was left. Neither man is a character; together they are a shape."
+      },
+      {
+        "id": "bottle",
+        "label": "The bottle",
+        "box": [
+          0.42,
+          0.08,
+          0.6,
+          0.6
+        ],
+        "text": "One vertical at the exact centre, dividing the picture into two halves that answer each other without matching. Remove it and the composition collapses into a pair of men; leave it and they become the two sides of something. It is the smallest object on the table and it is carrying the entire structure."
+      },
+      {
+        "id": "hands",
+        "label": "The hands and the cards",
+        "box": [
+          0.14,
+          0.52,
+          0.88,
+          0.86
+        ],
+        "text": "The cards are held close and angled down, and no one is playing — there is no money on the table and no visible game in progress. What is painted is the attention itself: two men concentrating, in silence, for as long as the picture lasts. Cézanne worked on the group for years and never showed anyone winning."
+      }
+    ]
   },
   {
     "id": "whistler-mother",
