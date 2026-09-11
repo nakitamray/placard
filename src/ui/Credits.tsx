@@ -179,8 +179,8 @@ export function Credits() {
               <section>
                 <h3 className="meta credits-section">The museums</h3>
                 <p className="body credits-note">
-                  Seven rooms, each modelled on a real one and named after it. Nothing here is
-                  affiliated with them; the works are theirs and so is the last word on them.
+                  All seven rooms are modelled on a real one and named after it. Nothing here is
+                  affiliated with them and the works are theirs.
                   Every corridor title links out to the museum&rsquo;s own site, and so do these.
                 </p>
                 <ul className="credits-museums">
@@ -224,9 +224,12 @@ export function Credits() {
                 <h3 className="meta credits-section">Music</h3>
                 <p className="body credits-note">
                   The rooms are played through these recordings, streamed from YouTube in an
-                  embedded player rather than copied or re-hosted. The entrance has its own
-                  piece, the corridors shuffle four between them, and the atlas has one of its
-                  own. All credit and all traffic belong to the uploaders.
+                  embedded player. The entrance has its own
+                  piece and because I'm a big fan of Pride & Prejudice soundtrack, that's the music.
+                  The corridors shuffle between four ambient videos meant to mimic the quiet, yet focused, experience of
+                  being in a museum. The atlas has its own musical piece, inspired by the vastness of space
+                  as we understand how history is connected, especially through art. 
+                  All credit and all traffic belong to the uploaders.
                 </p>
                 <ul className="credits-tracks">
                   {[ENTRANCE_TRACK, ...MUSEUM_TRACKS, ATLAS_TRACK].map((t, i, all) => (
@@ -251,23 +254,22 @@ export function Credits() {
                 <p className="body credits-note credits-lede">
                   A painting is the thing everyone has already seen. What nobody sees is the
                   weight of writing behind it — the letters, the reviews, the catalogue entries,
-                  the arguments. So the paintings here are literally built out of that writing:
-                  every stroke is a character from a text about that work, moving through the
-                  corpus in reading order. Hold the cursor still and the picture resolves; press
-                  space and you can pull a passage back out of the part of the canvas it belongs
-                  to.
+                  the arguments, and the history. The paintings in Placard are literally built out of that
+                  writing. Every stroke is a character from a text about that work. Hold the cursor down 
+                  and the picture resolves. Press space and you can pull a passage back out of the part 
+                  of the canvas it belongs to, seeing the "thread."
                 </p>
               </section>
               <section>
-                <h3 className="meta credits-section">Rules the interface follows</h3>
+                <h3 className="meta credits-section">Rules of the interface</h3>
                 <ol className="credits-rules">
                   <li className="body">
-                    <strong>The interface is the quiet frame around a loud idea.</strong> One
-                    serif, one accent, no colour that is not already in the room. Nothing is
-                    labelled that the architecture can say by itself.
+                    <strong>Keep the interface quiet.</strong> There is one serif, one accent,
+                    and no colour that doesn’t already belong to the space. If something can be 
+                    understood from the architecture, it doesn’t need a label.
                   </li>
                   <li className="body">
-                    <strong>Every panel is a veil, never a card.</strong> Overlays are frosted
+                    <strong>Every panel sits in the space, never on top of it</strong> Overlays are frosted
                     glass with feathered edges, so they take their colour from the painting
                     behind them instead of cutting a hole in it.
                   </li>
@@ -281,30 +283,31 @@ export function Credits() {
                     painting; only a click keeps it open and brings the wall label.
                   </li>
                   <li className="body">
-                    <strong>Nothing announces itself twice.</strong> The control hints start
-                    legible and settle to a whisper after the first input.
+                    <strong>Nothing announces itself twice.</strong> The control are clear when they first
+                    apper, then become more subtle once you've started using the site. 
                   </li>
                   <li className="body">
                     <strong>Motion is a room, not an effect.</strong> Every transition is a move
-                    through architecture — down a corridor, through an end wall, into a bay — and
-                    all of it stops under <code>prefers-reduced-motion</code>.
+                    through architecture. You move down a corridor, through a wall, or into 
+                    another gallery rather than just watching things animate. Transitions
+                    are disabled with <code>prefers-reduced-motion</code>.
                   </li>
                   <li className="body">
-                    <strong>Sound fades, never cuts.</strong> The room quietens when you stand in
-                    front of a painting and comes back when you walk away, on a ramp measured in
-                    seconds.
+                    <strong>Sound should move with you.</strong> Sound is meant to be an immersive experiance
+                    that moves with your own thoughts. The room gets quieter when you stop in front of
+                    a painting and gradually returns as you move away. Nothing cuts in or out suddenly.
                   </li>
                 </ol>
               </section>
               <section>
                 <h3 className="meta credits-section">The rooms</h3>
                 <p className="body credits-note">
-                  Seven corridors, all one procedural machine driven by a different style record:
-                  ceiling, floor, wall treatment, frame profile, palette and the whole lighting
-                  rig come from data. Adding a museum is a JSON file, not a rendering change. The
-                  buildings are modelled on the real ones — the Louvre&rsquo;s barrel vault, the
-                  Orsay&rsquo;s train-shed roof, the Met&rsquo;s glazed court between a marble
-                  wall and a brick one.
+                  There are seven museum spaces, all built from the same procedural system.
+                  Each museum has its own ceiling, floor, walls, frames, palette and lighting, 
+                  all defined in data. Adding another museum means adding a JSON file rather 
+                  than changing the renderer. The architecture is based on the real buildings: 
+                  the Louvre’s barrel vault, the Orsay’s train-shed roof, and the Met’s glazed 
+                  court between marble and brick.
                 </p>
               </section>
             </>
@@ -340,6 +343,13 @@ export function Credits() {
                   <li>
                     <span className="caption">Build</span>
                     <span className="body">Vite, pnpm, sharp for the image pipeline</span>
+                  </li>
+                  <li>
+                    <span className="caption">Written by</span>
+                    <span className="body">
+                      nakitamray, The architecture and most of the code are mine; Claude worked
+                      alongside me on parts of it.
+                    </span>
                   </li>
                 </ul>
               </section>
@@ -670,7 +680,7 @@ function ContactForm() {
       <h3 className="meta credits-section credits-contact-head">Write to me</h3>
       {state === 'sent' ? (
         <p className="body credits-note contact-thanks">
-          Thank you — it arrived. I read everything.
+          Just got your message! I'll make sure to reply soon :)
           <br />
           <button className="caption contact-again" onClick={() => setState('idle')}>
             Write another
