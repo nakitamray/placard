@@ -73,8 +73,20 @@ export function Floor({ style, d, quality }: Props) {
   const run = d.length + d.bayDepth * 3;
   const w = d.halfWidth * 2;
 
-  // how wet the floor looks. Polished marble and stone throw long specular
-  // streaks down a gallery; a courtyard pavement does not.
+  /*
+   * How wet the floor looks. Polished marble throws long specular streaks
+   * down a gallery; a courtyard pavement in the open air does not.
+   *
+   * Three of these were set so low that turning `Rich` on changed nothing you
+   * could see, which made the most expensive switch in the exhibition look
+   * broken. The Egyptian gallery's stone is waxed and does carry the
+   * colonnade down its length; the Grande Galerie's oak is polished hard
+   * enough to hold the whole vault in it, which is half of why photographs of
+   * that room look the way they do; and the Orsay's nave is the shiniest
+   * floor in the building. None of them is a mirror — but a corridor whose
+   * floor gives back nothing at the top budget is a corridor with the feature
+   * switched off.
+   */
   const mirror =
     kind === 'checkerboard'
       ? 0.72
@@ -83,10 +95,12 @@ export function Floor({ style, d, quality }: Props) {
         : kind === 'court-paving'
           ? 0.22
           : kind === 'stone-bands'
-            ? 0.18
+            ? 0.46
             : kind === 'parquet' || kind === 'parquet-check'
-              ? 0.4
-              : 0.5;
+              ? 0.58
+              : kind === 'promenade'
+                ? 0.56
+                : 0.5;
   const roughness =
     kind === 'court-paving'
       ? 0.5
@@ -111,7 +125,27 @@ export function Floor({ style, d, quality }: Props) {
             resolution={quality.reflectionRes}
             blur={[400, 100]}
             mixBlur={0.85}
-            mixStrength={kind === 'court-paving' || kind === 'stone-bands' ? 0.3 : 0.6}
+            /*
+             * How hard the reflection is mixed in, which is a different
+             * question from how mirrored the surface is.
+             *
+             * Stone and marble take it at full strength — those floors are
+             * wet-looking in the real rooms. Oak does not: at 0.6 the dark
+             * plinths and benches came back as hard black shapes lying on the
+             * parquet, which reads as a rendering fault rather than as a
+             * polished floor. Wood scatters, so it gets a softer mix and the
+             * vault and the frames arrive as a sheen instead of a picture.
+             *
+             * The Met's court is the one floor with real daylight on it and
+             * nothing overhead to give back at all.
+             */
+            mixStrength={
+              kind === 'court-paving'
+                ? 0.3
+                : kind === 'parquet' || kind === 'parquet-check'
+                  ? 0.55
+                  : 0.6
+            }
             roughness={roughness}
             depthScale={0.7}
             minDepthThreshold={0.4}
@@ -200,7 +234,15 @@ export function Floor({ style, d, quality }: Props) {
             roughness={0.34}
             metalness={0.1}
             transparent
-            opacity={0.94}
+            /*
+             * The oak is laid ON the mirror, not instead of it. At 0.94 it was
+             * very nearly an opaque lid: the reflective plane was underneath
+             * doing its expensive second render of the whole room, and six per
+             * cent of it reached the eye. Polished parquet is not a mirror, but
+             * it holds the vault and the frames well enough to see, and this is
+             * the ratio that gives that back without the floor turning to glass.
+             */
+            opacity={0.82}
           />
         </mesh>
       )}
@@ -292,7 +334,16 @@ export function Floor({ style, d, quality }: Props) {
         // a wide central walkway with the galleries raised either side
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, mid]}>
           <planeGeometry args={[w * 0.46, run]} />
-          <meshStandardMaterial color={p.floorInlay} roughness={0.28} metalness={0.1} />
+          {/* translucent, so the nave carries down the middle of the walk —
+              which is exactly where the eye goes and where the Orsay's own
+              floor is brightest */}
+          <meshStandardMaterial
+            color={p.floorInlay}
+            roughness={0.28}
+            metalness={0.1}
+            transparent
+            opacity={0.84}
+          />
         </mesh>
       )}
 
@@ -317,7 +368,15 @@ export function Floor({ style, d, quality }: Props) {
             place={(i, m) => m.makeTranslation(0, 0, -i * BAND * 2)}
           >
             <boxGeometry args={[w, 0.004, BAND]} />
-            <meshStandardMaterial color={p.floorInlay} roughness={0.62} metalness={0.06} />
+            {/* the dark courses are waxed stone, not felt: a little of the
+                colonnade comes back up through them */}
+            <meshStandardMaterial
+              color={p.floorInlay}
+              roughness={0.62}
+              metalness={0.06}
+              transparent
+              opacity={0.86}
+            />
           </Instanced>
           {/* the joint between courses: a hairline, darker than either */}
           <Instanced

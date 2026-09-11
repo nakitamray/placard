@@ -584,9 +584,8 @@ publishing a broken room. Warnings — a work still on a stand-in, a scan whose
 proportions do not match its catalogue — do not.
 
 Set `VITE_CONTACT_ENDPOINT` in the project's environment variables if you want
-the contact form. Without it — or `VITE_CONTACT_EMAIL` — the form is not
-rendered at all, because a form that goes nowhere is worse than no form. See
-[Contact form](#contact-form) for which of the two to use.
+the contact form. Without it the form is not rendered at all, because a form
+that goes nowhere is worse than no form. See [Contact form](#contact-form).
 
 **If six minutes a deploy becomes annoying**, the fix is to stop rebuilding
 what did not change: commit `public/artworks` and `public/museums` (they are
@@ -627,25 +626,31 @@ repository variable for a custom domain (use `/`). On Vercel, leave it alone.
 
 ## Contact form
 
-The **About** tab of the Colophon carries a three-field form. It needs one of
-two environment variables, and with neither it does not render.
+The **About** tab of the Colophon carries a three-field form. It needs one
+environment variable, and without it the form does not render.
 
 ```
-VITE_CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx   # POSTs JSON, address stays private
-VITE_CONTACT_EMAIL=you@example.com                      # composes a mailto:
+VITE_CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx
 ```
 
-**Prefer the endpoint.** Vite inlines `VITE_`-prefixed variables at build time,
-so whatever goes in one becomes a plain string in the shipped JavaScript — an
-address set here is readable by anyone who opens the bundle, and a crawler that
-reads `.js` files finds it as fast as one that reads HTML. `VITE_CONTACT_EMAIL`
-therefore publishes the address twice over: once in the bundle and once in the
-mail client it opens in front of the visitor. `VITE_CONTACT_ENDPOINT` publishes
-a form URL instead, and the address lives with the form service.
+**The address is never in the browser.** Vite inlines `VITE_`-prefixed
+variables at build time, so whatever goes in one becomes a plain string in the
+shipped JavaScript — readable by anyone who opens the bundle, and findable by
+any crawler that reads `.js` files as easily as one that reads HTML. What goes
+in this variable is a form id, which is meant to be public and gives nothing
+away. The address it forwards to is known to the form service and to nobody
+else, and a visitor who submits the form never sees it.
 
-Formspree, Getform and Basin all give a free endpoint that takes a JSON POST
-and forwards it to you. A serverless function of your own works too — anything
-that accepts `{ name, email, message }`.
+There is deliberately **no `mailto:` fallback**. It is the obvious way to build
+a contact form and it cannot be made private: the address would sit in the
+bundle *and* be shown to the visitor in their own mail client's To: field. An
+earlier version supported both and chose whichever was set; a private form with
+a public-by-construction fallback one misconfiguration away is not a private
+form, so the fallback was removed rather than discouraged.
+
+Formspree, Web3Forms, Getform and Basin all give a free endpoint that takes a
+JSON POST and forwards it to you. A serverless function of your own works too —
+anything that accepts `{ name, email, message }`.
 
 Because the substitution happens at build time, changing either one needs a
 redeploy, not just a restart.

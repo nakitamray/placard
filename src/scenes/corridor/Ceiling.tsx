@@ -54,6 +54,19 @@ function Repeated({
 
 /* ── Louvre: white barrel vault pierced by arched skylights ─────────────── */
 
+/**
+ * How much of the vault is glass, as an angle of the arch.
+ *
+ * The barrel spans a half turn from springing to springing; this is the
+ * middle of it. Around two-thirds reads as the Grande Galerie — a roof that
+ * is mostly window, with enough solid vault left at the haunches to carry the
+ * ribs and the gilt and to keep it a room rather than a greenhouse.
+ */
+const GLASS_ARC = Math.PI * 0.66;
+
+/** how far inside the vault surface the glazing sits, in metres */
+const GLASS_INSET = 0.03;
+
 function BarrelSkylight({ style, d }: Props) {
   const p = style.palette;
   const r = d.halfWidth;
@@ -89,42 +102,100 @@ function BarrelSkylight({ style, d }: Props) {
       {/*
        * The skylights.
        *
-       * One long opening at the crown rather than a punched hole per bay: the
-       * Grande Galerie is roofed in glass down its whole length, and what
-       * makes that read is an unbroken strip of sky with the ribs crossing
-       * it, not a row of separate windows with ceiling between them. The
-       * frame is iron and thin — a glazing bar every third of a metre — so
-       * the sky is most of what is up there and the bars are the drawing on
-       * it.
+       * One long opening down the whole length rather than a punched hole per
+       * bay: the Grande Galerie is roofed in glass from end to end, and what
+       * makes that read is an unbroken run of sky with the ribs crossing it,
+       * not a row of separate windows with ceiling between them.
+       *
+       * AND IT FOLLOWS THE VAULT.
+       *   This was a flat plane laid across the crown, and a flat plane
+       *   inside a cylinder is a chord: at the centre it sat just under the
+       *   apex, and a metre either side the vault had curved down past it, so
+       *   the glass was buried in the ceiling everywhere except directly
+       *   overhead. What reached the room was a thin bright slit — a strip
+       *   light, not a roof.
+       *
+       *   It is a cylinder section now, struck from the same centre as the
+       *   vault and a few centimetres inside it, spanning the middle of the
+       *   arch. Being concentric it cannot clip, and being wide it does what
+       *   the Grande Galerie's roof actually does: the ceiling *is* the
+       *   window for most of its width, and the solid vault is the haunch on
+       *   either side of it. Everything that sits on the glass — bars, purlins
+       *   and kerbs — is struck on the same arc, so the whole assembly curves
+       *   together.
        */}
-      <mesh
-        position={[0, springing + r - 0.04, mid]}
-        rotation={[Math.PI / 2, 0, 0]}
-      >
-        <planeGeometry args={[r * 0.86, d.length + d.bayDepth * 3]} />
-        <meshBasicMaterial color={p.sky} toneMapped={false} />
+      <mesh position={[0, springing, mid]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry
+          args={[
+            r - GLASS_INSET,
+            r - GLASS_INSET,
+            d.length + d.bayDepth * 3,
+            48,
+            1,
+            true,
+            Math.PI / 2 + (Math.PI - GLASS_ARC) / 2,
+            GLASS_ARC,
+          ]}
+        />
+        <meshBasicMaterial color={p.sky} toneMapped={false} side={THREE.BackSide} />
       </mesh>
-      {/* the glazing bars across it, and the two light purlins along */}
+
+      {/* the glazing bars across it — torus arcs on the same centre, so each
+          one crosses the glass instead of cutting a straight line through it */}
       <Repeated
         count={Math.round((d.length + d.bayDepth * 3) / 0.34)}
-        place={(i, m) => m.makeTranslation(0, springing + r - 0.07, mid + (d.length + d.bayDepth * 3) / 2 - i * 0.34)}
+        place={(i, m) => {
+          m.makeRotationZ((Math.PI - GLASS_ARC) / 2);
+          m.setPosition(
+            0,
+            springing,
+            mid + (d.length + d.bayDepth * 3) / 2 - i * 0.34,
+          );
+        }}
       >
-        <boxGeometry args={[r * 0.88, 0.022, 0.022]} />
+        <torusGeometry args={[r - GLASS_INSET - 0.03, 0.022, 5, 26, GLASS_ARC]} />
         <meshStandardMaterial color={p.ceilingAccent} roughness={0.5} metalness={0.4} />
       </Repeated>
-      {[-0.28, 0.28].map((f) => (
-        <mesh key={f} position={[f * r, springing + r - 0.075, mid]}>
-          <boxGeometry args={[0.035, 0.035, d.length + d.bayDepth * 3]} />
-          <meshStandardMaterial color={p.ceilingAccent} roughness={0.5} metalness={0.4} />
-        </mesh>
-      ))}
-      {/* the moulded kerb the glazing sits in, both sides, all the way down */}
-      {[-1, 1].map((side) => (
-        <mesh key={side} position={[side * r * 0.45, springing + r - 0.16, mid]}>
-          <boxGeometry args={[0.13, 0.3, d.length + d.bayDepth * 3]} />
-          <meshStandardMaterial color={p.molding} roughness={0.72} />
-        </mesh>
-      ))}
+
+      {/* the two purlins running the length, laid ON the arc rather than
+          across it — at a third of the way out from the crown either side */}
+      {[-1, 1].map((side) => {
+        const a = side * GLASS_ARC * 0.3;
+        return (
+          <mesh
+            key={side}
+            position={[
+              Math.sin(a) * (r - GLASS_INSET - 0.04),
+              springing + Math.cos(a) * (r - GLASS_INSET - 0.04),
+              mid,
+            ]}
+            rotation={[0, 0, -a]}
+          >
+            <boxGeometry args={[0.035, 0.035, d.length + d.bayDepth * 3]} />
+            <meshStandardMaterial color={p.ceilingAccent} roughness={0.5} metalness={0.4} />
+          </mesh>
+        );
+      })}
+
+      {/* the moulded kerb the glazing dies into, both sides, all the way down
+          — set at the edge of the arc and turned to sit square on it */}
+      {[-1, 1].map((side) => {
+        const a = side * (GLASS_ARC / 2);
+        return (
+          <mesh
+            key={side}
+            position={[
+              Math.sin(a) * (r - 0.1),
+              springing + Math.cos(a) * (r - 0.1),
+              mid,
+            ]}
+            rotation={[0, 0, -a]}
+          >
+            <boxGeometry args={[0.14, 0.26, d.length + d.bayDepth * 3]} />
+            <meshStandardMaterial color={p.molding} roughness={0.72} />
+          </mesh>
+        );
+      })}
 
       {/*
        * And the light it lets in, on the floor. A glazed roof whose only
@@ -137,12 +208,12 @@ function BarrelSkylight({ style, d }: Props) {
           position={[0, 0.02, bayZ(d, b)]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
-          <planeGeometry args={[d.halfWidth * 1.5, d.bayDepth * 0.95]} />
+          <planeGeometry args={[d.halfWidth * 1.9, d.bayDepth * 0.98]} />
           <meshBasicMaterial
             map={glowTexture()}
             color={p.sky}
             transparent
-            opacity={0.12}
+            opacity={0.16}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             toneMapped={false}

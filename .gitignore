@@ -11,3 +11,8 @@ package-lock.json
 public/artworks/
 public/museums/
 tsconfig.tsbuildinfo
+
+# local environment — never committed
+.env
+.env.local
+.env.*.local

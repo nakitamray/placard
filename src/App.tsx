@@ -32,8 +32,10 @@ import { endReveal, startReveal } from './transitions/reveal';
 import { asset } from './lib/asset';
 import { attention, roomTone, setSound, sfx, soundEnabled, soundStored } from './lib/audio';
 import { loadAtlas, useAtlas } from './state/atlas';
+import { BOOT_STEPS, markBoot, useBoot } from './state/boot';
 import { FrameGovernor } from './render/frameGovernor';
 import { useCanvasLive } from './render/canvasGate';
+import { Warmup } from './render/warmup';
 import type { MuseumIndexEntry } from './types';
 
 /**
@@ -67,8 +69,10 @@ export default function App() {
   const setPhase = useStore((s) => s.setPhase);
   const setMuseums = useStore((s) => s.setMuseums);
   const artworks = useStore(selectArtworks);
-  const [progress, setProgress] = useState(0);
   const [webgl] = useState(webgl2Supported);
+  const bootReady = useBoot((s) => s.ready);
+  /** the entrance curtain is still on screen, fading or not */
+  const [curtain, setCurtain] = useState(true);
   const tier = useMemo(detectTier, []);
   const [qualityName, setQualityName] = useState<QualityName>(() => initialQuality(tier).name);
   const quality = useMemo(() => qualityFor(qualityName), [qualityName]);
@@ -185,14 +189,13 @@ export default function App() {
   // a new room is seen at the distance it was composed for
   useEffect(() => resetZoom(), [phase]);
 
-  // BOOT: fetch the list of museums, then land. The chosen museum's own
-  // manifest is fetched on selection, so entering one wing never costs the
-  // download of the other four.
+  // BOOT: fetch the list of museums. The chosen museum's own manifest is
+  // fetched on selection, so entering one wing never costs the download of
+  // the others.
   useEffect(() => {
     if (!webgl) return;
     let alive = true;
     (async () => {
-      setProgress(0.25);
       try {
         const list = (await fetch(asset('museums/index.json')).then((r) =>
           r.json(),
@@ -200,16 +203,51 @@ export default function App() {
         if (!alive) return;
         setMuseums(list);
       } catch {
-        // assets missing (build:assets not run) — land anyway and say so
+        // assets missing (build:assets not run) — open anyway and say so
       }
-      if (!alive) return;
-      setProgress(1);
-      setTimeout(() => alive && setPhase('landing'), 250);
+      if (alive) markBoot('catalogue');
     })();
     return () => {
       alive = false;
     };
-  }, [webgl, setMuseums, setPhase]);
+  }, [webgl, setMuseums]);
+
+  /*
+   * The door, and the thing that will open it no matter what.
+   *
+   * Every step reports honestly, which means every step can also fail to
+   * report — a missing assets build, a fetch that never resolves, a driver
+   * that does not answer. A loading screen that waits forever is a worse
+   * failure than the stutter it was put there to hide, so the curtain goes up
+   * on a timer regardless. The exhibition behind it copes with missing pieces
+   * perfectly well; it has always been able to.
+   */
+  useEffect(() => {
+    const t = window.setTimeout(() => useBoot.getState().open(), 9000);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!bootReady || phase !== 'boot') return;
+    setPhase('landing');
+  }, [bootReady, phase, setPhase]);
+
+  /*
+   * And then the curtain goes, over the fade in the stylesheet, so what it
+   * uncovers is a scene that has already been drawing for a beat.
+   *
+   * Deliberately a separate effect from the one above. Together they were one
+   * effect that called `setPhase` and then set a timer — and changing the
+   * phase re-ran the effect, whose cleanup cancelled the very timer it had
+   * just set. The curtain reached full transparency and stayed in the tree
+   * forever, which on a page whose controls live underneath it is a locked
+   * front door.
+   */
+  useEffect(() => {
+    if (phase === 'boot' || !curtain) return;
+    const t = window.setTimeout(() => setCurtain(false), 1100);
+    return () => window.clearTimeout(t);
+  }, [phase, curtain]);
 
   // global Esc: exits reveal, gallery→map, map→corridor
   useEffect(() => {
@@ -283,6 +321,8 @@ export default function App() {
           }}
         >
           <FrameGovernor maxFps={quality.maxFps} running={canvasLive} />
+          <Warmup ready={phase === 'boot'} />
+          <CurtainRaiser />
           <ExposureRig exposure={exposure} />
           <FrameWatchdog quality={qualityName} onStruggling={setQualityName} />
           <color attach="background" args={[bg]} />
@@ -290,8 +330,16 @@ export default function App() {
           <fog attach="fog" args={[fog[0], fog[1], fog[2]]} />
           <Suspense fallback={null}>
             <Environment intensity={inGallery ? 0.4 : 0.26} />
-            {/* the landing hero: one painting, live, behind the headline */}
-            {phase === 'landing' && !museum && <LandingScene tier={tier} />}
+            {/*
+              The landing hero: one painting, live, behind the headline — and
+              behind the entrance curtain before that. It is mounted during
+              boot precisely so the expensive first frame happens while the
+              loading screen is still up, which is the whole point of the
+              curtain; what it uncovers is a scene already running.
+            */}
+            {(phase === 'landing' || phase === 'boot') && !museum && (
+              <LandingScene tier={tier} />
+            )}
             {inCorridor && museum && artworks.length > 0 && <CorridorScene quality={quality} />}
             {inGallery && <GalleryScene tier={tier} quality={quality} />}
           </Suspense>
@@ -301,7 +349,7 @@ export default function App() {
       {/* reveal vignette — generous radius, 18% max */}
       <div className={`reveal-vignette ${revealed ? 'is-on' : ''}`} aria-hidden />
 
-      {phase === 'boot' && <LoadingBar progress={progress} />}
+      {curtain && <LoadingBar closing={phase !== 'boot'} />}
       <LandingLayer />
       <MapOverlay />
       <Placard />
@@ -406,6 +454,27 @@ function ThreadToggle() {
       {on ? '◉' : '○'} <span className="sound-word">Threads</span>
     </button>
   );
+}
+
+/**
+ * Raises the entrance curtain, and not one frame early.
+ *
+ * Every step having reported is not the same as the room being on screen: the
+ * last of them is a shader compile, and the frame that uses it has still to
+ * be drawn. Waiting two real frames past the last report is the difference
+ * between uncovering a painting and uncovering the moment before one.
+ */
+function CurtainRaiser() {
+  const done = useBoot((s) => s.done);
+  const ready = useBoot((s) => s.ready);
+  const drawn = useRef(0);
+  const all = done.length >= BOOT_STEPS.length;
+  useFrame(() => {
+    if (!all || ready) return;
+    drawn.current++;
+    if (drawn.current >= 2) useBoot.getState().open();
+  });
+  return null;
 }
 
 /**

@@ -104,16 +104,73 @@ button:active { transform: translateY(1px); }
 }
 
 /* ─── loading ─── */
-.loading { position: fixed; inset: 0; background: var(--ink); z-index: 60; }
-.loading-word {
-  position: absolute; bottom: 28px; left: 0; right: 0;
-  text-align: center; color: var(--bone); letter-spacing: 0.35em;
+/* ─── the entrance curtain ─────────────────────────────────────────────────
+   It covers a stall that has to happen somewhere (see render/warmup.tsx) and
+   spends it on the first thing worth reading. It leaves by fading, over a
+   scene that has already been drawing underneath it for a beat. */
+.loading {
+  position: fixed; inset: 0; z-index: 60;
+  background: var(--ink);
+  display: grid; grid-template-rows: 1fr auto;
+  /* the label sits clear of the foot rather than on top of it — a wall text
+     crowding the wordmark reads as a layout that has not finished loading
+     either */
+  row-gap: var(--s7);
+  padding: var(--s7) var(--s6) 52px;
+  opacity: 1;
+  transition: opacity 900ms var(--e-both);
 }
+/* The curtain does not slide, it stops being in the way — and it stops taking
+   the pointer immediately, so a visitor who is already reaching for a museum
+   is never clicking through a sheet that is only mostly gone. */
+.loading.is-closing { opacity: 0; pointer-events: none; }
+
+.loading-text {
+  display: flex; flex-direction: column; justify-content: flex-end;
+  max-width: 62ch; margin: 0 auto; width: 100%;
+  /* the words arrive when the first painting's label does, which is partway
+     through the wait — so they fade in rather than appearing */
+  animation: loading-words 1100ms var(--e-out) both;
+}
+@keyframes loading-words { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.loading-line {
+  margin: 0; color: var(--stone);
+  font-size: clamp(15px, 1.7vw, 20px); line-height: 1.72;
+  /* the first line is set slightly proud of the rest, the way a wall label's
+     opening sentence is */
+  text-wrap: pretty;
+}
+.loading-credit {
+  margin: var(--s4) 0 0; color: var(--gilt);
+  font-size: 10px; letter-spacing: 0.16em;
+}
+
+.loading-foot {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--s4); margin: 0 auto; max-width: 62ch; width: 100%;
+}
+.loading-word {
+  margin: 0; color: var(--bone); letter-spacing: 0.35em;
+}
+.loading-step { margin: 0; color: var(--taupe); letter-spacing: 0.14em; font-size: 10px; }
+.loading-count { opacity: 0.55; }
+
 .loading-rule {
-  position: absolute; bottom: 16px; left: 0; right: 0;
+  position: absolute; bottom: 16px; left: var(--s6); right: var(--s6);
   height: 1px; background: var(--gilt);
   transform-origin: left center;
-  transition: transform var(--d-base) var(--e-out);
+  transition: transform 700ms var(--e-out);
+}
+
+@media (max-width: 700px) {
+  .loading { padding: var(--s6) var(--s5) 44px; }
+  .loading-rule { left: var(--s5); right: var(--s5); }
+}
+
+/* Nothing here moves for a visitor who has asked for that. */
+@media (prefers-reduced-motion: reduce) {
+  .loading-text { animation: none; }
+  .loading, .loading-rule { transition: none; }
 }
 
 .webgl-missing {
