@@ -218,6 +218,15 @@ export interface MuseumStyle {
     floorInlay: string;
     accent: string;
     sky: string;
+    /**
+     * A hard, cold stone for doorcases and pilasters, where a room has them.
+     *
+     * The National Gallery's openings are framed in dark green marble, and it
+     * is doing real work: against four walls of crimson and a ceiling of red
+     * and gold, the one cold colour in the room is what stops the whole thing
+     * reading as a single warm blur, and it is always at a door.
+     */
+    stone?: string;
   };
   light: {
     /** sun / skylight colour and strength */
@@ -254,6 +263,16 @@ export interface MuseumStyle {
     terraces: boolean;
     /** the corridor ends in a floor-to-ceiling window rather than a solid wall */
     glazedEnd?: boolean;
+    /**
+     * The end wall carries an opening through to the next room.
+     *
+     * An enfilade is most of what a nineteenth-century picture gallery feels
+     * like from the inside: you are never in one room, you are in the first of
+     * several, and the doorcase at the end is the proof. It is also where the
+     * visitor walks through to the floor plan, so the door is not decoration —
+     * it is the thing they are already aiming at.
+     */
+    doorway?: boolean;
     /** brass stanchions and red rope down both sides, in front of the plinths */
     ropes?: boolean;
     /** waist-high stone platforms with glass cases on them, stripped of contents */

@@ -779,7 +779,20 @@ button:active { transform: translateY(1px); }
    page rather than arriving as a slab of another colour. */
 .credits-contact {
   margin-top: var(--s7);
-  padding-top: var(--s5);
+  /*
+   * A shade of its own, and a rule over it.
+   *
+   * Ruled lines alone were quiet to the point of invisibility: the form did
+   * not read as a form, it read as more document, and a visitor scrolling
+   * past had nothing to tell them there was anything here to use. The faintest
+   * warm ground under it — a couple of per cent of ink, no border, no corner
+   * radius — separates it from the page without turning it back into the card
+   * it used to be. It is a sheet laid on a desk, not a panel bolted to one.
+   */
+  padding: var(--s5) var(--s5) var(--s6);
+  margin-left: calc(var(--s5) * -1);
+  margin-right: calc(var(--s5) * -1);
+  background: rgba(36, 31, 26, 0.038);
   /* the one heavy rule on the page, because this is where it ends */
   border-top: 2px solid var(--c-gilt);
 }
@@ -799,18 +812,23 @@ button:active { transform: translateY(1px); }
 @media (max-width: 620px) { .contact-row { grid-template-columns: 1fr; gap: var(--s5); } }
 
 .contact-field { display: flex; flex-direction: column; gap: 2px; }
+/* Dark enough to read at a glance. These were set at half the ink of the page
+   and, being small caps at ten pixels, they disappeared into the paper — a
+   caption nobody can read is a field nobody knows the name of. */
 .contact-field .caption {
-  color: rgba(36, 31, 26, 0.5); opacity: 1;
-  letter-spacing: 0.16em; text-transform: uppercase; font-size: 10px;
+  color: rgba(36, 31, 26, 0.78); opacity: 1;
+  letter-spacing: 0.15em; text-transform: uppercase; font-size: 10.5px;
 }
 .contact-field input,
 .contact-field textarea {
   font: inherit; font-size: 16px; line-height: 30px;
   color: var(--ink);
-  background: none;
+  /* a hint of shade, so the field reads as somewhere to write before anybody
+     clicks in it — still a ruled line, not a box */
+  background: rgba(255, 253, 248, 0.5);
   border: none;
   /* the line you write on, and nothing else */
-  border-bottom: 1px solid rgba(36, 31, 26, 0.22);
+  border-bottom: 1px solid rgba(36, 31, 26, 0.34);
   border-radius: 0;
   padding: 2px 0 4px;
   width: 100%;
@@ -820,12 +838,13 @@ button:active { transform: translateY(1px); }
   resize: vertical; min-height: 90px;
   /* a ruled page rather than one long line: the rule repeats down it at the
      same rhythm as the line height, so the message field is the book */
+  background-color: rgba(255, 253, 248, 0.5);
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0,
     transparent 29px,
-    rgba(36, 31, 26, 0.12) 29px,
-    rgba(36, 31, 26, 0.12) 30px
+    rgba(36, 31, 26, 0.1) 29px,
+    rgba(36, 31, 26, 0.1) 30px
   );
   border-bottom-color: transparent;
 }

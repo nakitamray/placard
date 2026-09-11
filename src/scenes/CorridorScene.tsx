@@ -38,6 +38,7 @@ import { Fixtures } from './corridor/Fixtures';
 import { bayZ, dimsFor, hangHeight, workMaxHeight, type Dims } from './corridor/dims';
 import { Atmosphere } from './corridor/Atmosphere';
 import { duskWallSkyTexture } from './corridor/nightsky';
+import { glowTexture } from './corridor/glow';
 import type { ArtworkIndexEntry, MuseumData } from '../types';
 import type { Quality } from '../lib/quality';
 import { useShadowRefresh } from '../render/shadows';
@@ -391,6 +392,142 @@ function Bays({
 }
 
 /**
+ * How tall the opening in the end wall is.
+ *
+ * Generous — a nineteenth-century gallery door is nearly the height of the
+ * hang — and always clear of the picture above it, which is what the Apse
+ * reads it for.
+ */
+function doorHeight(d: Dims): number {
+  return Math.min(3.7, d.wallHeight * 0.6);
+}
+
+/**
+ * The opening at the end of the room, and the room beyond it.
+ *
+ * An enfilade is most of what a picture gallery of this date feels like from
+ * the inside. You are never in one room; you are in the first of several, and
+ * the doorcase at the end — with another red wall showing through it, lit
+ * differently, going on past where you can see — is the whole of that
+ * sensation. A gallery that ends in a flat wall is a corridor.
+ *
+ * It is also honest about what happens next: walking into the end of this
+ * room is the transition to the floor plan, so the visitor is already aiming
+ * at this door. Better that it be a door.
+ *
+ * The dark stone is doing real work. Against four walls of crimson and a
+ * ceiling of red and gold, the one cold colour in the room is what stops the
+ * whole thing reading as a single warm blur — and in the building it is
+ * always, exactly, at a door.
+ */
+function Doorway({ museum, d }: { museum: MuseumData; d: Dims }) {
+  const p = museum.style.palette;
+  const stone = p.stone ?? p.wallDeep;
+  const h = doorHeight(d);
+  /* a doorcase is taller than it is wide; the first pass made a squat hole
+     nearly as broad as it was high, which reads as a serving hatch */
+  const w = Math.min(2.7, d.halfWidth * 0.4);
+  const jamb = 0.34;
+  const z = d.apseZ;
+
+  return (
+    <group>
+      {/*
+       * The room beyond, which is a painted backdrop and not a room — and,
+       * for that matter, not behind anything.
+       *
+       * The end wall is one opaque plane and there is no hole cut in it, so
+       * the first version of this put a lit room four metres further back
+       * where nothing could ever see it. What reads as an opening from down
+       * the length of a gallery is not parallax, it is a dark rectangle with
+       * warm light pooling at the bottom of it; both of those can be painted
+       * straight onto the front of the wall, and at this distance the eye
+       * takes it for depth.
+       *
+       * Modelling the next gallery properly would double the scene for
+       * something glimpsed for two seconds on the way through it.
+       */}
+      <mesh position={[0, h / 2, z + 0.02]}>
+        <planeGeometry args={[w, h]} />
+        <meshBasicMaterial
+          map={doorwayBeyond(mixHex(p.wall, '#000000', 0.78), museum.style.light.lamp)}
+          toneMapped={false}
+        />
+      </mesh>
+
+      {/* the jambs, in dark marble, with a gilt bead down the inner edge */}
+      {[-1, 1].map((side) => (
+        <group key={side}>
+          <mesh position={[side * (w / 2 + jamb / 2), h / 2, z + 0.09]}>
+            <boxGeometry args={[jamb, h + 0.1, 0.18]} />
+            <meshStandardMaterial color={stone} roughness={0.28} metalness={0.28} />
+          </mesh>
+          <mesh position={[side * (w / 2 + 0.03), h / 2, z + 0.2]}>
+            <boxGeometry args={[0.07, h, 0.07]} />
+            <meshStandardMaterial color={p.gilt} metalness={0.8} roughness={0.34} />
+          </mesh>
+          {/* plinth block at the foot, as every doorcase of this date has */}
+          <mesh position={[side * (w / 2 + jamb / 2), 0.28, z + 0.11]}>
+            <boxGeometry args={[jamb + 0.1, 0.56, 0.22]} />
+            <meshStandardMaterial color={stone} roughness={0.24} metalness={0.3} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* the lintel, its gilt bead, and the cornice shelf over it */}
+      <mesh position={[0, h + 0.26, z + 0.09]}>
+        <boxGeometry args={[w + jamb * 2, 0.52, 0.18]} />
+        <meshStandardMaterial color={stone} roughness={0.28} metalness={0.28} />
+      </mesh>
+      <mesh position={[0, h + 0.02, z + 0.2]}>
+        <boxGeometry args={[w + 0.12, 0.07, 0.07]} />
+        <meshStandardMaterial color={p.gilt} metalness={0.8} roughness={0.34} />
+      </mesh>
+      <mesh position={[0, h + 0.58, z + 0.16]}>
+        <boxGeometry args={[w + jamb * 2 + 0.34, 0.16, 0.34]} />
+        <meshStandardMaterial color={p.gilt} metalness={0.72} roughness={0.38} />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * What is seen through the opening, as a gradient.
+ *
+ * An enfilade read from thirty metres away is two facts: it is darker in
+ * there than out here, and there is warm light on the floor a long way off.
+ * A radial glow sprite gives neither — it is a bright oval hanging in the
+ * middle of the doorway, and it reads as a lamp rather than as a room. A
+ * vertical ramp gives both, costs one 4×128 texture for the life of the page,
+ * and has no edge anywhere in it for the eye to catch on.
+ */
+let beyondTex: THREE.CanvasTexture | null = null;
+function doorwayBeyond(dark: string, warm: string): THREE.Texture {
+  if (beyondTex) return beyondTex;
+  const c = document.createElement('canvas');
+  c.width = 4;
+  c.height = 128;
+  const ctx = c.getContext('2d')!;
+  const g = ctx.createLinearGradient(0, 0, 0, 128);
+  // top of the opening: the darkest thing in the room
+  g.addColorStop(0, dark);
+  g.addColorStop(0.52, mixHex(dark, warm, 0.16));
+  // and the floor of the next room, catching a lamp out of sight
+  g.addColorStop(0.86, mixHex(dark, warm, 0.62));
+  g.addColorStop(1, mixHex(dark, warm, 0.44));
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 4, 128);
+  beyondTex = new THREE.CanvasTexture(c);
+  beyondTex.colorSpace = THREE.SRGBColorSpace;
+  return beyondTex;
+}
+
+/** two colours, blended — for the darker crimson inside an opening */
+function mixHex(a: string, b: string, t: number): string {
+  return '#' + new THREE.Color(a).lerp(new THREE.Color(b), t).getHexString();
+}
+
+/**
  * The terminal wall. Walking into it is the transition to the floor plan, so
  * it has to read as a destination from the far end of the corridor: it is
  * lit brighter than anything else and carries either the museum's own
@@ -402,7 +539,12 @@ function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
   const textures = useArtworkTextures(artworks);
   const a = artworks[1] ?? artworks[0];
   if (!a) return null;
-  const { width: aw, height: h } = fitWork(a.aspect, Math.min(2.6, d.wallHeight * 0.42), d.halfWidth * 1.2);
+  /* a door under it leaves less wall, so the work above one is hung smaller —
+     the alternative is a canvas whose top edge is through the cornice */
+  const maxH = museum.style.fixtures.doorway
+    ? Math.min(1.75, d.wallHeight * 0.3)
+    : Math.min(2.6, d.wallHeight * 0.42);
+  const { width: aw, height: h } = fitWork(a.aspect, maxH, d.halfWidth * 1.2);
 
   return (
     <group>
@@ -431,8 +573,17 @@ function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
           fine={museum.style.fixtures.dusk}
         />
       )}
+      {museum.style.fixtures.doorway && <Doorway museum={museum} d={d} />}
       {!museum.style.fixtures.clock && (
-        <group position={[0, hangHeight(d) + 0.5, d.apseZ + 0.1]}>
+        <group
+          position={[
+            0,
+            museum.style.fixtures.doorway
+              ? Math.min(d.wallHeight - 0.5 - h / 2, doorHeight(d) + 1.35 + h / 2)
+              : hangHeight(d) + 0.5,
+            d.apseZ + 0.1,
+          ]}
+        >
           <mesh position={[0, 0, -0.02]}>
             <planeGeometry args={[aw + 1.6, h + 1.6]} />
             <meshStandardMaterial

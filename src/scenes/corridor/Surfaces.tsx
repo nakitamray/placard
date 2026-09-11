@@ -200,14 +200,45 @@ export function Floor({ style, d, quality }: Props) {
       )}
 
       {kind === 'parquet' && (
-        // light polished boards running the length of the room
-        <Instanced
-          count={Math.floor(w / 0.42)}
-          place={(i, m) => m.makeTranslation(-w / 2 + 0.21 + i * 0.42, 0.004, mid)}
-        >
-          <boxGeometry args={[0.02, 0.004, run]} />
-          <meshStandardMaterial color={p.floorInlay} roughness={0.45} />
-        </Instanced>
+        <group>
+          {/* light polished boards running the length of the room */}
+          <Instanced
+            count={Math.floor(w / 0.42)}
+            place={(i, m) => m.makeTranslation(-w / 2 + 0.21 + i * 0.42, 0.004, mid)}
+          >
+            <boxGeometry args={[0.02, 0.004, run]} />
+            <meshStandardMaterial color={p.floorInlay} roughness={0.45} />
+          </Instanced>
+          {/*
+           * The border, and the margin of plain boards outside it.
+           *
+           * A gallery floor of this date is never boards wall to wall: it is a
+           * field, a dark inlaid band a metre or so in from the skirting, and
+           * a plain margin outside that. The band is what gives a very long
+           * room a middle — it draws the eye down the centre and keeps the
+           * boards from running into the wall — and it costs two strips.
+           */}
+          {[-1, 1].map((side) => (
+            <mesh
+              key={side}
+              rotation={[-Math.PI / 2, 0, 0]}
+              position={[side * (w / 2 - 1.15), 0.006, mid]}
+            >
+              <planeGeometry args={[0.16, run]} />
+              <meshStandardMaterial color={p.floorInlay} roughness={0.4} metalness={0.08} />
+            </mesh>
+          ))}
+          {[-1, 1].map((side) => (
+            <mesh
+              key={`thin${side}`}
+              rotation={[-Math.PI / 2, 0, 0]}
+              position={[side * (w / 2 - 0.92), 0.006, mid]}
+            >
+              <planeGeometry args={[0.05, run]} />
+              <meshStandardMaterial color={p.floorInlay} roughness={0.4} metalness={0.08} />
+            </mesh>
+          ))}
+        </group>
       )}
 
       {kind === 'parquet-check' && (
