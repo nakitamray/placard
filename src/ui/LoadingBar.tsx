@@ -29,7 +29,13 @@
  * as a light coming up rather than as a cut.
  */
 import { useEffect, useRef } from 'react';
-import { BOOT_STEPS, bootProgress, bootWaitingFor, useBoot } from '../state/boot';
+import {
+  BOOT_STEPS,
+  bootProgress,
+  bootWaitingFor,
+  markBootFilled,
+  useBoot,
+} from '../state/boot';
 
 /**
  * The wall's text.
@@ -56,6 +62,34 @@ const CHAR_RATE = 6;
 const REDRAW_HZ = 12;
 /** how wide the lit edge is, as a fraction of the whole wall */
 const EDGE = 0.08;
+/**
+ * How long the wall is given to light its last characters, in seconds, once
+ * every step has reported in.
+ *
+ * The three steps land whenever they land, and the light chasing them is
+ * eased — so at the moment the work finished, the wall was typically lit to
+ * somewhere around its middle, and the curtain went up on a half-written
+ * sentence. This is the sweep that finishes it: from wherever the light had
+ * got to, to the last character, on a clock rather than on an easing tail
+ * that only ever approaches the end. Two seconds is long enough to read as
+ * the wall completing itself and short enough that nobody waiting to get in
+ * notices they are being held.
+ */
+const FILL_S = 2;
+/**
+ * The cells around the step's name are held back, so the words sit in their
+ * own band of shade.
+ *
+ * Without it the name is gilt on a wall that is *becoming* gilt, and at the
+ * end — which is exactly when the wall is brightest — the one thing on screen
+ * that is saying something disappears into the thing it is written on. A
+ * little darkness held around the letters costs nothing and means the words
+ * stand clear of the wall for the whole animation rather than for the first
+ * half of it.
+ */
+const PLAQUE_PAD = 3;
+const PLAQUE_ROWS = 1;
+const PLAQUE_DIM = 0.34;
 
 /** dim bone → gilt, quantised, so the loop never builds a colour string */
 const LEVELS = 10;
@@ -113,6 +147,10 @@ export function LoadingBar({ closing = false }: { closing?: boolean }) {
     const started = performance.now();
     /** eases toward the reported progress, so the light moves rather than jumps */
     let lit = 0;
+    /** when every step had reported, and how far the light had got by then */
+    let finishedAt = 0;
+    let litAtFinish = 0;
+    let reported = false;
 
     const resize = () => {
       // capped: this is a full-screen grid of text and a retina phone would
@@ -141,6 +179,29 @@ export function LoadingBar({ closing = false }: { closing?: boolean }) {
       // the light eases toward whatever has reported in
       lit += (progress.current - lit) * (reduced ? 1 : 0.09);
 
+      /*
+       * …and once there is nothing left to wait for, a sweep takes over and
+       * carries it the rest of the way on a clock. The easing alone never
+       * arrives: it halves the remaining distance forever, and the last tenth
+       * of the wall would still be dim at the moment the door opened.
+       */
+      if (progress.current >= 1) {
+        if (!finishedAt) {
+          finishedAt = now;
+          litAtFinish = lit;
+        }
+        const k = reduced ? 1 : clamp01((now - finishedAt) / 1000 / FILL_S);
+        // past 1 by the width of the lit edge: the edge is a ramp, so light
+        // stopping at 1 leaves the last few rows halfway up it
+        const swept = litAtFinish + (1 + EDGE - litAtFinish) * k;
+        if (swept > lit) lit = swept;
+        // one full wall, held for a frame, and then the room behind it
+        if (!reported && k >= 1) {
+          reported = true;
+          markBootFilled();
+        }
+      }
+
       ctx.fillStyle = '#15120e';
       ctx.fillRect(0, 0, w, h);
 
@@ -155,6 +216,8 @@ export function LoadingBar({ closing = false }: { closing?: boolean }) {
       const text = labelRef.current;
       const wordRow = Math.floor(rows / 2);
       const wordCol = Math.max(0, Math.floor((cols - text.length) / 2));
+      const plaqueFrom = wordCol - PLAQUE_PAD;
+      const plaqueTo = wordCol + text.length + PLAQUE_PAD;
 
       for (let row = 0; row < rows; row++) {
         const y = row * CELL + CELL / 2;
@@ -191,11 +254,18 @@ export function LoadingBar({ closing = false }: { closing?: boolean }) {
           const f = i / total;
           const level = clamp01((lit - f) / EDGE + (reduced ? 0 : 0));
           const breathe = reduced ? 0.5 : 0.5 + 0.5 * Math.sin(breath + i * 0.21);
+          // held back around the step's name, whatever the wall is doing
+          const shade =
+            Math.abs(row - wordRow) <= PLAQUE_ROWS &&
+            col >= plaqueFrom &&
+            col < plaqueTo
+              ? PLAQUE_DIM
+              : 1;
           // the breath modulates the lit level without ever darkening it to
           // nothing, so a lit region reads as lit even at the bottom of a breath
           const idx = Math.min(
             LEVELS - 1,
-            Math.round(level * (LEVELS - 1) * (0.82 + 0.18 * breathe)),
+            Math.round(level * shade * (LEVELS - 1) * (0.82 + 0.18 * breathe)),
           );
           ctx.fillStyle = PALETTE[idx];
           ctx.fillText(ch, x, y);
@@ -212,12 +282,26 @@ export function LoadingBar({ closing = false }: { closing?: boolean }) {
 
     resize();
     window.addEventListener('resize', resize);
+    /*
+     * With motion turned off there is no loop to notice a step landing, so
+     * the wall is redrawn when one does instead — and the store is read here
+     * rather than trusting the ref, which React has not updated yet at the
+     * moment a subscriber runs. Without this the reduced-motion wall never
+     * reaches its end, never reports, and the door would sit closed until the
+     * failsafe in App opened it.
+     */
+    let unsubscribe = () => {};
     if (reduced) {
       draw(performance.now());
+      unsubscribe = useBoot.subscribe((s) => {
+        progress.current = bootProgress(s.done);
+        draw(performance.now());
+      });
     } else {
       raf = requestAnimationFrame(tick);
     }
     return () => {
+      unsubscribe();
       window.removeEventListener('resize', resize);
       if (raf) cancelAnimationFrame(raf);
     };
