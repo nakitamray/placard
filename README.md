@@ -631,7 +631,19 @@ environment variable, and without it the form does not render.
 
 ```
 VITE_CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx
+CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxxx      # the same thing, shorter name
 ```
+
+**Either name works.** The first is the Vite convention; the second is
+accepted because some hosts' dashboards will not take a `VITE_`-prefixed name.
+What makes the short one possible is `envPrefix` in `vite.config.ts`, which
+lists the prefixes Vite is allowed to expose to the browser — a variable not
+covered by one of them is simply absent at runtime, which looks identical to a
+form nobody has configured. Keep that list narrow: **anything matching a
+prefix in it is published into a file any visitor can read**, so never name a
+secret `CONTACT_ANYTHING`.
+
+Set only one of the two. If both are set, `VITE_CONTACT_ENDPOINT` wins.
 
 **The address is never in the browser.** Vite inlines `VITE_`-prefixed
 variables at build time, so whatever goes in one becomes a plain string in the
@@ -652,7 +664,7 @@ Formspree, Web3Forms, Getform and Basin all give a free endpoint that takes a
 JSON POST and forwards it to you. A serverless function of your own works too —
 anything that accepts `{ name, email, message }`.
 
-Because the substitution happens at build time, changing either one needs a
+Because the substitution happens at build time, changing it needs a
 redeploy, not just a restart.
 
 ## Known limits

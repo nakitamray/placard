@@ -617,7 +617,19 @@ export function Credits() {
  *
  * It is deliberately three fields. Every extra one costs replies.
  */
-const CONTACT_ENDPOINT = (import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined) ?? '';
+/*
+ * Either name works.
+ *
+ * `VITE_CONTACT_ENDPOINT` is the Vite convention; `CONTACT_ENDPOINT` is here
+ * because some hosts' dashboards will not take the first one, and being told
+ * your contact form is broken by a naming convention is a bad afternoon.
+ * `envPrefix` in vite.config.ts is what lets the shorter name through — a
+ * variable Vite has not been told to expose is simply absent at runtime,
+ * which looks exactly like a form that has not been configured.
+ */
+const CONTACT_ENDPOINT =
+  ((import.meta.env.VITE_CONTACT_ENDPOINT ??
+    import.meta.env.CONTACT_ENDPOINT) as string | undefined) ?? '';
 
 function ContactForm() {
   const [name, setName] = useState('');
