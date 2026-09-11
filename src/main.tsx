@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import App from './App';
 import './styles.css';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { Analytics } from '@vercel/analytics/react';
 
 // GSAP defaults to lagSmoothing(500, 33): any frame longer than 500ms is
 // treated as 33ms, which quietly converts wall-clock choreography into
@@ -17,5 +18,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
     <SpeedInsights />
+    <Analytics />
   </React.StrictMode>,
 );
