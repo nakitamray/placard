@@ -253,89 +253,363 @@ function BarrelSkylight({ style, d }: Props) {
   );
 }
 
-/* ── National Gallery: pitched glass lantern on gilded arches ───────────── */
+/* ── National Gallery: a coffered ceiling under a long glazed lantern ────── */
 
+/**
+ * Room 32, and the reason that room is worth modelling at all.
+ *
+ * What is overhead there is not a glass roof — it is a CEILING, deeply
+ * coffered in red and gold, with a long flat lantern let into the middle of
+ * it. That distinction is the whole look. An earlier version here built a
+ * bare white tent of glass from wall to wall, which is a Victorian railway
+ * station: correct about where the daylight comes from and wrong about
+ * everything a visitor actually sees when they look up.
+ *
+ * So, from the middle outward:
+ *
+ *   THE LANTERN   A flat run of glazing down the centre line, a little under
+ *                 half the width of the room, panes divided by a grid of
+ *                 white glazing bars. Flat, not pitched: it reads as a hole
+ *                 cut in a ceiling, which is what it is.
+ *
+ *   THE KERB      The moulded gilt upstand the lantern sits in, running the
+ *                 length on both sides — the bright line that separates the
+ *                 daylight from the decoration.
+ *
+ *   THE COVES     The sloped compartments either side, in deep red, carrying
+ *                 a grid of sunk coffers with gilt borders and a rosette in
+ *                 each. This is the detail the room is famous for and the
+ *                 thing most worth spending geometry on; every coffer is one
+ *                 instance, so the whole ceiling is four draw calls.
+ *
+ *   THE ARCHES    Transverse gilded ribs at every bay division, springing
+ *                 from the cornice and dying into the lantern kerb, with a
+ *                 boss where they meet it. These are what divide the ceiling
+ *                 into compartments and give the room its rhythm down the
+ *                 length.
+ *
+ *   THE CORNICE   A heavy stacked entablature at the wall head — three
+ *                 courses and a dentil run — because the join between a red
+ *                 wall and a red ceiling is invisible without one, and in the
+ *                 room it is the single most emphatic gilt line there is.
+ */
 function PitchedGlass({ style, d }: Props) {
   const p = style.palette;
   const r = d.halfWidth;
-  const eaves = d.wallHeight + 1.1;
+  const eaves = d.wallHeight + 0.55;
   const ridge = d.vaultHeight;
-  const slope = Math.atan2(ridge - eaves, r * 0.62);
-  const slopeLen = Math.hypot(ridge - eaves, r * 0.62);
   const mid = -d.length / 2;
   const runLength = d.length + d.bayDepth * 3;
 
+  /** half-width of the glazed opening */
+  const lantern = r * 0.44;
+  /** horizontal run of one cove, from lantern kerb out to the cornice */
+  const coveRun = r - lantern;
+  const coveRise = ridge - eaves;
+  const coveLen = Math.hypot(coveRun, coveRise);
+  const coveTilt = Math.atan2(coveRise, coveRun);
+  /** the middle of one cove, in the room */
+  const coveX = lantern + coveRun / 2;
+  const coveY = eaves + coveRise / 2;
+
+  /* one coffer per (bay division × row), sunk into the cove */
+  /*
+   * Two rows, not three.
+   *
+   * The cove is steep and it is seen almost edge-on from anywhere in the
+   * room, so ribs running ALONG its length foreshorten into a set of parallel
+   * gold stripes and crowd out everything else. Fewer of them, and lighter,
+   * leaves the cross ribs and the bay arches to do the drawing — which is
+   * what the eye actually reads a coffered ceiling by.
+   */
+  const COFFER_ROWS = 3;
+  const cofferCols = Math.max(2, Math.round(runLength / (d.bayDepth / 4)));
+  const cofferW = runLength / cofferCols;
+  const cofferH = coveLen / COFFER_ROWS;
+
   return (
     <group>
-      {/* The two glazed slopes of the lantern.
-          A PlaneGeometry lies in its own XY, so its second dimension runs
-          *up* unless it is laid down first. The group carries the slope and
-          the mesh's own -90° about X lays the plane along the corridor;
-          rotating only about Z would stand a 50-metre sheet of glass on end
-          across the room. */}
+      {/* ── the glazed lantern ─────────────────────────────────────────── */}
+      <mesh position={[0, ridge, mid]} rotation={[Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[lantern * 2, runLength]} />
+        <meshBasicMaterial color={p.sky} side={THREE.DoubleSide} toneMapped={false} />
+      </mesh>
+      {/* glazing bars across, one per metre, and four running the length */}
+      <Repeated
+        count={Math.round(runLength)}
+        place={(i, m) => m.makeTranslation(0, ridge - 0.04, mid + runLength / 2 - i)}
+      >
+        <boxGeometry args={[lantern * 2, 0.05, 0.05]} />
+        <meshStandardMaterial color={p.ceiling} roughness={0.75} />
+      </Repeated>
+      {[-0.62, -0.21, 0.21, 0.62].map((f) => (
+        <mesh key={f} position={[f * lantern, ridge - 0.05, mid]}>
+          <boxGeometry args={[0.06, 0.06, runLength]} />
+          <meshStandardMaterial color={p.ceiling} roughness={0.75} />
+        </mesh>
+      ))}
+
+      {/* ── the kerb the glazing sits in ───────────────────────────────── */}
       {[-1, 1].map((side) => (
-        <group
-          key={side}
-          position={[(side * r * 0.62) / 2, (eaves + ridge) / 2, mid]}
-          rotation={[0, 0, -side * slope]}
-        >
-          <mesh rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[slopeLen, runLength]} />
-            <meshBasicMaterial color={p.sky} side={THREE.DoubleSide} />
+        <group key={`kerb${side}`}>
+          <mesh position={[side * lantern, ridge - 0.16, mid]}>
+            <boxGeometry args={[0.2, 0.34, runLength]} />
+            <meshStandardMaterial color={p.gilt} metalness={0.75} roughness={0.36} />
+          </mesh>
+          <mesh position={[side * (lantern + 0.11), ridge - 0.35, mid]}>
+            <boxGeometry args={[0.14, 0.12, runLength]} />
+            <meshStandardMaterial color={p.molding} roughness={0.66} />
           </mesh>
         </group>
       ))}
-      {/* white structural ribs across the glass, one pair per half-bay */}
-      <Repeated
-        count={(d.bays + 1) * 2}
-        place={(i, m) => {
-          const side = i % 2 ? 1 : -1;
-          const z = -(i >> 1) * d.bayDepth;
-          m.makeRotationZ(-side * slope);
-          m.setPosition((side * r * 0.62) / 2, (eaves + ridge) / 2, z);
-        }}
-      >
-        <boxGeometry args={[slopeLen, 0.1, 0.1]} />
-        <meshStandardMaterial color={p.ceiling} roughness={0.7} />
-      </Repeated>
-      {/* ridge beam */}
-      <mesh position={[0, ridge, mid]}>
-        <boxGeometry args={[0.22, 0.2, runLength]} />
-        <meshStandardMaterial color={p.ceiling} roughness={0.7} />
-      </mesh>
 
-      {/* the coved ceiling below the lantern: warm red and gold sections
-          divided by gilded arches */}
+      {/* ── the coved compartments, and their coffers ───────────────────── */}
       {[-1, 1].map((side) => (
         <group
           key={`cove${side}`}
-          position={[side * (r * 0.62 + (r - r * 0.62) / 2), eaves - 0.35, mid]}
-          rotation={[0, 0, side * -0.55]}
+          position={[side * coveX, coveY, mid]}
+          /*
+           * Minus, and the sign is the whole geometry.
+           *
+           * The cove has to fall from the lantern kerb at the ridge DOWN to
+           * the cornice at the eaves. Rotated the other way it climbed the
+           * opposite direction — from the lantern's edge at eaves height up to
+           * the wall head at ridge height — which put almost the entire
+           * surface inside the wall, with only the few centimetres nearest the
+           * lantern ever reaching the room. Every coffer, rib and rosette was
+           * being drawn correctly and buried in masonry, which is why
+           * brightening them changed nothing.
+           */
+          rotation={[0, 0, -side * coveTilt]}
         >
+          {/*
+           * The ground of the cove, and it is CREAM, not red.
+           *
+           * This had it the wrong way round — a dark red field with gilt
+           * stripes on it, which from the floor read as a striped awning and
+           * made the brightest ceiling in the exhibition the gloomiest thing
+           * in the room. In the room itself the framing is the pale, luminous
+           * part and the sunk panels are the red ones; the cove sits directly
+           * beside a lantern flooding it with daylight, so it is the lightest
+           * surface overhead, not the darkest.
+           *
+           * Everything below is stacked a few centimetres proud of this, on
+           * the room's side. The cove is a plane laid face-up and then tilted,
+           * so its local -Y is where the visitor is standing; the first
+           * version stacked the ribs and rosettes at +Y, where the cove's own
+           * surface hid every one of them.
+           */}
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[(r - r * 0.62) * 1.5, runLength]} />
+            <planeGeometry args={[coveLen, runLength]} />
+            {/*
+             * The recess, and it is the RED one.
+             *
+             * Which of the two colours is proud and which is sunk is not a
+             * detail here, it is the whole appearance of the ceiling. A cove
+             * this steep is seen almost edge-on from everywhere in the room,
+             * and at a grazing angle whatever stands proud hides whatever is
+             * behind it — so with red panels raised over a cream ground, the
+             * cream never reached the eye at all and the ceiling read as a
+             * dark red slab with gold stripes. The building's own ceiling is
+             * the opposite: pale, luminous framing standing forward, red
+             * compartments sunk behind it.
+             */}
             <meshStandardMaterial
-              color={p.ceilingAccent}
-              roughness={0.85}
+              color={mix(p.ceilingAccent, '#000000', 0.35)}
+              roughness={0.9}
               side={THREE.DoubleSide}
             />
           </mesh>
+
+          {/* the panels */}
+          <Repeated
+            count={cofferCols * COFFER_ROWS}
+            place={(i, m) => {
+              const col = i % cofferCols;
+              const row = Math.floor(i / cofferCols);
+              m.makeRotationX(-Math.PI / 2);
+              m.setPosition(
+                -coveLen / 2 + cofferH * (row + 0.5),
+                -0.06,
+                -runLength / 2 + cofferW * (col + 0.5),
+              );
+            }}
+          >
+            <planeGeometry args={[cofferH * 0.94, cofferW * 0.94]} />
+            {/* the pale coffer face, carrying the bounce off the lantern a
+                metre away — the cove is turned away from the key light, so
+                without a little emissive the brightest ceiling in the
+                exhibition renders as the gloomiest surface in the room */}
+            <meshStandardMaterial
+              color={p.molding}
+              emissive={p.molding}
+              emissiveIntensity={0.3}
+              roughness={0.84}
+              side={THREE.DoubleSide}
+            />
+          </Repeated>
+
+          {/* the red field inside each coffer — cream frame, red centre, gold
+              boss, which is the order the room reads in */}
+          <Repeated
+            count={cofferCols * COFFER_ROWS}
+            place={(i, m) => {
+              const col = i % cofferCols;
+              const row = Math.floor(i / cofferCols);
+              m.makeRotationX(-Math.PI / 2);
+              m.setPosition(
+                -coveLen / 2 + cofferH * (row + 0.5),
+                -0.09,
+                -runLength / 2 + cofferW * (col + 0.5),
+              );
+            }}
+          >
+            <planeGeometry args={[cofferH * 0.6, cofferW * 0.6]} />
+            <meshStandardMaterial
+              color={p.ceilingAccent}
+              roughness={0.88}
+              side={THREE.DoubleSide}
+            />
+          </Repeated>
+
+          {/* a rosette in the middle of each */}
+          <Repeated
+            count={cofferCols * COFFER_ROWS}
+            place={(i, m) => {
+              const col = i % cofferCols;
+              const row = Math.floor(i / cofferCols);
+              m.makeRotationX(-Math.PI / 2);
+              m.setPosition(
+                -coveLen / 2 + cofferH * (row + 0.5),
+                -0.13,
+                -runLength / 2 + cofferW * (col + 0.5),
+              );
+            }}
+          >
+            <circleGeometry args={[Math.min(cofferH, cofferW) * 0.15, 8]} />
+            <meshStandardMaterial
+              color={p.gilt}
+              emissive={p.gilt}
+              emissiveIntensity={0.16}
+              metalness={0.86}
+              roughness={0.28}
+              side={THREE.DoubleSide}
+            />
+          </Repeated>
+
+          {/*
+           * The gilt grid, both ways.
+           *
+           * Ribs along the run alone leave a ceiling of long stripes — which
+           * is what this was, and it read as a striped awning rather than as
+           * coffering. What makes a coffered ceiling is the CROSS rib: the
+           * division across the room at every cell, repeated down the length,
+           * so the eye reads a field of boxes instead of a set of lines.
+           */}
+          {Array.from({ length: COFFER_ROWS + 1 }, (_, row) => (
+            <mesh key={`rib${row}`} position={[-coveLen / 2 + cofferH * row, -0.14, 0]}>
+              <boxGeometry args={[0.07, 0.07, runLength]} />
+              <meshStandardMaterial color={p.gilt} metalness={0.7} roughness={0.42} />
+            </mesh>
+          ))}
+          <Repeated
+            count={cofferCols + 1}
+            place={(i, m) =>
+              m.makeTranslation(0, -0.14, -runLength / 2 + cofferW * i)
+            }
+          >
+            <boxGeometry args={[coveLen, 0.1, 0.12]} />
+            <meshStandardMaterial color={p.gilt} metalness={0.74} roughness={0.38} />
+          </Repeated>
+
+          {/*
+           * And the heavy rib at every bay division — the transverse arch.
+           *
+           * Same construction as the cell ribs, three times the section and a
+           * pale moulding under it, because these are what divide the ceiling
+           * into compartments and give the room its rhythm down the length.
+           * The eye counts these; it only reads the rest as texture.
+           */}
+          <Repeated
+            count={d.bays + 4}
+            place={(i, m) =>
+              m.makeTranslation(0, -0.3, runLength / 2 - i * d.bayDepth)
+            }
+          >
+            <boxGeometry args={[coveLen, 0.34, 0.5]} />
+            <meshStandardMaterial
+              color={p.molding}
+              emissive={p.molding}
+              emissiveIntensity={0.22}
+              roughness={0.58}
+            />
+          </Repeated>
+          {/* the gilt bead along the face of each arch, which is the line the
+              eye follows across the room */}
+          <Repeated
+            count={d.bays + 4}
+            place={(i, m) =>
+              m.makeTranslation(0, -0.48, runLength / 2 - i * d.bayDepth)
+            }
+          >
+            <boxGeometry args={[coveLen, 0.1, 0.56]} />
+            <meshStandardMaterial color={p.gilt} metalness={0.8} roughness={0.32} />
+          </Repeated>
         </group>
       ))}
-      {/* the intricate gilded archways between vault sections */}
-      <Repeated
-        count={d.bays + 1}
-        place={(i, m) => m.makeTranslation(0, eaves - 0.9, -i * d.bayDepth)}
-      >
-        <torusGeometry args={[r - 0.05, 0.13, 8, 28, Math.PI]} />
-        <meshStandardMaterial color={p.gilt} metalness={0.8} roughness={0.35} />
-      </Repeated>
-      {/* gilt eaves cornice running the length of both walls */}
+
+      {/* the boss where each arch dies into the lantern kerb */}
       {[-1, 1].map((side) => (
-        <mesh key={`e${side}`} position={[side * (r - 0.12), eaves - 0.55, mid]}>
-          <boxGeometry args={[0.3, 0.3, runLength]} />
-          <meshStandardMaterial color={p.gilt} metalness={0.7} roughness={0.4} />
-        </mesh>
+        <Repeated
+          key={`boss${side}`}
+          count={d.bays + 4}
+          place={(i, m) =>
+            m.makeTranslation(
+              side * (lantern + 0.16),
+              ridge - 0.42,
+              mid + runLength / 2 - i * d.bayDepth,
+            )
+          }
+        >
+          <sphereGeometry args={[0.13, 10, 8]} />
+          <meshStandardMaterial color={p.gilt} metalness={0.82} roughness={0.3} />
+        </Repeated>
+      ))}
+
+      {/* ── the cornice: three courses and a dentil run ─────────────────── */}
+      {[-1, 1].map((side) => (
+        <group key={`corn${side}`}>
+          {/* the bed mould, proud of the wall */}
+          <mesh position={[side * (r - 0.2), eaves - 0.16, mid]}>
+            <boxGeometry args={[0.4, 0.3, runLength]} />
+            <meshStandardMaterial color={p.gilt} metalness={0.7} roughness={0.4} />
+          </mesh>
+          {/* the frieze under it, in the wall's own deep red */}
+          <mesh position={[side * (r - 0.09), eaves - 0.52, mid]}>
+            <boxGeometry args={[0.18, 0.44, runLength]} />
+            <meshStandardMaterial color={p.wallDeep} roughness={0.85} />
+          </mesh>
+          {/* dentils: the single most legible piece of ornament at this
+              distance, because the gaps between them do the drawing */}
+          <Repeated
+            count={Math.round(runLength / 0.42)}
+            place={(i, m) =>
+              m.makeTranslation(
+                side * (r - 0.16),
+                eaves - 0.4,
+                mid + runLength / 2 - i * 0.42,
+              )
+            }
+          >
+            <boxGeometry args={[0.26, 0.16, 0.2]} />
+            <meshStandardMaterial color={p.gilt} metalness={0.7} roughness={0.42} />
+          </Repeated>
+          {/* the fillet the frieze sits on */}
+          <mesh position={[side * (r - 0.05), eaves - 0.78, mid]}>
+            <boxGeometry args={[0.14, 0.13, runLength]} />
+            <meshStandardMaterial color={p.gilt} metalness={0.72} roughness={0.38} />
+          </mesh>
+        </group>
       ))}
     </group>
   );
