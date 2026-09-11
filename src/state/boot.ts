@@ -39,17 +39,31 @@ export type BootKey = (typeof BOOT_STEPS)[number]['key'];
 interface BootState {
   /** which steps have reported in */
   done: BootKey[];
+  /**
+   * The curtain has finished saying what it had to say.
+   *
+   * The work being done and the screen covering it finish at different
+   * moments. The three steps can all land while the wall of text is still
+   * lighting — and a curtain pulled at that instant leaves half a wall bone
+   * and half of it gilt, which does not read as an exhibition opening. It
+   * reads as an animation that was interrupted. So the wall reports in too,
+   * and the door waits the second or so it costs to complete the sentence.
+   */
+  filled: boolean;
   /** the first frame has been drawn: the room behind the curtain is real */
   ready: boolean;
   mark: (key: BootKey) => void;
+  fill: () => void;
   open: () => void;
 }
 
 export const useBoot = create<BootState>((set) => ({
   done: [],
+  filled: false,
   ready: false,
   mark: (key) =>
     set((s) => (s.done.includes(key) ? s : { done: [...s.done, key] })),
+  fill: () => set({ filled: true }),
   open: () => set({ ready: true }),
 }));
 
@@ -70,3 +84,6 @@ export function bootWaitingFor(done: BootKey[]) {
  * holding a hook to say they have finished.
  */
 export const markBoot = (key: BootKey) => useBoot.getState().mark(key);
+
+/** the wall of text has lit all the way to its last character */
+export const markBootFilled = () => useBoot.getState().fill();

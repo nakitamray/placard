@@ -223,7 +223,8 @@ export default function App() {
    * perfectly well; it has always been able to.
    */
   useEffect(() => {
-    const t = window.setTimeout(() => useBoot.getState().open(), 9000);
+    // 9s of work, plus the two the wall is given to finish lighting
+    const t = window.setTimeout(() => useBoot.getState().open(), 11000);
     return () => window.clearTimeout(t);
   }, []);
 
@@ -467,8 +468,18 @@ function ThreadToggle() {
 function CurtainRaiser() {
   const done = useBoot((s) => s.done);
   const ready = useBoot((s) => s.ready);
+  /*
+   * …and not one frame before the curtain has finished speaking, either. The
+   * wall of text lights in reading order as the steps report in, and the last
+   * of them habitually landed while the wall was still somewhere around its
+   * middle. Opening there left a screen half bone and half gilt for the
+   * fraction of a second before it faded, which looks like an animation that
+   * was cut off rather than one that finished. The wall now takes a couple of
+   * seconds to light its last characters and says so — see ui/LoadingBar.
+   */
+  const filled = useBoot((s) => s.filled);
   const drawn = useRef(0);
-  const all = done.length >= BOOT_STEPS.length;
+  const all = done.length >= BOOT_STEPS.length && filled;
   useFrame(() => {
     if (!all || ready) return;
     drawn.current++;

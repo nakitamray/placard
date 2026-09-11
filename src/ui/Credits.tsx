@@ -679,8 +679,7 @@ function ContactForm() {
       ) : (
         <>
           <p className="body credits-note">
-            Something you liked, something that broke, a painting you think ought to be hanging
-            here — or nothing in particular at all. Write it down and I will write back.
+            Something you liked, something that broke, a painting you want added, or just to connect! Write it down and I'll get back to you.
           </p>
           <form className="contact" onSubmit={submit}>
             {/* the two short answers share a line; the message gets the page */}
