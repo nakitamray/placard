@@ -27,6 +27,9 @@ import { HelpBubble } from './ui/HelpBubble';
 import { CursorRing } from './ui/CursorRing';
 import { LoadingBar } from './ui/LoadingBar';
 import { OrientationGate } from './ui/OrientationGate';
+import { SmallScreenNotice } from './ui/SmallScreenNotice';
+import { ZoomControls } from './ui/ZoomControls';
+import { useIsTouch } from './lib/device';
 import { FlashLayer } from './ui/Flash';
 import { endReveal, startReveal } from './transitions/reveal';
 import { asset } from './lib/asset';
@@ -63,6 +66,7 @@ const AtlasView = lazy(() => import('./ui/AtlasView').then((m) => ({ default: m.
 const Credits = lazy(() => import('./ui/Credits').then((m) => ({ default: m.Credits })));
 
 export default function App() {
+  const touch = useIsTouch();
   const phase = useStore((s) => s.phase);
   const revealed = useStore((s) => s.revealed);
   const museum = useStore((s) => s.museum);
@@ -390,6 +394,10 @@ export default function App() {
         </button>
       )}
       <ControlHints />
+      {/* leaning in and back, for a screen with no keyboard and no wheel. Only
+          in the gallery, because that is the only room where zoom means
+          anything — see attachZoom. */}
+      {inGallery && touch && <ZoomControls />}
       {(phase === 'corridor' || inGallery) && (
         <QualityToggle value={qualityName} onChange={chooseQuality} />
       )}
@@ -428,6 +436,8 @@ export default function App() {
       {/* a precondition rather than a phase: it sits over everything and the
           exhibition keeps running underneath it */}
       <OrientationGate />
+      {/* said once, on a phone, after the curtain is up */}
+      <SmallScreenNotice ready={phase !== 'boot'} />
 
       {/* screen-reader / keyboard proxies for the canvas artworks */}
       {inGallery && <ArtworkProxies />}

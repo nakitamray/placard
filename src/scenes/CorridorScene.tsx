@@ -25,7 +25,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { useStore } from '../state/store';
-import { corridor, warp, pointer, resetCorridor } from '../state/motion';
+import { corridor, warp, pointer, pointerLook, resetCorridor, wasSwipe } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
 import { flash } from '../ui/Flash';
 import { OrnateFrame } from './OrnateFrame';
@@ -609,6 +609,9 @@ function Apse({ museum, d }: { museum: MuseumData; d: Dims }) {
               e.stopPropagation();
               const st = useStore.getState();
               if (st.phase !== 'corridor') return;
+              // a swipe down the corridor finishes with the finger somewhere,
+              // and often that somewhere is a canvas — see wasSwipe
+              if (wasSwipe()) return;
               document.body.style.cursor = '';
               st.setIndex(artworks.indexOf(a));
               st.setPhase('warp');
@@ -849,6 +852,9 @@ const WALK_MAX = 0.6;
 
 export function CorridorScene({ quality }: { quality: Quality }) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
+  // the drawing-buffer size, which is what the lens has to suit — see the fov
+  // calculation in the frame loop below
+  const size = useThree((s) => s.size);
   const phase = useStore((s) => s.phase);
   const museum = useStore((s) => s.museum);
   const reducedMotion = useStore((s) => s.reducedMotion);
@@ -891,13 +897,37 @@ export function CorridorScene({ quality }: { quality: Quality }) {
       corridor.goal += e.deltaY * 0.00045;
       clamp();
     };
+    /*
+     * A swipe up the glass walks you down the corridor — and only ever with one
+     * finger. A second finger is a pinch somewhere else in the exhibition, and
+     * reading `touches[0]` through one sent the visitor lurching down the room
+     * while they were trying to do something else entirely.
+     */
     let touchY = 0;
-    const onTouchStart = (e: TouchEvent) => (touchY = e.touches[0].clientY);
+    let walking = false;
+    const onTouchStart = (e: TouchEvent) => {
+      touchY = e.touches[0].clientY;
+      walking = e.touches.length === 1;
+    };
     const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 1) {
+        walking = false;
+        return;
+      }
+      if (!walking) {
+        // one finger left of a pinch: resume from where it actually is
+        touchY = e.touches[0].clientY;
+        walking = true;
+        return;
+      }
       const dy = touchY - e.touches[0].clientY;
       touchY = e.touches[0].clientY;
       corridor.goal += dy * 0.0018;
       clamp();
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      walking = false;
+      if (e.touches.length === 1) touchY = e.touches[0].clientY;
     };
 
     const accelerate = () => {
@@ -952,6 +982,7 @@ export function CorridorScene({ quality }: { quality: Quality }) {
     window.addEventListener('wheel', onWheel, { passive: true });
     window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('blur', onBlur);
@@ -959,6 +990,7 @@ export function CorridorScene({ quality }: { quality: Quality }) {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('blur', onBlur);
@@ -1017,14 +1049,41 @@ export function CorridorScene({ quality }: { quality: Quality }) {
 
     const railZ = corridor.mouth + -d.length * corridor.t;
     let z = railZ;
-    let fov = 48;
+    /*
+     * THE LENS FOLLOWS THE SHAPE OF THE WINDOW.
+     *
+     * 48° is a vertical angle, and the width it covers is that angle times the
+     * window's aspect. Composed on a desktop at roughly 1.7 it takes in both
+     * walls of the enfilade; held in a portrait phone at 0.46 it takes in a
+     * slice up the middle, with the hang on either side outside the frame and
+     * the vault above it. The room was still there — there was simply no way to
+     * look at it.
+     *
+     * So below the aspect it was composed for, the vertical angle opens until
+     * the horizontal one is back to what it should be: a tall window sees the
+     * same width of corridor as a wide one, and gets the extra height for free.
+     * The cap keeps the perspective from going fisheye on the narrowest phone,
+     * where a little cropping is better than a room that bends.
+     */
+    const REF_ASPECT = 1.7;
+    const aspect = size.width / Math.max(1, size.height);
+    const base =
+      aspect >= REF_ASPECT
+        ? 48
+        : Math.min(
+            78,
+            (Math.atan(Math.tan((48 * Math.PI) / 360) * (REF_ASPECT / aspect)) * 360) / Math.PI,
+          );
+    let fov = base;
     if (phase === 'warp') {
       z = THREE.MathUtils.lerp(railZ, d.apseZ + 1.6, warp.p);
-      fov = 48 + 30 * warp.p * warp.p;
+      fov = base + 30 * warp.p * warp.p;
     }
 
     const k = dampK(0.075, delta);
-    const active = phase === 'corridor' && !reducedMotion;
+    // ...and not on a touch screen, where `pointer` is the last thing tapped
+    // rather than where anybody is looking — see pointerLook
+    const active = phase === 'corridor' && !reducedMotion && pointerLook();
     const px = active ? pointer.x : 0;
     const py = active ? pointer.y : 0;
     look.current.x += (px - look.current.x) * k;

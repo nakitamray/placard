@@ -26,7 +26,7 @@ import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { selectArtworks, useStore } from '../state/store';
-import { gallery, pointer, view } from '../state/motion';
+import { gallery, pointer, pointerLook, view, wasSwipe } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
 import { GlyphPrePass } from '../glyph/GlyphPrePass';
 import { loadReveal, prefetchAround, type LoadedArtwork } from '../glyph/artworkLoader';
@@ -390,16 +390,41 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
         if (clamped !== useStore.getState().index) setIndex(clamped);
       }, 150);
     };
+    /*
+     * ONE FINGER MOVES THE ROOM; TWO ARE A PINCH AND BELONG TO THE ZOOM.
+     *
+     * Both gestures are on the same surface, and the rail used to read
+     * `touches[0]` whatever else was on the glass — so every pinch also dragged
+     * the room sideways, and letting go of one finger left the remaining one
+     * mid-drag from a position the rail had never seen. Zooming in on a detail
+     * therefore slid you off the painting you were zooming into. The rail now
+     * stands down the moment a second finger arrives (see attachZoom, which
+     * owns the pinch) and rearms from the finger that is left.
+     */
     const onTouchStart = (e: TouchEvent) => {
-      touch.current = { x: e.touches[0].clientX, active: true };
+      touch.current = { x: e.touches[0].clientX, active: e.touches.length === 1 };
     };
     const onTouchMove = (e: TouchEvent) => {
-      if (!touch.current.active) return;
+      if (e.touches.length !== 1) {
+        touch.current.active = false;
+        return;
+      }
+      if (!touch.current.active) {
+        // a finger lifted out of a pinch: take up the drag from where it is
+        // now rather than from wherever the pinch started
+        touch.current = { x: e.touches[0].clientX, active: true };
+        return;
+      }
       const dx = touch.current.x - e.touches[0].clientX;
       touch.current.x = e.touches[0].clientX;
       gallery.goal += dx * 0.02;
     };
-    const onTouchEnd = () => {
+    const onTouchEnd = (e: TouchEvent) => {
+      // still a finger down: this is one end of a pinch, not the end of a drag
+      if (e.touches.length) {
+        touch.current = { x: e.touches[0].clientX, active: false };
+        return;
+      }
       touch.current.active = false;
       const i = Math.max(0, Math.min(artworks.length - 1, Math.round(gallery.goal / SPACING)));
       gsap.to(gallery, { goal: i * SPACING, duration: 0.5, ease: 'power3.out' });
@@ -458,8 +483,11 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
 
     // pointer parallax, damped
     const k = dampK(0.06, delta);
-    const px = reducedMotion ? 0 : pointer.x;
-    const py = reducedMotion ? 0 : pointer.y;
+    // the head-turn is a cursor gesture and does not exist on a touch screen —
+    // see pointerLook, and note the pan below still follows the last touch
+    const look0 = reducedMotion || !pointerLook();
+    const px = look0 ? 0 : pointer.x;
+    const py = look0 ? 0 : pointer.y;
     look.current.x += (px - look.current.x) * k;
     look.current.y += (py - look.current.y) * k;
 
@@ -470,7 +498,36 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
      * The floor of 1.55m stops the camera walking through the frame.
      */
     view.v = damp(view.v, view.goal, 0.09, delta);
-    const dz = Math.max(1.55, CAM_Z / view.v);
+
+    /*
+     * STAND BACK FAR ENOUGH THAT THE PAINTING IS ON THE SCREEN.
+     *
+     * 5.2 metres was measured against a desktop window — wide, and a good deal
+     * wider than it is tall. The camera's field of view is vertical, so the
+     * width it actually covers is that angle times the window's aspect ratio,
+     * and on a portrait phone the aspect is not 1.8 but 0.46. The same 5.2m in
+     * front of the same canvas therefore showed about a quarter of its width:
+     * the visitor was standing in the right place for a room they were not in,
+     * with the left and right thirds of the work off either side of the glass.
+     *
+     * So the composed distance is a floor now, not the answer. The camera also
+     * works out how far back it would have to stand for this particular work,
+     * at this particular window shape, to have the whole of it inside the
+     * frame with a little wall showing around it — and takes whichever of the
+     * two is further. On a desktop the fitted distance is the shorter one and
+     * nothing moves; on a tall window it is what puts the painting on screen.
+     */
+    const entry = artworks[index];
+    const fit = entry ? fitWork(entry.aspect, PLANE_H, MAX_W) : { width: 0, height: 0 };
+    const halfFov = Math.tan(((camera.fov || 45) * Math.PI) / 360);
+    const aspect = size.width / Math.max(1, size.height);
+    // a painting hung tight to the edges of the window is a screenshot, not a
+    // room: the margin is the wall either side of it
+    const MARGIN = 1.22;
+    const toFitHeight = (fit.height / 2 / halfFov) * MARGIN;
+    const toFitWidth = (fit.width / 2 / (halfFov * aspect)) * MARGIN;
+    const composed = Math.max(CAM_Z, toFitHeight, toFitWidth);
+    const dz = Math.max(1.55, composed / view.v);
 
     /*
      * Zoom in on what you are looking at, not on the middle.
@@ -487,10 +544,8 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
      * never carry the camera off the side of the painting, and it unwinds by
      * itself as you zoom back out. `0` still puts everything back.
      */
-    const entry = artworks[index];
-    const fit = entry ? fitWork(entry.aspect, PLANE_H, MAX_W) : { width: 0, height: 0 };
-    const halfH = Math.tan(((camera.fov || 45) * Math.PI) / 360) * dz;
-    const halfW = halfH * (size.width / Math.max(1, size.height));
+    const halfH = halfFov * dz;
+    const halfW = halfH * aspect;
     const toward = 1 - 1 / Math.max(1, view.v);
     const wantPanX = reducedMotion
       ? 0
@@ -737,6 +792,9 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
           }}
           onTap={(u, v) => {
             if (i !== index) return;
+            // a swipe along the rail ends with the finger over a painting, and
+            // that is not a request to open it — see wasSwipe
+            if (wasSwipe()) return;
             const s = useStore.getState();
             // Thread Pull: Shift-click extracts the region under the cursor
             if (s.extractionMode) {

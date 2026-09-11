@@ -37,6 +37,7 @@ import { prepass } from '../glyph/GlyphPrePass';
 import { loadArtwork } from '../glyph/artworkLoader';
 import { sfx } from '../lib/audio';
 import { discoverFromText } from '../state/atlas';
+import { useIsTouch } from '../lib/device';
 import type { ArtworkRegion, DeviceTier } from '../types';
 
 /**
@@ -52,6 +53,7 @@ const FLIGHT_CHARS = 120;
 const SETTLE_MS = 240;
 
 export function ThreadPull({ tier }: { tier: DeviceTier }) {
+  const touch = useIsTouch();
   const phase = useStore((s) => s.phase);
   const artworks = useStore(selectArtworks);
   const index = useStore((s) => s.index);
@@ -330,7 +332,11 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
           boxes are an authoring detail nobody came to see. */}
       {extractionMode && !pulledRegion && (
         <p className="tp-prompt caption">
-          {hoveredRegion ? hoveredRegion.label : 'Move over the painting to pull a thread'}
+          {hoveredRegion
+            ? hoveredRegion.label
+            : touch
+              ? 'Tap anywhere on the painting to pull a thread'
+              : 'Move over the painting to pull a thread'}
         </p>
       )}
 
@@ -339,12 +345,20 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
         <button
           className="tp-mode caption"
           onClick={() => setThreadMode(false)}
-          title="Leave thread mode (space)"
+          title={touch ? 'Leave thread mode' : 'Leave thread mode (space)'}
         >
           <span className="tp-mode-dot" aria-hidden />
           Thread mode on
+          {/* the way out, named in whatever the visitor actually has: a key on
+              a desk, and this control itself on a screen with no keyboard */}
           <span className="tp-mode-key">
-            <kbd>space</kbd> to leave
+            {touch ? (
+              'tap to leave'
+            ) : (
+              <>
+                <kbd>space</kbd> to leave
+              </>
+            )}
           </span>
         </button>
       )}
@@ -388,7 +402,9 @@ export function ThreadPull({ tier }: { tier: DeviceTier }) {
 
           <footer className="tp-foot">
             {pinned ? (
-              <span className="caption tp-hint">Pinned · Esc to release</span>
+              <span className="caption tp-hint">
+                {touch ? 'Pinned · close to release' : 'Pinned · Esc to release'}
+              </span>
             ) : (
               <button className="caption tp-pin" onClick={() => setPinned(true)}>
                 Pin this thread

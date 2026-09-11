@@ -93,7 +93,12 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
 button:active { transform: translateY(1px); }
 
 /* ─── canvas ─── */
+/* The pinch and the swipe belong to the room, not to the browser: without
+   this, a two-finger zoom on the painting is the page zooming instead, and a
+   swipe along the rail is a rubber-band scroll on a body that has nowhere to
+   go. Only the canvas — every panel over it scrolls normally. */
 .canvas-wrap {
+  touch-action: none;
   position: fixed;
   inset: 0;
   transition: filter var(--d-slow) var(--e-both), transform var(--d-slow) var(--e-both);
@@ -198,9 +203,27 @@ button:active { transform: translateY(1px); }
    margins, never `transform`. Scrolls rather than clips when it cannot fit. */
 .landing-content {
   position: absolute; top: 0; bottom: 0; left: 12vw;
-  display: flex; flex-direction: column; justify-content: center;
+  display: flex; flex-direction: column;
   width: 480px; max-width: 88vw; color: var(--bone);
   padding: 4vh 0; overflow-y: auto; scrollbar-width: none;
+  /*
+   * THE CENTRED COLUMN THAT ATE ITS OWN TITLE.
+   *
+   * `justify-content: center` on a scrolling flex column does not clip
+   * symmetrically — it clips the START, and the start is unreachable, because
+   * a scroll container cannot be scrolled above its own origin. On a short
+   * screen the list of museums grew past the available height and the name of
+   * the exhibition went off the top of the column with no way to scroll back
+   * up to it: the visitor could reach every gallery and the colophon and never
+   * see what the site was called.
+   *
+   * `safe center` is the keyword for exactly this: centre it while it fits,
+   * and fall back to the start rather than overflow the edge you cannot reach.
+   * The plain `center` above it is the fallback for browsers that do not know
+   * the keyword, which are the ones where the column fits anyway.
+   */
+  justify-content: center;
+  justify-content: safe center;
 }
 .landing-content::-webkit-scrollbar { display: none; }
 /* The title page: the name, then the one line under it. Nothing else — the
@@ -1077,7 +1100,17 @@ a.corridor-title:hover .corridor-out { opacity: 0.9; }
 /* the same switch as a corner control, for anyone who never presses keys —
    sits beside the sound toggle in .corner-toggles and wears the same veil */
 .thread-toggle.is-on { opacity: 0.95; color: var(--gilt); border-color: rgba(201, 162, 39, 0.42); }
-@media (max-width: 860px) { .thread-toggle { display: none; } }
+/*
+ * IT HID ITSELF ON EXACTLY THE DEVICES THAT NEEDED IT.
+ *
+ * Thread mode has two doors: the space bar, and this switch. Hiding the switch
+ * below 860px left the space bar as the only one — on a phone, which has no
+ * space bar. The whole feature was therefore unreachable on every touch
+ * device, which is not a narrow-screen compromise, it is a missing exhibit.
+ * It stays. On a narrow screen it loses its word and keeps its dot, like the
+ * sound switch beside it.
+ */
+@media (max-width: 860px) and (any-hover: hover) { .thread-toggle { display: none; } }
 
 /* Above the control hints (31) and the corner toggles (30): the panel runs
    the full height of the right-hand side, and anything drawn over its foot
@@ -1268,6 +1301,12 @@ a.corridor-title:hover .corridor-out { opacity: 0.9; }
 .sound-toggle:hover { opacity: 1; }
 .sound-toggle.is-on { opacity: 0.9; color: var(--gilt); }
 @media (max-width: 860px) { .sound-word { display: none; } }
+/* ...except the one whose name IS the affordance. A lone dot in the corner of a
+   gallery is not a feature anybody discovers, and on a touch screen this switch
+   is the ONLY way into thread mode — so it keeps its word at every width. There
+   is room: the two switches together come to about ninety pixels, and the
+   nearest thing to their right starts at two hundred and forty. */
+@media (max-width: 860px) { .thread-toggle .sound-word { display: inline; } }
 
 /* the line under the demonstration that says how to do it yourself */
 .tp-demo { color: var(--gilt); display: inline-flex; align-items: center; gap: 6px; }
@@ -1487,4 +1526,279 @@ a.corridor-title:hover .corridor-out { opacity: 0.9; }
   .control-hints { bottom: 12px; left: 0; right: 42vw; transform: none; margin: 0 auto; width: auto; }
   .corner-toggles { bottom: 12px; }
   .rail { display: none; }
+}
+
+/* ─── zoom controls ──────────────────────────────────────────────────────
+   The gallery's + and −, and the atlas's, for hands rather than keys. Same
+   chip treatment as every other corner control, and no backdrop-filter — see
+   the rule at the top of this file. */
+.zoom-controls {
+  position: fixed; bottom: 20px; right: 62px; z-index: 33;
+  display: flex; align-items: center; gap: 2px; padding: 3px;
+  background: rgba(24, 20, 16, 0.56);
+  border: 1px solid rgba(242, 235, 223, 0.1);
+  border-radius: 999px;
+}
+.zoom-btn {
+  /* 34px square: a finger's worth, which is the whole reason these exist */
+  min-width: 34px; height: 34px; padding: 0 6px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--bone); font-size: 15px; line-height: 1; letter-spacing: 0;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  opacity: 0.82; transition: opacity var(--d-fast), background-color var(--d-fast);
+}
+.zoom-btn:hover:not(:disabled) { opacity: 1; background: rgba(242, 235, 223, 0.1); }
+.zoom-btn:disabled { opacity: 0.28; }
+/* the figure in the middle is a readout as much as a control, so it is set in
+   the caption size rather than the marks' size */
+.zoom-reset { font-size: 10px; letter-spacing: 0.1em; color: var(--gilt); }
+.zoom-reset.is-idle { color: var(--bone); }
+/* in the atlas there is no quality switch to sit beside, so it takes the
+   corner itself */
+.atlas-zoom { right: var(--s5); bottom: 62px; z-index: 61; }
+
+/* ─── the atlas panel's own way out ───
+   Needed only because the panel becomes a bottom sheet on a narrow screen and
+   covers the empty sky that would otherwise clear the selection. */
+.atlas-panel-close {
+  position: absolute; top: 6px; right: 6px;
+  width: 32px; height: 32px; border-radius: 999px;
+  display: grid; place-items: center;
+  color: rgba(242, 235, 223, 0.55); font-size: 12px;
+  transition: color var(--d-fast), background-color var(--d-fast);
+}
+.atlas-panel-close:hover { color: var(--bone); background: rgba(242, 235, 223, 0.1); }
+
+/* ─── the notice a phone is shown once ───────────────────────────────────
+   Bottom of the entrance, over everything, blocking nothing. See
+   ui/SmallScreenNotice for why it is a notice and not a door. */
+.small-notice {
+  position: fixed; left: var(--s3); right: var(--s3); bottom: var(--s3); z-index: 56;
+  display: flex; align-items: flex-end; gap: var(--s4);
+  padding: var(--s4) var(--s4) var(--s4) var(--s5);
+  background: rgba(20, 17, 14, 0.94);
+  border: 1px solid rgba(242, 235, 223, 0.14);
+  border-left: 2px solid var(--gilt);
+  border-radius: 3px;
+  box-shadow: 0 18px 44px rgba(8, 7, 6, 0.5);
+  color: var(--bone);
+  animation: small-notice-in 460ms var(--e-out) both;
+}
+@keyframes small-notice-in {
+  from { opacity: 0; translate: 0 14px; }
+  to { opacity: 1; translate: 0 0; }
+}
+.small-notice.is-leaving {
+  opacity: 0; translate: 0 14px;
+  transition: opacity 300ms var(--e-both), translate 300ms var(--e-both);
+}
+@media (prefers-reduced-motion: reduce) {
+  .small-notice { animation: none; }
+  .small-notice.is-leaving { transition: opacity 300ms linear; translate: 0 0; }
+}
+.small-notice-body { min-width: 0; }
+.small-notice-eyebrow { color: var(--gilt); margin: 0 0 var(--s2); font-size: 9.5px; letter-spacing: 0.16em; }
+.small-notice-text { margin: 0; font-size: 14px; line-height: 21px; color: rgba(242, 235, 223, 0.88); }
+.small-notice-close {
+  flex: none; align-self: center;
+  padding: 10px 14px; border-radius: 999px;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  color: var(--gilt); font-size: 10px; letter-spacing: 0.14em;
+}
+.small-notice-close:hover { background: rgba(201, 162, 39, 0.16); }
+@media (max-width: 420px) {
+  .small-notice { flex-direction: column; align-items: stretch; gap: var(--s3); }
+  .small-notice-close { align-self: flex-end; }
+}
+
+/* ─── SMALL SCREENS ──────────────────────────────────────────────────────
+   The exhibition was composed for a desk, and every corner control was placed
+   against a window wide enough for all of them at once. At 390 across, the
+   back control, the museum's name and the way into the atlas are one row of
+   three on a row that fits one and a half — so the name of the room you are
+   standing in was underneath the atlas button, which is the reported symptom
+   "cannot see the title".
+
+   The fix is not to shrink everything until it fits. It is to give the chrome
+   a second row: the two ends of the journey on the top line, the things that
+   leave the room on the one below it, and the same again at the foot of the
+   screen. Nothing is hidden that a desktop visitor can see — it is the same
+   exhibition, laid out for a window that is tall rather than wide.
+
+   900, NOT 760. The top row holds a back control, a centred pair of links and
+   the museum's name, and the name is the long one — "Musée du Louvre · Grande
+   Galerie" is about three hundred pixels. Centred links collide with a name of
+   that length below roughly 775, which is 768 — a portrait iPad, the exact
+   device this work is for. The breakpoint is set clear of the longest name in
+   the collection rather than against the narrowest screen. */
+@media (max-width: 900px) {
+  .gallery-back { top: var(--s3); left: var(--s3); }
+  .corridor-title {
+    top: var(--s3); right: var(--s3);
+    /* the museum's name is allowed to be the longest thing on the line, and
+       is allowed to run out of line — but never to run off the screen or
+       under the control opposite it */
+    max-width: 52vw; font-size: 11px; padding: 6px 11px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  /* the subtitle is the first thing to go: it is the room's description, and
+     the room is on screen */
+  .corridor-sub { display: none; }
+  /* second row: the ways out of the room, clear of the two above them */
+  .top-links { top: 56px; }
+  .walk-end { top: 54px; left: var(--s3); }
+
+  /* the foot of the screen, likewise: a row of controls, and the hint line
+     riding above it rather than through it */
+  .control-hints {
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    max-width: 94vw;
+  }
+  .corner-toggles { bottom: calc(14px + env(safe-area-inset-bottom, 0px)); left: var(--s3); }
+  .quality { bottom: calc(14px + env(safe-area-inset-bottom, 0px)); right: var(--s3); }
+  .zoom-controls { bottom: calc(14px + env(safe-area-inset-bottom, 0px)); right: 52px; }
+  /*
+   * And the rail above the hint line, not behind it.
+   *
+   * `width: max-content` for the same reason the hint line needs it: anchored
+   * at left:50%, the width available to a fixed element is half the window, so
+   * fourteen ticks wrapped into three rows on a phone rather than sitting in
+   * one line the way they do everywhere else.
+   */
+  .rail {
+    bottom: calc(126px + env(safe-area-inset-bottom, 0px));
+    width: max-content; max-width: 92vw;
+  }
+  .rail-ticks { gap: 12px; max-width: 92vw; flex-wrap: wrap; }
+  .rail-tick { width: 11px; }
+  .rail-tick.is-active { width: 18px; }
+
+  /*
+   * Thread mode's two captions, stacked above everything else at the foot.
+   *
+   * There are four things wanting the bottom of a phone screen in this room —
+   * the control row, the hint line, the rail, and these two — and at the
+   * desktop offsets the mode pill landed across the hint line with the rail
+   * through the middle of both. So they go in one order, each clear of the one
+   * below it: controls, hints, rail, mode, prompt.
+   */
+  .tp-mode {
+    bottom: calc(176px + env(safe-area-inset-bottom, 0px));
+    white-space: nowrap; font-size: 9px; padding: 6px 12px; gap: 6px;
+  }
+  .tp-prompt {
+    bottom: calc(214px + env(safe-area-inset-bottom, 0px));
+    max-width: 86vw; text-align: center;
+  }
+
+  /*
+   * A pulled thread arrives as a sheet from the bottom, not a full-height
+   * column. The point of the effect is watching a passage lift off the canvas
+   * and land somewhere you can read it — and a panel 92vw wide and the full
+   * height of a phone covers the canvas it just came from, so the visitor sees
+   * the words arrive from behind the thing that is now hiding the painting.
+   */
+  .tp-panel {
+    top: auto; left: 0; right: 0; bottom: 0;
+    width: 100%; max-height: 62vh;
+    border-left: 0; border-top: 1px solid var(--limestone);
+    box-shadow: 0 -24px 60px rgba(36, 31, 26, 0.3);
+    animation: tp-in-up var(--d-base) var(--e-out);
+  }
+  /* the head loses some of its air; the body keeps its padding exactly, because
+     .tp-flight is positioned against those same offsets and a character that
+     lands eight pixels from where it settles is the one seam this effect must
+     not have */
+  .tp-head { padding: var(--s5) var(--s6) var(--s3); }
+  .tp-foot { padding: var(--s3) var(--s6) calc(var(--s4) + env(safe-area-inset-bottom, 0px)); }
+}
+@keyframes tp-in-up {
+  from { transform: translateY(18px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* The atlas is its own room and needs its own arrangement: the panel becomes a
+   sheet across the foot (already), so everything else has to get out from
+   under it. */
+@media (max-width: 900px) {
+  .atlas-progress {
+    top: 56px; bottom: auto; left: var(--s3); right: var(--s3);
+    max-width: none; font-size: 9.5px; line-height: 14px;
+  }
+  .atlas-panel {
+    max-height: 56vh;
+    padding: var(--s5) var(--s4) calc(var(--s5) + env(safe-area-inset-bottom, 0px));
+  }
+  /*
+   * Down from the top right, not centred on it.
+   *
+   * Centred vertically, the stack sat at 422px on an 844 screen — and the
+   * panel, a sheet of up to 56vh rising from the bottom, starts at about 371.
+   * So the moment a node was opened the zoom controls were on top of its
+   * heading, beside its close button. Anchored below the progress line they
+   * clear the sheet at any height it takes.
+   */
+  .atlas-zoom {
+    top: 104px; bottom: auto; right: var(--s3);
+    transform: none; flex-direction: column;
+  }
+  /* a name in the web is a tap target here, not a caption */
+  .atlas-label { font-size: 11px; padding: 5px 7px; }
+}
+
+/* A short landscape screen keeps the placard as a right-hand column rather
+   than a sheet (see the max-height rule above), so the new zoom controls have
+   to stand clear of that column instead of sitting on top of the wall label —
+   which they would, being the later rule and the higher z-index. */
+@media (max-height: 559px) {
+  .zoom-controls { bottom: 12px; right: calc(42vw + 12px); }
+}
+
+/* Narrower again — a phone held upright. Everything above still holds; this is
+   only where the type has to give. */
+@media (max-width: 480px) {
+  .corridor-title { max-width: 46vw; font-size: 10px; }
+  .gallery-back { font-size: 10px; padding: 6px 11px; }
+  .control-hints { font-size: 9.5px; gap: 5px var(--s3); padding: 7px var(--s4); }
+  .rail-ticks { gap: 9px; }
+  .zoom-controls { right: 48px; }
+  .zoom-btn { min-width: 30px; height: 30px; }
+}
+
+/* ─── touch targets ──────────────────────────────────────────────────────
+   A fingertip is about 40px across and most of this interface was drawn for a
+   cursor, which is one. The chips keep their drawn size — making them all
+   forty pixels tall would turn a quiet frame into a toolbar — and gain the
+   difference as invisible padding, which is what the finger actually lands on
+   and what the eye never sees. */
+@media (pointer: coarse) {
+  /*
+   * ONLY THE ONES THAT ARE NOT POSITIONED ALREADY.
+   *
+   * A ::before pinned with `inset` needs a positioned ancestor, and the
+   * reflex is to add `position: relative` to the element it hangs off. Three
+   * of these are `position: fixed` — which is already a containing block —
+   * and relative overwrote it, dropping the back control, the museum's name
+   * and the way to the far end out of their corners and into the document
+   * flow, stacked down the top-left of the screen on top of each other. The
+   * rule meant to make the chrome easier to hit is what scattered it.
+   */
+  .atlas-open, .sound-toggle, .rail-tick {
+    position: relative;
+  }
+  .gallery-back::before,
+  .atlas-open::before,
+  .walk-end::before,
+  .sound-toggle::before,
+  .rail-tick::before,
+  .atlas-label::before {
+    content: ''; position: absolute; inset: -9px; border-radius: inherit;
+  }
+  /* the ? is 22px drawn and needs to be 40 to press */
+  .help-mark { width: 34px; height: 34px; font-size: 13px; }
+  /* hover states never resolve on a touch screen: they latch on the last
+     thing pressed and stay there, which reads as a control stuck in a state
+     nobody chose */
+  .museum-row:hover .museum-name,
+  .room-row:hover .room-artist { transform: none; }
 }

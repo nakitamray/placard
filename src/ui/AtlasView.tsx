@@ -53,6 +53,7 @@ import {
 } from '../state/atlas';
 import { useStore, loadMuseum } from '../state/store';
 import { sfx } from '../lib/audio';
+import { useIsTouch } from '../lib/device';
 import { FrameGovernor } from '../render/frameGovernor';
 import type { MuseumIndexEntry } from '../types';
 
@@ -308,7 +309,7 @@ function Graph({
    * join. It looked fine for as long as the layout happened to settle during a
    * render; adding nodes made it settle later, and the whole graph came apart.
    */
-  const nodeRefs = useRef<Array<THREE.Mesh | null>>([]);
+  const nodeRefs = useRef<Array<THREE.Object3D | null>>([]);
   const index = useMemo(() => new Map(bodies.map((b, i) => [b.id, i])), [bodies]);
   const quietRef = useRef<THREE.LineSegments>(null);
 
@@ -640,32 +641,53 @@ function Graph({
         // eighty things competing with what you have actually found
         const opacity = known ? (on ? 1 : lit ? 0.92 : 0.24) : near ? 0.08 : 0.18;
         return (
-          <mesh
+          <group
             key={b.id}
             ref={(el) => {
               nodeRefs.current[bi] = el;
             }}
             position={b.p}
-            onPointerOver={(e) => {
-              e.stopPropagation();
-              if (known) onHover(b.id, false);
-            }}
-            // clear only if this node is still the one being reported: r3f can
-            // deliver the "out" of the node you left after the "over" of the
-            // one you arrived at, which would blank the highlight you just lit
-            onPointerOut={() => onHover(b.id, true)}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (known) onPick(node);
-            }}
           >
-            <sphereGeometry args={[r * (on ? 1.6 : 1), 16, 12]} />
-            <meshBasicMaterial
-              color={known ? KIND_COLOUR[node.kind] : '#6E5B4A'}
-              transparent
-              opacity={opacity}
-            />
-          </mesh>
+            {/* the mote itself, at the size the diagram wants */}
+            <mesh raycast={() => null}>
+              <sphereGeometry args={[r * (on ? 1.6 : 1), 16, 12]} />
+              <meshBasicMaterial
+                color={known ? KIND_COLOUR[node.kind] : '#6E5B4A'}
+                transparent
+                opacity={opacity}
+              />
+            </mesh>
+            {/*
+              AND THE THING YOU ACTUALLY HIT, WHICH IS MUCH BIGGER.
+              A found node is between four and twelve pixels across on a phone.
+              A fingertip is closer to forty. So every click and hover went to
+              the empty sky between the motes, and the atlas was a picture on
+              a touch screen rather than a map — you could turn it, and nothing
+              in it could be opened. The target is a sphere of its own, several
+              times the size of the dot and completely transparent, so the
+              diagram keeps its scale and the hand gets something to land on.
+              `hitScale` stays at 1 for an undiscovered mote: those are not
+              controls, and a fat invisible target in front of one only steals
+              taps meant for whatever is behind it.
+            */}
+            <mesh
+              onPointerOver={(e) => {
+                e.stopPropagation();
+                if (known) onHover(b.id, false);
+              }}
+              // clear only if this node is still the one being reported: r3f can
+              // deliver the "out" of the node you left after the "over" of the
+              // one you arrived at, which would blank the highlight you just lit
+              onPointerOut={() => onHover(b.id, true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (known) onPick(node);
+              }}
+            >
+              <sphereGeometry args={[known ? Math.max(r * 2.6, 0.62) : r, 8, 6]} />
+              <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+            </mesh>
+          </group>
         );
       })}
     </group>
@@ -691,6 +713,18 @@ export function AtlasView() {
     zoom: 1,
   });
   const drag = useRef<{ x: number; y: number; moved: number } | null>(null);
+  /*
+   * Every finger or cursor currently on the stage, by pointer id.
+   *
+   * One is a drag that turns the web. Two are a pinch, which is the only way
+   * anybody zooms anything on a phone — and the atlas had no zoom at all
+   * there, because the wheel was the entire implementation and a touch screen
+   * has no wheel. The map was stuck at whatever distance it opened at, with a
+   * hundred and thirty nodes in a web the size of a stamp.
+   */
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinch = useRef(0);
+  const touch = useIsTouch();
   /** which connection is opened out to read */
   const [openEdge, setOpenEdge] = useState<string | null>(null);
   /** what the pointer is over, which lights its edges without committing */
@@ -760,9 +794,26 @@ export function AtlasView() {
       <div
         className="atlas-stage"
         onPointerDown={(e) => {
+          pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          if (pointers.current.size === 2) {
+            // a pinch has started: the turn stands down so the map does not
+            // spin away underneath the gesture
+            pinch.current = spreadOf(pointers.current);
+            drag.current = null;
+            return;
+          }
           drag.current = { x: e.clientX, y: e.clientY, moved: 0 };
         }}
         onPointerMove={(e) => {
+          const known = pointers.current.get(e.pointerId);
+          if (known) pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+          if (pointers.current.size >= 2) {
+            const now = spreadOf(pointers.current);
+            if (pinch.current && now) zoomBy(spin, pinch.current / now);
+            pinch.current = now;
+            return;
+          }
           if (!drag.current) return;
           const dx = e.clientX - drag.current.x;
           const dy = e.clientY - drag.current.y;
@@ -775,17 +826,35 @@ export function AtlasView() {
             moved: drag.current.moved + Math.abs(dx) + Math.abs(dy),
           };
         }}
-        onPointerUp={() => {
-          // turning the map is not the same gesture as putting it down: only
-          // a press that stayed still counts as "nothing selected"
-          if (drag.current && drag.current.moved < 5) {
+        onPointerUp={(e) => {
+          const wasPinching = pointers.current.size >= 2;
+          pointers.current.delete(e.pointerId);
+          pinch.current = pointers.current.size >= 2 ? spreadOf(pointers.current) : 0;
+          /*
+           * Turning the map is not the same gesture as putting it down: only a
+           * press that stayed still counts as "nothing selected". The tolerance
+           * is wider than it was — five pixels is a mouse standing still, and a
+           * thumb never stands that still, so on a phone every tap on empty sky
+           * read as a drag and the selection could not be cleared. Ten is still
+           * well inside what a browser itself treats as a tap.
+           */
+          if (!wasPinching && drag.current && drag.current.moved < 10) {
             select(null);
             setOpenEdge(null);
             setHover(null);
           }
           drag.current = null;
         }}
-        onPointerLeave={() => (drag.current = null)}
+        onPointerCancel={(e) => {
+          pointers.current.delete(e.pointerId);
+          pinch.current = 0;
+          drag.current = null;
+        }}
+        onPointerLeave={(e) => {
+          pointers.current.delete(e.pointerId);
+          pinch.current = 0;
+          drag.current = null;
+        }}
         onWheel={(e) => {
           spin.current.zoom = Math.max(0.45, Math.min(2.4, spin.current.zoom * (1 + e.deltaY * 0.0012)));
         }}
@@ -823,6 +892,29 @@ export function AtlasView() {
       <button className="caption gallery-back atlas-back" onClick={() => setOpen(false)}>
         ← Back
       </button>
+
+      {/* the pinch, with a face on it — same reasoning as the gallery's own
+          zoom controls, and the same three moves */}
+      <div className="zoom-controls atlas-zoom caption" role="group" aria-label="Zoom the atlas">
+        {/* `zoom` is a distance, so standing further back is the larger
+            number — see zoomBy */}
+        <button className="zoom-btn" onClick={() => zoomBy(spin, 1.3)} aria-label="Zoom out">
+          −
+        </button>
+        <button
+          className="zoom-btn zoom-reset"
+          onClick={() => (spin.current.zoom = 1)}
+          aria-label="Back to the composed distance"
+        >
+          {/* the same mark the gallery's reset carries: a crosshair glyph read
+              as a speck at this size, and a control nobody can read the label
+              of is a control nobody presses */}
+          1×
+        </button>
+        <button className="zoom-btn" onClick={() => zoomBy(spin, 1 / 1.3)} aria-label="Zoom in">
+          +
+        </button>
+      </div>
       <p className="caption corridor-title atlas-level">The atlas</p>
 
       <header className="atlas-head">
@@ -830,8 +922,10 @@ export function AtlasView() {
       </header>
 
       <p className="caption atlas-progress">
-        {foundLinks} of {totalLinks} connections found · click a node to light what it joins ·
-        pull threads out of the paintings to uncover more
+        {foundLinks} of {totalLinks} connections found ·{' '}
+        {touch
+          ? 'tap a node to light what it joins · drag to turn, pinch to come closer'
+          : 'click a node to light what it joins · pull threads out of the paintings to uncover more'}
       </p>
 
       <div className="atlas-legend caption">
@@ -845,6 +939,23 @@ export function AtlasView() {
 
       {node && (
         <aside className="atlas-panel">
+          {/*
+            A way out of the panel that is not "tap the map behind it".
+            On a phone the panel is a sheet across the bottom half of the
+            screen, so the empty sky that clears a selection on a desktop is
+            largely underneath it — leaving a visitor who opened a node with
+            nothing to press.
+          */}
+          <button
+            className="caption atlas-panel-close"
+            onClick={() => {
+              select(null);
+              setOpenEdge(null);
+            }}
+            aria-label="Close"
+          >
+            ✕
+          </button>
           <p className="caption atlas-kind">{KIND_LABEL[node.kind]}</p>
           <h3 className="title atlas-name">{node.label}</h3>
           {node.note && <p className="caption atlas-note">{node.note}</p>}
@@ -904,7 +1015,9 @@ export function AtlasView() {
             })}
             {!edges.length && (
               <li className="caption atlas-empty">
-                Nothing found yet. Press space in one of their rooms and read a passage.
+                {touch
+                  ? 'Nothing found yet. Turn on threads in one of their rooms and read a passage.'
+                  : 'Nothing found yet. Press space in one of their rooms and read a passage.'}
               </li>
             )}
           </ul>
@@ -939,6 +1052,28 @@ const labelEls = new Map<string, HTMLElement>();
 function hide(el: HTMLElement) {
   el.style.opacity = '0';
   el.style.pointerEvents = 'none';
+}
+
+/** the distance between the first two pointers on the stage */
+function spreadOf(map: Map<number, { x: number; y: number }>): number {
+  const [a, b] = [...map.values()];
+  if (!a || !b) return 0;
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+/**
+ * One place that changes how far away the web is, clamped.
+ *
+ * `zoom` here is a camera distance multiplier, so a bigger number is further
+ * away — which is why pinching apart passes a factor below one. Keeping that
+ * inversion in a single function is the difference between three controls that
+ * agree and three that each got it right or wrong on their own.
+ */
+function zoomBy(
+  spin: React.MutableRefObject<{ yaw: number; pitch: number; zoom: number }>,
+  factor: number,
+) {
+  spin.current.zoom = Math.max(0.45, Math.min(2.4, spin.current.zoom * factor));
 }
 
 /** applies the drag/zoom to the graph, damped, so it never snaps */
