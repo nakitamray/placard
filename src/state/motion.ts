@@ -38,6 +38,28 @@ function nudgeZoom(factor: number) {
   setZoom(view.goal * factor);
 }
 
+/*
+ * The same three moves, as functions rather than as keystrokes.
+ *
+ * `+`, `-` and `0` are the whole zoom on a desk, and on a phone they are three
+ * keys nobody has. The on-screen controls (see ui/ZoomControls) call these, so
+ * the pinch, the keys and the buttons are one mechanism with three faces
+ * rather than three implementations that drift apart.
+ */
+export function zoomIn() {
+  nudgeZoom(1.3);
+}
+export function zoomOut() {
+  nudgeZoom(1 / 1.3);
+}
+/** how far in the visitor currently is, for a control that wants to grey out */
+export function zoomAtMax(): boolean {
+  return view.goal >= ZOOM_MAX - 0.001;
+}
+export function zoomAtMin(): boolean {
+  return view.goal <= ZOOM_MIN + 0.001;
+}
+
 export function resetZoom() {
   view.v = 1;
   view.goal = 1;
@@ -102,21 +124,39 @@ export function attachZoom(active: () => boolean) {
     nudgeZoom(Math.exp(-e.deltaY * 0.0022));
   };
 
-  // two-finger pinch on touch
+  /*
+   * Two-finger pinch on touch.
+   *
+   * `touchend` fires per finger, so lifting one of a pinch used to leave the
+   * gesture armed with a stale spread — and the next single-finger drag along
+   * the rail arrived as a pinch of some enormous ratio, which snapped the zoom
+   * to a limit for no reason the visitor could see. The gesture is now rearmed
+   * whenever the number of fingers changes and dropped the moment there are
+   * fewer than two.
+   */
   let pinch = 0;
   const spread = (t: TouchList) =>
     Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
   const onTouchStart = (e: TouchEvent) => {
-    if (e.touches.length === 2) pinch = spread(e.touches);
+    pinch = e.touches.length === 2 ? spread(e.touches) : 0;
   };
   const onTouchMove = (e: TouchEvent) => {
-    if (!active() || e.touches.length !== 2 || !pinch) return;
+    if (e.touches.length !== 2) {
+      pinch = 0;
+      return;
+    }
+    if (!active()) return;
     const now = spread(e.touches);
+    // the first move of a pinch that began before the gesture was armed
+    if (!pinch) {
+      pinch = now;
+      return;
+    }
     nudgeZoom(now / pinch);
     pinch = now;
   };
-  const onTouchEnd = () => {
-    pinch = 0;
+  const onTouchEnd = (e: TouchEvent) => {
+    pinch = e.touches.length === 2 ? spread(e.touches) : 0;
   };
 
   window.addEventListener('keydown', onKey);
@@ -133,11 +173,89 @@ export function attachZoom(active: () => boolean) {
   };
 }
 
+/**
+ * How far the finger currently on the glass has travelled.
+ *
+ * WHY THIS HAS TO EXIST. Both rooms are driven by swipes — up the screen walks
+ * the corridor, across it moves along the rail — and both also answer a tap on
+ * a painting by opening it. On a desk those are different gestures with
+ * different buttons; on a touch screen they are the same finger, and the only
+ * thing separating them is how far it moved.
+ *
+ * The browser normally makes that distinction itself and withholds the `click`
+ * after a drag. But the canvas is `touch-action: none` — it has to be, or every
+ * pinch is the page zooming instead of the painting — and how much slop an
+ * engine allows before it stops calling a touch a tap is neither specified nor
+ * consistent once the default action is gone. Chrome and Safari disagree, and
+ * both of them are wrong for a swipe of exactly the length somebody uses to
+ * step down a corridor.
+ *
+ * So the distance is measured here, once, and the two places that open a
+ * painting ask before they do it. `total` is deliberately NOT cleared on
+ * `touchend`: the `click` arrives after the finger has left, and a counter
+ * zeroed a moment too early would let every swipe through as a tap — which is
+ * the bug this exists to prevent.
+ */
+export const touchSlip = { total: 0 };
+
+/** far enough that the visitor was moving the room, not choosing something */
+export function wasSwipe(): boolean {
+  return touchSlip.total > 12;
+}
+
+/**
+ * Whether moving the pointer should also turn the visitor's head.
+ *
+ * On a desk the parallax is the whole feeling of standing in a room: the walls
+ * of the corridor swing gently as you look along them, and the painting leans a
+ * degree or two as the cursor crosses it. It is driven by where the cursor is,
+ * and on a desk the cursor is where the visitor is looking.
+ *
+ * On a touch screen there is no cursor. `pointer` there records where a finger
+ * last landed — which is very often a control in a corner — so the room lurched
+ * two degrees toward the bottom-left of the screen a second after the visitor
+ * pressed the sound switch, and stayed there. In a gallery that is now framed
+ * to the edges of a narrow window, two degrees of yaw is enough to push the
+ * painting off the side: tapping "threads" moved the Mona Lisa half out of
+ * frame. The gesture does not exist on the device, so neither should its
+ * effect.
+ *
+ * `pointer` itself keeps being updated — the zoom still leans toward the last
+ * place a finger touched, which on a touch screen is exactly right — this only
+ * governs the head-turn.
+ */
+export function pointerLook(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return true;
+  return !matchMedia('(pointer: coarse)').matches || matchMedia('(any-hover: hover)').matches;
+}
+
 export function attachPointer() {
   const onMove = (e: PointerEvent) => {
     pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
     pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
   };
+
+  let last: { x: number; y: number } | null = null;
+  const onTouchStart = (e: TouchEvent) => {
+    touchSlip.total = 0;
+    const t = e.touches[0];
+    last = t ? { x: t.clientX, y: t.clientY } : null;
+  };
+  const onTouchMove = (e: TouchEvent) => {
+    const t = e.touches[0];
+    if (!t) return;
+    if (last) touchSlip.total += Math.hypot(t.clientX - last.x, t.clientY - last.y);
+    last = { x: t.clientX, y: t.clientY };
+    // a second finger is a pinch, which is never a tap on anything
+    if (e.touches.length > 1) touchSlip.total = 999;
+  };
+
   window.addEventListener('pointermove', onMove, { passive: true });
-  return () => window.removeEventListener('pointermove', onMove);
+  window.addEventListener('touchstart', onTouchStart, { passive: true });
+  window.addEventListener('touchmove', onTouchMove, { passive: true });
+  return () => {
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('touchstart', onTouchStart);
+    window.removeEventListener('touchmove', onTouchMove);
+  };
 }
