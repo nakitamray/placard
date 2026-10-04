@@ -161,7 +161,7 @@ export function qualityFor(name: QualityName): Quality {
 /**
  * The budget to start with: the visitor's choice, else the device.
  *
- * A desktop that detection has already judged capable starts at `Rich`. The
+ * Every desktop starts at `Rich`. The
  * argument for holding it back was that a stuttering room reads as broken —
  * but that risk is already covered from the other end: FrameWatchdog measures
  * real frame times for a few seconds and steps down once if the room is not
@@ -178,7 +178,9 @@ export function initialQuality(tier: DeviceTier): Quality {
     typeof window !== 'undefined' &&
     window.matchMedia('(pointer: fine)').matches &&
     !window.matchMedia('(pointer: coarse)').matches;
-  if (tier.name === 'high' && desktop) return qualityFor('high');
+  // Rich is the exhibition as it was made to be seen, so every desk starts
+  // there, whatever a renderer string guesses about it
+  if (desktop) return qualityFor('high');
   return qualityFor(tier.name === 'high' ? 'mid' : tier.name);
 }
 

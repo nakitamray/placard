@@ -134,45 +134,12 @@ button:active { transform: translateY(1px); }
 }
 
 /* ─── opening a museum — see ui/MuseumLoader.tsx ──────────────────────────
-   The entrance curtain's cousin: the same dark ground and the same grid of
-   stepping type, made of the museum's own painters and titles and lit from
-   the middle outward around its name. It comes in quickly, because the
-   visitor has just clicked, and goes slowly, over a corridor already drawn. */
-.museum-loader {
-  position: fixed; inset: 0; z-index: 60;
-  background: #15120e;
-  animation: museum-loader-in 320ms var(--e-out) both;
-  transition: opacity 700ms var(--e-both);
-}
-.museum-loader.is-closing { opacity: 0; pointer-events: none; }
-@keyframes museum-loader-in { from { opacity: 0; } to { opacity: 1; } }
-.museum-loader-plaque {
-  position: absolute; left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
-  width: min(620px, calc(100vw - 32px));
-  padding: var(--s7) var(--s6);
-  text-align: center;
-  /* a pool of shade so the name stands clear of the lit wall behind it */
-  background: radial-gradient(ellipse 60% 58% at center, rgba(21, 18, 14, 0.94) 40%, rgba(21, 18, 14, 0) 100%);
-}
-.museum-loader-city { margin: 0; color: var(--taupe); }
-.museum-loader-name {
-  margin: var(--s2) 0 0; color: var(--bone); font-weight: 500;
-  font-size: 46px; line-height: 52px; letter-spacing: 0.04em;
-}
-.museum-loader-sub { margin: var(--s2) 0 0; color: var(--limestone); }
-.museum-loader-step {
-  margin: var(--s5) 0 0; color: var(--gilt);
-  animation: museum-loader-breathe 2.4s ease-in-out infinite;
-}
-@keyframes museum-loader-breathe { 0%, 100% { opacity: 0.62; } 50% { opacity: 1; } }
-@media (max-width: 560px) {
-  .museum-loader-name { font-size: 32px; line-height: 38px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .museum-loader { animation: none; transition: none; }
-  .museum-loader-step { animation: none; }
-}
+   Everything is painted into the canvas: the wall writes itself in, holds,
+   and opens from the middle onto the corridor. The layer itself is clear, so
+   the text arriving over the entrance is what covers it, and it stops taking
+   the pointer the moment it starts to open. */
+.museum-loader { position: fixed; inset: 0; z-index: 60; }
+.museum-loader.is-closing { pointer-events: none; }
 
 .webgl-missing {
   position: fixed; inset: 0; display: grid; place-items: center;
@@ -532,10 +499,13 @@ button:active { transform: translateY(1px); }
 }
 .reveal-vignette.is-on { opacity: 1; }
 
-/* ─── the veil between corridor and room — see ui/Veil.tsx ─── */
-.veil {
+/* the list fading over the room chosen from it must never catch a click */
+.map-overlay.is-leaving { pointer-events: none; }
+
+/* ─── warp flash ─── */
+.flash {
   position: fixed; inset: 0; z-index: 50; pointer-events: none;
-  background: #15120e; opacity: 0;
+  background: #fff8ea; opacity: 0;
 }
 
 /* ─── credits ────────────────────────────────────────────────────────────

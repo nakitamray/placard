@@ -8,9 +8,7 @@ import {
   QUALITY_INFO,
   initialQuality,
   qualityFor,
-  stepDown,
   storeQuality,
-  storedQuality,
   type QualityName,
 } from './lib/quality';
 import { LandingScene } from './scenes/LandingScene';
@@ -31,7 +29,7 @@ import { OrientationGate } from './ui/OrientationGate';
 import { SmallScreenNotice } from './ui/SmallScreenNotice';
 import { ZoomControls } from './ui/ZoomControls';
 import { useIsTouch } from './lib/device';
-import { VeilLayer } from './ui/Veil';
+import { FlashLayer } from './ui/Flash';
 import { endReveal, startReveal } from './transitions/reveal';
 import { asset } from './lib/asset';
 import { loadArtwork } from './glyph/artworkLoader';
@@ -195,8 +193,8 @@ export default function App() {
    * Hovering a canvas in the corridor is the strongest hint this site ever
    * gets about what is wanted next, and clicking it is a certainty. Either
    * one starts the work's glyph field downloading, along with the room's
-   * code, so by the time the veil is down there is little or nothing left to
-   * wait for behind it.
+   * code, so by the time the dive through the end wall is over there is little
+   * or nothing left to wait for.
    */
   const hoveredWork = useStore((s) => s.hoveredWork);
   useEffect(() => {
@@ -349,7 +347,7 @@ export default function App() {
           <Warmup ready={phase === 'boot'} />
           <CurtainRaiser />
           <ExposureRig exposure={exposure} />
-          <FrameWatchdog quality={qualityName} onStruggling={setQualityName} />
+          <FrameWatchdog quality={qualityName} />
           <color attach="background" args={[bg]} />
           {/* light haze for depth only — the far bays should still read */}
           <fog attach="fog" args={[fog[0], fog[1], fog[2]]} />
@@ -452,7 +450,7 @@ export default function App() {
         {atlasOpen && <AtlasView />}
       </Suspense>
       <AtlasToast />
-      <VeilLayer />
+      <FlashLayer />
       <CursorRing />
       {/* a precondition rather than a phase: it sits over everything and the
           exhibition keeps running underneath it */}
@@ -533,43 +531,27 @@ function ExposureRig({ exposure }: { exposure: number }) {
 }
 
 /**
- * Keeps the room keeping up.
+ * Keeps the room keeping up, without taking anything out of it.
  *
  * Detection guesses from hardware; this measures. It samples frame times over
  * a couple of seconds of real rendering and, if the median is well short of
- * the frame rate the budget asked for, does the cheapest thing that helps.
+ * the frame rate the budget asked for, draws the canvas at a slightly lower
+ * pixel density — a notch at a time, re-measuring after each, and never below
+ * 1×. On a laptop at 2× the canvas is four times the pixels of the same window
+ * at 1×, and every one of them is lit, shadowed and reflected; drawing at 1.5×
+ * is hard to see and frees most of that cost.
  *
- * FIRST THE PIXELS, THEN THE FEATURES. On a laptop at 2× the canvas is four
- * times the pixels of the same window at 1×, and every one of them is lit,
- * shadowed and (on Rich) reflected. Drawing at 1.5× instead is hard to see
- * and frees most of that, so the resolution steps down first, a notch at a
- * time, and the budget only drops a level once there is no resolution left to
- * give. Nothing is ever switched off that the visitor can't switch back on —
- * the quality toggle still offers every level.
- *
- * It re-measures after every step, because one step is often enough, and it
- * never steps back up: oscillating between budgets is worse than sitting on
- * the lower one. A visitor who has picked a level keeps it — only the
- * resolution, which they never chose, is adjusted under them.
- *
- * The frames it measures are the ones FrameGovernor let through, so the bar
- * is set against the budget's own cap: a 30fps budget is not "slow" for
- * running at 30.
+ * It never touches the budget itself. Rich is the default and stays Rich:
+ * which features are on is the visitor's decision, made on the toggle, and a
+ * page that quietly switched them off would be making it for them.
  */
-function FrameWatchdog({
-  quality,
-  onStruggling,
-}: {
-  quality: QualityName;
-  onStruggling: (q: QualityName) => void;
-}) {
+function FrameWatchdog({ quality }: { quality: QualityName }) {
   const setDpr = useThree((s) => s.setDpr);
   const gl = useThree((s) => s.gl);
   const samples = useRef<number[]>([]);
   const last = useRef(0);
   /** frames to ignore after a change, while the room settles */
   const settle = useRef(30);
-  const giveUp = useRef(false);
 
   // a new budget is a new room to measure
   useEffect(() => {
@@ -578,7 +560,6 @@ function FrameWatchdog({
   }, [quality]);
 
   useFrame(() => {
-    if (giveUp.current) return;
     const now = performance.now();
     const dt = last.current ? now - last.current : 0;
     last.current = now;
@@ -599,14 +580,9 @@ function FrameWatchdog({
     if (median <= Math.max(target * 1.33, 1000 / 45)) return;
 
     const dpr = gl.getPixelRatio();
-    if (dpr > 1.01) {
-      setDpr(Math.max(1, Math.round((dpr - 0.25) * 4) / 4));
-      settle.current = 30;
-      return;
-    }
-    const next = storedQuality() ? null : stepDown(quality);
-    if (next) onStruggling(next);
-    else giveUp.current = true;
+    if (dpr <= 1.01) return;
+    setDpr(Math.max(1, Math.round((dpr - 0.25) * 4) / 4));
+    settle.current = 30;
   });
   return null;
 }

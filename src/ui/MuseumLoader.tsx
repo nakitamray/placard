@@ -1,37 +1,59 @@
 /**
- * The screen between the entrance and a museum's corridor.
+ * The doorway between the entrance and a museum's corridor.
  *
- * A cousin of the entrance curtain (ui/LoadingBar), not a copy of it. The
- * curtain is a wall of anonymous prose lighting in reading order; this one is
- * made of the museum itself — the names of the painters who hang there and
- * the titles of what they painted, stepping through at the glyph field's own
- * six characters a second — and it lights from the middle outward, the way a
- * room does when somebody finds the switch, around the name of the place you
- * are walking into.
+ * Built from the same stuff as the entrance curtain (ui/LoadingBar): a wall of
+ * type stepping through its text at the glyph field's own six characters a
+ * second, breathing, lighting from dim bone to gilt in reading order as the
+ * work behind it reports in. The text here is the museum itself — who hangs
+ * there and what they painted — and the only words standing still in it are
+ * the museum's name.
  *
- * The light follows the three steps in state/opening. Once they are all in,
- * it sweeps out to the corners on a clock and the screen fades over a
- * corridor that has already been drawing underneath it.
+ * It has three movements, and none of them is a fade:
+ *
+ *   IN      The wall writes itself across the entrance in reading order, row
+ *           over row, in about half a second — the click is answered by text
+ *           arriving, not by a screen being put up.
+ *
+ *   HOLD    While the plan, the paintings and the room's shaders load, the
+ *           light runs through the text. The cursor is a lamp held up to the
+ *           wall: the letters under it light and run faster, so there is
+ *           something to do with your hand while you wait.
+ *
+ *   OUT     When everything is in, the wall opens from the middle outward,
+ *           each letter flaring gilt as it goes, and the corridor's walk in
+ *           from the doorway starts at the same moment — so the room is
+ *           something you pass through the text into, not something you are
+ *           dropped in front of.
  */
 import { useEffect, useRef } from 'react';
 import { OPENING_STEPS, useOpening } from '../state/opening';
+import { pointer } from '../state/motion';
 
 /** one character cell, in CSS pixels — the curtain's own grid */
 const CELL = 19;
 const CHAR_RATE = 6;
-const REDRAW_HZ = 12;
-/** the soft edge of the light, as a fraction of the screen's half-diagonal */
-const EDGE = 0.22;
-/** how long the light takes to reach the corners once everything is in */
-const SWEEP_S = 0.6;
-/** never on screen for less than this, so a cached wing is a beat, not a flicker */
-const MIN_SHOW_MS = 650;
-/** and never longer than this, whatever has or has not reported */
+/** the wall at rest is a slow thing; the lamp and the movements want more */
+const HOLD_HZ = 30;
+/** how long the wall takes to write itself across the screen */
+const IN_S = 0.55;
+/** how long the light takes to finish the wall once everything is in */
+const FILL_S = 0.7;
+/** how long the wall takes to open */
+const OUT_S = 1.35;
+/** the soft edge of the light, as a fraction of the wall */
+const EDGE = 0.08;
+/** never on screen for less than this, so a cached wing still has its moment */
+const MIN_SHOW_MS = 900;
+/** and never longer, whatever has or has not reported */
 const MAX_SHOW_MS = 12000;
-/** the stylesheet's fade, plus a frame */
-const FADE_MS = 720;
+/** the lamp under the cursor, in CSS pixels */
+const LAMP_R = 150;
 
-const LEVELS = 10;
+const GROUND = '#15120e';
+const WORD = 'rgba(201,162,39,0.95)';
+const FLARE = 'rgba(255,226,140,0.95)';
+
+const LEVELS = 12;
 const PALETTE = (() => {
   const out: string[] = [];
   for (let i = 0; i < LEVELS; i++) {
@@ -39,13 +61,22 @@ const PALETTE = (() => {
     const r = Math.round(226 + (201 - 226) * t);
     const g = Math.round(219 + (162 - 219) * t);
     const b = Math.round(202 + (39 - 202) * t);
-    const a = 0.04 + t * t * 0.62;
+    const a = 0.05 + t * t * 0.8;
     out.push(`rgba(${r},${g},${b},${a.toFixed(3)})`);
   }
   return out;
 })();
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
+const smooth = (a: number, b: number, v: number) => {
+  const t = clamp01((v - a) / (b - a));
+  return t * t * (3 - 2 * t);
+};
+/** a stable per-cell number in 0..1, so the wall opens the same way every frame */
+const hash = (i: number) => {
+  const x = Math.sin(i * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+};
 
 export function MuseumLoader() {
   const museum = useOpening((s) => s.museum);
@@ -54,35 +85,28 @@ export function MuseumLoader() {
   const closing = useOpening((s) => s.closing);
   const canvas = useRef<HTMLCanvasElement>(null);
 
-  const progress = useRef(0);
-  progress.current = done.length / OPENING_STEPS.length;
-  const corpus = useRef('');
-  corpus.current =
-    words ?? (museum ? `${museum.name} · ${museum.subtitle} · ${museum.city} · ` : '');
-  const step = OPENING_STEPS.find((s) => !done.includes(s.key));
+  // read inside the draw loop, so a step landing never restarts the animation
+  const live = useRef({ progress: 0, corpus: '', name: '', closing: false });
+  live.current.progress = done.length / OPENING_STEPS.length;
+  live.current.corpus = words ?? (museum ? `${museum.name} · ${museum.city} · ` : ' ');
+  live.current.name = museum ? museum.name.toUpperCase() : '';
+  live.current.closing = closing;
 
-  // a screen that waits forever is worse than the stutter it is hiding: the
-  // corridor copes with a missing texture, so the door opens regardless
+  // a doorway that never opens is worse than the stutter it hides
   useEffect(() => {
     if (!museum) return;
     const failsafe = window.setTimeout(() => useOpening.getState().close(), MAX_SHOW_MS);
     return () => window.clearTimeout(failsafe);
   }, [museum]);
 
-  // once it has faded, it is gone
-  useEffect(() => {
-    if (!closing) return;
-    const t = window.setTimeout(() => useOpening.getState().clear(), FADE_MS);
-    return () => window.clearTimeout(t);
-  }, [closing]);
-
   useEffect(() => {
     const el = canvas.current;
     if (!el || !museum) return;
-    const ctx = el.getContext('2d', { alpha: false });
+    const ctx = el.getContext('2d');
     if (!ctx) return;
 
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lampOn = !reduced && matchMedia('(pointer: fine)').matches;
     let cols = 0;
     let rows = 0;
     let raf = 0;
@@ -91,10 +115,12 @@ export function MuseumLoader() {
     let lit = 0;
     let finishedAt = 0;
     let litAtFinish = 0;
-    let reported = false;
+    let openedAt = 0;
+    /** per-cell order for the opening, recomputed with the grid */
+    let order = new Float32Array(0);
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const w = window.innerWidth;
       const h = window.innerHeight;
       el.width = Math.round(w * dpr);
@@ -107,6 +133,19 @@ export function MuseumLoader() {
       ctx.font = `${CELL - 5}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
       cols = Math.ceil(w / CELL);
       rows = Math.ceil(h / CELL);
+      // the opening runs from the middle out, ragged so it reads as a wall
+      // giving way letter by letter rather than as an iris
+      order = new Float32Array(cols * rows);
+      const cx = w / 2;
+      const cy = h / 2;
+      const reach = Math.hypot(cx, cy);
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const i = row * cols + col;
+          const d = Math.hypot(col * CELL + CELL / 2 - cx, (row * CELL + CELL / 2 - cy) * 1.4) / reach;
+          order[i] = Math.min(1, d) * 0.72 + hash(i) * 0.28;
+        }
+      }
       lastDraw = 0;
     };
 
@@ -114,57 +153,121 @@ export function MuseumLoader() {
       const t = (now - started) / 1000;
       const w = window.innerWidth;
       const h = window.innerHeight;
+      const L = live.current;
 
-      // a third of the way out per step, eased so the light moves rather than jumps
-      lit += (progress.current * 0.62 - lit) * (reduced ? 1 : 0.1);
-      if (progress.current >= 1 && now - started >= MIN_SHOW_MS) {
+      // IN: how far the wall has written itself, 0..1 (a little past, for the soft front)
+      const inK = reduced ? 2 : (t / IN_S) * 1.15;
+
+      // HOLD: the light follows the steps in, then sweeps the rest on a clock
+      lit += (L.progress * 0.85 - lit) * (reduced ? 1 : 0.12);
+      if (L.progress >= 1 && now - started >= MIN_SHOW_MS) {
         if (!finishedAt) {
           finishedAt = now;
           litAtFinish = lit;
         }
-        const k = reduced ? 1 : clamp01((now - finishedAt) / 1000 / SWEEP_S);
-        lit = Math.max(lit, litAtFinish + (1 + EDGE - litAtFinish) * k * k);
-        if (!reported && k >= 1) {
-          reported = true;
-          useOpening.getState().close();
-        }
+        const k = reduced ? 1 : clamp01((now - finishedAt) / 1000 / FILL_S);
+        lit = Math.max(lit, litAtFinish + (1 + EDGE - litAtFinish) * k);
+        if (k >= 1 && !L.closing) useOpening.getState().close();
       }
 
-      ctx.fillStyle = '#15120e';
-      ctx.fillRect(0, 0, w, h);
+      // OUT: how far the wall has opened, 0..1
+      if (L.closing && !openedAt) openedAt = now;
+      const outK = openedAt ? (reduced ? 2 : (now - openedAt) / 1000 / OUT_S) : 0;
+      if (outK >= 1.2) {
+        useOpening.getState().clear();
+        return;
+      }
 
-      const text = corpus.current || ' ';
+      ctx.clearRect(0, 0, w, h);
+      const covered = inK >= 1.15 && !openedAt;
+      if (inK >= 1.15) useOpening.getState().write();
+      if (covered) {
+        ctx.fillStyle = GROUND;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      const text = L.corpus || ' ';
+      const name = L.name;
       const charOffset = reduced ? 0 : Math.floor(t * CHAR_RATE);
       const breath = t * 1.4;
-      const cx = w / 2;
-      const cy = h / 2;
-      const reach = Math.hypot(cx, cy);
+      const total = cols * rows;
+      const wordRow = Math.floor(rows / 2);
+      const wordCol = Math.max(0, Math.floor((cols - name.length) / 2));
+      const plaqueFrom = wordCol - 3;
+      const plaqueTo = wordCol + name.length + 3;
+      // the lamp: the cursor in CSS pixels
+      const px = (pointer.x * 0.5 + 0.5) * w;
+      const py = (pointer.y * 0.5 + 0.5) * h;
 
       for (let row = 0; row < rows; row++) {
         const y = row * CELL + CELL / 2;
+        const inWordRow = row === wordRow;
+        // each row starts a touch later than the one above, so the wall is written
+        const rowStart = (row / rows) * 0.8;
         for (let col = 0; col < cols; col++) {
           const i = row * cols + col;
-          const ch = text[(i + charOffset) % text.length];
-          if (ch === ' ') continue;
           const x = col * CELL + CELL / 2;
-          // distance from the middle, as a fraction of the way to a corner
-          const f = Math.hypot(x - cx, (y - cy) * 1.35) / reach;
-          const level = clamp01((lit - f) / EDGE);
-          const breathe = reduced ? 0.5 : 0.5 + 0.5 * Math.sin(breath + i * 0.21);
-          const idx = Math.min(
-            LEVELS - 1,
-            Math.round(level * (LEVELS - 1) * (0.82 + 0.18 * breathe)),
-          );
-          ctx.fillStyle = PALETTE[idx];
+
+          // IN: is this cell written yet?
+          let a = 1;
+          if (!covered && inK < 1.15) {
+            const front = rowStart + (col / cols) * 0.2;
+            a = smooth(front, front + 0.12, inK);
+            if (a <= 0) continue;
+          }
+          // OUT: has the wall opened here yet? Letters flare just before they go.
+          let flare = 0;
+          if (openedAt) {
+            const o = order[i];
+            const gone = smooth(o - 0.04, o + 0.06, outK);
+            if (gone >= 1) continue;
+            flare = 1 - Math.abs(gone * 2 - 1);
+            a *= 1 - gone;
+          }
+
+          if (!covered) {
+            ctx.globalAlpha = a;
+            ctx.fillStyle = GROUND;
+            ctx.fillRect(col * CELL, row * CELL, CELL, CELL);
+          }
+
+          const isWord = inWordRow && col >= wordCol && col < wordCol + name.length;
+          let lamp = 0;
+          if (lampOn) {
+            const d = Math.hypot(x - px, y - py);
+            if (d < LAMP_R) lamp = 1 - d / LAMP_R;
+          }
+          // under the lamp the letters run faster, as if read more quickly
+          const ch = isWord
+            ? name[col - wordCol]
+            : text[(i + charOffset + (lamp > 0.25 ? Math.floor(t * 18) : 0)) % text.length];
+          if (ch === ' ') continue;
+
+          ctx.globalAlpha = a;
+          if (flare > 0.35) {
+            ctx.fillStyle = FLARE;
+          } else if (isWord) {
+            ctx.fillStyle = WORD;
+          } else {
+            const f = i / total;
+            const level = clamp01((lit - f) / EDGE);
+            const breathe = reduced ? 0.5 : 0.5 + 0.5 * Math.sin(breath + i * 0.21);
+            const shade =
+              Math.abs(row - wordRow) <= 1 && col >= plaqueFrom && col < plaqueTo ? 0.3 : 1;
+            const v = Math.max(level * shade * (0.82 + 0.18 * breathe), lamp * 0.9);
+            ctx.fillStyle = PALETTE[Math.min(LEVELS - 1, Math.round(v * (LEVELS - 1)))];
+          }
           ctx.fillText(ch, x, y);
         }
       }
+      ctx.globalAlpha = 1;
     };
 
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
-      // the sweep at the end wants every frame; the field itself does not
-      if (!finishedAt && now - lastDraw < 1000 / REDRAW_HZ) return;
+      // the movements in and out want every frame; the wall at rest does not
+      const moving = now - started < IN_S * 1000 + 100 || openedAt || finishedAt;
+      if (!moving && now - lastDraw < 1000 / HOLD_HZ) return;
       lastDraw = now;
       draw(now);
     };
@@ -188,12 +291,6 @@ export function MuseumLoader() {
       aria-label={`Opening ${museum.name} — ${done.length} of ${OPENING_STEPS.length}`}
     >
       <canvas ref={canvas} className="loading-field" aria-hidden />
-      <div className="museum-loader-plaque" aria-hidden>
-        <p className="caption museum-loader-city">{museum.city}</p>
-        <h2 className="museum-loader-name">{museum.name}</h2>
-        <p className="meta museum-loader-sub">{museum.subtitle}</p>
-        <p className="caption museum-loader-step">{step ? step.label : 'Come in'}</p>
-      </div>
     </div>
   );
 }

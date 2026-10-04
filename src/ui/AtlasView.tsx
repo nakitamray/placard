@@ -909,7 +909,7 @@ export function AtlasView() {
           {/* the same mark the gallery's reset carries: a crosshair glyph read
               as a speck at this size, and a control nobody can read the label
               of is a control nobody presses */}
-          1×
+          <AtlasZoomLabel spin={spin} />
         </button>
         <button className="zoom-btn" onClick={() => zoomBy(spin, 1 / 1.3)} aria-label="Zoom in">
           +
@@ -1074,6 +1074,31 @@ function zoomBy(
   factor: number,
 ) {
   spin.current.zoom = Math.max(0.45, Math.min(2.4, spin.current.zoom * factor));
+}
+
+/**
+ * How far in the atlas is, as a magnification.
+ *
+ * `zoom` is a camera distance and lives in a ref the wheel, the pinch and the
+ * buttons all write to without a render — so the label read it once, at
+ * mount, and said 1× forever. It samples instead, a few times a second, which
+ * is quicker than anyone reads a label and far cheaper than rendering the
+ * atlas on every wheel tick. Standing at half the distance is 2×.
+ */
+function AtlasZoomLabel({
+  spin,
+}: {
+  spin: React.MutableRefObject<{ yaw: number; pitch: number; zoom: number }>;
+}) {
+  const [mag, setMag] = useState(1);
+  useEffect(() => {
+    const t = window.setInterval(() => {
+      const next = Math.round((1 / spin.current.zoom) * 10) / 10;
+      setMag((m) => (m === next ? m : next));
+    }, 120);
+    return () => window.clearInterval(t);
+  }, [spin]);
+  return <>{mag.toFixed(1)}×</>;
 }
 
 /** applies the drag/zoom to the graph, damped, so it never snaps */

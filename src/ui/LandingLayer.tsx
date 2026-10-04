@@ -24,7 +24,7 @@ import { loadMuseum, useStore } from '../state/store';
 import { pointer } from '../state/motion';
 import { imageUrl } from '../lib/image';
 import { exhibitionWorks, heroWorks, shuffled, type ExhibitionWork } from '../state/works';
-import { markOpening, useOpening } from '../state/opening';
+import { markOpening, useOpening, whenWritten } from '../state/opening';
 
 const HOLD_MS = 7000;
 /* Long, and linear. A short crossfade between two full-bleed paintings reads
@@ -217,6 +217,7 @@ export function LandingLayer() {
 
     await corridorModule.preloadWalls(museum.artworks);
     markOpening('walls');
+    await whenWritten();
 
     setMuseum(museum);
     setMuseumLoading(null);

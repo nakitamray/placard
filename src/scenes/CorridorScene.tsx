@@ -27,7 +27,7 @@ import gsap from 'gsap';
 import { useStore } from '../state/store';
 import { corridor, warp, pointer, pointerLook, resetCorridor, wasSwipe } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
-import { coverVeil } from '../ui/Veil';
+import { flash } from '../ui/Flash';
 import { markOpening, useOpening } from '../state/opening';
 import { OrnateFrame } from './OrnateFrame';
 import { frameReach } from './frames';
@@ -1072,7 +1072,9 @@ export function CorridorScene({ quality }: { quality: Quality }) {
   const covered = useOpening((s) => !!s.museum && !s.closing);
   useEffect(() => {
     if (phase === 'corridor' && !covered && corridor.mouth > 0.01) {
-      gsap.to(corridor, { mouth: 0, duration: reducedMotion ? 0.2 : 1.2, ease: 'power2.inOut' });
+      // long and decelerating: it starts as the opening wall parts, so the
+      // first of it is the step through the text and the rest is arriving
+      gsap.to(corridor, { mouth: 0, duration: reducedMotion ? 0.2 : 2.6, ease: 'power3.out' });
     }
     if (phase === 'landing') {
       corridor.mouth = 4;
@@ -1080,34 +1082,22 @@ export function CorridorScene({ quality }: { quality: Quality }) {
     }
   }, [phase, reducedMotion, covered]);
 
-  /*
-   * T3: into a painting's room.
-   *
-   * This was a dive through the end wall — the camera accelerating down the
-   * corridor for a second and a half and a white flash at the bottom of it —
-   * which is a long way to travel to reach something you have already chosen.
-   * Now the camera leans a step forward while the room dims, in a fifth of a
-   * second, and the gallery is built behind the dark and comes up as soon as
-   * its painting is ready (see ui/Veil and GalleryScene). The veil takes the
-   * colour the room will open on, so the cut is from dark to that room's own
-   * ground rather than through a flash of something else.
-   */
+  // T3 warp: map → gallery, straight through the end wall
   useEffect(() => {
     if (phase !== 'warp') return;
     warp.p = 0;
-    const s = useStore.getState();
-    const work = s.museum?.artworks[s.index];
-    const ground = work
-      ? `#${new THREE.Color(work.accent).multiplyScalar(0.34).getHexString()}`
-      : undefined;
-    const ms = reducedMotion ? 80 : 190;
-    coverVeil(ms, ground);
-    const tl = gsap.timeline();
-    tl.to(warp, { p: reducedMotion ? 0 : 1, duration: ms / 1000, ease: 'power2.in' });
-    const go = window.setTimeout(() => setPhase('gallery'), ms + 20);
+    const tl = gsap.timeline({ onComplete: () => setPhase('gallery') });
+    if (reducedMotion) {
+      flash(400);
+      tl.to(warp, { p: 1, duration: 0.25, ease: 'none' });
+    } else {
+      tl.to(warp, { p: 1, duration: 1.4, ease: 'power4.in' });
+      tl.call(() => flash(900), [], 1.15);
+    }
+    const failsafe = window.setTimeout(() => setPhase('gallery'), reducedMotion ? 700 : 2200);
     return () => {
       tl.kill();
-      window.clearTimeout(go);
+      window.clearTimeout(failsafe);
     };
   }, [phase, reducedMotion, setPhase]);
 
@@ -1158,9 +1148,8 @@ export function CorridorScene({ quality }: { quality: Quality }) {
           );
     let fov = base;
     if (phase === 'warp') {
-      // half a step forward while the veil comes down — a lean, not a dive
-      z = railZ - 0.5 * warp.p;
-      fov = base - 3 * warp.p;
+      z = THREE.MathUtils.lerp(railZ, d.apseZ + 1.6, warp.p);
+      fov = base + 30 * warp.p * warp.p;
     }
 
     const k = dampK(0.075, delta);

@@ -32,11 +32,14 @@ interface OpeningState {
    */
   words: string | null;
   done: OpeningKey[];
-  /** fading away over the room it was covering */
+  /** the wall has finished writing itself over the entrance and covers it */
+  written: boolean;
+  /** opening onto the room it was covering */
   closing: boolean;
   start: (m: MuseumIndexEntry) => void;
   setWords: (w: string) => void;
   mark: (k: OpeningKey) => void;
+  write: () => void;
   close: () => void;
   clear: () => void;
 }
@@ -45,12 +48,14 @@ export const useOpening = create<OpeningState>((set) => ({
   museum: null,
   words: null,
   done: [],
+  written: false,
   closing: false,
-  start: (museum) => set({ museum, words: null, done: [], closing: false }),
+  start: (museum) => set({ museum, words: null, done: [], written: false, closing: false }),
   setWords: (words) => set({ words }),
   mark: (k) => set((s) => (s.done.includes(k) ? s : { done: [...s.done, k] })),
+  write: () => set((s) => (s.written ? s : { written: true })),
   close: () => set((s) => (s.museum ? { closing: true } : s)),
-  clear: () => set({ museum: null, words: null, done: [], closing: false }),
+  clear: () => set({ museum: null, words: null, done: [], written: false, closing: false }),
 }));
 
 /** report a step from outside React — the loaders are not components */
@@ -61,3 +66,24 @@ export const openingActive = () => {
   const s = useOpening.getState();
   return !!s.museum && !s.closing;
 };
+
+/**
+ * Resolves once the wall covers the screen.
+ *
+ * The room must not be swapped in underneath a wall that is still being
+ * written — on a second visit everything is cached and would be ready before
+ * the text had reached the bottom of the screen, showing the corridor through
+ * the unwritten rows.
+ */
+export function whenWritten(): Promise<void> {
+  return new Promise((resolve) => {
+    const s = useOpening.getState();
+    if (s.written || !s.museum) return resolve();
+    const off = useOpening.subscribe((n) => {
+      if (n.written || !n.museum) {
+        off();
+        resolve();
+      }
+    });
+  });
+}

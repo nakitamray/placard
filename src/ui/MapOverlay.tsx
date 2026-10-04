@@ -13,10 +13,12 @@
  * DOM rather than SVG for crisp type, real click targets, keyboard order and
  * screen-reader access. Esc returns to the corridor; choosing a work starts T3.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useStore } from '../state/store';
 import { pointer } from '../state/motion';
+import { loadArtwork } from '../glyph/artworkLoader';
+import { detectTier } from '../lib/deviceTier';
 import type { MuseumRoom } from '../types';
 
 export function MapOverlay() {
@@ -27,6 +29,8 @@ export function MapOverlay() {
   const reducedMotion = useStore((s) => s.reducedMotion);
   const listRef = useRef<HTMLUListElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  /** fading away over the room that was chosen from it */
+  const [leaving, setLeaving] = useState(false);
 
   // The entrance is a GSAP tween rather than a CSS keyframe. Every other
   // transition in the app is already rAF-driven, and a compositor-driven CSS
@@ -74,12 +78,44 @@ export function MapOverlay() {
     return () => cancelAnimationFrame(raf);
   }, [phase, reducedMotion]);
 
-  if (phase !== 'map' || !museum) return null;
+  /*
+   * Out of the list and into the room: a fade, not a dive.
+   *
+   * Chosen from this list, the painting's room is mounted at once behind the
+   * list, and the list fades away over it while the blur on the canvas
+   * clears — so the room comes up through the index rather than through a
+   * flight down the corridor the visitor has already walked. The dive through
+   * the end wall is kept for every other way in.
+   */
+  useEffect(() => {
+    if (!leaving || !rootRef.current) return;
+    const tween = gsap.to(rootRef.current, {
+      opacity: 0,
+      duration: reducedMotion ? 0.05 : 0.75,
+      ease: 'power2.inOut',
+      onComplete: () => setLeaving(false),
+    });
+    // the overlay must come down even if the tween never reports complete
+    const failsafe = window.setTimeout(() => setLeaving(false), 1500);
+    return () => {
+      tween.kill();
+      window.clearTimeout(failsafe);
+    };
+  }, [leaving, reducedMotion]);
+
+  if ((phase !== 'map' && !leaving) || !museum) return null;
 
   const select = (room: MuseumRoom) => {
-    if (!room.active) return;
+    if (!room.active || leaving) return;
     setIndex(Math.max(0, room.artworkIndex));
-    setPhase('warp');
+    setLeaving(true);
+    setPhase('gallery');
+  };
+
+  // hovering a row is the strongest hint there is about which room is next
+  const prefetch = (room: MuseumRoom) => {
+    const art = museum.artworks[room.artworkIndex];
+    if (art) void loadArtwork(art.id, detectTier()).catch(() => {});
   };
 
   // only rooms that actually hold a painting: the plan's courtyards and
@@ -88,7 +124,7 @@ export function MapOverlay() {
 
   return (
     <div
-      className="map-overlay"
+      className={`map-overlay ${leaving ? 'is-leaving' : ''}`}
       ref={rootRef}
       role="dialog"
       aria-label={`${museum.name} — choose a painting`}
@@ -115,6 +151,8 @@ export function MapOverlay() {
                 <button
                   className="room-row"
                   onClick={() => select(room)}
+                  onPointerEnter={() => prefetch(room)}
+                  onFocus={() => prefetch(room)}
                   aria-label={
                     art
                       ? `Enter the room of ${art.title} by ${art.artist}`

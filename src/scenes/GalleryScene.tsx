@@ -37,7 +37,6 @@ import { fitWork } from './fit';
 import { placardAnchor } from './placardAnchor';
 import { startReveal, endReveal, revealAnim } from '../transitions/reveal';
 import { closeLens, moveLens } from '../transitions/lens';
-import { liftVeil, veilDown } from '../ui/Veil';
 import { discoverWork } from '../state/atlas';
 import { artworkProjector, regionAt } from '../threadpull/state';
 import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
@@ -499,27 +498,6 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     };
     return useStore.subscribe((s) => s.index, onJump);
   }, []);
-
-  /*
-   * Coming up from under the veil.
-   *
-   * The corridor hands over behind a dark veil (see ui/Veil), and the room
-   * lifts it the moment its painting is actually drawn — two frames after the
-   * glyph field for this work has arrived — rather than after a fixed delay
-   * that would be too long on a fast connection and too short on a slow one.
-   * It arrives a half step back and settles in, so the room reads as
-   * something you have walked up to rather than something switched on.
-   */
-  const arrival = useRef({ done: false, frames: 0 });
-  useFrame(() => {
-    const a = arrival.current;
-    if (a.done || !loaded.get(index)) return;
-    if (++a.frames < 2) return;
-    a.done = true;
-    if (!veilDown()) return;
-    if (!reducedMotion) view.v = 0.93;
-    liftVeil(reducedMotion ? 150 : 420);
-  });
 
   useFrame((state, delta) => {
     gallery.x = damp(gallery.x, gallery.goal, 0.09, delta);

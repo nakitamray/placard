@@ -1,7 +1,7 @@
 /**
  * Application state machine
  *
- * BOOT → LANDING →(T1 portal)→ CORRIDOR →(T2)→ MAP →(T3 veil)→ GALLERY
+ * BOOT → LANDING →(T1 portal)→ CORRIDOR →(T2)→ MAP →(T3 warp)→ GALLERY
  * ARTWORK is a sub-state of GALLERY (the camera does not move), so it is
  * modelled as `revealed: boolean` on the gallery phase rather than a phase
  * of its own. MAP ⇄ CORRIDOR and GALLERY → MAP go backwards on Esc.
@@ -17,7 +17,8 @@ const ALLOWED: Record<Phase, Phase[]> = {
   // have to walk to the far wall and use the plan to reach a canvas you can
   // already see
   corridor: ['map', 'landing', 'warp'],
-  map: ['corridor', 'warp'],
+  // the list of rooms fades straight into the one chosen — see MapOverlay
+  map: ['corridor', 'warp', 'gallery'],
   warp: ['gallery'],
   gallery: ['map'],
 };

@@ -572,8 +572,8 @@ export const sfx = {
   placardClose: () => swoosh(2200, 380, 0.34, 0.022),
   /** walking through the end wall */
   warp: () => {
-    tone(90, 360, 0.42, 0.08);
-    burst(0.45, 1200, 0.4, 0.07, 'bandpass');
+    tone(70, 420, 1.3, 0.1);
+    burst(1.4, 1200, 0.4, 0.09, 'bandpass');
   },
   /** a painting resolving */
   chime: () => tone(660, 990, 0.7, 0.026),
