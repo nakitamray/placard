@@ -290,11 +290,18 @@ move. The click is answered by a wall of text writing itself across the
 entrance — the museum's own painters and titles, with its name standing still
 in the middle — and the cursor is a lamp held up to it, lighting the letters
 underneath and making them run. The light fills the wall as the plan, the
-paintings for its walls and the room's shaders report in behind it. Then the
-wall opens from the middle outward, each letter flaring gilt as it goes, and the
-walk in from the corridor's doorway starts at the same moment, so the room is
-something you pass through the text into rather than something you are dropped
-in front of.
+paintings for its walls and the room's shaders report in behind it, and then
+the wall fades, slowly, over a corridor that is already drawing, while the walk
+in from the doorway begins.
+
+The wall is drawn on a thread of its own, into an OffscreenCanvas from a
+worker. Building a corridor and drawing it for the first time is the heaviest
+thing this site asks of the main thread — the scene assembled, ten pictures
+uploaded to the GPU, the room's programs linked — and while that lasts nothing
+on the main thread moves. Drawn there, the wall froze for a beat halfway
+through every time; drawn in a worker, it goes on breathing straight through
+it. Browsers that cannot hand a canvas to a worker draw it on the page as
+before.
 
 A painting's room is reached by diving down the corridor through the end wall,
 from a canvas in the corridor or from the atlas. From the list of rooms the
