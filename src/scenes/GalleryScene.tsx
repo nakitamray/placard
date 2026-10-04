@@ -37,6 +37,7 @@ import { fitWork } from './fit';
 import { placardAnchor } from './placardAnchor';
 import { startReveal, endReveal, revealAnim } from '../transitions/reveal';
 import { closeLens, moveLens } from '../transitions/lens';
+import { liftVeil, veilDown } from '../ui/Veil';
 import { discoverWork } from '../state/atlas';
 import { artworkProjector, regionAt } from '../threadpull/state';
 import type { ArtworkIndexEntry, DeviceTier, MuseumData } from '../types';
@@ -94,6 +95,22 @@ const WALL_H = 6.2;
  * would, at the hero's radius, read as the painting simply coming back.
  */
 const LENS_RADIUS = 0.26;
+
+/**
+ * The largest the glyph field is ever drawn, per device tier.
+ *
+ * The field is sized to the canvas as it appears on screen (see the frame
+ * loop), so leaning in asks for more pixels. These are where that stops: a
+ * 4096 target is about forty megabytes of video memory, which a desktop card
+ * does not notice and a phone very much does.
+ */
+const GLYPH_RT_CAP: Record<DeviceTier['name'], number> = { high: 4096, mid: 3072, low: 2048 };
+/** never smaller than this, so a small window still gets legible letters */
+const GLYPH_RT_MIN = 1024;
+/** a little over one texel per screen pixel, so the letters stay crisp */
+const GLYPH_RT_SUPERSAMPLE = 1.15;
+/** sizes snap to steps of 256, so a slow zoom is a handful of resizes */
+const GLYPH_RT_STEP = 256;
 
 /** the warm end of the fill light; a constant, so it is made once */
 const FILL_WARM = new THREE.Color('#FFF3E0');
@@ -294,6 +311,8 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
   const artworks = useStore(selectArtworks);
   const index = useStore((s) => s.index);
   const revealed = useStore((s) => s.revealed);
+  /** the wall label is up — the room holds still while it is read */
+  const reading = useStore((s) => s.revealed && s.revealLatched);
   const reducedMotion = useStore((s) => s.reducedMotion);
   const setIndex = useStore((s) => s.setIndex);
 
@@ -321,6 +340,9 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
   const pan = useRef({ x: 0, y: 0 });
   const touch = useRef({ x: 0, active: false });
   const roomTone = useRef(new THREE.Color('#3A3630'));
+  /** the glyph field's resolution, written by the frame loop — see GlyphPrePass */
+  const glyphRes = useRef({ w: tier.rtSize, h: tier.rtSize, work: -1 });
+  const gl = useThree((s) => s.gl);
 
   // load current + warm zone. The work in front of the visitor
   // loads immediately; its neighbours wait for an idle moment, so a prefetch
@@ -478,6 +500,27 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     return useStore.subscribe((s) => s.index, onJump);
   }, []);
 
+  /*
+   * Coming up from under the veil.
+   *
+   * The corridor hands over behind a dark veil (see ui/Veil), and the room
+   * lifts it the moment its painting is actually drawn — two frames after the
+   * glyph field for this work has arrived — rather than after a fixed delay
+   * that would be too long on a fast connection and too short on a slow one.
+   * It arrives a half step back and settles in, so the room reads as
+   * something you have walked up to rather than something switched on.
+   */
+  const arrival = useRef({ done: false, frames: 0 });
+  useFrame(() => {
+    const a = arrival.current;
+    if (a.done || !loaded.get(index)) return;
+    if (++a.frames < 2) return;
+    a.done = true;
+    if (!veilDown()) return;
+    if (!reducedMotion) view.v = 0.93;
+    liftVeil(reducedMotion ? 150 : 420);
+  });
+
   useFrame((state, delta) => {
     gallery.x = damp(gallery.x, gallery.goal, 0.09, delta);
 
@@ -488,8 +531,20 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     const look0 = reducedMotion || !pointerLook();
     const px = look0 ? 0 : pointer.x;
     const py = look0 ? 0 : pointer.y;
-    look.current.x += (px - look.current.x) * k;
-    look.current.y += (py - look.current.y) * k;
+    /*
+     * HOLD STILL WHILE THE LABEL IS OPEN.
+     *
+     * With the label up, the cursor is on its way to the card, the close
+     * button, the "Read more" link — and every one of those trips swung the
+     * room and the painting underneath it, which dragged the card (anchored to
+     * the canvas) along too. Reading wants a still wall. The head-turn and the
+     * zoom pan simply stop where they are, and pick up again from there when
+     * the label is closed.
+     */
+    if (!reading) {
+      look.current.x += (px - look.current.x) * k;
+      look.current.y += (py - look.current.y) * k;
+    }
 
     /*
      * Zoom here is a step toward the canvas, not a change of lens: in a room
@@ -553,8 +608,10 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
     const wantPanY = reducedMotion
       ? 0
       : clamp(-pointer.y * halfH * toward, -fit.height / 2, fit.height / 2);
-    pan.current.x = damp(pan.current.x, wantPanX, 0.12, delta);
-    pan.current.y = damp(pan.current.y, wantPanY, 0.12, delta);
+    if (!reading) {
+      pan.current.x = damp(pan.current.x, wantPanX, 0.12, delta);
+      pan.current.y = damp(pan.current.y, wantPanY, 0.12, delta);
+    }
 
     /*
      * Step aside for the label.
@@ -565,6 +622,43 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
      * little to the left while the label is open, which is what you do in a
      * gallery anyway: you stand off to one side to read the wall text.
      */
+    /*
+     * DRAW THE LETTERS AT THE SIZE THEY ARE SEEN.
+     *
+     * The field is rendered into a texture and the canvas samples it. That
+     * texture was a fixed square: on a landscape painting each letter was
+     * squashed sideways to fit, and leaning in magnified the texture past one
+     * texel per pixel until the letters broke up into blocks. So it is sized
+     * here from how many screen pixels the canvas actually covers at this
+     * distance, in the canvas's own proportions, and it grows as you lean in.
+     *
+     * Growing is immediate, so zooming in never shows the blur; shrinking
+     * waits until the zoom has settled and the need has fallen well below
+     * what is held, so easing back out is not a stream of reallocations.
+     */
+    if (entry) {
+      const plane = fitWork(entry.shape === 'round' ? 1 : entry.aspect, PLANE_H, MAX_W);
+      const dpr = gl.getPixelRatio();
+      const onScreenH = (plane.height / (2 * halfH)) * size.height * dpr * GLYPH_RT_SUPERSAMPLE;
+      const cap = Math.min(GLYPH_RT_CAP[tier.name], gl.capabilities.maxTextureSize || 4096);
+      const planeAspect = plane.width / plane.height;
+      // the longer edge is what meets the cap
+      let wantH = Math.max(GLYPH_RT_MIN / Math.max(1, planeAspect), onScreenH);
+      wantH = Math.min(wantH, cap, cap / planeAspect);
+      const snap = (v: number) =>
+        Math.max(GLYPH_RT_STEP, Math.min(cap, Math.ceil(v / GLYPH_RT_STEP) * GLYPH_RT_STEP));
+      const res = glyphRes.current;
+      const settled = Math.abs(view.v - view.goal) < 0.01;
+      // a different work is a different shape: that is always a resize
+      const grow = wantH > res.h * 1.04;
+      const shrink = settled && wantH < res.h * 0.6;
+      if (res.work !== index || grow || shrink) {
+        res.work = index;
+        res.h = snap(wantH);
+        res.w = snap(wantH * planeAspect);
+      }
+    }
+
     const wantShift = revealed && size.width > 900 ? Math.min(1.35, (dz * 0.3) / view.v) : 0;
     shift.current = damp(shift.current, wantShift, 0.11, delta);
 
@@ -670,7 +764,12 @@ export function GalleryScene({ tier, quality }: { tier: DeviceTier; quality: Qua
 
   return (
     <group>
-      <GlyphPrePass artwork={activeArt} rtSize={tier.rtSize} active />
+      <GlyphPrePass
+        artwork={activeArt}
+        rtSize={tier.rtSize}
+        resolution={glyphRes.current}
+        active
+      />
 
       {/* the wall behind the bays, and the ceiling over them */}
       <mesh position={[centreX, WALL_H / 2, -0.14]}>

@@ -347,8 +347,7 @@ export function Credits() {
                   <li>
                     <span className="caption">Written by</span>
                     <span className="body">
-                      nakitamray, The architecture and most of the code are mine; Claude worked
-                      alongside me on parts of it.
+                      nakitamray
                     </span>
                   </li>
                 </ul>

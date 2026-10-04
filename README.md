@@ -67,7 +67,7 @@ complete set behind the **?** in the bottom right corner.
 | Corridor | <kbd>Shift</kbd> | hurry to the far end |
 | Corridor | wheel, drag | also moves along the rail |
 | Corridor | click a canvas | walk straight into that painting's room |
-| Floor plan | click a room | choose a painter and warp into their room |
+| Floor plan | click a room | choose a painter and step straight into their room |
 | Gallery | wheel, <kbd>←</kbd> <kbd>→</kbd> | move between paintings, with a magnetic snap |
 | Gallery | move over a painting | the **reading lens** — a soft circle where the words give way and the paint shows through |
 | Gallery | click, or <kbd>Enter</kbd> | the whole work dissolves out of its text and the wall label arrives |
@@ -285,6 +285,22 @@ gilt in reading order as the steps land. The progress *is* the text being lit.
 There is no bar, because a bar would be furniture, and this site does not have
 furniture.
 
+Choosing a museum is the second wait, and it gets the same treatment. The
+corridor used to be shown while it was still fetching its ten paintings and
+compiling its lights, so the first second inside was a room assembling itself
+in stutters. Now a screen in the same material comes up the moment a museum is
+clicked — this time made of the museum's own painters and titles, lit from the
+middle outward around its name — while the plan, the paintings for its walls
+and the room's shaders report in behind it. It lifts onto a corridor that is
+already drawing, and the walk in from the doorway happens as it fades.
+
+Walking into a painting's room was a dive through the end wall and a white
+flash, the best part of two seconds every time. Now the corridor dims in a
+fifth of a second to the colour of the room you are going into, the room is
+built behind the dark, and it comes up the moment its painting is drawn. The
+painting's text starts downloading as soon as you hover a canvas, so there is
+usually nothing left to wait for.
+
 ## Performance
 
 Three budgets, chosen from the device and overridable by the visitor. Measured
@@ -341,6 +357,18 @@ there are, which for a room that mostly drifts turns out to matter more.
   animates steps six characters a second. Moving the reading lens, dissolving a
   work or pulling a thread takes it straight back to full rate for as long as
   that lasts.
+- **The glyph field is drawn at the size it is seen.** The render target used to
+  be a fixed square, so a landscape painting's letters were squashed sideways
+  to fit and leaning in magnified them until they broke up into blocks. It now
+  takes the canvas's own proportions and as many pixels as the canvas covers on
+  screen, growing as you lean in and shrinking again once you have stepped
+  back. At the composed distance that is usually fewer pixels than the old
+  square, and up close it is sharp.
+- **The room measures itself and gives back resolution first.** A watchdog
+  times real frames, and if the median falls well short of what the budget
+  asked for it lowers the pixel density a notch at a time before it drops the
+  budget a level. Drawing a 2× laptop screen at 1.5× is hard to see and frees
+  most of the cost; every feature is still one click away on the toggle.
 - **Shadow maps are drawn when the light moves.** Each one is a third pass over
   the room's geometry, and three.js runs it every frame by default. The only
   caster in either room is a single light over architecture that never moves,

@@ -27,7 +27,8 @@ import gsap from 'gsap';
 import { useStore } from '../state/store';
 import { corridor, warp, pointer, pointerLook, resetCorridor, wasSwipe } from '../state/motion';
 import { damp, dampK } from '../lib/damp';
-import { flash } from '../ui/Flash';
+import { coverVeil } from '../ui/Veil';
+import { markOpening, useOpening } from '../state/opening';
 import { OrnateFrame } from './OrnateFrame';
 import { frameReach } from './frames';
 import { fitWork } from './fit';
@@ -57,8 +58,12 @@ import { useShadowRefresh } from '../render/shadows';
  * way into a room, and stepped down to JPEG where it cannot.
  */
 const wallTextures = new Map<string, THREE.Texture>();
+/** settles when the texture of the same id has its picture, or has given up */
+const wallReady = new Map<string, Promise<void>>();
 
 function loadWallTexture(id: string): THREE.Texture {
+  let settle = () => {};
+  wallReady.set(id, new Promise<void>((r) => (settle = r)));
   const tex = new THREE.Texture();
   tex.colorSpace = THREE.SRGBColorSpace;
   /*
@@ -77,10 +82,12 @@ function loadWallTexture(id: string): THREE.Texture {
     img.onload = () => {
       tex.image = img;
       tex.needsUpdate = true;
+      settle();
     };
     img.onerror = () => {
       const next = fallbackUrl(url);
       if (next) attempt(next);
+      else settle();
     };
     img.src = url;
   };
@@ -88,16 +95,37 @@ function loadWallTexture(id: string): THREE.Texture {
   return tex;
 }
 
+function wallTexture(id: string): THREE.Texture {
+  const hit = wallTextures.get(id);
+  if (hit) return hit;
+  const t = loadWallTexture(id);
+  wallTextures.set(id, t);
+  return t;
+}
+
+/**
+ * Fetch a corridor's paintings before the corridor is shown.
+ *
+ * Called from behind the museum's opening screen (ui/MuseumLoader), so the
+ * visitor walks into a room whose pictures are already on the walls rather
+ * than watching ten of them pop in one by one. Resolves when every picture
+ * has arrived or failed, or after `timeoutMs` — a slow image is a reason to
+ * hold the door a moment, not to keep it shut.
+ */
+export function preloadWalls(artworks: ArtworkIndexEntry[], timeoutMs = 6000): Promise<void> {
+  const all = Promise.all(
+    artworks.map((a) => {
+      wallTexture(a.id);
+      return wallReady.get(a.id) ?? Promise.resolve();
+    }),
+  ).then(() => undefined);
+  return Promise.race([all, new Promise<void>((r) => window.setTimeout(r, timeoutMs))]);
+}
+
 function useArtworkTextures(artworks: ArtworkIndexEntry[]) {
   return useMemo(
     () =>
-      artworks.map((a) => {
-        const hit = wallTextures.get(a.id);
-        if (hit) return hit;
-        const t = loadWallTexture(a.id);
-        wallTextures.set(a.id, t);
-        return t;
-      }),
+      artworks.map((a) => wallTexture(a.id)),
     [artworks],
   );
 }
@@ -999,33 +1027,87 @@ export function CorridorScene({ quality }: { quality: Quality }) {
     };
   }, [phase, reducedMotion]);
 
-  // T1 portal tail: the camera dollies in from the corridor mouth
+  /*
+   * The last of the museum's opening steps: the room compiled and drawn.
+   *
+   * Every material in the corridor is built by the driver the first time it
+   * is drawn, and that is the stall the opening screen is there to hide. So
+   * the room asks for all of them to be compiled while it is still covered,
+   * and reports in two real frames after that — the frame that uses them has
+   * to have been drawn, not merely be about to be.
+   */
+  const gl = useThree((s) => s.gl) as THREE.WebGLRenderer & {
+    compileAsync?: (scene: THREE.Object3D, camera: THREE.Camera) => Promise<unknown>;
+  };
+  const scene = useThree((s) => s.scene);
+  const lit = useRef({ compiled: false, frames: 0, reported: false });
   useEffect(() => {
-    if (phase === 'corridor' && corridor.mouth > 0.01) {
+    if (!museum) return;
+    const l: typeof lit.current = { compiled: false, frames: 0, reported: false };
+    lit.current = l;
+    let alive = true;
+    const done = () => {
+      if (alive) l.compiled = true;
+    };
+    // after the commit, so the whole room is in the scene graph to compile
+    const t = window.setTimeout(() => {
+      if (gl.compileAsync) void gl.compileAsync(scene, camera).then(done, done);
+      else done();
+    }, 0);
+    return () => {
+      alive = false;
+      window.clearTimeout(t);
+    };
+  }, [museum, gl, scene, camera]);
+  useFrame(() => {
+    const l = lit.current;
+    if (l.reported || !l.compiled) return;
+    if (++l.frames < 2) return;
+    l.reported = true;
+    markOpening('light');
+  });
+
+  // T1 portal tail: the camera dollies in from the corridor mouth — once the
+  // opening screen has started to lift, so the walk in is something you see
+  const covered = useOpening((s) => !!s.museum && !s.closing);
+  useEffect(() => {
+    if (phase === 'corridor' && !covered && corridor.mouth > 0.01) {
       gsap.to(corridor, { mouth: 0, duration: reducedMotion ? 0.2 : 1.2, ease: 'power2.inOut' });
     }
     if (phase === 'landing') {
       corridor.mouth = 4;
       resetCorridor(0);
     }
-  }, [phase, reducedMotion]);
+  }, [phase, reducedMotion, covered]);
 
-  // T3 warp: map → gallery, straight through the end wall
+  /*
+   * T3: into a painting's room.
+   *
+   * This was a dive through the end wall — the camera accelerating down the
+   * corridor for a second and a half and a white flash at the bottom of it —
+   * which is a long way to travel to reach something you have already chosen.
+   * Now the camera leans a step forward while the room dims, in a fifth of a
+   * second, and the gallery is built behind the dark and comes up as soon as
+   * its painting is ready (see ui/Veil and GalleryScene). The veil takes the
+   * colour the room will open on, so the cut is from dark to that room's own
+   * ground rather than through a flash of something else.
+   */
   useEffect(() => {
     if (phase !== 'warp') return;
     warp.p = 0;
-    const tl = gsap.timeline({ onComplete: () => setPhase('gallery') });
-    if (reducedMotion) {
-      flash(400);
-      tl.to(warp, { p: 1, duration: 0.25, ease: 'none' });
-    } else {
-      tl.to(warp, { p: 1, duration: 1.4, ease: 'power4.in' });
-      tl.call(() => flash(900), [], 1.15);
-    }
-    const failsafe = window.setTimeout(() => setPhase('gallery'), reducedMotion ? 700 : 2200);
+    const s = useStore.getState();
+    const work = s.museum?.artworks[s.index];
+    const ground = work
+      ? `#${new THREE.Color(work.accent).multiplyScalar(0.34).getHexString()}`
+      : undefined;
+    const ms = reducedMotion ? 80 : 190;
+    coverVeil(ms, ground);
+    const tl = gsap.timeline();
+    tl.to(warp, { p: reducedMotion ? 0 : 1, duration: ms / 1000, ease: 'power2.in' });
+    const go = window.setTimeout(() => setPhase('gallery'), ms + 20);
     return () => {
       tl.kill();
-      window.clearTimeout(failsafe);
+      window.clearTimeout(go);
     };
   }, [phase, reducedMotion, setPhase]);
 
@@ -1076,8 +1158,9 @@ export function CorridorScene({ quality }: { quality: Quality }) {
           );
     let fov = base;
     if (phase === 'warp') {
-      z = THREE.MathUtils.lerp(railZ, d.apseZ + 1.6, warp.p);
-      fov = base + 30 * warp.p * warp.p;
+      // half a step forward while the veil comes down — a lean, not a dive
+      z = railZ - 0.5 * warp.p;
+      fov = base - 3 * warp.p;
     }
 
     const k = dampK(0.075, delta);

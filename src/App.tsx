@@ -26,13 +26,15 @@ import { ControlHints } from './ui/ControlHints';
 import { HelpBubble } from './ui/HelpBubble';
 import { CursorRing } from './ui/CursorRing';
 import { LoadingBar } from './ui/LoadingBar';
+import { MuseumLoader } from './ui/MuseumLoader';
 import { OrientationGate } from './ui/OrientationGate';
 import { SmallScreenNotice } from './ui/SmallScreenNotice';
 import { ZoomControls } from './ui/ZoomControls';
 import { useIsTouch } from './lib/device';
-import { FlashLayer } from './ui/Flash';
+import { VeilLayer } from './ui/Veil';
 import { endReveal, startReveal } from './transitions/reveal';
 import { asset } from './lib/asset';
+import { loadArtwork } from './glyph/artworkLoader';
 import { attention, roomTone, setSound, sfx, soundEnabled, soundStored } from './lib/audio';
 import { loadAtlas, useAtlas } from './state/atlas';
 import { BOOT_STEPS, markBoot, useBoot } from './state/boot';
@@ -186,6 +188,24 @@ export default function App() {
     const h = w.requestIdleCallback(warm, { timeout: 4000 });
     return () => w.cancelIdleCallback?.(h);
   }, [phase]);
+
+  /*
+   * The painting a visitor is about to walk into, fetched before they do.
+   *
+   * Hovering a canvas in the corridor is the strongest hint this site ever
+   * gets about what is wanted next, and clicking it is a certainty. Either
+   * one starts the work's glyph field downloading, along with the room's
+   * code, so by the time the veil is down there is little or nothing left to
+   * wait for behind it.
+   */
+  const hoveredWork = useStore((s) => s.hoveredWork);
+  useEffect(() => {
+    const i = phase === 'warp' ? useStore.getState().index : hoveredWork?.index ?? -1;
+    const work = i >= 0 ? artworks[i] : undefined;
+    if (!work) return;
+    void import('./scenes/GalleryScene');
+    void loadArtwork(work.id, tier).catch(() => {});
+  }, [phase, hoveredWork, artworks, tier]);
 
   useEffect(() => attachPointer(), []);
   // zoom is a gallery gesture; see attachZoom
@@ -355,6 +375,7 @@ export default function App() {
       <div className={`reveal-vignette ${revealed ? 'is-on' : ''}`} aria-hidden />
 
       {curtain && <LoadingBar closing={phase !== 'boot'} />}
+      <MuseumLoader />
       <LandingLayer />
       <MapOverlay />
       <Placard />
@@ -431,7 +452,7 @@ export default function App() {
         {atlasOpen && <AtlasView />}
       </Suspense>
       <AtlasToast />
-      <FlashLayer />
+      <VeilLayer />
       <CursorRing />
       {/* a precondition rather than a phase: it sits over everything and the
           exhibition keeps running underneath it */}
@@ -512,21 +533,28 @@ function ExposureRig({ exposure }: { exposure: number }) {
 }
 
 /**
- * Drops the budget a step if the room is genuinely not keeping up.
+ * Keeps the room keeping up.
  *
  * Detection guesses from hardware; this measures. It samples frame times over
- * a few seconds of real rendering and steps down once if the median is below
- * roughly 24fps, which is where panning starts to feel like it is dragging.
+ * a couple of seconds of real rendering and, if the median is well short of
+ * the frame rate the budget asked for, does the cheapest thing that helps.
  *
- * Two things it deliberately does not do: it never steps *up*, because
- * oscillating between budgets is worse than sitting on the lower one; and it
- * never overrides a visitor who has picked a level, because being second-
- * guessed by the page is more annoying than a slow frame.
+ * FIRST THE PIXELS, THEN THE FEATURES. On a laptop at 2× the canvas is four
+ * times the pixels of the same window at 1×, and every one of them is lit,
+ * shadowed and (on Rich) reflected. Drawing at 1.5× instead is hard to see
+ * and frees most of that, so the resolution steps down first, a notch at a
+ * time, and the budget only drops a level once there is no resolution left to
+ * give. Nothing is ever switched off that the visitor can't switch back on —
+ * the quality toggle still offers every level.
  *
- * The frames it measures are the ones FrameGovernor let through, so a capped
- * room reads as 30 or 60 rather than as whatever the machine could manage.
- * That is the right thing to measure — it is what the visitor is looking at —
- * and 24 sits below every cap, so a budget can never trip its own watchdog.
+ * It re-measures after every step, because one step is often enough, and it
+ * never steps back up: oscillating between budgets is worse than sitting on
+ * the lower one. A visitor who has picked a level keeps it — only the
+ * resolution, which they never chose, is adjusted under them.
+ *
+ * The frames it measures are the ones FrameGovernor let through, so the bar
+ * is set against the budget's own cap: a 30fps budget is not "slow" for
+ * running at 30.
  */
 function FrameWatchdog({
   quality,
@@ -535,28 +563,50 @@ function FrameWatchdog({
   quality: QualityName;
   onStruggling: (q: QualityName) => void;
 }) {
+  const setDpr = useThree((s) => s.setDpr);
+  const gl = useThree((s) => s.gl);
   const samples = useRef<number[]>([]);
-  const done = useRef(false);
   const last = useRef(0);
+  /** frames to ignore after a change, while the room settles */
+  const settle = useRef(30);
+  const giveUp = useRef(false);
+
+  // a new budget is a new room to measure
+  useEffect(() => {
+    samples.current = [];
+    settle.current = 30;
+  }, [quality]);
 
   useFrame(() => {
-    if (done.current || storedQuality()) return;
+    if (giveUp.current) return;
     const now = performance.now();
-    if (last.current) {
-      const dt = now - last.current;
-      // ignore the first frames after a scene swap, which are always slow
-      if (dt < 500) samples.current.push(dt);
-    }
+    const dt = last.current ? now - last.current : 0;
     last.current = now;
-
-    if (samples.current.length < 180) return;
-    done.current = true;
-    const sorted = [...samples.current].sort((a, b) => a - b);
-    const median = sorted[sorted.length >> 1];
-    if (median > 1000 / 24) {
-      const next = stepDown(quality);
-      if (next) onStruggling(next);
+    if (settle.current > 0) {
+      settle.current--;
+      return;
     }
+    // ignore the gaps of a scene swap or a hidden tab, which are not frame times
+    if (dt <= 0 || dt > 500) return;
+    samples.current.push(dt);
+    if (samples.current.length < 120) return;
+
+    const sorted = [...samples.current].sort((a, b) => a - b);
+    samples.current = [];
+    const median = sorted[sorted.length >> 1];
+    const target = 1000 / qualityFor(quality).maxFps;
+    // a third slower than asked for is where a pan starts to feel like a drag
+    if (median <= Math.max(target * 1.33, 1000 / 45)) return;
+
+    const dpr = gl.getPixelRatio();
+    if (dpr > 1.01) {
+      setDpr(Math.max(1, Math.round((dpr - 0.25) * 4) / 4));
+      settle.current = 30;
+      return;
+    }
+    const next = storedQuality() ? null : stepDown(quality);
+    if (next) onStruggling(next);
+    else giveUp.current = true;
   });
   return null;
 }

@@ -1,7 +1,7 @@
 /**
  * Application state machine
  *
- * BOOT → LANDING →(T1 portal)→ CORRIDOR →(T2)→ MAP →(T3 warp)→ GALLERY
+ * BOOT → LANDING →(T1 portal)→ CORRIDOR →(T2)→ MAP →(T3 veil)→ GALLERY
  * ARTWORK is a sub-state of GALLERY (the camera does not move), so it is
  * modelled as `revealed: boolean` on the gallery phase rather than a phase
  * of its own. MAP ⇄ CORRIDOR and GALLERY → MAP go backwards on Esc.
