@@ -179,7 +179,7 @@ export function Credits() {
               <section>
                 <h3 className="meta credits-section">The museums</h3>
                 <p className="body credits-note">
-                  All seven rooms are modelled on a real one and named after it. Nothing here is
+                  All seven rooms are modelled after real ones and named after there. Nothing here is
                   affiliated with them and the works are theirs.
                   Every corridor title links out to the museum&rsquo;s own site, and so do these.
                 </p>
