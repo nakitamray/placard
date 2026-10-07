@@ -24,6 +24,7 @@ import { loadMuseum, useStore } from '../state/store';
 import { pointer } from '../state/motion';
 import { imageUrl } from '../lib/image';
 import { exhibitionWorks, heroWorks, shuffled, type ExhibitionWork } from '../state/works';
+import { markOpening, useOpening, whenWritten } from '../state/opening';
 
 const HOLD_MS = 7000;
 /* Long, and linear. A short crossfade between two full-bleed paintings reads
@@ -165,55 +166,72 @@ export function LandingLayer() {
 
   if (phase !== 'landing' && !leaving) return null;
 
+  /*
+   * Into a museum, behind its opening screen.
+   *
+   * The screen comes up at once — the click is answered in the same frame —
+   * and the work it covers runs in parallel where it can: the manifest and
+   * the corridor's code together, then the ten paintings for its walls. The
+   * corridor is mounted behind the screen as soon as those are in, compiles
+   * its materials there and reports the last step itself (CorridorScene), so
+   * the screen lifts onto a room that is already drawing rather than one
+   * still assembling.
+   *
+   * The push-through is kept, and shortened: the headline and the list still
+   * fly outward past the visitor, now into the opening screen rather than
+   * into a corridor that was not ready for them.
+   */
   const enter = async (id: string, el: HTMLElement) => {
     if (leaving || loadingId) return;
+    const entry = museums.find((m) => m.id === id);
     setError(null);
     setMuseumLoading(id);
+    if (entry) useOpening.getState().start(entry);
+
+    if (!reducedMotion && !seenIntro) {
+      el.classList.add('is-chosen');
+      gsap.to(contentRef.current, { opacity: 0, scale: 1.16, duration: 0.45, ease: 'power2.in' });
+      gsap.to(bgRef.current, { scale: 1.08, duration: 0.6, ease: 'power2.inOut' });
+    }
+
     let museum;
+    let corridorModule;
     try {
-      museum = await loadMuseum(id);
+      [museum, corridorModule] = await Promise.all([
+        loadMuseum(id),
+        import('../scenes/CorridorScene'),
+      ]);
     } catch {
       setMuseumLoading(null);
+      useOpening.getState().clear();
+      el.classList.remove('is-chosen');
+      gsap.set([bgRef.current, contentRef.current], { clearProps: 'all' });
       setError('That wing could not be opened. Run `pnpm build:assets` and reload.');
       return;
     }
+    // the screen is made of who hangs here, as soon as we know
+    useOpening
+      .getState()
+      .setWords(museum.artworks.map((a) => `${a.artist} — ${a.title} · `).join(''));
+    markOpening('plan');
+
+    await corridorModule.preloadWalls(museum.artworks);
+    markOpening('walls');
+    await whenWritten();
+
     setMuseum(museum);
     setMuseumLoading(null);
     setLeaving(true);
-
-    const root = rootRef.current!;
-    if (reducedMotion || seenIntro) {
-      gsap.to(root, {
-        opacity: 0,
-        duration: 0.4,
-        onComplete: () => {
-          setPhase('corridor');
-          setLeaving(false);
-        },
-      });
-      return;
-    }
-
-    // T1 push-through: landing layers scale outward at differing rates
-    // (foreground fastest) while the corridor dollies in behind
-    el.classList.add('is-chosen');
-    const finish = () => {
-      setLeaving(false);
-      gsap.set([root, bgRef.current, contentRef.current], { clearProps: 'all' });
-    };
-    // the overlay must come down even if the timeline never reports complete,
-    // or a full-screen layer sits over the corridor swallowing every click
-    const failsafe = window.setTimeout(finish, 1600);
-    const tl = gsap.timeline({
+    setPhase('corridor');
+    // the landing layer is behind the screen now; take it down without a show
+    gsap.to(rootRef.current, {
+      opacity: 0,
+      duration: 0.25,
       onComplete: () => {
-        window.clearTimeout(failsafe);
-        finish();
+        setLeaving(false);
+        gsap.set([rootRef.current, bgRef.current, contentRef.current], { clearProps: 'all' });
       },
     });
-    tl.to(contentRef.current, { opacity: 0, scale: 1.22, duration: 0.7, ease: 'power2.in' }, 0.15);
-    tl.to(bgRef.current, { scale: 1.12, duration: 1.2, ease: 'power2.inOut' }, 0);
-    tl.to(root, { opacity: 0, duration: 0.9, ease: 'power2.inOut' }, 0.3);
-    setPhase('corridor');
   };
 
   return (

@@ -133,6 +133,23 @@ button:active { transform: translateY(1px); }
   .loading { transition: none; }
 }
 
+/* ─── opening a museum — see ui/MuseumLoader.tsx ──────────────────────────
+   The wall is painted into the canvas, writing itself in over the entrance;
+   the layer itself is clear. It leaves the way the entrance curtain does — a
+   long fade over a corridor already drawing underneath it — and stops taking
+   the pointer the moment it starts to go. The fade is the compositor's, so
+   nothing the page is busy with can make it stutter. */
+.museum-loader {
+  position: fixed; inset: 0; z-index: 60;
+  opacity: 1;
+  transition: opacity 950ms var(--e-both);
+}
+.museum-loader.is-closing { opacity: 0; pointer-events: none; }
+.museum-loader-field { position: absolute; inset: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .museum-loader { transition-duration: 200ms; }
+}
+
 .webgl-missing {
   position: fixed; inset: 0; display: grid; place-items: center;
   background: var(--bone); color: var(--ink); padding: var(--s6); text-align: center;
@@ -490,6 +507,9 @@ button:active { transform: translateY(1px); }
   opacity: 0; transition: opacity 700ms var(--e-both) 200ms;
 }
 .reveal-vignette.is-on { opacity: 1; }
+
+/* the list fading over the room chosen from it must never catch a click */
+.map-overlay.is-leaving { pointer-events: none; }
 
 /* ─── warp flash ─── */
 .flash {

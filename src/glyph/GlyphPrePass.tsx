@@ -82,6 +82,7 @@ export function GlyphPrePass({
   inkLift,
   sizeScale,
   clearAlpha = 1,
+  resolution,
   target,
 }: {
   artwork: LoadedArtwork | null;
@@ -94,6 +95,17 @@ export function GlyphPrePass({
   sizeScale?: number;
   /** 0 renders the field on transparency, so it can be composited over paint */
   clearAlpha?: number;
+  /**
+   * The size the field should be drawn at, in pixels, read every frame.
+   *
+   * Without it the target is a fixed square, which is right for the landing
+   * hero and wrong for a canvas you can walk up to: a 2048 square stretched
+   * over a landscape painting has its letters squashed one way, and leaning
+   * in magnifies them until each one is a smear of a few texels. The gallery
+   * writes here the size the work actually covers on screen, and the target
+   * follows it.
+   */
+  resolution?: { w: number; h: number };
   /**
    * Somewhere to publish this pass's render target other than the shared
    * `glyphRT`. Two fields can then be on screen at once — which is what a
@@ -215,6 +227,10 @@ export function GlyphPrePass({
 
   useFrame((_, delta) => {
     if (!active || !artwork || !meshRef.current) return;
+    if (resolution && (resolution.w !== rt.width || resolution.h !== rt.height)) {
+      rt.setSize(resolution.w, resolution.h);
+      dirty.current = true;
+    }
     // corpus animation frozen under prefers-reduced-motion
     if (!reducedMotion) {
       timeRef.current += delta;

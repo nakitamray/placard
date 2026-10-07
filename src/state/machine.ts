@@ -17,7 +17,8 @@ const ALLOWED: Record<Phase, Phase[]> = {
   // have to walk to the far wall and use the plan to reach a canvas you can
   // already see
   corridor: ['map', 'landing', 'warp'],
-  map: ['corridor', 'warp'],
+  // the list of rooms fades straight into the one chosen — see MapOverlay
+  map: ['corridor', 'warp', 'gallery'],
   warp: ['gallery'],
   gallery: ['map'],
 };
